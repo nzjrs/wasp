@@ -11,5 +11,5 @@ Documentation
    :maxdepth: 2
 
    sw/doc/autopilot
-
+   sw/test/tinyxml
 
