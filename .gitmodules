@@ -1,0 +1,3 @@
+[submodule "sw/groundstation/libserial"]
+	path = sw/groundstation/libserial
+	url = git://github.com/nzjrs/libserial.git
