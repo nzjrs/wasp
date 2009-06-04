@@ -1,0 +1,2 @@
+./run.sh ./groundstation.py
+./run.sh ./booz-serial-monitor.py
