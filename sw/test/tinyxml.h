@@ -1770,6 +1770,13 @@ private:
 	TIXML_STRING lineBreak;
 };
 
+/** Frobnicates rapidly.
+
+    \param a Your mum
+    \param c me
+*/
+char *frobnicate(int a, char c);
+
 
 #ifdef _MSC_VER
 #pragma warning( pop )

@@ -13,3 +13,11 @@ Documentation
    sw/doc/autopilot
    sw/test/tinyxml
 
+doxygenfunction Directive Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This should work.
+
+.. doxygenfunction:: frobnicate
+   :project: tinyxml
+

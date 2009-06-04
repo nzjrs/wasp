@@ -90,6 +90,12 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+# -- Options for breath doxygen bridge ---------------------------------------------------
+
+breathe_projects = {
+    "tinyxml":"doc/built/tinyxml/xml/"
+}
+breathe_default_project = "tinyxml"
 
 # -- Options for HTML output ---------------------------------------------------
 
