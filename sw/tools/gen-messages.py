@@ -3,6 +3,7 @@
 import xmlobject
 import gentools
 
+import string
 import optparse
 import re
 import os.path
@@ -42,20 +43,18 @@ class Message:
                 self.fields = [m.field]
         except:
             self.fields = []
-        self.sizes = ["0"] + [str(get_field_length(f.type)) for f in self.fields]
 
-class _Writer:
+        sizes = [get_field_length(f.type) for f in self.fields]
 
-    def __init__(self, messages):
+        self.size = sum(sizes)
+        self.sizes = ["0"] + [str(s) for s in sizes]
+
+class _Writer(object):
+
+    def __init__(self, messages, note, messages_file):
         self.messages = messages
-
-    def _print_id(self, m):
-        name = m.name.upper()
-        print "#define MESSAGE_ID_%s %d" % (name, m.id)
-
-    def _print_length(self, m):
-        name = m.name.upper()
-        print "#define MESSAGE_LENGTH_%s (%s)" % (name, "+".join(m.sizes))
+        self.note = note
+        self.messages_path = messages_path
 
     def preamble(self):
         pass
@@ -66,7 +65,34 @@ class _Writer:
     def postamble(self):
         pass
 
-class MacroWriter(_Writer):
+class _CWriter(_Writer):
+
+    def _print_id(self, m):
+        name = m.name.upper()
+        print "#define MESSAGE_ID_%s %d" % (name, m.id)
+
+    def _print_length(self, m):
+        name = m.name.upper()
+        print "#define MESSAGE_LENGTH_%s (%s)" % (name, "+".join(m.sizes))
+
+    def preamble(self):
+        gentools.print_header(
+            "%s_H" % self.note.upper(),
+            generatedfrom=self.messages_path)
+
+        print "#include \"std.h\""
+        print
+        for m in self.messages:
+            self._print_id(m)
+        print
+        for m in self.messages:
+            self._print_length(m)
+        print
+
+    def postamble(self):
+        gentools.print_footer("%s_H" % self.note.upper())
+
+class MacroWriter(_CWriter):
 
     def _print_send_function(self, m):
         name = m.name.upper()
@@ -104,19 +130,18 @@ class MacroWriter(_Writer):
 
 
     def preamble(self):
-        print "#include \"std.h\""
-        print
-        print "#define _Put1ByteByAddr(_byte) {	 \\"
-        print "\tuint8_t _x = *(_byte);		 \\"
-        print "\tDownlinkPutUint8(_x);	 \\"
+        _CWriter.preamble(self)
+        print "#define _Put1ByteByAddr(_byte) {     \\"
+        print "\tuint8_t _x = *(_byte);         \\"
+        print "\tDownlinkPutUint8(_x);     \\"
         print "}"
         print "#define _Put2ByteByAddr(_byte) { \\"
-        print "\t_Put1ByteByAddr(_byte);	\\"
-        print "\t_Put1ByteByAddr((const uint8_t*)_byte+1);	\\"
+        print "\t_Put1ByteByAddr(_byte);    \\"
+        print "\t_Put1ByteByAddr((const uint8_t*)_byte+1);    \\"
         print "}"
         print "#define _Put4ByteByAddr(_byte) { \\"
-        print "\t_Put2ByteByAddr(_byte);	\\"
-        print "\t_Put2ByteByAddr((const uint8_t*)_byte+2);	\\"
+        print "\t_Put2ByteByAddr(_byte);    \\"
+        print "\t_Put2ByteByAddr((const uint8_t*)_byte+2);    \\"
         print "}"
         print "#define _PutInt8ByAddr(_x) _Put1ByteByAddr(_x)"
         print "#define _PutUint8ByAddr(_x) _Put1ByteByAddr((const uint8_t*)_x)"
@@ -126,12 +151,6 @@ class MacroWriter(_Writer):
         print "#define _PutUint32ByAddr(_x) _Put4ByteByAddr((const uint8_t*)_x)"
         print "#define _PutFloatByAddr(_x) _Put4ByteByAddr((const uint8_t*)_x)"
         print
-        for m in self.messages:
-            self._print_id(m)
-        print
-        for m in self.messages:
-            self._print_length(m)
-        print
 
     def body(self):
         for m in self.messages:
@@ -140,7 +159,7 @@ class MacroWriter(_Writer):
         for m in self.messages:
             self._print_accessor(m)
 
-class FunctionWriter(_Writer):
+class FunctionWriter(_CWriter):
 
     def _print_pack_function(self, m):
         name = m.name.lower()
@@ -150,6 +169,7 @@ class FunctionWriter(_Writer):
         print "}"
 
     def preamble(self):
+        _CWriter.preamble(self)
         print "static inline void message_start(uint8_t id, uint8_t len)\n{\n}"
 
 #    comm_send_ch(chan, STX);
@@ -166,17 +186,79 @@ class FunctionWriter(_Writer):
 #    comm_send_ch(chan, comm_status[chan].ck_a);
 #    comm_send_ch(chan, comm_status[chan].ck_a);
 
-    
     def body(self):
         for m in self.messages:
             self._print_pack_function(m)
+
+class RSTWriter(_Writer):
+
+    TABLE_COL_W  = 10
+    TABLE_GAP_W  = 1
+    TABLE_HEADER = '='*TABLE_COL_W
+    HEADING_LEVELS = ('=','-','^','"')
+
+    def _write_header(self, name, level=0):
+        print name
+        print self.HEADING_LEVELS[level]*len(name)
+        
+    def _write_table(self, m, indent=None):
+        def _print_field(name, _type, center=False, gap=" "):
+            if center:
+                f = string.center
+            else:
+                f = string.ljust
+
+            if indent:
+                print indent,
+            print "%s%s%s" % ( f(name,self.TABLE_COL_W), gap*self.TABLE_GAP_W, f(_type, self.TABLE_COL_W))
+
+        def _print_header():
+            _print_field(self.TABLE_HEADER, self.TABLE_HEADER, center=True)
+
+        def _print_title(name):
+            title_w = 2*self.TABLE_COL_W + self.TABLE_GAP_W
+            title_ul = "-"*self.TABLE_COL_W
+
+            if indent:
+                print indent,
+            print string.center(name, title_w)
+            _print_field(title_ul, title_ul, gap="-")
+
+        _print_header()
+        _print_title("Payload")
+        _print_field("name", "type", center=True)
+        _print_header()
+        
+        for f in m.fields:
+            _print_field(f.name, f.type)
+        
+        _print_header()
+
+    def preamble(self):
+        self._write_header("Messages")
+        print
+        self._write_header("Message Definitions", level=2)
+        print
+
+    def body(self):
+        for m in self.messages:
+
+            print " * **%s**" % m.name
+            print 
+            print "   *ID:* %s" % m.id
+            print
+            print "   *Payload Length:* %s" % m.size
+            print
+            self._write_table(m, indent="  ")
+            print
+
         
 
 if __name__ == "__main__":
-    H = "MESSAGES_H"
     OUTPUT_MODES = {
         "macro"     :   MacroWriter,
         "function"  :   FunctionWriter,
+        "rst"          :   RSTWriter,
     }
     OUTPUT_MODES_DEFAULT = "macro"
     OUTPUT_MODES_LIST = ", ".join(OUTPUT_MODES)
@@ -207,14 +289,11 @@ if __name__ == "__main__":
         import traceback
         parser.error("invalid xml\n%s" % traceback.format_exc())
 
-    gentools.print_header(H, generatedfrom=messages_path)
-
-    writer = klass(messages)
+    writer = klass(messages, "messages", messages_path)
     writer.preamble()
     writer.body()
     writer.postamble()
 
-    gentools.print_footer(H)
 
 
 
