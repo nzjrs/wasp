@@ -43,7 +43,7 @@ class TransportParser:
 
     def __init__(self, check_crc=True, debug=False):
         self._check_crc = check_crc
-        self._debug = debug
+        self._dbg = debug
         self._buf = array.array('c','\0'*256)
         self._state = self.STATE_UNINIT
         self._payload_len = 0
@@ -51,6 +51,10 @@ class TransportParser:
         self._ck_a = 0
         self._ck_b = 0
         self._error = 0
+
+    def _debug(self, msg):
+        if self._dbg:
+            print msg
 
     def parse_many(self, string):
         """
@@ -122,17 +126,20 @@ class TransportParser:
         #convert to 8bit int
         d = ord(c)
 
+        #if self._debug:
+        #    print "0x%X" % d
+
         if self._state == self.STATE_UNINIT:
             if d == 0x99:
                 self._state += 1
+                self._debug("-- STX")
         elif self._state == self.STATE_GOT_STX:
             self._payload_len = d - 4
             self._ck_a = d
             self._ck_b = d
             self._payload_idx = 0
             self._state += 1
-            if self._debug: 
-                print "TR LEN=%s PL LEN=%s" % (self._payload_len, d)
+            self._debug("-- SIZE: TR (%s) PL (%s)" % (self._payload_len, d))
         elif self._state == self.STATE_GOT_LENGTH:
             self._buf[self._payload_idx] = c
             #wrap to 8bit (simulate 8 bit addition)
@@ -141,21 +148,23 @@ class TransportParser:
             self._payload_idx += 1
             if self._payload_idx == self._payload_len:
                 self._state += 1
+                self._debug("-- PL")
         elif self._state == self.STATE_GOT_PAYLOAD:
             if d != self._ck_a and self._check_crc:
                 error = True
-                if self._debug:
-                    print "CRC_A ERROR: ACID=%s MSG=%s" % (ord(self._buf[0]), ord(self._buf[1]))
+                self._debug("-- CRC_A ERROR")
             else:
                 self._state += 1
+                self._debug("-- CRC_A OK")
         elif self._state == self.STATE_GOT_CRC1:
             if d != self._ck_b and self._check_crc:
                 error = True
-                if self._debug:
-                    print "CRC_B ERROR"
+                self._debug("-- CRC_B ERROR")
             else:
                 payload = self._buf[:self._payload_len].tostring()
                 self._state = self.STATE_UNINIT
+                self._debug("-- CRC_B OK")
+                self._debug("-- FIN: ACID (%s) MSG (%s)\n" % (ord(self._buf[0]), ord(self._buf[1])))
 
         if error:
             self._error += 1
