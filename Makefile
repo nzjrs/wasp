@@ -9,13 +9,16 @@ ALLSPHINXOPTS   = -d $(DOCDIR)/.doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 doc: mkdir generated html
 
-generated: $(BUILT_DOCDIR)/onboard/xml/index.xml
+generated: $(BUILT_DOCDIR)/onboard/xml/index.xml sw/doc/messages.rst
 
 mkdir:
 	@mkdir -p $(BUILT_DOCDIR)
 
 $(BUILT_DOCDIR)/onboard/xml/index.xml:
 	DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen sw/onboard/doxygen.cfg
+
+sw/doc/messages.rst: sw/onboard/conf-john/messages.xml
+	./sw/tools/gen-messages.py -m sw/onboard/conf-john/messages.xml -f rst > sw/doc/messages.rst
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) doc/built/html
