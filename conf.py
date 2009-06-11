@@ -93,15 +93,15 @@ pygments_style = 'sphinx'
 # -- Options for breath doxygen bridge ---------------------------------------------------
 
 breathe_projects = {
-    "tinyxml":"doc/built/tinyxml/xml/"
+    "onboard":"doc/built/onboard/xml/"
 }
-breathe_default_project = "tinyxml"
+breathe_default_project = "onboard"
 
 # -- Options for HTML output ---------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'blue'
+html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
