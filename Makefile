@@ -9,13 +9,13 @@ ALLSPHINXOPTS   = -d $(DOCDIR)/.doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 doc: mkdir generated html
 
-generated: $(BUILT_DOCDIR)/tinyxml/xml/index.xml
+generated: $(BUILT_DOCDIR)/onboard/xml/index.xml
 
 mkdir:
 	@mkdir -p $(BUILT_DOCDIR)
 
-$(BUILT_DOCDIR)/tinyxml/xml/index.xml:
-	DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen sw/test/doxygen.cfg
+$(BUILT_DOCDIR)/onboard/xml/index.xml:
+	DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen sw/onboard/doxygen.cfg
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) doc/built/html

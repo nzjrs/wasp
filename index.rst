@@ -11,13 +11,8 @@ Documentation
    :maxdepth: 2
 
    sw/doc/autopilot
-   sw/test/tinyxml
+   sw/doc/onboard
+   sw/doc/comm-protocol
 
-doxygenfunction Directive Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This should work.
-
-.. doxygenfunction:: frobnicate
-   :project: tinyxml
 

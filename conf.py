@@ -93,9 +93,9 @@ pygments_style = 'sphinx'
 # -- Options for breath doxygen bridge ---------------------------------------------------
 
 breathe_projects = {
-    "tinyxml":"doc/built/tinyxml/xml/"
+    "onboard":"doc/built/onboard/xml/"
 }
-breathe_default_project = "tinyxml"
+breathe_default_project = "onboard"
 
 # -- Options for HTML output ---------------------------------------------------
 
