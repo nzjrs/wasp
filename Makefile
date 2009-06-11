@@ -14,11 +14,11 @@ doc: mkdir $(GENERATED_FILES) html
 mkdir:
 	@mkdir -p $(BUILT_DOCDIR)
 
-$(BUILT_DOCDIR)/onboard/xml/index.xml:
-	DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen sw/onboard/doxygen.cfg
+$(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg
+	DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen $<
 
 sw/doc/messages.txt: sw/onboard/conf-john/messages.xml
-	./sw/tools/gen-messages.py -m sw/onboard/conf-john/messages.xml -f rst > sw/doc/messages.txt
+	./sw/tools/gen-messages.py -m $< -f rst > $@
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) doc/built/html
@@ -26,6 +26,6 @@ html:
 	@echo "Build finished. The HTML pages are in doc/html."
 
 clean:
-	-rm -rf $(BUILT_DOCDIR) $(DOCDIR)/.doctrees
+	-rm -rf $(BUILT_DOCDIR) $(DOCDIR)/.doctrees $(GENERATED_FILES)
 
 .PHONY: doc clean
