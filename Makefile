@@ -15,7 +15,7 @@ mkdir:
 	@mkdir -p $(BUILT_DOCDIR)
 
 $(BUILT_DOCDIR)/tinyxml/xml/index.xml:
-	DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen sw/test/tinyxml.cfg
+	DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen sw/test/doxygen.cfg
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) doc/built/html
