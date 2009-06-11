@@ -1,3 +1,4 @@
+import optparse
 import os.path
 import struct
 
@@ -191,27 +192,20 @@ class Message:
         return "<Message: %s (%s)>" % (self._name, self._id)
 
 class MessagesFile:
-    def __init__(self, xmlfile, class_name="telemetry"):
-        self._c = None
-
+    def __init__(self, xmlfile):
         if not os.path.exists(xmlfile):
             raise Exception("Message file not found: %s" % xmlfile)
 
         try:
-            for c in xmlobject.XMLFile(path=xmlfile).protocol.CLASS:
-                if c.name == class_name:
-                    self._c = c
+            self._messages = xmlobject.XMLFile(path=xmlfile).root.message
         except AttributeError:
-            print "ERROR PARSING MESSAGES"
-
-        if not self._c:
-            raise Exception("Message Class: %s Not Found" % class_name)
+            raise Exception("Error parsing messages")
         
         self._msgs_by_id = {}
         self._msgs_by_name = {}
 
     def parse(self, debug=False):
-        for m in self._c.message:
+        for m in self._messages:
             try:
                 msg = Message(m.name, m.id, m)
                 self._msgs_by_id[int(m.id)] = msg
