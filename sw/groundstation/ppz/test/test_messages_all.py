@@ -7,7 +7,7 @@ import ppz.messages as messages
 path = testsetup.get_messages()
 data = open(os.path.join(testsetup.TEST_DIR,"capture.dat")).read()
 
-t = transport.TransportParser(check_crc=False, debug=False)
+t = transport.Transport(check_crc=False, debug=False)
 m = messages.MessagesFile(path)
 m.parse(debug=True)
 

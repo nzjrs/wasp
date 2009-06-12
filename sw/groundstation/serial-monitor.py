@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     m = messages.MessagesFile(xmlfile=options.messages, debug=options.debug)
     s = transport.SerialTransport(port=options.port, speed=options.speed, timeout=options.timeout)
-    t = transport.TransportParser(check_crc=options.crc, debug=options.debug)
+    t = transport.Transport(check_crc=options.crc, debug=options.debug)
 
     s.connect_to_port()
     m.parse()

@@ -3,7 +3,7 @@ import os.path
 import testsetup
 import ppz.transport as transport
 
-p = transport.TransportParser(check_crc=False, debug=False)
+p = transport.Transport(check_crc=False, debug=False)
 
 data = open(os.path.join(testsetup.TEST_DIR,"capture.dat")).read()
 

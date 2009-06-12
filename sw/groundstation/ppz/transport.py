@@ -27,7 +27,7 @@ class TransportHeaderFooter:
         self.ck_a = ck_a
         self.ck_b = ck_b
 
-class TransportParser:
+class Transport:
     """
     Class that extracts a paparazzi payload from a string or 
     sequence of characters from the transport layer
