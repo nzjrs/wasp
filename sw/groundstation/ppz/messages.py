@@ -23,23 +23,23 @@ class MessageError(Exception):
 
 class Field:
     def __init__(self, name, typ, node):
-        self._type = typ
-        self._name = name
+        self.type = typ
+        self.name = name
 
-        if self._type == "uint8":
+        if self.type == "uint8":
             try:
                 self._enum_values = node.values.split("|")
             except AttributeError:
                 self._enum_values = []
     
-        if self._type.endswith("[]"):
-            typ = self._type.split("[]")[0]
+        if self.type.endswith("[]"):
+            typ = self.type.split("[]")[0]
             self._is_array = True
             self._format = TYPE_TO_STRUCT_MAP[typ]
             self._size = struct.calcsize(self._format)
         else:
             self._is_array = False
-            self._format = MESSAGE_ENDIANESS+TYPE_TO_STRUCT_MAP[self._type]
+            self._format = MESSAGE_ENDIANESS+TYPE_TO_STRUCT_MAP[self.type]
             self._size = struct.calcsize(self._format)
 
         try:
@@ -57,7 +57,13 @@ class Field:
         except:
             self._coef = 1
 
-        self._isenum = self._type == "uint8" and self._enum_values
+        self._isenum = self.type == "uint8" and self._enum_values
+
+    def _get_python_type(self):
+        if self.type == "float":
+            return float
+        else:
+            return int    
 
     def is_array(self):
         return self._is_array
@@ -85,7 +91,21 @@ class Field:
             return struct.unpack(MESSAGE_ENDIANESS+(l*self._format),buf[start:]), start
         else:
             return struct.unpack(self._format,buf[start]), start + self._size
-            
+
+    def get_default_value(self):
+        klass = self._get_python_type()
+        return klass()
+
+    def interpret_value_from_user_string(self, string, default=None):
+        klass = self._get_python_type()
+        try:
+            return klass(string)
+        except ValueError:
+            #invalid user input for type
+            if default:
+                return default
+            else:
+                return klass()
 
     def get_printable_value(self, value):
         if self._is_array:
@@ -104,14 +124,14 @@ class Field:
                 return self._fstr % (self._coef * value)
 
     def __str__(self):
-        return "<Field: %s (%s)>" % (self._name, self._type)
+        return "<Field: %s (%s)>" % (self.name, self.type)
 
 
 class Message:
 
     def __init__(self, name, id, node):
-        self._name = name
-        self._id = id
+        self.name = name
+        self.id = id
         self._fields = []
         self._fields_by_name = {}
         self._contains_array_field = False
@@ -137,10 +157,10 @@ class Message:
                     self._fields_by_name[f.name] = field
                 except KeyError:
                     #messages must contain a type we know how to process
-                    raise MessageError("Field in %s message is an unknown type (%s)" % (self._name, f.type))
+                    raise MessageError("Field in %s message is an unknown type (%s)" % (self.name, f.type))
                 except AttributeError:
                     #messages must contain a name and a type at least
-                    raise MessageError("Field in %s message %s is missing a name or type attribute" % self._name)
+                    raise MessageError("Field in %s message %s is missing a name or type attribute" % self.name)
 
             #cache the struct for performace reasons
             self._struct = struct.Struct(format)
@@ -206,13 +226,13 @@ class Message:
                             for i in range(len(self._fields))])
 
     def get_id(self):
-        return int(self._id)
+        return int(self.id)
 
     def get_size(self):
         return sum([f.get_size(0,0) for f in self._fields])
 
     def __str__(self):
-        return "<Message: %s (%s)>" % (self._name, self._id)
+        return "<Message: %s (%s)>" % (self.name, self.id)
 
 class MessagesFile:
     def __init__(self, xmlfile, debug):
