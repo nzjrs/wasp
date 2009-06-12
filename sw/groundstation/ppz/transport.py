@@ -18,6 +18,14 @@ class SerialTransport(libserial.SerialSender.SerialSender):
         if self.is_open():
             self._serial.write(data)
 
+class TransportHeaderFooter:
+    def __init__(self, stx, length, acid, msgid, ck_a, ck_b):
+        self.stx = stx
+        self.length = length
+        self.acid = acid
+        self.msgid = msgid
+        self.ck_a = ck_a
+        self.ck_b = ck_b
 
 class TransportParser:
     """
@@ -27,30 +35,35 @@ class TransportParser:
     Data is expected in the following form
 
     Transport
-    |STX|length|... payload=(length-4) bytes ...|Checksum A|Checksum B|
+    |STX|length|AC_ID|MESSAGE_ID|... payload=(length-6) bytes ...|Checksum A|Checksum B|
     
     Payload
-    |AC_ID|MESSAGE_ID|... MESSAGE DATA ...|
+    |... MESSAGE DATA ...|
     
     Data sent in little endian byte order
     """
 
-    STATE_UNINIT = 0
-    STATE_GOT_STX = 1
-    STATE_GOT_LENGTH = 2
-    STATE_GOT_PAYLOAD = 3
-    STATE_GOT_CRC1 = 4
+    STATE_UNINIT,       \
+    STATE_GOT_STX,      \
+    STATE_GOT_LENGTH,   \
+    STATE_GOT_ACID,     \
+    STATE_GOT_MSGID,    \
+    STATE_GOT_PAYLOAD,  \
+    STATE_GOT_CRC1 =    range(0,7)
 
     def __init__(self, check_crc=True, debug=False):
         self._check_crc = check_crc
         self._dbg = debug
         self._buf = array.array('c','\0'*256)
         self._state = self.STATE_UNINIT
+        self._total_len = 0
         self._payload_len = 0
         self._payload_idx = 0
         self._ck_a = 0
         self._ck_b = 0
         self._error = 0
+        self._acid = 0
+        self._msgid = 0
 
     def _debug(self, msg):
         if self._dbg:
@@ -65,9 +78,9 @@ class TransportParser:
         """
         payloads = []
         for c in string:
-            p = self.parse_one(c)
+            h,p = self.parse_one(c)
             if p:
-                payloads.append(p)
+                payloads.append((h,p))
         return payloads
 
     def parse_one(self, c):
@@ -80,79 +93,52 @@ class TransportParser:
         is available
         """
 
-        # Adapted from pprz_transport.h
-        #  switch (pprz_status) {
-        #  case UNINIT:
-        #    if (c == STX)
-        #      pprz_status++;
-        #    break;
-        #  case GOT_STX:
-        #    if (pprz_msg_received) {
-        #      pprz_ovrn++;
-        #      goto error;
-        #    }
-        #    pprz_payload_len = c-4; /* Counting STX, LENGTH and CRC1 and CRC2 */
-        #    _ck_a = _ck_b = c;
-        #    pprz_status++;
-        #    payload_idx = 0;
-        #    break;
-        #  case GOT_LENGTH:
-        #    pprz_payload[payload_idx] = c;
-        #    _ck_a += c; _ck_b += _ck_a;
-        #    payload_idx++;
-        #    if (payload_idx == pprz_payload_len)
-        #      pprz_status++;
-        #    break;
-        #  case GOT_PAYLOAD:
-        #    if (c != _ck_a)
-        #      goto error;
-        #    pprz_status++;
-        #    break;
-        #  case GOT_CRC1:
-        #    if (c != _ck_b)
-        #      goto error;
-        #    pprz_msg_received = TRUE;
-        #    goto restart;
-        #  }
-        #  return;
-        # error:
-        #  pprz_error++;
-        # restart:
-        #  pprz_status = UNINIT;
-        #  return;
+        def update_checksum(d):
+            #wrap to 8bit (simulate 8 bit addition)
+            self._ck_a = (self._ck_a + d) % 256
+            self._ck_b = (self._ck_b + self._ck_a) % 256
+
+        def add_to_buf(char, uint8):
+            self._buf[self._payload_idx] = char
+            update_checksum(uint8)
+            self._payload_idx += 1
 
         payload = ""
         error = False
         #convert to 8bit int
         d = ord(c)
 
-        #if self._debug:
-        #    print "0x%X" % d
-
         if self._state == self.STATE_UNINIT:
             if d == 0x99:
                 self._state += 1
                 self._debug("-- STX")
         elif self._state == self.STATE_GOT_STX:
-            self._payload_len = d - 4
-            self._ck_a = d
-            self._ck_b = d
+            self._total_len = d
+            self._payload_len = d - 6
+            self._ck_a = self._total_len
+            self._ck_b = self._total_len
             self._payload_idx = 0
             self._state += 1
-            self._debug("-- SIZE: TR (%s) PL (%s)" % (self._payload_len, d))
+            self._debug("-- SIZE: PL (%s) TOT (%s)" % (self._payload_len, self._total_len))
         elif self._state == self.STATE_GOT_LENGTH:
-            self._buf[self._payload_idx] = c
-            #wrap to 8bit (simulate 8 bit addition)
-            self._ck_a = (self._ck_a + d) % 256
-            self._ck_b = (self._ck_b + self._ck_a) % 256
-            self._payload_idx += 1
+            self._debug("-- ACID: %x" % d)
+            self._acid = d
+            update_checksum(d)
+            self._state += 1
+        elif self._state == self.STATE_GOT_ACID:
+            self._debug("-- MSGID: %x" % d)
+            self._msgid = d
+            update_checksum(d)
+            self._state += 1
+        elif self._state == self.STATE_GOT_MSGID:
+            add_to_buf(c, d)
             if self._payload_idx == self._payload_len:
                 self._state += 1
                 self._debug("-- PL")
         elif self._state == self.STATE_GOT_PAYLOAD:
             if d != self._ck_a and self._check_crc:
                 error = True
-                self._debug("-- CRC_A ERROR")
+                self._debug("-- CRC_A ERROR %x v %x" % (d, self._ck_a))
             else:
                 self._state += 1
                 self._debug("-- CRC_A OK")
@@ -164,12 +150,17 @@ class TransportParser:
                 payload = self._buf[:self._payload_len].tostring()
                 self._state = self.STATE_UNINIT
                 self._debug("-- CRC_B OK")
-                self._debug("-- FIN: ACID (%s) MSG (%s)\n" % (ord(self._buf[0]), ord(self._buf[1])))
 
         if error:
             self._error += 1
             self._state = self.STATE_UNINIT
 
-        return payload
+        return TransportHeaderFooter(
+                    stx=0x99,
+                    length=self._total_len,
+                    acid=self._acid,
+                    msgid=self._msgid,
+                    ck_a=self._ck_a,
+                    ck_b=self._ck_b), payload
 
 
