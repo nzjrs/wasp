@@ -69,7 +69,7 @@ class Field:
         else:
             return self._size
 
-    def get_value(self, buf, start):
+    def unpack_value_from_buffer(self, buf, start):
         if self._is_array:
             l = struct.unpack("B",buf[start])[0]
             start += 1
@@ -156,7 +156,7 @@ class Message:
                 start = 0
                 vals = []
                 for f in self._fields:
-                    v, start = f.get_value(string, start)
+                    v, start = f.unpack_value_from_buffer(string, start)
                     vals += v
                 return vals
             else:
@@ -168,7 +168,7 @@ class Message:
                 start = 0
                 strings = []
                 for f in self._fields:
-                    vals, start = f.get_value(string, start)
+                    vals, start = f.unpack_value_from_buffer(string, start)
                     strings.append(
                                 f.get_printable_value(vals)
                     )

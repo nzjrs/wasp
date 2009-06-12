@@ -4,8 +4,8 @@ import testsetup
 import ppz.transport as transport
 import ppz.messages as messages
 
+path = testsetup.get_messages()
 data = open(os.path.join(testsetup.TEST_DIR,"capture.dat")).read()
-path = "/home/john/UAV/paparazzi3/conf/messages.xml"
 
 t = transport.TransportParser(check_crc=False, debug=False)
 m = messages.MessagesFile(path)

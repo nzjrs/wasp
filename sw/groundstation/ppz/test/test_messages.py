@@ -3,8 +3,7 @@ import os.path
 import testsetup
 import ppz.messages as messages
 
-#path = "/home/john/UAV/paparazzi3/conf/messages.xml"
-path = os.path.join(testsetup.TEST_DIR, "messages.xml")
+path = testsetup.get_messages()
 
 i = messages.MessagesFile(path)
 i.parse(debug=True)
