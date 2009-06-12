@@ -69,6 +69,15 @@ class Field:
         else:
             return self._size
 
+    def pack_into_buffer(self, buf, start):
+        #if self._is_array:
+        #    l = struct.unpack("B",buf[start])[0]
+        #    start += 1
+        #    return struct.unpack(MESSAGE_ENDIANESS+(l*self._format),buf[start:]), start
+        #else:
+        #    return struct.unpack(self._format,buf[start]), start + self._size
+        raise NotImplementedError
+        
     def unpack_value_from_buffer(self, buf, start):
         if self._is_array:
             l = struct.unpack("B",buf[start])[0]
@@ -140,7 +149,6 @@ class Message:
             #messages can contain 0 fields
             pass
 
-
     def get_fields(self):
         return self._fields
 
@@ -149,6 +157,18 @@ class Message:
             return self._fields_by_name[name]
         except KeyError:
             return None
+
+    def pack_values(self, *values):
+        assert len(values) == len(self._fields)
+
+        if self._fields:
+            if self._contains_array_field:
+                raise NotImplementedError
+                #for i in range(0, len(self._fields)):
+                #    pass #self._fields[i].
+            else:
+                return self._struct.pack(*values)
+        return ""
 
     def unpack_values(self, string):
         if self._fields:
@@ -187,6 +207,9 @@ class Message:
 
     def get_id(self):
         return int(self._id)
+
+    def get_size(self):
+        return sum([f.get_size(0,0) for f in self._fields])
 
     def __str__(self):
         return "<Message: %s (%s)>" % (self._name, self._id)

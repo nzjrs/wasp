@@ -34,6 +34,7 @@ if __name__ == "__main__":
     s.connect_to_port()
     m.parse()
 
+    i = 0
     while s.is_open():
         try:
             data = s.read()
@@ -41,6 +42,16 @@ if __name__ == "__main__":
                 msg = m.get_message_by_id(header.msgid)
                 print "%s\n\t" % msg,
                 print msg.unpack_printable_values(payload, joiner=",")
+
+                if i == 10:
+                    p = m.get_message_by_name("PONG")
+                    data = t.pack_one(
+                                transport.TransportHeaderFooter(acid=0x78), 
+                                p,
+                                p.pack_values())
+                    s.write(data.tostring())
+                    i = 0;
+                i += 1
 
         except KeyboardInterrupt:
             s.disconnect_from_port()

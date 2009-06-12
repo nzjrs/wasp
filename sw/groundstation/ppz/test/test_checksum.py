@@ -1,6 +1,6 @@
 
-#A PONG message
-data = "\x99\x06\x78\x03\x81\x05"
+#A TEST_MESSAGE message
+data = "\x99\x18\x78\x08\x01\xFF\x0A\x00\xF6\xFF\x64\x00\x00\x00\x9C\xFF\xFF\xFF\x00\x00\x80\x3F\xEC\xDB"
 
 stx = ord(data[0])
 l = ord(data[1])
@@ -15,9 +15,9 @@ print "CK= %x %x" % (cka, ckb)
 print "ACID= %x" % acid
 print "MSGID= %x" % msgid
 
-ck = l
-ck2 = l
-for i in data[2:-2]:
+ck = stx
+ck2 = stx
+for i in data[1:-2]:
     ck = (ck + ord(i)) % 256
     ck2 = (ck2 + ck) % 256
 
