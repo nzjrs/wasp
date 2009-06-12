@@ -16,8 +16,8 @@ for payload in t.parse_many(data):
     mid = ord(payload[1])
     
     msg = m.get_message_by_id(mid)
-    #print msg.get_values(payload[2:])
-    print msg.get_all_printable_values(payload[2:], joiner=",")
+    #print msg.unpack_values(payload[2:])
+    print msg.unpack_printable_values(payload[2:], joiner=",")
             
 
 

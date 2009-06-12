@@ -18,7 +18,7 @@ for d in data:
     if pl:
         if ord(pl[1]) == alive.get_id():
             print "ACID=%s MSG=%s" % (ord(pl[0]),ord(pl[1]))
-            print alive.get_values(pl[2:])
+            print alive.unpack_values(pl[2:])
             
 
 

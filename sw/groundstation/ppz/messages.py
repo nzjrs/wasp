@@ -28,9 +28,9 @@ class Field:
 
         if self._type == "uint8":
             try:
-                self._values = node.values.split("|")
+                self._enum_values = node.values.split("|")
             except AttributeError:
-                self._values = []
+                self._enum_values = []
     
         if self._type.endswith("[]"):
             typ = self._type.split("[]")[0]
@@ -57,7 +57,7 @@ class Field:
         except:
             self._coef = 1
 
-        self._isenum = self._type == "uint8" and self._values
+        self._isenum = self._type == "uint8" and self._enum_values
 
     def is_array(self):
         return self._is_array
@@ -88,7 +88,7 @@ class Field:
                 #If this is an uint8 enum type then return the
                 #enum value
                 try:
-                    return "%s" % self._values[value]
+                    return "%s" % self._enum_values[value]
                 except IndexError:
                     return "?%s?" % value
             else:
@@ -150,7 +150,7 @@ class Message:
         except KeyError:
             return None
 
-    def get_values(self, string):
+    def unpack_values(self, string):
         if self._fields:
             if self._contains_array_field:
                 start = 0
@@ -163,7 +163,7 @@ class Message:
                 return self._struct.unpack(string)
         return ()
 
-    def get_all_printable_values(self, string, joiner=" "):
+    def unpack_printable_values(self, string, joiner=" "):
         if self._contains_array_field:
                 start = 0
                 strings = []
@@ -174,7 +174,7 @@ class Message:
                     )
                 return joiner.join(strings)
         else:
-            vals = self.get_values(string)
+            vals = self.unpack_values(string)
             assert len(vals) == len(self._fields)
             #fastest way to do string concentation
             #http://www.skymind.com/~ocrow/python_string/
@@ -192,7 +192,8 @@ class Message:
         return "<Message: %s (%s)>" % (self._name, self._id)
 
 class MessagesFile:
-    def __init__(self, xmlfile):
+    def __init__(self, xmlfile, debug):
+        self._debug = debug
         if not os.path.exists(xmlfile):
             raise Exception("Message file not found: %s" % xmlfile)
 
@@ -204,17 +205,17 @@ class MessagesFile:
         self._msgs_by_id = {}
         self._msgs_by_name = {}
 
-    def parse(self, debug=False):
+    def parse(self):
         for m in self._messages:
             try:
                 msg = Message(m.name, m.id, m)
                 self._msgs_by_id[int(m.id)] = msg
                 self._msgs_by_name[m.name] = msg
             except AttributeError, e:
-                if debug:
+                if self._debug:
                     print "INVALID MESSAGES", e
             except MessageError, e:
-                if debug:
+                if self._debug:
                     print "SKIPPED MESSAGE %s" % e
 
     def get_messages(self):
@@ -224,12 +225,16 @@ class MessagesFile:
         try:
             return self._msgs_by_name[name]
         except KeyError:
+            if self._debug:
+                print "ERROR: No message %s" % name
             return None
 
     def get_message_by_id(self, id):
         try:
             return self._msgs_by_id[id]
         except KeyError:
+            if self._debug:
+                print "ERROR: No message %s" % id
             return None
 
 
