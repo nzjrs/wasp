@@ -1,25 +1,23 @@
 
-#An ALIVE message
-alive = "\x99\x17\x98\x02\x10\x79\x37\x9e\x5d\x43\x2e\x65\x97\x63\xb5\x99\x21\x19\x9a\xbb\x8f\xa8\x4a"
-
-data = alive
+#A PONG message
+data = "\x99\x06\x78\x03\x81\x05"
 
 stx = ord(data[0])
 l = ord(data[1])
+acid = ord(data[2])
+msgid = ord(data[3])
 cka = ord(data[-2])
 ckb = ord(data[-1])
 
-payload = data[2:-2]
-acid = ord(payload[0])
-mcid = ord(payload[1])
-
-print "STX=", stx
-print "LEN=", l
-print "CK=", cka, ckb
+print "STX= %x" % stx
+print "LEN= %x" % l
+print "CK= %x %x" % (cka, ckb)
+print "ACID= %x" % acid
+print "MSGID= %x" % msgid
 
 ck = l
 ck2 = l
-for i in payload:
+for i in data[2:-2]:
     ck = (ck + ord(i)) % 256
     ck2 = (ck2 + ck) % 256
 
