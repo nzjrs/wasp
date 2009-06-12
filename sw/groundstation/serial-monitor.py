@@ -27,24 +27,20 @@ if __name__ == "__main__":
 
     options, args = parser.parse_args()
 
-    m = messages.MessagesFile(options.messages)
+    m = messages.MessagesFile(xmlfile=options.messages, debug=options.debug)
     s = transport.SerialTransport(port=options.port, speed=options.speed, timeout=options.timeout)
     t = transport.TransportParser(check_crc=options.crc, debug=options.debug)
 
     s.connect_to_port()
-    m.parse(debug=options.debug)
+    m.parse()
 
     while s.is_open():
         try:
             data = s.read()
-            for payload in t.parse_many(data):
-                acid = ord(payload[0])
-                mid = ord(payload[1])
-                
-                msg = m.get_message_by_id(mid)
-
+            for header, payload in t.parse_many(data):
+                msg = m.get_message_by_id(header.msgid)
                 print "%s\n\t" % msg,
-                print msg.get_all_printable_values(payload[2:], joiner=",")
+                print msg.unpack_printable_values(payload, joiner=",")
 
         except KeyboardInterrupt:
             s.disconnect_from_port()
