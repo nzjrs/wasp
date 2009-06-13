@@ -123,6 +123,11 @@ hex: $(OBJDIR)/$(TARGET).hex
 lss: $(OBJDIR)/$(TARGET).lss 
 sym: $(OBJDIR)/$(TARGET).sym
 
+# Display MD5 of binary
+md5: $(OBJDIR)/$(TARGET).elf
+	@echo MD5 $(OBJDIR)/$(TARGET).elf
+	$(Q)md5sum $(OBJDIR)/$(TARGET).elf
+
 # Display size of file.
 ELFSIZE = $(SIZE) -A $(OBJDIR)/$(TARGET).elf
 size:
