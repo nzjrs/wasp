@@ -1,13 +1,17 @@
-#!/usr/bin/env python2.5
+#!/usr/bin/env python
 
+import os.path
 import optparse
 import ppz.transport as transport
 import ppz.messages as messages
 
 if __name__ == "__main__":
+    thisdir = os.path.abspath(os.path.dirname(__file__))
+    default_messages = os.path.join(thisdir, "..", "messages.xml")
+
     parser = optparse.OptionParser()
     parser.add_option("-m", "--messages",
-                    default="/home/john/Programming/paparazzi.git/conf/messages.xml",
+                    default=default_messages,
                     help="messages xml file", metavar="FILE")
     parser.add_option("-p", "--port",
                     default="/dev/ttyUSB0",
@@ -24,6 +28,9 @@ if __name__ == "__main__":
     parser.add_option("-c", "--crc",
                     action="store_true",
                     help="check message crc")
+    parser.add_option("-q", "--quiet",
+                    action="store_true",
+                    help="do not print messages, useful with --debug")
 
     options, args = parser.parse_args()
 
@@ -40,8 +47,10 @@ if __name__ == "__main__":
             data = s.read()
             for header, payload in t.parse_many(data):
                 msg = m.get_message_by_id(header.msgid)
-                print "%s\n\t" % msg,
-                print msg.unpack_printable_values(payload, joiner=",")
+
+                if not options.quiet:
+                    print "%s\n\t" % msg,
+                    print msg.unpack_printable_values(payload, joiner=",")
 
                 if i == 10:
                     p = m.get_message_by_name("PONG")

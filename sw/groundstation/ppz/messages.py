@@ -130,7 +130,7 @@ class Field:
 class Message:
 
     def __init__(self, name, id, node):
-        self.name = name
+        self.name = name.upper()
         self.id = id
         self._fields = []
         self._fields_by_name = {}
