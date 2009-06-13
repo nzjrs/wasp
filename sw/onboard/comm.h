@@ -76,6 +76,9 @@ comm_send_ch ( CommChannel_t chan, uint8_t c );
 void
 comm_send_message ( CommChannel_t chan, CommMessage_t *message );
 
+bool_t
+comm_send_message_by_id (CommChannel_t chan, uint8_t msgid);
+
 uint8_t
 comm_get_ch( CommChannel_t chan );
 

@@ -34,12 +34,7 @@ static inline void main_init( void ) {
 }
 
 static inline void main_periodic_task( void ) {
-  
-  RunOnceEvery(200, {
-    led_toggle(4);
-    comm_periodic_task(DA_COMM);
-  });
-
+  comm_periodic_task(DA_COMM);
 }
 
 static inline void main_event_task( void ) {

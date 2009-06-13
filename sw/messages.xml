@@ -45,4 +45,8 @@
      <field name="a_float" type="float"></field>
    </message>
 
+   <periodic>
+      <message name="COMM_STATUS" frequency="1"></message>
+   </periodic>
+
 </messages>

@@ -29,6 +29,36 @@ def get_field_length(_type):
     else:
         return LENGTHS[_type]
 
+class Periodic:
+
+    STRUCT =                                    \
+    "typedef struct __PeriodicMessage {\n"      \
+    "    uint16_t    target;\n"                 \
+    "    uint16_t    cnt;\n"                    \
+    "    uint8_t     msgid;\n"                  \
+    "} PeriodicMessage_t;"
+    #use a uint8_t for counting how many main iterations
+    #to wait until releasing this message for transmission
+    CNT_MAX = (2 ** 16) - 1
+
+    def __init__(self, m, periodicfreq=60.0):
+        self._periodicfreq = periodicfreq
+        self._message = m.name
+        self._frequency = float(m.frequency)
+
+        #the main loop runs at periodicfreq. We want to run at frequency
+        #calculate how many iterations we must wait before we run
+        maxfreq = periodicfreq                      #can't run faster than main
+        minfreq = periodicfreq/self.CNT_MAX         #can only count to n
+
+        if self._frequency > minfreq and self._frequency < maxfreq:
+            self._target = int(60/self._frequency)
+        else:
+            raise Exception("periodic freq, f=%s, must be %s < f < %s" % (self._frequency, minfreq, maxfreq))
+
+    def get_initializer(self):
+        return "{ %d, %d, MESSAGE_ID_%s }" % (self._target, 0, self._message)
+
 class Message:
     def __init__(self, m):
         self.name = m.name
@@ -37,11 +67,8 @@ class Message:
         else:
             raise Exception("Message IDs must be <= 255")
         try:
-            if len(m.field):
-                self.fields = m.field
-            else:
-                self.fields = [m.field]
-        except:
+            self.fields = xmlobject.ensure_list(m.field)
+        except AttributeError:
             self.fields = []
 
         sizes = [get_field_length(f.type) for f in self.fields]
@@ -51,8 +78,9 @@ class Message:
 
 class _Writer(object):
 
-    def __init__(self, messages, note, messages_file):
+    def __init__(self, messages, periodic, note, messages_file):
         self.messages = messages
+        self.periodic = periodic
         self.note = note
         self.messages_path = messages_path
 
@@ -82,11 +110,16 @@ class _CWriter(_Writer):
 
         print "#include \"std.h\""
         print
+        print Periodic.STRUCT
+        print
         for m in self.messages:
             self._print_id(m)
         print
         for m in self.messages:
             self._print_length(m)
+        print
+        print "#define NUM_PERIODIC_MESSAGES %d" % len(self.periodic)
+        print "#define PERIODIC_MESSAGE_INITIALIZER {", ", ".join([p.get_initializer() for p in self.periodic]), "};"
         print
 
     def postamble(self):
@@ -284,12 +317,22 @@ if __name__ == "__main__":
     try:
         messages_path = os.path.abspath(options.messages)
         x = xmlobject.XMLFile(path=messages_path)
+
+        #must have some valid messaeges
         messages = [Message(m) for m in x.root.message]
+        #must have a periodic element
+        p = x.root.periodic
+        #but periodic messages are optional
+        try: 
+            pm = xmlobject.ensure_list(p.message)
+        except AttributeError:
+            pm = []
+        periodic = [Periodic(m) for m in pm]
     except:
         import traceback
         parser.error("invalid xml\n%s" % traceback.format_exc())
 
-    writer = klass(messages, "messages", messages_path)
+    writer = klass(messages, periodic, "messages", messages_path)
     writer.preamble()
     writer.body()
     writer.postamble()

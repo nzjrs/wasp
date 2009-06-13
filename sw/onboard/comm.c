@@ -138,45 +138,56 @@ comm_parse ( CommChannel_t chan )
 }
 
 bool_t
+comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
+{
+#if 0
+    static uint8_t u8 = 1;
+    static uint8_t i8 = -1;
+    static uint16_t u16 = 10;
+    static int16_t i16 = -10;
+    static uint32_t u32 = 100;
+    static int32_t i32 = -100;
+    static float f = 1.0;
+
+    MESSAGE_SEND_TEST_MESSAGE ( &u8, &i8, &u16, &i16, &u32, &i32, &f );
+    u8 += 1;
+    i8 -= 1;
+    u16 += 10;
+    i16 -= 10;
+    u32 += 100;
+    i32 -= 100;
+    f += 15.0;
+#endif
+
+    switch(msgid) 
+    {
+        case MESSAGE_ID_PONG:
+            MESSAGE_SEND_PONG();
+            break;
+        case MESSAGE_ID_COMM_STATUS:
+            MESSAGE_SEND_COMM_STATUS( &comm_status[chan].pprz_ovrn, &comm_status[chan].pprz_error )
+            break;
+        default:
+            return FALSE;
+            break;
+    }
+    return TRUE;
+}
+
+bool_t
 comm_event_task ( CommChannel_t chan ) 
 {
-/*
-
-#define PprzBuffer() PprzLink(ChAvailable())
-#define ReadPprzBuffer() { while (PprzLink(ChAvailable())&&!pprz_msg_received) parse_pprz(PprzLink(Getch())); }
-
-#define DatalinkEvent() {			\
-  if (PprzBuffer()) {				\
-    ReadPprzBuffer();				\
-    if (pprz_msg_received) {			\
-      pprz_parse_payload();			\
-      pprz_msg_received = FALSE;		\
-    }						\
-  }						\
-  if (dl_msg_available) {			\
-    dl_parse_msg();				\
-    dl_msg_available = FALSE;			\
-  }						\
-}
-*/
-    uint8_t ret = TRUE;
+    bool_t handled;
+    bool_t ret = TRUE;
 
     if ( comm_channel_used[chan] && comm_ch_available(chan) && comm_parse(chan) ) 
     {
-        switch (comm_message[chan].msgid) 
-        {
-            case MESSAGE_ID_PONG:
-                MESSAGE_SEND_PONG();
-                break;
-            case MESSAGE_ID_COMM_STATUS:
-                MESSAGE_SEND_COMM_STATUS( &comm_status[chan].pprz_ovrn, &comm_status[chan].pprz_error )
-                break;
-            default:
-                if (comm_callback[chan])
-                    ret = comm_callback[chan](&comm_message[chan]);
-                else
-                    ret = FALSE;
-                break;
+        handled = comm_send_message_by_id(chan, comm_message[chan].msgid);
+        if ( !handled ) {
+            if (comm_callback[chan])
+                ret = comm_callback[chan](&comm_message[chan]);
+            else
+                ret = FALSE;
         }
         comm_status[chan].pprz_msg_received = FALSE;
     }
@@ -189,33 +200,24 @@ comm_event_task ( CommChannel_t chan )
 void
 comm_periodic_task ( CommChannel_t chan )
 {
-    static uint8_t u8 = 1;
-    static uint8_t i8 = -1;
-    static uint16_t u16 = 10;
-    static int16_t i16 = -10;
-    static uint32_t u32 = 100;
-    static int32_t i32 = -100;
-    static float f = 1.0;
+    static PeriodicMessage_t periodic[NUM_PERIODIC_MESSAGES] = PERIODIC_MESSAGE_INITIALIZER;
 
-/*
-#include "periodic.h"
-#define Booz2TelemetryPeriodic() {		\
-    PeriodicSendMain();				\
-  }
-*/
-//    MESSAGE_SEND_PONG();
-    MESSAGE_SEND_COMM_STATUS( &comm_status[chan].pprz_ovrn, &comm_status[chan].pprz_error );
-    MESSAGE_SEND_TEST_MESSAGE ( &u8, &i8, &u16, &i16, &u32, &i32, &f );
+    uint8_t i;
+    PeriodicMessage_t *p;
 
+    for (i = 0; i < NUM_PERIODIC_MESSAGES; i++) 
+    {
+        p = &periodic[i];
 
-    u8 += 1;
-    i8 -= 1;
-    u16 += 10;
-    i16 -= 10;
-    u32 += 100;
-    i32 -= 100;
-    f += 15.0;
-
+        if (p->cnt == p->target) {
+            comm_send_message_by_id(chan, p->msgid);
+            p->cnt = 0;
+        } else
+            p->cnt += 1;
+    }
+            
 }
-						
+
+
+
 
