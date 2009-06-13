@@ -179,7 +179,7 @@ class Message:
             return None
 
     def pack_values(self, *values):
-        assert len(values) == len(self._fields)
+        assert len(values) == len(self._fields), "%s != %s" % (len(values), len(self._fields))
 
         if self._fields:
             if self._contains_array_field:

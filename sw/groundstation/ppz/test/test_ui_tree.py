@@ -6,7 +6,14 @@ import ppz.transport as transport
 import ppz.ui.treeview as treeview
 
 def _send(btn, tv):
-    tv.send_selected()
+    message, values = tv.get_selected_message_and_values()
+    if message:
+        t = transport.Transport(check_crc=True, debug=True)
+        data = t.pack_message_with_values(
+                    transport.TransportHeaderFooter(acid=0x78), 
+                    message,
+                    *values)
+        print data
 
 path = testsetup.get_messages()
 mf = messages.MessagesFile(xmlfile=path, debug=True)

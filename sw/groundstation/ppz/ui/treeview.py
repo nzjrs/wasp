@@ -68,17 +68,18 @@ class MessageTreeView(gtk.TreeView):
             txt = field.get_printable_value(value)
         cell.set_property("text", txt)
 
-    def send_selected(self):
+    def get_selected_message_and_values(self):
         model, _iter = self.get_selection().get_selected()
 
         #make sure something selected
         if not _iter:
-            return
+            return None, None
 
         #make sure a message, not a field is selected
         if model.iter_depth(_iter) == 1:
             _iter = model.iter_parent(_iter)
 
+        message = model.get_value(_iter, MessageTreeStore.OBJECT_IDX)
         fields = model.get_value(_iter, MessageTreeStore.FIELDS_IDX)
         values = []
 
@@ -88,7 +89,8 @@ class MessageTreeView(gtk.TreeView):
             values.append(val)
             _iter = model.iter_next(_iter)
 
+        print message
         print values
 
-        assert len(values) == len(fields)
+        return message, values
 

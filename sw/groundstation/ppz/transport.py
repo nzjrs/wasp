@@ -77,6 +77,12 @@ class Transport:
         if self._dbg:
             print msg
 
+    def pack_message_with_values(self, header, message, *values):
+        return self.pack_one(
+                        header,
+                        message,
+                        message.pack_values(*values))
+
     def pack_one(self, header, message, payload):
         payload_len = len(payload)
         total_len = payload_len + self.NUM_NON_PAYLOAD_BYTES
