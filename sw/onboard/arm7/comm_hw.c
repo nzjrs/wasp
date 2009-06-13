@@ -24,7 +24,7 @@ comm_init ( CommChannel_t chan )
     for (uint8_t i = 0; i < COMM_NB; i++) {
         comm_callback[i] = 0;
     
-        comm_status[i].pprz_status = UNINIT;
+        comm_status[i].parse_state = STATE_UNINIT;
         comm_status[i].payload_idx = 0;
         comm_status[i].pprz_msg_received = FALSE;
         comm_status[i].pprz_ovrn = 0;

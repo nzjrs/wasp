@@ -5,12 +5,7 @@
 
 #define STX 0x99
 #define ACID 120
-
-#define UNINIT 0
-#define GOT_STX 1
-#define GOT_LENGTH 2
-#define GOT_PAYLOAD 3
-#define GOT_CRC1 4
+#define NUM_NON_PAYLOAD_BYTES 6
 
 #define PPRZ_PAYLOAD_LEN 256
 
@@ -19,6 +14,17 @@ typedef enum {
     COMM_2,
     COMM_NB
 } CommChannel_t;
+
+typedef enum {
+    STATE_UNINIT,
+    STATE_GOT_STX,
+    STATE_GOT_LENGTH,
+    STATE_GOT_ACID,
+    STATE_GOT_MSGID,
+    STATE_GOT_PAYLOAD,
+    STATE_GOT_CRC1
+} ParseState_t;
+    
 
 typedef struct __CommMessage {
     uint8_t acid;
@@ -35,12 +41,14 @@ typedef struct __CommStatus {
     uint8_t rx_ck_a;
     uint8_t rx_ck_b;
     uint8_t pprz_msg_received;
-    uint8_t pprz_status;
     uint8_t payload_idx;
     uint8_t pprz_payload_len;
     uint8_t pprz_payload[PPRZ_PAYLOAD_LEN] __attribute__ ((aligned));
     uint8_t pprz_ovrn;
     uint8_t pprz_error;
+    uint8_t acid;
+    uint8_t msgid;
+    ParseState_t parse_state;
 } CommStatus_t;
 
 typedef bool_t (*CommMessageCallback_t)(CommMessage_t *message);
