@@ -149,7 +149,7 @@ generated/radio.h: conf-$(CONFIG)/radio.xml
 	@echo GENERATE $@
 	$(Q)$(TOOLS)/gen-radio.py $^ > $@
 
-generated/messages.h: conf-$(CONFIG)/messages.xml
+generated/messages.h: ../messages.xml
 	@echo GENERATE $@
 	$(Q)$(TOOLS)/gen-messages.py --messages=$^ > $@
 
