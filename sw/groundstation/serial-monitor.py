@@ -4,6 +4,7 @@
 import time
 import os.path
 import optparse
+import ppz
 import ppz.transport as transport
 import ppz.messages as messages
 
@@ -12,18 +13,8 @@ if __name__ == "__main__":
     default_messages = os.path.join(thisdir, "..", "messages.xml")
 
     parser = optparse.OptionParser()
-    parser.add_option("-m", "--messages",
-                    default=default_messages,
-                    help="messages xml file", metavar="FILE")
-    parser.add_option("-p", "--port",
-                    default="/dev/ttyUSB0",
-                    help="serial port")
-    parser.add_option("-s", "--speed",
-                    type="int", default=57600,
-                    help="serial port baud rate")
-    parser.add_option("-t", "--timeout",
-                    type="int", default=1,
-                    help="serial timeout")
+    ppz.setup_comm_optparse_options(parser, default_messages)
+
     parser.add_option("-d", "--debug",
                     action="store_true",
                     help="print extra debugging information")
