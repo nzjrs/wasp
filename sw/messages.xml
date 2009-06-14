@@ -46,7 +46,8 @@
    </message>
 
    <periodic>
-      <message name="COMM_STATUS" frequency="1"></message>
+      <message name="COMM_STATUS" frequency="0.5"></message>
+      <message name="TEST_MESSAGE" frequency="0.5"></message>
    </periodic>
 
 </messages>
