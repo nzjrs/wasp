@@ -18,7 +18,7 @@
    </message>
 
    <message name="TIME" id="6">
-     <field name="t" type="uint32"></field>
+     <field name="t" type="uint16"></field>
    </message>
 
    <!-- Begin custom messages at 25 -->
@@ -40,7 +40,7 @@
 
    <periodic>
       <message name="COMM_STATUS" frequency="0.5"></message>
-      <message name="TEST_MESSAGE" frequency="0.5"></message>
+      <message name="TIME" frequency="0.1"></message>
    </periodic>
 
 </messages>

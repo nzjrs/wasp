@@ -3,6 +3,7 @@
  */
 
 #include "comm.h"
+#include "sys_time.h"
 
 CommMessageCallback_t    comm_callback[COMM_NB];
 CommMessage_t            comm_message[COMM_NB];
@@ -141,29 +142,27 @@ comm_parse ( CommChannel_t chan )
 bool_t
 comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
 {
-    static uint8_t u8 = 1;
-    static uint8_t i8 = -1;
-    static uint16_t u16 = 10;
-    static int16_t i16 = -10;
-    static uint32_t u32 = 100;
-    static int32_t i32 = -100;
-    static float f = 0.0;
+#ifdef MESSAGE_ID_TEST_MESSAGE
+    static uint8_t u8 = 1; static uint8_t i8 = -1; static uint16_t u16 = 10; static int16_t i16 = -10;
+    static uint32_t u32 = 100; static int32_t i32 = -100; static float f = 0.0;
+#endif
 
     switch(msgid) 
     {
         case MESSAGE_ID_PING:
             MESSAGE_SEND_PONG();
             break;
+        case MESSAGE_ID_TIME:
+            MESSAGE_SEND_TIME( &cpu_time_sec );
         case MESSAGE_ID_COMM_STATUS:
             MESSAGE_SEND_COMM_STATUS( &comm_status[chan].buffer_overrun, &comm_status[chan].parse_error )
             break;
+#ifdef MESSAGE_ID_TEST_MESSAGE
         case MESSAGE_ID_TEST_MESSAGE:
             MESSAGE_SEND_TEST_MESSAGE ( &u8, &i8, &u16, &i16, &u32, &i32, &f );
-            u8 += 1; i8 -= 1;
-            u16 += 10; i16 -= 10;
-            u32 += 100; i32 -= 100;
-            f += 15.0;
+            u8 += 1; i8 -= 1; u16 += 10; i16 -= 10; u32 += 100; i32 -= 100; f += 15.0;
             break;
+#endif
         default:
             return FALSE;
             break;
