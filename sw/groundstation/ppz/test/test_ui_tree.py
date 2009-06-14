@@ -13,7 +13,9 @@ def _send(btn, tv):
                     transport.TransportHeaderFooter(acid=0x78), 
                     message,
                     *values)
-        print data
+        print data, "LEN: ", len(data)
+        for d in data:
+            print "    %#X" % ord(d)
 
 path = testsetup.get_messages()
 mf = messages.MessagesFile(xmlfile=path, debug=True)

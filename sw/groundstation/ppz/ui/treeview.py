@@ -89,8 +89,5 @@ class MessageTreeView(gtk.TreeView):
             values.append(val)
             _iter = model.iter_next(_iter)
 
-        print message
-        print values
-
         return message, values
 
