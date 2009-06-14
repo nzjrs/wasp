@@ -9,7 +9,7 @@ class MessageTreeStore(gtk.TreeStore):
     VALUE_IDX,      \
     FIELDS_IDX =    range(5)
 
-    def __init__(self, messagefile):
+    def __init__(self):
         gtk.TreeStore.__init__(self, 
             str,        #NAME, message.name or field.name
             object,     #OBJECT, message or field underlying python object

@@ -21,7 +21,7 @@ path = testsetup.get_messages()
 mf = messages.MessagesFile(xmlfile=path, debug=True)
 mf.parse()
 
-ts = treeview.MessageTreeStore(mf)
+ts = treeview.MessageTreeStore()
 
 for m in mf.get_messages():
     ts.add_message(m)
