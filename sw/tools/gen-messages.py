@@ -172,14 +172,14 @@ class MacroWriter(_CWriter):
             else:
                 l = get_field_length(f.type)
                 if l == 1:
-                    print "(%s)(*((uint8_t*)_payload+%d))" % (f.type, offset)
+                    print "(%s_t)(*((uint8_t*)_payload+%d))" % (f.type, offset)
                 elif l == 2:
-                    print "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8)" % (f.type, offset, offset)
+                    print "(%s_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8)" % (f.type, offset, offset)
                 elif l == 4:
                     if f.type == "float":
                         print "({ union { uint32_t u; float f; } _f; _f.u = (uint32_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24); _f.f; })" % (offset, offset, offset, offset)
                     else:
-                        print "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24)" % (f.type, offset, offset, offset, offset)
+                        print "(%s_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24)" % (f.type, offset, offset, offset, offset)
 
 
     def preamble(self):
