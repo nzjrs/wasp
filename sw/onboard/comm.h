@@ -2,6 +2,7 @@
 #define COMM_H
 
 #include "std.h"
+#include "generated/messages.h"
 
 #define STX 0x99
 #define ACID 120
@@ -25,29 +26,12 @@ typedef enum {
     STATE_GOT_CRC1
 } ParseState_t;
     
-
-typedef struct __CommMessage {
-    uint8_t acid;
-    uint8_t msgid;
-    uint8_t len;
-    uint8_t *buffer;
-    uint8_t ck_a;
-    uint8_t ck_b;
-} CommMessage_t;
-
 typedef struct __CommStatus {
     uint8_t ck_a;
     uint8_t ck_b;
-    uint8_t rx_ck_a;
-    uint8_t rx_ck_b;
-    uint8_t pprz_msg_received;
-    uint8_t payload_idx;
-    uint8_t pprz_payload_len;
-    uint8_t pprz_payload[PPRZ_PAYLOAD_LEN] __attribute__ ((aligned));
-    uint8_t pprz_ovrn;
-    uint8_t pprz_error;
-    uint8_t acid;
-    uint8_t msgid;
+    uint8_t msg_received;
+    uint8_t buffer_overrun;
+    uint8_t parse_error;
     ParseState_t parse_state;
 } CommStatus_t;
 

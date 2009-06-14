@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# vim: ai ts=4 sts=4 et sw=4
 
 import xmlobject
 import gentools
@@ -60,6 +61,18 @@ class Periodic:
         return "{ %d, %d, MESSAGE_ID_%s }" % (self._target, 0, self._message)
 
 class Message:
+
+    STRUCT =                                                                     \
+    "typedef struct __CommMessage {\n"                                           \
+    "    uint8_t acid;   /**< Aircraft ID, id of message sender */\n"            \
+    "    uint8_t msgid;  /**< ID of message in payload */\n"                     \
+    "    uint8_t len;    /**< Length of payload */\n"                            \
+    "    uint8_t payload[256] __attribute__ ((aligned));\n"                      \
+    "    uint8_t ck_a;   /**< Checksum high byte */\n"                           \
+    "    uint8_t ck_b;   /**< Checksum low byte */\n"                            \
+    "    uint8_t idx;    /**< State vaiable when filling payload. Not sent */\n" \
+    "} CommMessage_t;" 
+
     def __init__(self, m):
         self.name = m.name
         if int(m.id) <= 255:
@@ -111,6 +124,8 @@ class _CWriter(_Writer):
         print "#include \"std.h\""
         print
         print Periodic.STRUCT
+        print
+        print Message.STRUCT
         print
         for m in self.messages:
             self._print_id(m)

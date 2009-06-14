@@ -25,10 +25,9 @@ comm_init ( CommChannel_t chan )
         comm_callback[i] = 0;
     
         comm_status[i].parse_state = STATE_UNINIT;
-        comm_status[i].payload_idx = 0;
-        comm_status[i].pprz_msg_received = FALSE;
-        comm_status[i].pprz_ovrn = 0;
-        comm_status[i].pprz_error = 0;
+        comm_status[i].msg_received = FALSE;
+        comm_status[i].buffer_overrun = 0;
+        comm_status[i].parse_error = 0;
     }
 
 }
