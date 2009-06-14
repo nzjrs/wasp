@@ -1,41 +1,34 @@
 <?xml version="1.0"?>
 <messages>
-   <message name="BOOT" id="1">
-     <field name="version" type="uint16"></field>
+
+   <!-- IDs < 25 are reserved for standard messages -->
+   <message name="PING" id="1"/>
+   <message name="PONG" id="2"/>
+
+   <message name="ACK" id="3">
+     <field name="msgid" type="uint8"/>
    </message>
 
-<!--
-   <message name="ALIVE" id="2">
-     <field name="md5sum" type="uint8[]"/>
-   </message>
--->
-
-   <message name="PONG" id="3">
+   <message name="NACK" id="4">
+     <field name="msgid" type="uint8"/>
    </message>
 
-   <message name="TAKEOFF" id="4">
-     <field name="cpu_time" type="uint16" unit="s"></field>
+   <message name="REQUEST_MESSAGE" id="5">
+     <field name="msgid" type="uint8"/>
    </message>
 
-   <message name="TIME" id="5">
+   <message name="TIME" id="6">
      <field name="t" type="uint32"></field>
    </message>
 
-   <message name="COMM_STATUS" id="6">
+   <!-- Begin custom messages at 25 -->
+
+   <message name="COMM_STATUS" id="25">
      <field name="overrun" type="uint8"></field>
      <field name="error" type="uint8"></field>
    </message>
 
-   <message name="DebugChao" id="7">
-     <field name="int16_1" type="int16" unit="deg"></field>
-     <field name="int16_2" type="int16" unit="deg"></field>
-     <field name="int16_3" type="int16" unit="deg"></field>
-     <field name="int32_1" type="int32" unit="deg"></field>
-     <field name="int32_2" type="int32" unit="deg"></field>
-     <field name="int32_3" type="int32" unit="deg"></field>
-   </message>
-
-   <message name="TEST_MESSAGE" id="8">
+   <message name="TEST_MESSAGE" id="26">
      <field name="a_uint8" type="uint8"></field>
      <field name="a_int8" type="int8"></field>
      <field name="a_uint16" type="uint16"></field>

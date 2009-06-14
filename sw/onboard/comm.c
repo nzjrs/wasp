@@ -151,7 +151,7 @@ comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
 
     switch(msgid) 
     {
-        case MESSAGE_ID_PONG:
+        case MESSAGE_ID_PING:
             MESSAGE_SEND_PONG();
             break;
         case MESSAGE_ID_COMM_STATUS:

@@ -340,6 +340,23 @@ if __name__ == "__main__":
 
         #must have some valid messaeges
         messages = [Message(m) for m in x.root.message]
+        #check for duplicate message IDs
+        ids = {}
+        for m in messages:
+            try:
+                dup = ids[m.id]
+                raise Exception("Duplicate Message ID %d in %s and %s" % (m.id, dup.name, m.name))
+            except KeyError:
+                ids[m.id] = m
+        #check for duplicate message names
+        names = {}
+        for m in messages:
+            try:
+                dup = names[m.name]
+                raise Exception("Duplicate Message names %s and %s" % (dup.name, m.name))
+            except KeyError:
+                names[m.name] = m
+
         #must have a periodic element
         p = x.root.periodic
         #but periodic messages are optional
