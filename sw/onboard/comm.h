@@ -4,12 +4,6 @@
 #include "std.h"
 #include "generated/messages.h"
 
-#define STX 0x99
-#define ACID 120
-#define NUM_NON_PAYLOAD_BYTES 6
-
-#define PPRZ_PAYLOAD_LEN 256
-
 typedef enum {
     COMM_1,
     COMM_2,

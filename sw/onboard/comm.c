@@ -25,14 +25,14 @@ void
 comm_start_message ( CommChannel_t chan, uint8_t id, uint8_t len )
 {
     /* Counting STX, LENGTH, ACID, MSGID, CRC1 and CRC2 */
-    uint8_t total_len = len + NUM_NON_PAYLOAD_BYTES;
+    uint8_t total_len = len + COMM_NUM_NON_PAYLOAD_BYTES;
 
-    comm_status[chan].ck_a = STX;
-    comm_status[chan].ck_b = STX;
-    comm_send_ch(chan, STX);
+    comm_status[chan].ck_a = COMM_STX;
+    comm_status[chan].ck_b = COMM_STX;
+    comm_send_ch(chan, COMM_STX);
 
     COMM_SEND_CH(chan, total_len);
-    COMM_SEND_CH(chan, ACID);
+    COMM_SEND_CH(chan, COMM_DEFAULT_ACID);
     COMM_SEND_CH(chan, id);
 }
 
@@ -48,7 +48,7 @@ comm_send_message ( CommChannel_t chan, CommMessage_t *message )
 {
     uint8_t i;
 
-    comm_send_ch(chan, STX);
+    comm_send_ch(chan, COMM_STX);
     comm_send_ch(chan, message->len + 4);
     comm_send_ch(chan, message->acid);
     comm_send_ch(chan, message->msgid);
@@ -80,10 +80,10 @@ comm_parse ( CommChannel_t chan )
         switch (comm_status[chan].parse_state) 
         {
             case STATE_UNINIT:
-                if (c == STX) {
+                if (c == COMM_STX) {
                     comm_status[chan].parse_state++;
-                    rxmsg->ck_a = STX;
-                    rxmsg->ck_b = STX;
+                    rxmsg->ck_a = COMM_STX;
+                    rxmsg->ck_b = COMM_STX;
                 }
                 break;
             case STATE_GOT_STX:
@@ -92,7 +92,7 @@ comm_parse ( CommChannel_t chan )
                     goto error;
                 }
                 /* Counting STX, LENGTH, ACID, MSGID, CRC1 and CRC2 */
-                rxmsg->len = c - NUM_NON_PAYLOAD_BYTES; 
+                rxmsg->len = c - COMM_NUM_NON_PAYLOAD_BYTES; 
                 rxmsg->idx = 0;
                 UPDATE_CHECKSUM(c)
                 comm_status[chan].parse_state++;

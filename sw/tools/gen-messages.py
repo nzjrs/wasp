@@ -67,7 +67,7 @@ class Message:
     "    uint8_t acid;   /**< Aircraft ID, id of message sender */\n"            \
     "    uint8_t msgid;  /**< ID of message in payload */\n"                     \
     "    uint8_t len;    /**< Length of payload */\n"                            \
-    "    uint8_t payload[256] __attribute__ ((aligned));\n"                      \
+    "    uint8_t payload[COMM_MAX_PAYLOAD_LEN] __attribute__ ((aligned));\n"     \
     "    uint8_t ck_a;   /**< Checksum high byte */\n"                           \
     "    uint8_t ck_b;   /**< Checksum low byte */\n"                            \
     "    uint8_t idx;    /**< State vaiable when filling payload. Not sent */\n" \
@@ -122,6 +122,11 @@ class _CWriter(_Writer):
             generatedfrom=self.messages_path)
 
         print "#include \"std.h\""
+        print
+        print "#define COMM_STX 0x99"
+        print "#define COMM_MAX_PAYLOAD_LEN 256"
+        print "#define COMM_DEFAULT_ACID 120"
+        print "#define COMM_NUM_NON_PAYLOAD_BYTES 6"
         print
         print Periodic.STRUCT
         print
