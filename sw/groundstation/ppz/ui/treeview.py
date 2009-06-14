@@ -17,12 +17,36 @@ class MessageTreeStore(gtk.TreeStore):
             object,     #VALUE, value of field
             object)     #FIELDS, list of fields, only set for message rows
 
+        self._message_ids = {}
+
     def add_message(self, message):
         fields = message.get_fields()
         m = self.append(None, (message.name, message, False, None, fields))
         for f in fields:
             self.append(m, (f.name, f, True, f.get_default_value(), None))
-            
+        return m
+
+    def update_message(self, message, payload, add=True):
+        if message.id not in self._message_ids:
+            if add:
+                self._message_ids[message.id] = self.add_message(message)
+            else:
+                return
+
+        #get the tree row that represents this message
+        _iter = self._message_ids[message.id]
+        #and the number of children rows, i.e. fields, of the message
+        nkids = self.iter_n_children(_iter)
+
+        vals = message.unpack_values(payload)
+        assert len(vals) == nkids
+
+        for i in range(nkids):
+            self.set_value(
+                   self.iter_nth_child(_iter, i),
+                   MessageTreeStore.VALUE_IDX,
+                   vals[i])
+
 class MessageTreeView(gtk.TreeView):
     def __init__(self, messagetreemodel, editable=True):
         gtk.TreeView.__init__(self, messagetreemodel)
