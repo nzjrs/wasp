@@ -49,14 +49,26 @@ class UI(GObjectSerialMonitor):
 
         self._transport = transport
 
-        self._ts = treeview.MessageTreeStore(messages_file)
-        tv = treeview.MessageTreeView(self._ts)
+        self._rxts = treeview.MessageTreeStore()
+        rxtv = treeview.MessageTreeView(self._rxts, editable=False)
+
+        txts = treeview.MessageTreeStore()
+        for m in ("PING", "REQUEST_MESSAGE"):
+            txts.add_message(messages_file.get_message_by_name(m))
+        self._txtv = treeview.MessageTreeView(txts, editable=True)
 
         w = gtk.Window()
         w.connect('delete-event', self._on_quit, serialsender)
 
+        btn = gtk.Button("Send")
+        btn.connect("clicked", self._on_send_clicked, serialsender)
+
         vb = gtk.VBox()
-        vb.pack_start(tv, True, True)
+        vb.pack_start(gtk.Label("RX"), False, False)
+        vb.pack_start(rxtv, True, True)
+        vb.pack_start(gtk.Label("TX"), False, False)
+        vb.pack_start(self._txtv, True, True)
+        vb.pack_start(btn, False, False)
 
         w.add(vb)
         w.set_default_size(350, 500)
@@ -68,9 +80,18 @@ class UI(GObjectSerialMonitor):
         for header, payload in t.parse_many(data):
             msg = m.get_message_by_id(header.msgid)
             if msg:
-                self._ts.update_message(msg, payload)
+                self._rxts.update_message(msg, payload)
 
         return True
+
+    def _on_send_clicked(self, btn, serial):
+        message, values = self._txtv.get_selected_message_and_values()
+        if message:
+            data = self._transport.pack_message_with_values(
+                        transport.TransportHeaderFooter(acid=0x78), 
+                        message,
+                        *values)
+            serial.write(data.tostring())
 
     def _on_quit(self, win, event, serial):
         serial.disconnect_from_port()
@@ -95,18 +116,4 @@ if __name__ == "__main__":
 
     ui = UI(m, s, t)
     gtk.main()
-
-#    while s.is_open():
-#        try:
-#            data = s.read()
-#            for header, payload in t.parse_many(data):
-#                msg = m.get_message_by_id(header.msgid)
-
-#                if not options.quiet:
-#                    print "%s\n\t" % msg,
-#                    print msg.unpack_printable_values(payload, joiner=",")
-
-#        except KeyboardInterrupt:
-#            s.disconnect_from_port()
-#            break
 
