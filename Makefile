@@ -17,7 +17,7 @@ mkdir:
 $(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg
 	DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen $<
 
-sw/doc/messages.txt: sw/onboard/conf-john/messages.xml
+sw/doc/messages.txt: sw/messages.xml
 	./sw/tools/gen-messages.py -m $< -f rst > $@
 
 html:
