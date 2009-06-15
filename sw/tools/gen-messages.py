@@ -147,18 +147,26 @@ class _CWriter(_Writer):
 
 class MacroWriter(_CWriter):
 
+    CHECK_FN    = "comm_check_free_space"
+    START_FN    = "comm_start_message"
+    END_FN      = "comm_end_message"
+    OVERRUN_FN  = "comm_overrun"
+    PUT_CH_FN   = "comm_send_message_ch"
+
     def _print_send_function(self, m):
         name = m.name.upper()
-        print "#define MESSAGE_SEND_%s(" % name,
-        print ", ".join([f.name for f in m.fields]), ") \\"
+        first_params = ["_chan"]
+
+        print "#define MESSAGE_SEND_%s(" % name, 
+        print ", ".join(first_params + [f.name for f in m.fields]), ") \\"
         print "{ \\"
-        print "\tif (DownlinkCheckFreeSpace(%s)) { \\" % "+".join(m.sizes)
-        print "\t\tDownlinkStartMessage(\"%s\", MESSAGE_ID_%s, MESSAGE_LENGTH_%s) \\" % (name, name, name)
+        print "\tif (%s(_chan, MESSAGE_LENGTH_%s)) { \\" % (self.CHECK_FN, name)
+        print "\t\t%s(_chan, MESSAGE_ID_%s, MESSAGE_LENGTH_%s); \\" % (self.START_FN, name, name)
         for f in m.fields:
-            print "\t\t_Put%sByAddr((%s)) \\" % (f.type.title(), f.name)
-        print "\t\tDownlinkEndMessage() \\"
+            print "\t\t_Put%sByAddr(_chan, (%s)) \\" % (f.type.title(), f.name)
+        print "\t\t%s(_chan); \\" % self.END_FN
         print "\t} else \\"
-        print "\t\tDownlinkOverrun(); \\"
+        print "\t\t%s(_chan); \\" % self.OVERRUN_FN
         print "}"
         print
 
@@ -184,25 +192,25 @@ class MacroWriter(_CWriter):
 
     def preamble(self):
         _CWriter.preamble(self)
-        print "#define _Put1ByteByAddr(_byte) {     \\"
+        print "#define _Put1ByteByAddr(_chan, _byte) {     \\"
         print "\tuint8_t _x = *(_byte);         \\"
-        print "\tDownlinkPutUint8(_x);     \\"
+        print "\t%s(_chan, _x);     \\" % self.PUT_CH_FN
         print "}"
-        print "#define _Put2ByteByAddr(_byte) { \\"
-        print "\t_Put1ByteByAddr(_byte);    \\"
-        print "\t_Put1ByteByAddr((const uint8_t*)_byte+1);    \\"
+        print "#define _Put2ByteByAddr(_chan, _byte) { \\"
+        print "\t_Put1ByteByAddr(_chan, _byte);    \\"
+        print "\t_Put1ByteByAddr(_chan, (const uint8_t*)_byte+1);    \\"
         print "}"
-        print "#define _Put4ByteByAddr(_byte) { \\"
-        print "\t_Put2ByteByAddr(_byte);    \\"
-        print "\t_Put2ByteByAddr((const uint8_t*)_byte+2);    \\"
+        print "#define _Put4ByteByAddr(_chan, _byte) { \\"
+        print "\t_Put2ByteByAddr(_chan, _byte);    \\"
+        print "\t_Put2ByteByAddr(_chan, (const uint8_t*)_byte+2);    \\"
         print "}"
-        print "#define _PutInt8ByAddr(_x) _Put1ByteByAddr(_x)"
-        print "#define _PutUint8ByAddr(_x) _Put1ByteByAddr((const uint8_t*)_x)"
-        print "#define _PutInt16ByAddr(_x) _Put2ByteByAddr((const uint8_t*)_x)"
-        print "#define _PutUint16ByAddr(_x) _Put2ByteByAddr((const uint8_t*)_x)"
-        print "#define _PutInt32ByAddr(_x) _Put4ByteByAddr((const uint8_t*)_x)"
-        print "#define _PutUint32ByAddr(_x) _Put4ByteByAddr((const uint8_t*)_x)"
-        print "#define _PutFloatByAddr(_x) _Put4ByteByAddr((const uint8_t*)_x)"
+        print "#define _PutInt8ByAddr(_chan, _x) _Put1ByteByAddr(_chan, _x)"
+        print "#define _PutUint8ByAddr(_chan, _x) _Put1ByteByAddr(_chan, (const uint8_t*)_x)"
+        print "#define _PutInt16ByAddr(_chan, _x) _Put2ByteByAddr(_chan, (const uint8_t*)_x)"
+        print "#define _PutUint16ByAddr(_chan, _x) _Put2ByteByAddr(_chan, (const uint8_t*)_x)"
+        print "#define _PutInt32ByAddr(_chan, _x) _Put4ByteByAddr(_chan, (const uint8_t*)_x)"
+        print "#define _PutUint32ByAddr(_chan, _x) _Put4ByteByAddr(_chan, (const uint8_t*)_x)"
+        print "#define _PutFloatByAddr(_chan, _x) _Put4ByteByAddr(_chan, (const uint8_t*)_x)"
         print
 
     def body(self):

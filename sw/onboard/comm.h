@@ -48,6 +48,9 @@ comm_event_task ( CommChannel_t chan );
 bool_t
 comm_ch_available ( CommChannel_t chan );
 
+void
+comm_send_message_ch ( CommChannel_t chan, uint8_t c );
+
 void 
 comm_send_ch ( CommChannel_t chan, uint8_t c );
 
@@ -71,6 +74,9 @@ comm_end_message ( CommChannel_t chan );
 
 bool_t
 comm_parse ( CommChannel_t chan );
+
+void
+comm_overrun ( CommChannel_t chan );
 
 #endif /* COMM_H */
 

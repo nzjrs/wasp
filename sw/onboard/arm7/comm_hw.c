@@ -82,3 +82,11 @@ comm_check_free_space ( CommChannel_t chan, uint8_t len )
     else
         return FALSE;
 }
+
+void
+comm_overrun ( CommChannel_t chan )
+{
+    if (chan < COMM_NB)
+        comm_status[chan].buffer_overrun++;
+}
+

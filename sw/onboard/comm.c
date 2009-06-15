@@ -10,17 +10,21 @@ CommMessage_t            comm_message[COMM_NB];
 CommStatus_t             comm_status[COMM_NB];
 bool_t                   comm_channel_used[COMM_NB];
 
-#define COMM_SEND_CH(_chan, _byte) {                    \
-    comm_status[_chan].ck_a += _byte;	                \
-    comm_status[_chan].ck_b += comm_status[_chan].ck_a;	\
-    comm_send_ch(_chan, _byte);		                    \
-}
+#define UPDATE_CHECKSUM(_msg, _x)           \
+    _msg->ck_a += _x;                       \
+    _msg->ck_b += _msg->ck_a;               \
 
-#define DownlinkStartMessage(_n, _id, _len) comm_start_message(chan, _id, _len);
-#define DownlinkCheckFreeSpace(_len) comm_check_free_space(chan, _len)
-#define DownlinkEndMessage() comm_end_message(chan);
-#define DownlinkOverrun() comm_status[chan].buffer_overrun++;
-#define DownlinkPutUint8(_ch) COMM_SEND_CH(chan, _ch);
+#define ADD_CHAR(_msg, _x)                  \
+    _msg->payload[_msg->idx] = _x;          \
+    _msg->idx++;
+
+void
+comm_send_message_ch ( CommChannel_t chan, uint8_t c )
+{
+    comm_status[chan].ck_a += c;
+    comm_status[chan].ck_b += comm_status[chan].ck_a;
+    comm_send_ch(chan, c);
+}
 
 void
 comm_start_message ( CommChannel_t chan, uint8_t id, uint8_t len )
@@ -32,9 +36,9 @@ comm_start_message ( CommChannel_t chan, uint8_t id, uint8_t len )
     comm_status[chan].ck_b = COMM_STX;
     comm_send_ch(chan, COMM_STX);
 
-    COMM_SEND_CH(chan, total_len);
-    COMM_SEND_CH(chan, COMM_DEFAULT_ACID);
-    COMM_SEND_CH(chan, id);
+    comm_send_message_ch(chan, total_len);
+    comm_send_message_ch(chan, COMM_DEFAULT_ACID);
+    comm_send_message_ch(chan, id);
 }
 
 void
@@ -48,27 +52,31 @@ void
 comm_send_message ( CommChannel_t chan, CommMessage_t *message )
 {
     uint8_t i;
+    /* Counting STX, LENGTH, ACID, MSGID, CRC1 and CRC2 */
+    uint8_t total_len = message->len + COMM_NUM_NON_PAYLOAD_BYTES;
 
+    /* Calculate the checksum for the message */
+    message->ck_a = COMM_STX;
+    message->ck_b = COMM_STX;
     comm_send_ch(chan, COMM_STX);
-    comm_send_ch(chan, message->len + 4);
+
+    UPDATE_CHECKSUM(message, total_len)
+    comm_send_ch(chan, total_len);
+
+    UPDATE_CHECKSUM(message, message->acid)
     comm_send_ch(chan, message->acid);
+
+    UPDATE_CHECKSUM(message, message->msgid)
     comm_send_ch(chan, message->msgid);
 
-    for (i = 0; i < message->len; i++)
+    for (i = 0; i < message->len; i++) {
+        UPDATE_CHECKSUM(message, message->payload[i])
         comm_send_ch(chan, message->payload[i]);
+    }
 
     comm_send_ch(chan, message->ck_a);
     comm_send_ch(chan, message->ck_b);
 }
-
-
-#define UPDATE_CHECKSUM(_x)                                                 \
-    rxmsg->ck_a += _x;                                        \
-    rxmsg->ck_b += rxmsg->ck_a;                 \
-
-#define ADD_CHAR(_x)                                                        \
-    rxmsg->payload[rxmsg->idx] = _x;     \
-    rxmsg->idx++;
 
 bool_t
 comm_parse ( CommChannel_t chan )
@@ -95,25 +103,25 @@ comm_parse ( CommChannel_t chan )
                 /* Counting STX, LENGTH, ACID, MSGID, CRC1 and CRC2 */
                 rxmsg->len = c - COMM_NUM_NON_PAYLOAD_BYTES; 
                 rxmsg->idx = 0;
-                UPDATE_CHECKSUM(c)
+                UPDATE_CHECKSUM(rxmsg, c)
                 comm_status[chan].parse_state++;
                 break;
             case STATE_GOT_LENGTH:
                 rxmsg->acid = c;
-                UPDATE_CHECKSUM(c)
+                UPDATE_CHECKSUM(rxmsg, c)
                 comm_status[chan].parse_state++;
                 break;
             case STATE_GOT_ACID:
                 rxmsg->msgid = c;
-                UPDATE_CHECKSUM(c)
+                UPDATE_CHECKSUM(rxmsg, c)
                 if (rxmsg->len == 0)
                     comm_status[chan].parse_state = STATE_GOT_PAYLOAD;
                 else
                     comm_status[chan].parse_state++;
                 break;
             case STATE_GOT_MSGID:
-                ADD_CHAR(c)
-                UPDATE_CHECKSUM(c)
+                ADD_CHAR(rxmsg, c)
+                UPDATE_CHECKSUM(rxmsg, c)
                 if (rxmsg->idx == rxmsg->len)
                     comm_status[chan].parse_state++;
                 break;
@@ -142,27 +150,16 @@ comm_parse ( CommChannel_t chan )
 bool_t
 comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
 {
-#ifdef MESSAGE_ID_TEST_MESSAGE
-    static uint8_t u8 = 1; static uint8_t i8 = -1; static uint16_t u16 = 10; static int16_t i16 = -10;
-    static uint32_t u32 = 100; static int32_t i32 = -100; static float f = 0.0;
-#endif
-
     switch(msgid) 
     {
         case MESSAGE_ID_PING:
-            MESSAGE_SEND_PONG();
+            MESSAGE_SEND_PONG(chan);
             break;
         case MESSAGE_ID_TIME:
-            MESSAGE_SEND_TIME( &cpu_time_sec );
+            MESSAGE_SEND_TIME(chan, &cpu_time_sec );
         case MESSAGE_ID_COMM_STATUS:
-            MESSAGE_SEND_COMM_STATUS( &comm_status[chan].buffer_overrun, &comm_status[chan].parse_error )
+            MESSAGE_SEND_COMM_STATUS(chan, &comm_status[chan].buffer_overrun, &comm_status[chan].parse_error )
             break;
-#ifdef MESSAGE_ID_TEST_MESSAGE
-        case MESSAGE_ID_TEST_MESSAGE:
-            MESSAGE_SEND_TEST_MESSAGE ( &u8, &i8, &u16, &i16, &u32, &i32, &f );
-            u8 += 1; i8 -= 1; u16 += 10; i16 -= 10; u32 += 100; i32 -= 100; f += 15.0;
-            break;
-#endif
         default:
             return FALSE;
             break;
