@@ -1,8 +1,8 @@
 #!/bin/sh
 
-PPZ_BRANCH=wasp-gps
-PPZ_DIR=/home/john/Programming/paparazzi.git/
-WASP_DIR=/home/john/Programming/wasp/
+PPZ_BRANCH=wasp
+PPZ_DIR=/home/john/Programming/paparazzi.gitsvn/
+WASP_DIR=/home/john/Programming/wasp.git/
 
 PPZ_SW_DIR=$PPZ_DIR/wasp/src
 WASP_SW_DIR=$WASP_DIR/sw/onboard
