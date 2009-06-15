@@ -50,7 +50,7 @@ class UI(GObjectSerialMonitor):
         self._transport = transport
 
         self._rxts = treeview.MessageTreeStore()
-        rxtv = treeview.MessageTreeView(self._rxts, editable=False)
+        rxtv = treeview.MessageTreeView(self._rxts, editable=False, show_dt=True)
 
         txts = treeview.MessageTreeStore()
         for m in ("PING", "REQUEST_MESSAGE"):
