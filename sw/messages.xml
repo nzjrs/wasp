@@ -38,6 +38,11 @@
      <field name="a_float" type="float"></field>
    </message>
 
+   <message name="WASP_GPS" id="27">
+      <field name="status"   type="uint8" values="NO_FIX|NA|2D|3D"/>
+      <field name="sv" type="uint8"/>
+   </message>
+
    <periodic>
       <message name="COMM_STATUS" frequency="0.5"></message>
       <message name="TIME" frequency="0.1"></message>

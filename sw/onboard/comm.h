@@ -29,15 +29,23 @@ typedef struct __CommStatus {
     ParseState_t parse_state;
 } CommStatus_t;
 
-typedef bool_t (*CommMessageCallback_t)(CommMessage_t *message);
+typedef bool_t (*CommRXMessageCallback_t)(CommChannel_t chan, CommMessage_t *message);
+typedef bool_t (*CommTXMessageCallback_t)(CommChannel_t chan, uint8_t msgid);
 
-extern CommMessageCallback_t    comm_callback[COMM_NB];
+extern CommRXMessageCallback_t  comm_callback_rx[COMM_NB];
+extern CommTXMessageCallback_t  comm_callback_tx[COMM_NB];
 extern CommMessage_t            comm_message[COMM_NB];
 extern CommStatus_t             comm_status[COMM_NB];
 extern bool_t                   comm_channel_used[COMM_NB];
 
 void
 comm_init ( CommChannel_t chan );
+
+void
+comm_add_rx_callback ( CommChannel_t chan, CommRXMessageCallback_t cb);
+
+void
+comm_add_tx_callback ( CommChannel_t chan, CommTXMessageCallback_t cb);
 
 void
 comm_periodic_task ( CommChannel_t chan );

@@ -5,7 +5,8 @@
 #include "comm.h"
 #include "sys_time.h"
 
-CommMessageCallback_t    comm_callback[COMM_NB];
+CommRXMessageCallback_t  comm_callback_rx[COMM_NB];
+CommTXMessageCallback_t  comm_callback_tx[COMM_NB];
 CommMessage_t            comm_message[COMM_NB];
 CommStatus_t             comm_status[COMM_NB];
 bool_t                   comm_channel_used[COMM_NB];
@@ -161,6 +162,8 @@ comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
             MESSAGE_SEND_COMM_STATUS(chan, &comm_status[chan].buffer_overrun, &comm_status[chan].parse_error )
             break;
         default:
+            if (comm_callback_tx[chan])
+                return comm_callback_tx[chan](chan, msgid);
             return FALSE;
             break;
     }
@@ -177,8 +180,8 @@ comm_event_task ( CommChannel_t chan )
     {
         handled = comm_send_message_by_id(chan, comm_message[chan].msgid);
         if ( !handled ) {
-            if (comm_callback[chan])
-                ret = comm_callback[chan](&comm_message[chan]);
+            if (comm_callback_rx[chan])
+                ret = comm_callback_rx[chan](chan, &comm_message[chan]);
             else
                 ret = FALSE;
         }
@@ -211,6 +214,19 @@ comm_periodic_task ( CommChannel_t chan )
             
 }
 
+void
+comm_add_rx_callback ( CommChannel_t chan, CommRXMessageCallback_t cb)
+{
+    if (chan < COMM_NB && cb)
+        comm_callback_rx[chan] = cb;
+}
+
+void
+comm_add_tx_callback ( CommChannel_t chan, CommTXMessageCallback_t cb)
+{
+    if (chan < COMM_NB && cb)
+        comm_callback_tx[chan] = cb;
+}
 
 
 

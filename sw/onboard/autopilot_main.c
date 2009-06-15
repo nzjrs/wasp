@@ -35,7 +35,9 @@
 #include "actuators_buss_twi_blmc_hw.h"
 
 #include "rc.h"
+
 #include "comm.h"
+#include "comm-autopilot.h"
 
 
 #include "booz2_imu.h"
@@ -87,7 +89,9 @@ STATIC_INLINE void booz2_main_init( void ) {
   actuators_init();
 
   rc_init();
+
   comm_init(COMM_1);
+  comm_add_tx_callback(COMM_1, comm_autopilot_send);
 
   gps_init();
 

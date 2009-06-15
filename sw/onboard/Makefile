@@ -39,7 +39,8 @@ SRCARM =                            \
     booz2_fms.c                     \
     booz2_fms_datalink.c            \
     booz2_fms_test_signal.c         \
-    comm.c
+    comm.c                          \
+    comm-autopilot.c
 
 # Arch sources
 SRCARM +=                           \
