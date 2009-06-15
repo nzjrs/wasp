@@ -145,15 +145,15 @@ upload: $(OBJDIR)/$(TARGET).elf bootloader
 generated: generated/radio.h generated/build.h generated/messages.h
 
 # Radio header
-generated/radio.h: conf-$(CONFIG)/radio.xml
+generated/radio.h: conf-$(CONFIG)/radio.xml $(TOOLS)/gen-radio.py
 	@echo GENERATE $@
-	$(Q)$(TOOLS)/gen-radio.py $^ > $@
+	$(Q)$(TOOLS)/gen-radio.py $< > $@
 
-generated/messages.h: ../messages.xml
+generated/messages.h: ../messages.xml $(TOOLS)/gen-messages.py
 	@echo GENERATE $@
-	$(Q)$(TOOLS)/gen-messages.py --messages=$^ > $@
+	$(Q)$(TOOLS)/gen-messages.py --messages=$< > $@
 
-generated/build.h: $(SRCARM)
+generated/build.h: $(SRCARM) $(TOOLS)/gen-build-info.py
 	@echo GENERATE $@
 	$(Q)$(TOOLS)/gen-build-info.py > $@
 
