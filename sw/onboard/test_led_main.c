@@ -25,20 +25,15 @@ static inline void main_init( void ) {
   sys_time_init();
   led_init();
   int_enable();
-  //  SetBit(IO0DIR, 18);
-  //  SetBit(IO0SET, 18);
-  //SetBit(IO0CLR, 18);
 }
 
 static inline void main_periodic_task( void ) {
-  //#if 0
   RunOnceEvery(100, {
-    LED_TOGGLE(1);
-    LED_TOGGLE(2);
-    LED_TOGGLE(3);
-    LED_TOGGLE(4);
+    led_toggle(1);
+    led_toggle(2);
+    led_toggle(3);
+    led_toggle(4);
   });
-  //#endif
 }
 
 static inline void main_event_task( void ) {
