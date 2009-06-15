@@ -48,11 +48,12 @@ test_message_tx ( CommChannel_t chan, uint8_t msgid )
 bool_t
 test_message_rx (CommChannel_t chan, CommMessage_t *message)
 {
-    led_on(2);
 
     if (message && message->msgid == MESSAGE_ID_TEST_MESSAGE) 
     {
         uint8_t *payload = message->payload;
+
+	    led_toggle(2);
 
         u8 = MESSAGE_TEST_MESSAGE_GET_FROM_BUFFER_a_uint8(payload);
         i8 = MESSAGE_TEST_MESSAGE_GET_FROM_BUFFER_a_int8(payload);
