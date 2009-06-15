@@ -151,45 +151,56 @@ comm_parse ( CommChannel_t chan )
 bool_t
 comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
 {
-    switch(msgid) 
+    bool_t ret = TRUE;
+
+    switch (msgid)
     {
-        case MESSAGE_ID_PING:
-            MESSAGE_SEND_PONG(chan);
-            break;
         case MESSAGE_ID_TIME:
             MESSAGE_SEND_TIME(chan, &cpu_time_sec );
+            break;
         case MESSAGE_ID_COMM_STATUS:
             MESSAGE_SEND_COMM_STATUS(chan, &comm_status[chan].buffer_overrun, &comm_status[chan].parse_error )
             break;
-        case MESSAGE_ID_REQUEST_MESSAGE:
-            msgid = MESSAGE_REQUEST_MESSAGE_GET_FROM_BUFFER_msgid(comm_message[chan].payload);
-            /* prevent recursing forever */
-            if (msgid != MESSAGE_ID_REQUEST_MESSAGE)
-                return comm_send_message_by_id(chan, msgid);
-            break;
         default:
             if (comm_callback_tx[chan])
-                return comm_callback_tx[chan](chan, msgid);
-            return FALSE;
+                ret = comm_callback_tx[chan](chan, msgid);
+            else
+                ret = FALSE;
             break;
     }
-    return TRUE;
+    return ret;
 }
 
 bool_t
 comm_event_task ( CommChannel_t chan ) 
 {
-    bool_t handled;
     bool_t ret = TRUE;
 
     if ( comm_channel_used[chan] && comm_ch_available(chan) && comm_parse(chan) ) 
     {
-        handled = comm_send_message_by_id(chan, comm_message[chan].msgid);
-        if ( !handled ) {
-            if (comm_callback_rx[chan])
-                ret = comm_callback_rx[chan](chan, &comm_message[chan]);
-            else
-                ret = FALSE;
+        uint8_t msgid = comm_message[chan].msgid;
+        CommMessage_t *msg = &comm_message[chan];
+
+        /* handle standard messages directly in the comm layer */
+        switch ( comm_message[chan].msgid )
+        {
+            case MESSAGE_ID_PING:
+                MESSAGE_SEND_PONG(chan);
+                break;
+            case MESSAGE_ID_REQUEST_MESSAGE:
+                msgid = MESSAGE_REQUEST_MESSAGE_GET_FROM_BUFFER_msgid(msg->payload);
+                ret = comm_send_message_by_id(chan, msgid);
+                break;
+            case MESSAGE_ID_TIME:
+            case MESSAGE_ID_COMM_STATUS:
+                ret = comm_send_message_by_id(chan, msgid);
+                break;
+            default:
+                if (comm_callback_rx[chan])
+                    ret = comm_callback_rx[chan](chan, &comm_message[chan]);
+                else
+                    ret = FALSE;
+                break;
         }
         comm_status[chan].msg_received = FALSE;
     }

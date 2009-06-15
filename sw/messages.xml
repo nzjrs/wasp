@@ -17,7 +17,12 @@
      <field name="msgid" type="uint8"/>
    </message>
 
-   <message name="TIME" id="6">
+   <message name="REQUEST_TELEMETRY" id="6">
+     <field name="msgid" type="uint8"/>
+     <field name="frequency" type="float"/>
+   </message>
+
+   <message name="TIME" id="7">
      <field name="t" type="uint16"></field>
    </message>
 
