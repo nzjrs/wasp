@@ -161,6 +161,12 @@ comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
         case MESSAGE_ID_COMM_STATUS:
             MESSAGE_SEND_COMM_STATUS(chan, &comm_status[chan].buffer_overrun, &comm_status[chan].parse_error )
             break;
+        case MESSAGE_ID_REQUEST_MESSAGE:
+            msgid = MESSAGE_REQUEST_MESSAGE_GET_FROM_BUFFER_msgid(comm_message[chan].payload);
+            /* prevent recursing forever */
+            if (msgid != MESSAGE_ID_REQUEST_MESSAGE)
+                return comm_send_message_by_id(chan, msgid);
+            break;
         default:
             if (comm_callback_tx[chan])
                 return comm_callback_tx[chan](chan, msgid);
