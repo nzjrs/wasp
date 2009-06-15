@@ -44,17 +44,19 @@ class GObjectSerialMonitor(gobject.GObject):
         raise NotImplementedError
 
 class UI(GObjectSerialMonitor):
-    def __init__(self, messages_file, serialsender, transport):
+    def __init__(self, messages_file, serialsender, transport, debug=False):
         GObjectSerialMonitor.__init__(self, serialsender)
-
+        self._debug = debug
         self._transport = transport
 
         self._rxts = treeview.MessageTreeStore()
         rxtv = treeview.MessageTreeView(self._rxts, editable=False, show_dt=True)
 
         txts = treeview.MessageTreeStore()
-        for m in ("PING", "REQUEST_MESSAGE"):
-            txts.add_message(messages_file.get_message_by_name(m))
+        for m in ("PING", "REQUEST_MESSAGE", "TEST_MESSAGE"):
+            msg = messages_file.get_message_by_name(m)
+            if msg:
+                txts.add_message(msg)
         self._txtv = treeview.MessageTreeView(txts, editable=True)
 
         w = gtk.Window()
@@ -93,6 +95,11 @@ class UI(GObjectSerialMonitor):
                         *values)
             serial.write(data.tostring())
 
+            if self._debug:
+                print data, "LEN: ", len(data)
+                for d in data:
+                    print "    %#X" % ord(d)
+
     def _on_quit(self, win, event, serial):
         serial.disconnect_from_port()
         gtk.main_quit()
@@ -106,6 +113,9 @@ if __name__ == "__main__":
     parser.add_option("-d", "--debug",
                     action="store_true",
                     help="print extra debugging information")
+    parser.add_option("-D", "--debug-tx",
+                    action="store_true",
+                    help="print extra debugging information about TX")
     options, args = parser.parse_args()
 
     m = messages.MessagesFile(xmlfile=options.messages, debug=options.debug)
@@ -114,6 +124,6 @@ if __name__ == "__main__":
 
     m.parse()
 
-    ui = UI(m, s, t)
+    ui = UI(m, s, t, debug=options.debug_tx)
     gtk.main()
 
