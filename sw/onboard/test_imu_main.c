@@ -4,9 +4,7 @@
 #include "init_hw.h"
 #include "sys_time.h"
 #include "led.h"
-#include "uart.h"
-#include "messages.h"
-#include "downlink.h"
+#include "comm.h"
 
 #include "booz2_imu.h"
 #include "booz2_imu_b2.h"
@@ -34,7 +32,9 @@ static inline void main_init( void ) {
   hw_init();
   sys_time_init();
   led_init();
-  uart1_init_tx();
+
+  comm_init(COMM_1);
+
   booz2_imu_impl_init();
   booz2_imu_init();
 
@@ -42,11 +42,12 @@ static inline void main_init( void ) {
 }
 
 static inline void main_periodic_task( void ) {
-  //#if 0
+  #if 0
   RunOnceEvery(100, {
-    LED_TOGGLE(3);
+    led_toggle(3);
     DOWNLINK_SEND_ALIVE(16, MD5SUM);
   });
+  #endif
   booz2_imu_periodic();
 
 }
@@ -61,7 +62,8 @@ static inline void on_imu_event(void) {
   Booz2ImuScaleGyro();
   Booz2ImuScaleAccel();
 
-  LED_TOGGLE(2);
+  led_toggle(2);
+#if 0
   static uint8_t cnt;
   cnt++;
   if (cnt > 15) cnt = 0;
@@ -84,4 +86,5 @@ static inline void on_imu_event(void) {
 			      &booz_imu.accel.y,
 			      &booz_imu.accel.z);
   }  
+#endif
 }

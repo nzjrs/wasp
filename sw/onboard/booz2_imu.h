@@ -1,6 +1,9 @@
 #ifndef BOOZ2_IMU_H
 #define BOOZ2_IMU_H
 
+/* For IMU_XXX scale constants */
+#include "airframe.h"
+
 #include "pprz_algebra_int.h"
 #include "booz2_imu_b2.h"
 
