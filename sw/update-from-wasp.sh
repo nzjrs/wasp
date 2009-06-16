@@ -39,6 +39,11 @@ then
 		--cvs-exclude					\
 		--exclude='*.pyc'				\
 		$PPZ_TOOLS_DIR/ $WASP_TOOLS_DIR/
+
+    #now commit here with the same message
+    COMMIT_FILE=`mktemp`
+    GIT_DIR=$PPZ_DIR/.git git log --pretty=format:"%b%s" -1 > $COMMIT_FILE
+    git commit -a -F $COMMIT_FILE -e
 else
 	echo "INCORRECT BRANCH $BRANCH"
 fi
