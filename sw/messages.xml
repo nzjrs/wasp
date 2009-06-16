@@ -48,6 +48,44 @@
       <field name="sv" type="uint8"/>
    </message>
 
+  <message name="IMU_GYRO_RAW" id="28">
+    <field name="gp" type="uint16" unit="adc"/>
+    <field name="gq" type="uint16" unit="adc"/>
+    <field name="gr" type="uint16" unit="adc"/>
+  </message>
+
+  <message name="IMU_ACCEL_RAW" id="29">
+    <field name="ax" type="uint16" unit="adc"/>
+    <field name="ay" type="uint16" unit="adc"/>
+    <field name="az" type="uint16" unit="adc"/>
+  </message>
+
+  <message name="IMU_MAG_RAW" id="30">
+    <field name="mx" type="int16" unit="adc"/>
+    <field name="my" type="int16" unit="adc"/>
+    <field name="mz" type="int16" unit="adc"/>
+  </message>
+
+ <message name="WASP_GYRO" id="31">
+   <field name="gp"    type="int32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
+   <field name="gq"    type="int32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
+   <field name="gr"    type="int32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
+ </message>
+
+ <message name="WASP_ACCEL" id="32">
+   <field name="ax"    type="int32" alt_unit="m/s2" alt_unit_coef="0.0009766"/>
+   <field name="ay"    type="int32" alt_unit="m/s2" alt_unit_coef="0.0009766"/>
+   <field name="az"    type="int32" alt_unit="m/s2" alt_unit_coef="0.0009766"/>
+ </message>
+
+ <message name="WASP_MAG" id="33">
+   <field name="mx"    type="int32" alt_unit="1" alt_unit_coef="0.0004883"/>
+   <field name="my"    type="int32" alt_unit="1" alt_unit_coef="0.0004883"/>
+   <field name="mz"    type="int32" alt_unit="1" alt_unit_coef="0.0004883"/>
+ </message>
+
+   <!-- Begin periodic messages -->
+
    <periodic>
       <message name="COMM_STATUS" frequency="0.5"></message>
       <message name="TIME" frequency="0.1"></message>
