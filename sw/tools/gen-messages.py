@@ -19,16 +19,27 @@ LENGTHS = {
     "int32"     :   4,
     "float"     :   4,
 }
-ARRAY_LENGTH = re.compile("^([a-z0-9]+)\[(\d{1,2})\]$")
 
-def get_field_length(_type):
-    #check if it is an array
-    m = ARRAY_LENGTH.match(_type)
-    if m:
-        _type, _len = m.groups()
-        return LENGTHS[_type] * int(_len)
-    else:
-        return LENGTHS[_type]
+class Field:
+
+    ARRAY_LENGTH = re.compile("^([a-z0-9]+)\[(\d{1,2})\]$")
+
+    def __init__(self, f):
+        self.name = f.name
+        self.type, self.length = self._get_field_length(f.type)
+
+    def _get_field_length(self, _type):
+        #check if it is an array
+        m = self.ARRAY_LENGTH.match(_type)
+        if m:
+            self.array = True
+            _type, _len = m.groups()
+            _len = LENGTHS[_type] * int(_len)
+        else:
+            self.array = False
+            _len = LENGTHS[_type]
+
+        return _type, _len
 
 class Periodic:
 
@@ -74,20 +85,26 @@ class Message:
     "} CommMessage_t;" 
 
     def __init__(self, m):
-        self.name = m.name
+        self.name = m.name.upper()
         if int(m.id) <= 255:
             self.id = int(m.id)
         else:
             raise Exception("Message IDs must be <= 255")
         try:
-            self.fields = xmlobject.ensure_list(m.field)
+            self.fields = [Field(f) for f in xmlobject.ensure_list(m.field)]
         except AttributeError:
             self.fields = []
 
-        sizes = [get_field_length(f.type) for f in self.fields]
+        sizes = [f.length for f in self.fields]
 
         self.size = sum(sizes)
         self.sizes = ["0"] + [str(s) for s in sizes]
+
+    def print_id(self):
+        print "#define MESSAGE_ID_%s %d" % (self.name, self.id)
+
+    def print_length(self):
+        print "#define MESSAGE_LENGTH_%s (%s)" % (self.name, "+".join(self.sizes))
 
 class _Writer(object):
 
@@ -108,14 +125,6 @@ class _Writer(object):
 
 class _CWriter(_Writer):
 
-    def _print_id(self, m):
-        name = m.name.upper()
-        print "#define MESSAGE_ID_%s %d" % (name, m.id)
-
-    def _print_length(self, m):
-        name = m.name.upper()
-        print "#define MESSAGE_LENGTH_%s (%s)" % (name, "+".join(m.sizes))
-
     def preamble(self):
         gentools.print_header(
             "%s_H" % self.note.upper(),
@@ -133,10 +142,10 @@ class _CWriter(_Writer):
         print Message.STRUCT
         print
         for m in self.messages:
-            self._print_id(m)
+            m.print_id()
         print
         for m in self.messages:
-            self._print_length(m)
+            m.print_length()
         print
         print "#define NUM_PERIODIC_MESSAGES %d" % len(self.periodic)
         print "#define PERIODIC_MESSAGE_INITIALIZER {", ", ".join([p.get_initializer() for p in self.periodic]), "};"
@@ -154,14 +163,13 @@ class MacroWriter(_CWriter):
     PUT_CH_FN   = "comm_send_message_ch"
 
     def _print_send_function(self, m):
-        name = m.name.upper()
         first_params = ["_chan"]
 
-        print "#define MESSAGE_SEND_%s(" % name, 
+        print "#define MESSAGE_SEND_%s(" % m.name, 
         print ", ".join(first_params + [f.name for f in m.fields]), ") \\"
         print "{ \\"
-        print "\tif (%s(_chan, MESSAGE_LENGTH_%s)) { \\" % (self.CHECK_FN, name)
-        print "\t\t%s(_chan, MESSAGE_ID_%s, MESSAGE_LENGTH_%s); \\" % (self.START_FN, name, name)
+        print "\tif (%s(_chan, MESSAGE_LENGTH_%s)) { \\" % (self.CHECK_FN, m.name)
+        print "\t\t%s(_chan, MESSAGE_ID_%s, MESSAGE_LENGTH_%s); \\" % (self.START_FN, m.name, m.name)
         for f in m.fields:
             print "\t\t_Put%sByAddr(_chan, (%s)) \\" % (f.type.title(), f.name)
         print "\t\t%s(_chan); \\" % self.END_FN
@@ -172,13 +180,12 @@ class MacroWriter(_CWriter):
 
     def _print_accessor(self, m):
         offset = 0
-        name = m.name.upper()
         for f in m.fields:
-            print "#define MESSAGE_%s_GET_FROM_BUFFER_%s(_payload)" % (name, f.name),
-            if ARRAY_LENGTH.match(f.type):
+            print "#define MESSAGE_%s_GET_FROM_BUFFER_%s(_payload)" % (m.name, f.name),
+            if f.array:
                 pass
             else:
-                l = get_field_length(f.type)
+                l = f.length
                 if l == 1:
                     print "(%s_t)(*((uint8_t*)_payload+%d))" % (f.type, offset)
                 elif l == 2:
@@ -233,20 +240,6 @@ class FunctionWriter(_CWriter):
     def preamble(self):
         _CWriter.preamble(self)
         print "static inline void message_start(uint8_t id, uint8_t len)\n{\n}"
-
-#    comm_send_ch(chan, STX);
-#    comm_status[chan].ck_a = len;
-#    comm_status[chan].ck_b = len;
-#    COMM_SEND_CH(chan, len+4);
-#    COMM_SEND_CH(chan, ACID);
-#    COMM_SEND_CH(chan, id);
-#}
-
-#void
-#comm_end_message ( CommChannel_t chan )
-#{
-#    comm_send_ch(chan, comm_status[chan].ck_a);
-#    comm_send_ch(chan, comm_status[chan].ck_a);
 
     def body(self):
         for m in self.messages:
