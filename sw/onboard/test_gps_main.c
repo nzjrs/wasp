@@ -37,6 +37,7 @@ static inline void main_periodic_task( void ) {
 
   RunOnceEvery(250, {
     comm_send_ch(COMM_1, booz_gps_state.num_sv);
+    MESSAGE_SEND_WASP_GPS( COMM_1, &booz_gps_state.fix, &booz_gps_state.num_sv );
   });
 
 
@@ -46,5 +47,7 @@ static inline void main_event_task( void ) {
   if (gps_event_task())
     if (booz_gps_state.fix == GPS_FIX_3D)
         led_on(GPS_LED);
+    else
+        led_toggle(GPS_LED);
 }
 
