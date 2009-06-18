@@ -89,6 +89,17 @@
    <field name="mz"    type="int32" alt_unit="1" alt_unit_coef="0.0004883"/>
  </message>
 
+<!--
+  <message name="PPM" id="34">
+    <field name="ppm_rate" type="uint8"></field>
+    <field name="values" type="uint16[6]" unit="ticks"/>
+  </message>
+
+  <message name="RC" id="35">
+    <field name="values" type="int16[5]" unit="pprz" format="%d"/>
+  </message>
+-->
+
    <!-- Begin periodic messages -->
 
    <periodic>

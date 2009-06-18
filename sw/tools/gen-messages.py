@@ -32,12 +32,14 @@ class Field:
         #check if it is an array
         m = self.ARRAY_LENGTH.match(_type)
         if m:
-            self.array = True
             _type, _len = m.groups()
             _len = LENGTHS[_type] * int(_len)
+            self.element_length = LENGTHS[_type]
+            self.array = True
         else:
-            self.array = False
             _len = LENGTHS[_type]
+            self.element_length = None
+            self.array = False
 
         return _type, _len
 
@@ -171,7 +173,11 @@ class MacroWriter(_CWriter):
         print "\tif (%s(_chan, MESSAGE_LENGTH_%s)) { \\" % (self.CHECK_FN, m.name)
         print "\t\t%s(_chan, MESSAGE_ID_%s, MESSAGE_LENGTH_%s); \\" % (self.START_FN, m.name, m.name)
         for f in m.fields:
-            print "\t\t_Put%sByAddr(_chan, (%s)) \\" % (f.type.title(), f.name)
+            if f.array:
+                for i in range(f.length):
+                    print "\t\t_Put%sByAddr(_chan, (%s)) \\" % (f.type.title(), f.name)
+            else:
+                print "\t\t_Put%sByAddr(_chan, (%s)) \\" % (f.type.title(), f.name)
         print "\t\t%s(_chan); \\" % self.END_FN
         print "\t} else \\"
         print "\t\t%s(_chan); \\" % self.OVERRUN_FN
@@ -183,7 +189,8 @@ class MacroWriter(_CWriter):
         for f in m.fields:
             print "#define MESSAGE_%s_GET_FROM_BUFFER_%s(_payload)" % (m.name, f.name),
             if f.array:
-                pass
+                l = f.length * f.element_length
+                print "(%s_t *)((uint8_t*)_payload+%d)" % (f.type, offset)
             else:
                 l = f.length
                 if l == 1:
@@ -195,7 +202,7 @@ class MacroWriter(_CWriter):
                         print "({ union { uint32_t u; float f; } _f; _f.u = (uint32_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24); _f.f; })" % (offset, offset, offset, offset)
                     else:
                         print "(%s_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24)" % (f.type, offset, offset, offset, offset)
-                offset += l
+            offset += l
 
 
     def preamble(self):
