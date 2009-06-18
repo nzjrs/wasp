@@ -7,8 +7,8 @@
 
 typedef enum {
     GPS_FIX_NONE,
-    GPS_FIX_2D = 0x02,
-    GPS_FIX_3D = 0x03,
+    GPS_FIX_2D,
+    GPS_FIX_3D,
 } GpsFix_t;
 
 struct Booz_gps_state {

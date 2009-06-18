@@ -12,8 +12,9 @@ volatile bool_t  booz2_gps_msg_received;
 volatile uint8_t booz2_gps_nb_ovrn;
 
 /* UBX parsing */
-#define  BOOZ2_GPS_FIX_NONE 0x00
-#define  BOOZ2_GPS_FIX_3D   0x03
+#define  UBX_FIX_NONE 0x00
+#define  UBX_FIX_2D   0x02
+#define  UBX_FIX_3D   0x03
 
 static bool_t  ubx_msg_available;
 
@@ -42,7 +43,7 @@ static uint8_t  ck_a, ck_b;
 
 void gps_init(void) 
 {
-  booz_gps_state.fix = BOOZ2_GPS_FIX_NONE;
+  booz_gps_state.fix = GPS_FIX_NONE;
   uart0_init_tx();
   ubx_init();
 }
@@ -65,8 +66,10 @@ gps_event_task(void)
             }
             else if (ubx_id == UBX_NAV_SOL_ID) {
                 uint8_t fix = UBX_NAV_SOL_GPSfix(ubx_msg_buf);
-                if ( fix == BOOZ2_GPS_FIX_3D)
+                if ( fix == UBX_FIX_3D)
                     booz_gps_state.fix = GPS_FIX_3D;
+                else if ( fix == UBX_FIX_2D )
+                    booz_gps_state.fix = GPS_FIX_2D;
                 else
                     booz_gps_state.fix = GPS_FIX_NONE;
                 booz_gps_state.ecef_pos.x   = UBX_NAV_SOL_ECEF_X(ubx_msg_buf);

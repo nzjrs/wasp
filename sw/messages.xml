@@ -28,6 +28,7 @@
 
    <message name="STATUS" id="8">
      <field name="rc" type="uint8" values="OK|LOST|REALLY_LOST"/>
+     <field name="gps" type="uint8" values="NO_FIX|2D_FIX|3D_FIX"/>
    </message>
 
    <!-- Begin custom messages at 25 -->
@@ -48,7 +49,7 @@
    </message>
 
    <message name="WASP_GPS" id="27">
-      <field name="status"   type="uint8" values="NO_FIX|NA|2D|3D"/>
+      <field name="fix" type="uint8" values="NONE|2D|3D"/>
       <field name="sv" type="uint8"/>
    </message>
 
