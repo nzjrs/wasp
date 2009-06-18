@@ -4,6 +4,7 @@
 
 #include "comm.h"
 #include "sys_time.h"
+#include "rc.h"
 
 CommRXMessageCallback_t  comm_callback_rx[COMM_NB];
 CommTXMessageCallback_t  comm_callback_tx[COMM_NB];
@@ -158,6 +159,9 @@ comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
         case MESSAGE_ID_TIME:
             MESSAGE_SEND_TIME(chan, &cpu_time_sec );
             break;
+        case MESSAGE_ID_STATUS:
+            MESSAGE_SEND_STATUS(chan, &rc_status );
+            break;
         case MESSAGE_ID_COMM_STATUS:
             MESSAGE_SEND_COMM_STATUS(chan, &comm_status[chan].buffer_overrun, &comm_status[chan].parse_error )
             break;
@@ -192,6 +196,7 @@ comm_event_task ( CommChannel_t chan )
                 ret = comm_send_message_by_id(chan, msgid);
                 break;
             case MESSAGE_ID_TIME:
+            case MESSAGE_ID_STATUS:
             case MESSAGE_ID_COMM_STATUS:
                 ret = comm_send_message_by_id(chan, msgid);
                 break;

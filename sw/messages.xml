@@ -26,6 +26,10 @@
      <field name="t" type="uint16"></field>
    </message>
 
+   <message name="STATUS" id="8">
+     <field name="rc" type="uint8" values="OK|LOST|REALLY_LOST"/>
+   </message>
+
    <!-- Begin custom messages at 25 -->
 
    <message name="COMM_STATUS" id="25">
@@ -87,7 +91,8 @@
    <!-- Begin periodic messages -->
 
    <periodic>
-      <message name="COMM_STATUS" frequency="0.5"></message>
+      <message name="COMM_STATUS" frequency="0.25"></message>
+      <message name="STATUS" frequency="0.5"></message>
       <message name="TIME" frequency="0.1"></message>
    </periodic>
 
