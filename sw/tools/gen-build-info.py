@@ -17,11 +17,11 @@ except:
 gentools.print_header("BUILD_H")
 if ok:
     print '#define BUILD_REV "%s"' % rev.strip()
-    print '#define BUILD_DIRTY', int(dirty)
     print '#define BUILD_BRANCH "%s"' % branch.split("/")[-1].strip()
+    print '#define BUILD_DIRTY', int(dirty)
 else:
     print '#define BUILD_REV "UNKNOWN"'
-    print '#define BUILD_DIRTY 0'
     print '#define BUILD_BRANCH "UNKNOWN"'
+    print '#define BUILD_DIRTY 0'
 print "#define BUILD_TIME", int(time.mktime(time.localtime()))
 gentools.print_footer("BUILD_H")

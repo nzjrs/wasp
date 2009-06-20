@@ -4,6 +4,7 @@
 
 #include "comm.h"
 #include "sys_time.h"
+#include "generated/build.h"
 
 CommRXMessageCallback_t  comm_callback_rx[COMM_NB];
 CommTXMessageCallback_t  comm_callback_tx[COMM_NB];
@@ -151,6 +152,11 @@ comm_parse ( CommChannel_t chan )
 bool_t
 comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
 {
+    static char build_revision[40] = BUILD_REV;
+    static char build_branch[10] = BUILD_BRANCH;
+    static uint8_t build_dirty = BUILD_DIRTY;
+    static uint32_t build_time = BUILD_TIME;
+
     bool_t ret = TRUE;
 
     switch (msgid)
@@ -160,6 +166,9 @@ comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
             break;
         case MESSAGE_ID_COMM_STATUS:
             MESSAGE_SEND_COMM_STATUS(chan, &comm_status[chan].buffer_overrun, &comm_status[chan].parse_error )
+            break;
+        case MESSAGE_ID_BUILD_INFO:
+            MESSAGE_SEND_BUILD_INFO(chan, build_revision, build_branch, &build_dirty, &build_time )
             break;
         default:
             if (comm_callback_tx[chan])
