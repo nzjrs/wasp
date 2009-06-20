@@ -9,12 +9,6 @@
 #include "airframe.h"
 #include "booz2_supervision.h"
 
-/*
-  We're not using the airframe file "mixer" facility
-  and instead explicitely call the "supervision" code
-  to do the mixing
-*/
-#ifndef SetActuatorsFromCommands
 #ifdef KILL_MOTORS
 #define SetActuatorsFromCommands(_motors_on) {		      \
     Actuator(SERVO_FRONT) = 0;				      \
@@ -34,7 +28,6 @@
     ActuatorsCommit();							\
   }
 #endif /* KILL_MOTORS              */
-#endif /* SetActuatorsFromCommands */
 
 #define ChopServo(x,a,b) ((x)>(b)?(b):(x))
 #define Actuator(i) buss_twi_blmc_motor_power[i]

@@ -29,8 +29,6 @@
 #define ACTUATORS_H
 
 #include "std.h"
-
-/** Defines SetActuatorsFromCommands() macro */
 #include "airframe.h"
 
 /** Must be defined by specific hardware implementation */
