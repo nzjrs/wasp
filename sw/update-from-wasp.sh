@@ -38,6 +38,7 @@ then
 		--verbose						\
 		--cvs-exclude					\
 		--exclude='*.pyc'				\
+		--exclude='messages.py'			\
 		$PPZ_TOOLS_DIR/ $WASP_TOOLS_DIR/
 
     #now commit here with the same message
