@@ -13,6 +13,7 @@ Documentation
    sw/doc/autopilot
    sw/doc/onboard
    sw/doc/comm-protocol
+   sw/doc/coding-standards
 
 
 
