@@ -26,11 +26,14 @@ class CField(messages.Field):
 
 class Periodic:
 
-    STRUCT =                                    \
-    "typedef struct __PeriodicMessage {\n"      \
-    "    uint16_t    target;\n"                 \
-    "    uint16_t    cnt;\n"                    \
-    "    uint8_t     msgid;\n"                  \
+    STRUCT =                                                                   \
+    "/**\n"                                                                    \
+    " * Description of a periodic message.\n"                                  \
+    " */\n"                                                                    \
+    "typedef struct __PeriodicMessage {\n"                                     \
+    "    uint16_t    target;\n"                                                \
+    "    uint16_t    cnt;\n"                                                   \
+    "    uint8_t     msgid;\n"                                                 \
     "} PeriodicMessage_t;"
     #use a uint8_t for counting how many main iterations
     #to wait until releasing this message for transmission
@@ -57,6 +60,9 @@ class Periodic:
 class CMessage(messages.Message):
 
     STRUCT =                                                                     \
+    "/**\n"                                                                      \
+    " * A message to be sent.\n"                                                 \
+    " */\n"                                                                      \
     "typedef struct __CommMessage {\n"                                           \
     "    uint8_t acid;   /**< Aircraft ID, id of message sender */\n"            \
     "    uint8_t msgid;  /**< ID of message in payload */\n"                     \
