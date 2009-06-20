@@ -7,7 +7,10 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(DOCDIR)/.doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-GENERATED_FILES = $(BUILT_DOCDIR)/onboard/xml/index.xml sw/doc/messages.txt
+GENERATED_FILES =							\
+	sw/doc/messages.txt						\
+	sw/onboard/generated/messages.h			\
+	$(BUILT_DOCDIR)/onboard/xml/index.xml
 
 doc: mkdir $(GENERATED_FILES) html
 
@@ -19,6 +22,9 @@ $(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg
 
 sw/doc/messages.txt: sw/messages.xml
 	@PYTHONPATH=./sw/groundstation/ ./sw/tools/gen-messages.py -m $< -f rst > $@
+
+sw/onboard/generated/messages.h: sw/messages.xml
+	@make -C sw/onboard/ generated/messages.h
 
 html:
 	@$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) doc/built/html
