@@ -91,8 +91,8 @@ CFLAGS += -Wmissing-prototypes -Wnested-externs
 CFLAGS += -std=gnu99
 CFLAGS += -fshort-enums
 
-BUILD_INFO ?= 1
-CFLAGS += -DBUILD_INFO=$(BUILD_INFO)
+INCLUDE_BUILD_INFO ?= 1
+CFLAGS += -DINCLUDE_BUILD_INFO=$(INCLUDE_BUILD_INFO)
 
 # Linker flags.
 LDFLAGS = -n -nostartfiles -Wl,-Map=$(OBJDIR)/$(TARGET).map,--cref

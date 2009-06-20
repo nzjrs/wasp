@@ -152,7 +152,7 @@ comm_parse ( CommChannel_t chan )
 bool_t
 comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
 {
-#if BUILD_INFO == 1
+#if INCLUDE_BUILD_INFO == 1
     static char build_revision[40] = BUILD_REV;
     static char build_branch[10] = BUILD_BRANCH;
     static uint8_t build_dirty = BUILD_DIRTY;
