@@ -4,44 +4,20 @@
 import xmlobject
 import gentools
 
+try:
+    import ppz.messages as messages
+except ImportError:
+    import messages
+
+
 import string
 import optparse
 import re
 import os.path
 import sys
 
-LENGTHS = {
-    "uint8"     :   1,
-    "int8"      :   1,
-    "uint16"    :   2,
-    "int16"     :   2,
-    "uint32"    :   4,
-    "int32"     :   4,
-    "float"     :   4,
-}
-
-class Field:
-
-    ARRAY_LENGTH = re.compile("^([a-z0-9]+)\[(\d{1,2})\]$")
-
-    def __init__(self, f):
-        self.name = f.name
-        self.type, self.length = self._get_field_length(f.type)
-
-    def _get_field_length(self, _type):
-        #check if it is an array
-        m = self.ARRAY_LENGTH.match(_type)
-        if m:
-            _type, _len = m.groups()
-            _len = LENGTHS[_type] * int(_len)
-            self.element_length = LENGTHS[_type]
-            self.array = True
-        else:
-            _len = LENGTHS[_type]
-            self.element_length = None
-            self.array = False
-
-        return _type, _len
+class CField(messages.Field):
+    pass
 
 class Periodic:
 
@@ -73,7 +49,7 @@ class Periodic:
     def get_initializer(self):
         return "{ %d, %d, MESSAGE_ID_%s }" % (self._target, 0, self._message)
 
-class Message:
+class CMessage(messages.Message):
 
     STRUCT =                                                                     \
     "typedef struct __CommMessage {\n"                                           \
@@ -87,20 +63,8 @@ class Message:
     "} CommMessage_t;" 
 
     def __init__(self, m):
-        self.name = m.name.upper()
-        if int(m.id) <= 255:
-            self.id = int(m.id)
-        else:
-            raise Exception("Message IDs must be <= 255")
-        try:
-            self.fields = [Field(f) for f in xmlobject.ensure_list(m.field)]
-        except AttributeError:
-            self.fields = []
-
-        sizes = [f.length for f in self.fields]
-
-        self.size = sum(sizes)
-        self.sizes = ["0"] + [str(s) for s in sizes]
+        messages.Message.__init__(self, m, CField)
+        self.sizes = ["0"] + [str(f.length) for f in self.fields]
 
     def print_id(self):
         print "#define MESSAGE_ID_%s %d" % (self.name, self.id)
@@ -141,7 +105,7 @@ class _CWriter(_Writer):
         print
         print Periodic.STRUCT
         print
-        print Message.STRUCT
+        print CMessage.STRUCT
         print
         for m in self.messages:
             m.print_id()
@@ -173,9 +137,11 @@ class MacroWriter(_CWriter):
         print "\tif (%s(_chan, MESSAGE_LENGTH_%s)) { \\" % (self.CHECK_FN, m.name)
         print "\t\t%s(_chan, MESSAGE_ID_%s, MESSAGE_LENGTH_%s); \\" % (self.START_FN, m.name, m.name)
         for f in m.fields:
-            if f.array:
+            if f.is_array:
+                offset = 0;
                 for i in range(f.length):
-                    print "\t\t_Put%sByAddr(_chan, (%s)) \\" % (f.type.title(), f.name)
+                    print "\t\t_Put%sByAddr(_chan, (%s + %d)) \\" % (f.type.title(), f.name, offset)
+                    offset += f.element_length
             else:
                 print "\t\t_Put%sByAddr(_chan, (%s)) \\" % (f.type.title(), f.name)
         print "\t\t%s(_chan); \\" % self.END_FN
@@ -188,7 +154,7 @@ class MacroWriter(_CWriter):
         offset = 0
         for f in m.fields:
             print "#define MESSAGE_%s_GET_FROM_BUFFER_%s(_payload)" % (m.name, f.name),
-            if f.array:
+            if f.is_array:
                 l = f.length * f.element_length
                 print "(%s_t *)((uint8_t*)_payload+%d)" % (f.type, offset)
             else:
@@ -348,7 +314,7 @@ if __name__ == "__main__":
         x = xmlobject.XMLFile(path=messages_path)
 
         #must have some valid messaeges
-        messages = [Message(m) for m in x.root.message]
+        messages = [CMessage(m) for m in x.root.message]
         #check for duplicate message IDs
         ids = {}
         for m in messages:

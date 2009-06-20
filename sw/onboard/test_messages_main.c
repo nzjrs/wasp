@@ -16,6 +16,7 @@ bool_t test_message_rx (CommChannel_t chan, CommMessage_t *message);
 #define DA_COMM COMM_1
 
 #ifdef MESSAGE_ID_TEST_MESSAGE
+static uint8_t testarray[3] = {1,2,3};
 static uint8_t u8 = 1; static uint8_t i8 = -1;
 static uint16_t u16 = 10; static int16_t i16 = -10;
 static uint32_t u32 = 100; static int32_t i32 = -100;
@@ -39,7 +40,7 @@ test_message_tx ( CommChannel_t chan, uint8_t msgid )
 {
     if (msgid == MESSAGE_ID_TEST_MESSAGE)
     {
-        MESSAGE_SEND_TEST_MESSAGE (DA_COMM, &u8, &i8, &u16, &i16, &u32, &i32, &f );
+        MESSAGE_SEND_TEST_MESSAGE (DA_COMM, &u8, &i8, &u16, &i16, &u32, &i32, &f, testarray );
         return TRUE;
     }
     return FALSE;
@@ -87,7 +88,7 @@ static inline void main_periodic_task( void ) {
     RunOnceEvery(200, {
         led_toggle(4);
 #ifdef MESSAGE_ID_TEST_MESSAGE
-        MESSAGE_SEND_TEST_MESSAGE (DA_COMM, &u8, &i8, &u16, &i16, &u32, &i32, &f );
+        MESSAGE_SEND_TEST_MESSAGE (DA_COMM, &u8, &i8, &u16, &i16, &u32, &i32, &f, testarray );
 #endif
     })      
 }

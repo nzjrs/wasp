@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     options, args = parser.parse_args()
 
-    m = messages.MessagesFile(xmlfile=options.messages, debug=options.debug)
+    m = messages.MessagesFile(path=options.messages, debug=options.debug)
     s = transport.SerialTransport(port=options.port, speed=options.speed, timeout=options.timeout)
     t = transport.Transport(check_crc=options.crc, debug=options.debug)
 

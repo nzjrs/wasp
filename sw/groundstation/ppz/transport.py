@@ -2,6 +2,10 @@ import array
 import serial
 import libserial.SerialSender
 
+STX = 0x99
+#6 non payload bytes; STX, LEN, MSGID, ACID, CK_A, CK_B
+NUM_NON_PAYLOAD_BYTES = 6
+
 class SerialTransport(libserial.SerialSender.SerialSender):
     """
     Reads data from the serial port 
@@ -20,9 +24,7 @@ class SerialTransport(libserial.SerialSender.SerialSender):
 
 class TransportHeaderFooter:
 
-    STX = 0x99
-
-    def __init__(self, stx=STX, length=6, acid=0, msgid=0, ck_a=0, ck_b=0):
+    def __init__(self, stx=STX, length=NUM_NON_PAYLOAD_BYTES, acid=0, msgid=0, ck_a=0, ck_b=0):
         self.stx = stx
         self.length = length
         self.acid = acid
@@ -56,12 +58,9 @@ class Transport:
     STATE_GOT_PAYLOAD,  \
     STATE_GOT_CRC1 =    range(0,7)
 
-    #6 non payload bytes
-    NUM_NON_PAYLOAD_BYTES = STATE_GOT_CRC1
-
     def __init__(self, check_crc=True, debug=False):
         self._check_crc = check_crc
-        self._dbg = debug
+        self._debug = debug
         self._buf = array.array('c','\0'*256)
         self._state = self.STATE_UNINIT
         self._total_len = 0
@@ -73,8 +72,8 @@ class Transport:
         self._acid = 0
         self._msgid = 0
 
-    def _debug(self, msg):
-        if self._dbg:
+    def _debug_msg(self, msg):
+        if self._debug:
             print msg
 
     def pack_message_with_values(self, header, message, *values):
@@ -85,19 +84,18 @@ class Transport:
 
     def pack_one(self, header, message, payload):
         payload_len = len(payload)
-        total_len = payload_len + self.NUM_NON_PAYLOAD_BYTES
+        total_len = payload_len + NUM_NON_PAYLOAD_BYTES
 
         #create an array big enough to hold data before the payload,
         #i.e. exclude the checksum
-        buf = array.array('c','\0'*(self.NUM_NON_PAYLOAD_BYTES - 2))
+        buf = array.array('c','\0'*(NUM_NON_PAYLOAD_BYTES - 2))
 
         buf[0] = chr(header.stx)
         buf[1] = chr(total_len)
         buf[2] = chr(header.acid)
-        buf[3] = chr(message.get_id())
+        buf[3] = chr(message.id)
     
         buf.fromstring(payload)
-
 
         first = True
         for d in buf:
@@ -111,11 +109,6 @@ class Transport:
 
         buf.append(chr(ck_a))
         buf.append(chr(ck_b))
-
-        #for b in buf:
-        #    print "%x" % ord(b)
-
-        #self._debug("SIZE: %s %s" % (payload_len, total_len))
 
         return buf
 
@@ -160,25 +153,25 @@ class Transport:
         d = ord(c)
 
         if self._state == self.STATE_UNINIT:
-            if d == TransportHeaderFooter.STX:
+            if d == STX:
                 self._state += 1
-                self._ck_a = TransportHeaderFooter.STX
-                self._ck_b = TransportHeaderFooter.STX
-                self._debug("-- STX")
+                self._ck_a = STX
+                self._ck_b = STX
+                self._debug_msg("-- STX")
         elif self._state == self.STATE_GOT_STX:
             self._total_len = d
-            self._payload_len = d - self.NUM_NON_PAYLOAD_BYTES
+            self._payload_len = d - NUM_NON_PAYLOAD_BYTES
             self._payload_idx = 0
             update_checksum(d)
             self._state += 1
-            self._debug("-- SIZE: PL (%s) TOT (%s)" % (self._payload_len, self._total_len))
+            self._debug_msg("-- SIZE: PL (%s) TOT (%s)" % (self._payload_len, self._total_len))
         elif self._state == self.STATE_GOT_LENGTH:
-            self._debug("-- ACID: %x" % d)
+            self._debug_msg("-- ACID: %x" % d)
             self._acid = d
             update_checksum(d)
             self._state += 1
         elif self._state == self.STATE_GOT_ACID:
-            self._debug("-- MSGID: %x" % d)
+            self._debug_msg("-- MSGID: %x" % d)
             self._msgid = d
             update_checksum(d)
             if self._payload_len == 0:
@@ -189,23 +182,23 @@ class Transport:
             add_to_buf(c, d)
             if self._payload_idx == self._payload_len:
                 self._state += 1
-                self._debug("-- PL")
+                self._debug_msg("-- PL")
         elif self._state == self.STATE_GOT_PAYLOAD:
             if d != self._ck_a and self._check_crc:
                 error = True
-                self._debug("-- CRC_A ERROR %x v %x" % (d, self._ck_a))
+                self._debug_msg("-- CRC_A ERROR %x v %x" % (d, self._ck_a))
             else:
                 self._state += 1
-                self._debug("-- CRC_A OK")
+                self._debug_msg("-- CRC_A OK")
         elif self._state == self.STATE_GOT_CRC1:
             if d != self._ck_b and self._check_crc:
                 error = True
-                self._debug("-- CRC_B ERROR")
+                self._debug_msg("-- CRC_B ERROR")
             else:
                 payload = self._buf[:self._payload_len].tostring()
                 received = True
                 self._state = self.STATE_UNINIT
-                self._debug("-- CRC_B OK")
+                self._debug_msg("-- CRC_B OK")
 
         if error:
             self._error += 1

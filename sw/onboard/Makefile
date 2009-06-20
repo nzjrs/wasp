@@ -153,7 +153,7 @@ generated/radio.h: conf-$(CONFIG)/radio.xml $(TOOLS)/gen-radio.py
 
 generated/messages.h: ../messages.xml $(TOOLS)/gen-messages.py
 	@echo GENERATE $@
-	$(Q)$(TOOLS)/gen-messages.py --messages=$< > $@
+	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-messages.py --messages=$< > $@
 
 generated/build.h: $(SRCARM) $(TOOLS)/gen-build-info.py
 	@echo GENERATE $@

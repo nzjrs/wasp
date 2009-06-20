@@ -81,6 +81,18 @@ from xml.dom.minidom import parse, parseString, getDOMImplementation
 
 impl = getDOMImplementation()
 
+def ensure_list(obj):
+    """
+    ensures the object passed is a list, so it is iterable.
+
+    useful workaround until i decide if XMLNode.foo should always
+    return a list of foo, even if there is only one foo child
+    """
+    if len(obj):
+        return obj
+    else:
+        return [obj]
+
 class MissingRootTag(Exception):
     """root tag name was not given"""
 

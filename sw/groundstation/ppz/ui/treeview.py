@@ -8,8 +8,7 @@ class MessageTreeStore(gtk.TreeStore):
     OBJECT_IDX,     \
     EDITABLE_IDX,   \
     VALUE_IDX,      \
-    FIELDS_IDX,     \
-    TIME_IDX =      range(6)
+    TIME_IDX =      range(5)
 
     def __init__(self):
         gtk.TreeStore.__init__(self, 
@@ -17,16 +16,15 @@ class MessageTreeStore(gtk.TreeStore):
                 object,     #OBJECT, message or field underlying python object
                 bool,       #EDITABLE, true for fields
                 object,     #VALUE, value of field
-                object,     #FIELDS, list of fields, only set for message rows
                 int)        #TIME, time last message was received
 
         self._message_ids = {}
 
     def add_message(self, message):
         fields = message.get_fields()
-        m = self.append(None, ( message.name, message, False, None, fields, int(time.time()) ))
+        m = self.append(None, ( message.name, message, False, None, int(time.time()) ))
         for f in fields:
-            self.append(m, ( f.name, f, True, f.get_default_value(), None, 0 ))
+            self.append(m, ( f.name, f, True, f.get_default_value(), 0 ))
         return m
 
     def update_message(self, message, payload, add=True):
@@ -42,6 +40,7 @@ class MessageTreeStore(gtk.TreeStore):
         nkids = self.iter_n_children(_iter)
 
         vals = message.unpack_values(payload)
+        vals = message.get_field_values(vals)
         assert len(vals) == nkids
 
         #update the time this message was received
@@ -138,13 +137,16 @@ class MessageTreeView(gtk.TreeView):
             _iter = model.iter_parent(_iter)
 
         message = model.get_value(_iter, MessageTreeStore.OBJECT_IDX)
-        fields = model.get_value(_iter, MessageTreeStore.FIELDS_IDX)
         values = []
 
         _iter = model.iter_children(_iter)
         while _iter:
             val = model.get_value(_iter, MessageTreeStore.VALUE_IDX)
-            values.append(val)
+            f = model.get_value(_iter, MessageTreeStore.OBJECT_IDX)
+            if f.is_array:
+                values += val
+            else:
+                values.append(val)
             _iter = model.iter_next(_iter)
 
         return message, values
