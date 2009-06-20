@@ -176,7 +176,17 @@ Nested comments and commented-out code both run the risk of allowing unexpected 
 ------------
 
 Whenever the width, in bits or bytes, of an integer value matters in the program, a fixed-width data type shall be used in place of **char**, **short**, **int**, **long**, or **long long**.
-The signed and unsigned fixed-width integer types shall be as shown in **Table 1**.
+The signed and unsigned fixed-width integer types shall be as shown below;
+
+=======================  =======================  ========================
+       Standard for signed and unsigned fixed-width integer types
+--------------------------------------------------------------------------
+    Integer width              Signed type              Unsigned type
+=======================  =======================  ========================
+8 bits / 1 byte          int8_t                   uint8_t
+16 bits / 1 byte         int16_t                  uint16_t
+32 bits / 1 byte         int32_t                  uint32_t
+=======================  =======================  ========================
 
 **Reasoning: **The ISO C standard allows implementation-defined widths for **char**, **short**, **int**, **long**, and **long long** types, which leads to portability problems.
 Though the 1999 standard did not change this underlying issue, it did introduce the uniform type names shown in the table, which are defined in the new header file **<stdint.h>**.
@@ -261,7 +271,53 @@ By contrast, the risk that either the compiler or a maintainer will misunderstan
 Add the above rules to your coding standard to keep bugs out of your firmware.
 Then join me at Embedded.com next month for the next installment of the Barr Code column and to learn more techniques for bug-proofing embedded systems.
 
-**Michael Barr***
+
+**Rule #11:**
+-------------
+
+The keywords **short** and **long** shall not be used.
+
+**Reasoning:**
+The ANSI/ISO C standard contains a set of strict requirements plus mere guidelines for the authors of C compilers. Among the guidelines (also known as "implementation-defined" behaviors) are the precise width, in bits, of the **char**, **short**, **int**, and **long** data types. ISO C mandates that variables of type **short** must hold at least 16 bits and **long** at least 32 bits, across all platforms. Other than that, the only strict requirement is that **sizeof(char) <= sizeof(short) <= sizeof(int) <= sizeof(long)**. There are times when you must use **char** (see Rule #12). In other places (e.g., loop counter declarations), it makes sense to allow the compiler to choose the best/fastest width using int. But in keeping with Rule #6 concerning adoption of the C99 fixed-width integer types/names, it is appropriate to ban use of the **short** and **long** types altogether. Like the semi-colon followed by left-brace sequence above, an automated tool can be used to enforce this rule.
+
+**Rule #12:**
+-------------
+
+Use of the keyword **char** shall be restricted to the declaration of and operations concerning strings.
+
+**Reasoning:**
+Among the implementation-defined behaviors of C is the signed-ness of a **char** data type. One compiler may treat your char variables as unsigned, another as signed--and yet both are technically ISO C compliant! This introduces subtle and potentially hidden risks related to using the bit-wise operators on signed char data (Rule #7) or mixing signed and unsigned data (Rule #8). The risk of bugs derived from this subtlety of C are entirely eliminated by choosing **int8_t** or **uint8_t** explicitly whenever the data is other than part or all of a string.
+
+**Rule #13:**
+-------------
+
+All variables shall be initialized before use.
+
+Reasoning: Too many C programmers assume the C run-time will watch out for them. This is a very bad assumption, which can prove dangerous in a real-time system. We may sometimes get lucky with C startup code that zeros all uninitialized data or the stack. But lucky is not acceptable in a medical device or any other safety-critical product. By making initialization before use a hard rule on your project, you elevate the warning a static-analysis tool can raise on this to an error that must be dealt with by the team.
+
+**Rule #14:**
+-------------
+
+The names of all global variables shall begin with the letter 'g'. For example, **g_zero_offset**.
+
+**Reasoning:** 
+Eschew them all you like, but global variables are a fact of life in some parts of embedded software. There are two specific risks associated with their use.
+
+The first risk of global varilables is that a race condition between two or more asynchronous entities (be they CPUs, peripherals, ISRs, tasks, or a combination) will corrupt the data stored there. To prevent this, exclusive access must be established programmatically, such as via use of interrupt disables or mutex acquisition. The second risk is that the compiler will optimize away one entity's read or write because it cannot see the other user during compilation. Both risks can be eliminated, but only if everyone on the team sees that they are global variables. By naming all globals in an obvious way, code reviews become that much more effective--all the way down to the individual line of code or function.
+
+**Rule #15:**
+-------------
+
+When evaluating the equality or inequality of a variable with a constant value, always place the constant value on the left side of the comparison operator.
+
+**Example (do)**::
+
+    if (0 == x){    /* Do this only if x is zero. */}
+
+**Reasoning:**
+It is always desirable to detect possible typos and as many other bugs as possible at compile-time; run-time discovery may be dangerous to the user of the product and require significant effort to locate. By following this rule, the compiler can detect erroneous attempts to assign (i.e., = instead of ==) a new value to a constant.2
+
+**Michael Barr**
 is the author of two books and over 40 articles about embedded systems design, as well as a former editor in chief of this magazine.
 Michael is also a popular speaker at the Embedded Systems Conference and the founder of embedded systems consultancy Netrino.
 
