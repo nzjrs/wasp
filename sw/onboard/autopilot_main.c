@@ -130,6 +130,7 @@ STATIC_INLINE void booz2_main_init( void ) {
 #endif
 
 STATIC_INLINE void booz2_main_periodic( void ) {
+  static uint8_t _cnt = 0;
   //  t0 = T0TC;
 
   booz2_imu_periodic();
@@ -138,28 +139,30 @@ STATIC_INLINE void booz2_main_periodic( void ) {
   /* set actuators     */
   SetActuatorsFromCommands(booz2_autopilot_motors_on);
 
-  PeriodicPrescaleBy10(							\
-    {						                        \
-      rc_periodic_task();		                        \
-      if (rc_status != RC_OK)						\
-	booz2_autopilot_set_mode(BOOZ2_AP_MODE_FAILSAFE);		\
-    },									\
-    {									\
+  /* Run the following tasks 10x times slower than the periodic rate */
+  _cnt++;
+  if (_cnt >= 10)
+    _cnt = 0;
+
+  switch (_cnt)
+  {
+    case 0:
+        rc_periodic_task();
+        if (rc_status == RC_OK)
+            led_on(RC_LED);
+        else
+        {
+            led_off(RC_LED);
+            booz2_autopilot_set_mode(BOOZ2_AP_MODE_FAILSAFE);
+        }
+        break;
+    case 1:
         comm_periodic_task(COMM_1);
-    },									\
-    {									\
-      ReadMag();							\
-    },									\
-    {									\
-      booz_fms_periodic();						\
-    },									\
-    {},									\
-    {},									\
-    {},									\
-    {},									\
-    {},									\
-    {}									\
-    );									\
+        break;
+    case 2:
+        booz_fms_periodic();
+        break;
+    }
 
   //  t1 = T0TC;
   //  diff = t1 - t0;
