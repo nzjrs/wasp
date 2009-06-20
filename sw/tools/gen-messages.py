@@ -17,7 +17,12 @@ import os.path
 import sys
 
 class CField(messages.Field):
-    pass
+
+    def get_ppz_type(self):
+        if self.type == "char":
+            return self.type
+        else:
+            return self.type+"_t"
 
 class Periodic:
 
@@ -154,20 +159,21 @@ class MacroWriter(_CWriter):
         offset = 0
         for f in m.fields:
             print "#define MESSAGE_%s_GET_FROM_BUFFER_%s(_payload)" % (m.name, f.name),
+            _type = f.get_ppz_type()
             if f.is_array:
                 l = f.length * f.element_length
-                print "(%s_t *)((uint8_t*)_payload+%d)" % (f.type, offset)
+                print "(%s *)((uint8_t*)_payload+%d)" % (_type, offset)
             else:
                 l = f.length
                 if l == 1:
-                    print "(%s_t)(*((uint8_t*)_payload+%d))" % (f.type, offset)
+                    print "(%s)(*((uint8_t*)_payload+%d))" % (_type, offset)
                 elif l == 2:
-                    print "(%s_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8)" % (f.type, offset, offset)
+                    print "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8)" % (_type, offset, offset)
                 elif l == 4:
-                    if f.type == "float":
+                    if _type == "float_t":
                         print "({ union { uint32_t u; float f; } _f; _f.u = (uint32_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24); _f.f; })" % (offset, offset, offset, offset)
                     else:
-                        print "(%s_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24)" % (f.type, offset, offset, offset, offset)
+                        print "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24)" % (_type, offset, offset, offset, offset)
             offset += l
 
 
@@ -186,6 +192,7 @@ class MacroWriter(_CWriter):
         print "\t_Put2ByteByAddr(_chan, (const uint8_t*)_byte+2);    \\"
         print "}"
         print "#define _PutInt8ByAddr(_chan, _x) _Put1ByteByAddr(_chan, _x)"
+        print "#define _PutCharByAddr(_chan, _x) _Put1ByteByAddr(_chan, (const uint8_t*)_x)"
         print "#define _PutUint8ByAddr(_chan, _x) _Put1ByteByAddr(_chan, (const uint8_t*)_x)"
         print "#define _PutInt16ByAddr(_chan, _x) _Put2ByteByAddr(_chan, (const uint8_t*)_x)"
         print "#define _PutUint16ByAddr(_chan, _x) _Put2ByteByAddr(_chan, (const uint8_t*)_x)"
@@ -206,7 +213,7 @@ class FunctionWriter(_CWriter):
     def _print_pack_function(self, m):
         name = m.name.lower()
         print "static inline void message_send_%s(" % name,
-        print ", ".join(["%s %s" % (f.type, f.name) for f in m.fields]), ")"
+        print ", ".join(["%s %s" % (f.get_ppz_type(), f.name) for f in m.fields]), ")"
         print "{"
         print "}"
 
@@ -258,7 +265,7 @@ class RSTWriter(_Writer):
         _print_header()
         
         for f in m.fields:
-            _print_field(f.name, f.type)
+            _print_field(f.name, f.ctype)
         
         _print_header()
 

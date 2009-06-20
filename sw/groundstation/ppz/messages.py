@@ -10,6 +10,7 @@ class Field:
 
     ARRAY_LENGTH = re.compile("^([a-z0-9]+)\[(\d{1,2})\]$")
     TYPE_LENGTH = {
+        "char"      :   1,
         "uint8"     :   1,
         "int8"      :   1,
         "uint16"    :   2,
@@ -72,6 +73,7 @@ class PyField(Field):
 
     #maps user defined names to python struct compatible ids
     TYPE_TO_STRUCT_MAP = {
+            "char"  :   "B",    #treat char as uint8 internally, only modify how they are displayed
             "uint8" :   "B",
             "int8"  :   "b",
             "uint16":   "H",
@@ -116,12 +118,17 @@ class PyField(Field):
     def _get_python_type(self):
         if self.type == "float":
             return float
+        elif self.type == "char":
+            if self.is_array:
+                return str
+            else:
+                return chr
         else:
             return int    
 
     def get_default_value(self):
         klass = self._get_python_type()
-        if self.is_array:
+        if self.is_array and self.type != "char":
             return list( [klass() for i in range(self.num_elements)] )
         else:
             return klass()
@@ -129,7 +136,7 @@ class PyField(Field):
     def interpret_value_from_user_string(self, string, default=None, sep=","):
         klass = self._get_python_type()
         try:
-            if self.is_array:
+            if self.is_array and self.type != "char":
                 vals = string.split(sep)
                 if len(vals) != self.num_elements:
                     raise ValueError
@@ -145,8 +152,11 @@ class PyField(Field):
 
     def get_printable_value(self, value):
         if self.is_array:
-            #Returns a printable array, e.g '[1, 2, 3]'
-            return str(value)
+            if self.type == "char":
+                return "".join([chr(c) for c in value])
+            else:
+                #Returns a printable array, e.g '[1, 2, 3]'
+                return str(value)
         else:
             #Return a single formatted number string
             if self._isenum:
