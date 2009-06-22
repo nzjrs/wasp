@@ -1,7 +1,8 @@
 #ifndef BOOZ2_IMU_H
 #define BOOZ2_IMU_H
 
-/* For IMU_XXX scale constants */
+/* FIXME: Include these as config/airframe.h
+ * For IMU_XXX scale constants */
 #include "airframe.h"
 
 #include "pprz_algebra_int.h"
@@ -42,23 +43,10 @@ extern void booz2_imu_init(void);
     booz_imu.accel.z = ((booz_imu.accel_unscaled.z - booz_imu.accel_neutral.z)*IMU_ACCEL_Z_SENS_NUM)/IMU_ACCEL_Z_SENS_DEN; \
   }
 
-#if defined IMU_MAG_45_HACK
-#define Booz2ImuScaleMag() {						\
-    int32_t msx = ((booz_imu.mag_unscaled.x - booz_imu.mag_neutral.x) * IMU_MAG_X_SENS_NUM) / IMU_MAG_X_SENS_DEN; \
-    int32_t msy = ((booz_imu.mag_unscaled.y - booz_imu.mag_neutral.y) * IMU_MAG_Y_SENS_NUM) / IMU_MAG_Y_SENS_DEN; \
-    booz_imu.mag.x = msx - msy;					\
-    booz_imu.mag.y = msx + msy;					\
-    booz_imu.mag.z = ((booz_imu.mag_unscaled.z - booz_imu.mag_neutral.z) * IMU_MAG_Z_SENS_NUM) / IMU_MAG_Z_SENS_DEN; \
-  }
-#else
 #define Booz2ImuScaleMag() {					\
     booz_imu.mag.x = ((booz_imu.mag_unscaled.x - booz_imu.mag_neutral.x) * IMU_MAG_X_SENS_NUM) / IMU_MAG_X_SENS_DEN; \
     booz_imu.mag.y = ((booz_imu.mag_unscaled.y - booz_imu.mag_neutral.y) * IMU_MAG_Y_SENS_NUM) / IMU_MAG_Y_SENS_DEN; \
     booz_imu.mag.z = ((booz_imu.mag_unscaled.z - booz_imu.mag_neutral.z) * IMU_MAG_Z_SENS_NUM) / IMU_MAG_Z_SENS_DEN; \
   }
-#endif
-
-
-
 
 #endif /* BOOZ2_IMU_H */

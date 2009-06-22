@@ -9,10 +9,6 @@
 #include "arm7/led_hw.h"
 #include "arm7/rc_hw.h"
 
-#ifdef USE_AMI601
-#include "arm7/AMI601.h"
-#endif
-
 uint16_t cpu_time_sec;
 uint32_t cpu_time_ticks;
 uint32_t last_periodic_event;
@@ -33,12 +29,6 @@ void TIMER0_ISR ( void ) {
       T0IR = TIR_CR2I;
     }
 #endif
-#ifdef USE_AMI601
-    if (T0IR&TIR_MR1I) {
-      AMI601ReadMeasure();
-      T0IR = TIR_MR1I; 
-    }
-#endif /* USE_AMI601 */
   }
   VICVectAddr = 0x00000000;
 

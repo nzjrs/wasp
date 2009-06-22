@@ -10,9 +10,7 @@ void booz2_imu_impl_init(void) {
 
   booz2_max1168_init();
 
-#ifdef USE_MICROMAG
   booz2_micromag_init();
-#endif
 
 }
 

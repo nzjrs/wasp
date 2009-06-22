@@ -17,6 +17,7 @@ static inline void main_periodic_task( void );
 static inline void main_event_task( void );
 
 static inline void on_imu_event(void);
+static inline void on_mag_event(void);
 
 int main( void ) {
     main_init();
@@ -49,6 +50,10 @@ static inline void main_periodic_task( void ) {
         led_toggle(3);
     });
 
+    RunOnceEvery(10, {
+        Booz2MicromagScheduleRead();
+    });
+
     booz2_imu_periodic();
 }
 
@@ -58,7 +63,10 @@ static inline void main_event_task( void )
 
     Booz2ImuEvent(on_imu_event);
     
-    Booz2ImuSpiEvent(booz2_max1168_read);
+    Booz2ImuSpiEvent(booz2_max1168_read,booz2_micromag_read);
+
+    Booz2MicromagEvent(on_mag_event);
+
 }
 
 #define TICKS 30
@@ -86,6 +94,12 @@ static inline void on_imu_event(void)
                 &booz_imu.accel_unscaled.x,
 			    &booz_imu.accel_unscaled.y,
 			    &booz_imu.accel_unscaled.z);
+
+        MESSAGE_SEND_IMU_MAG_RAW(
+                COMM_1,
+                &booz_imu.mag_unscaled.x,
+			    &booz_imu.mag_unscaled.y,
+			    &booz_imu.mag_unscaled.z);
     }
     else if (cnt == (TICKS / 2))
     {
@@ -102,5 +116,19 @@ static inline void on_imu_event(void)
                 &booz_imu.accel.x,
                 &booz_imu.accel.y,
                 &booz_imu.accel.z);
+
+        MESSAGE_SEND_WASP_MAG(
+                COMM_1,
+                &booz_imu.mag.x,
+			    &booz_imu.mag.y,
+			    &booz_imu.mag.z);
     }
+}
+
+static inline void on_mag_event(void) {
+  booz_imu.mag_unscaled.x = booz2_micromag_values[IMU_MAG_X_CHAN];
+  booz_imu.mag_unscaled.y = booz2_micromag_values[IMU_MAG_Y_CHAN];
+  booz_imu.mag_unscaled.z = booz2_micromag_values[IMU_MAG_Z_CHAN];
+
+  Booz2ImuScaleMag();
 }

@@ -19,6 +19,8 @@ SRCARM =                            \
     booz2_imu_b2_hw.c               \
     booz2_max1168.c                 \
     booz2_max1168_hw.c              \
+    booz2_micromag.c                \
+    booz2_micromag_hw.c             \
     booz2_imu.c                     \
     booz2_analog_baro.c             \
     booz2_battery.c                 \
@@ -47,7 +49,6 @@ SRCARM +=                           \
     arm7/armVIC.c                   \
     arm7/sys_time_hw.c              \
     arm7/led_hw.c                   \
-    arm7/AMI601.c                   \
     arm7/rc_hw.c                    \
     arm7/uart_hw.c                  \
     arm7/usb_ser_hw.c               \

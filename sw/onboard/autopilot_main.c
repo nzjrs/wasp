@@ -44,10 +44,6 @@
 #include "booz2_analog_baro.h"
 #include "booz2_battery.h"
 
-#ifdef USE_AMI601
-#include "arm7/AMI601.h"
-#endif
-
 #include "booz2_fms.h"
 #include "booz2_autopilot.h"
 #include "booz2_stabilization_rate.h"
@@ -100,10 +96,6 @@ STATIC_INLINE void booz2_main_init( void ) {
   booz2_battery_init();
   booz2_imu_impl_init();
   booz2_imu_init();
-#ifdef USE_AMI601
-  i2c1_init();
-  ami601_init();
-#endif
 
   booz_fms_init();
   booz2_autopilot_init();
@@ -120,14 +112,6 @@ STATIC_INLINE void booz2_main_init( void ) {
 
   int_enable();
 }
-
-#ifdef USE_AMI601
-#define ReadMag() ami601_read()
-#elif USE_MICROMAG
-#define ReadMag() Booz2MicromagScheduleRead()
-#else
-#define ReadMag() {}
-#endif
 
 STATIC_INLINE void booz2_main_periodic( void ) {
   static uint8_t _cnt = 0;
@@ -160,6 +144,9 @@ STATIC_INLINE void booz2_main_periodic( void ) {
         comm_periodic_task(COMM_1);
         break;
     case 2:
+        Booz2MicromagScheduleRead();
+        break;
+    case 3:
         booz_fms_periodic();
         break;
     }
@@ -188,15 +175,8 @@ STATIC_INLINE void booz2_main_event( void ) {
     booz_ins_update_gps();
   }
 
-#ifdef USE_AMI601
-  AMI601Event(on_mag_event);
-#endif
-#ifdef USE_MICROMAG
   Booz2ImuSpiEvent(booz2_max1168_read,booz2_micromag_read);
   Booz2MicromagEvent(on_mag_event);
-#else
-  Booz2ImuSpiEvent(booz2_max1168_read);
-#endif
 
   comm_event_task(COMM_1);
 }
@@ -227,19 +207,9 @@ static inline void on_baro_event( void ) {
 
 
 static inline void on_mag_event(void) {
-#ifdef USE_AMI601
-  booz_imu.mag_unscaled.x = ami601_val[IMU_MAG_X_CHAN];
-  booz_imu.mag_unscaled.y = ami601_val[IMU_MAG_Y_CHAN];
-  booz_imu.mag_unscaled.z = ami601_val[IMU_MAG_Z_CHAN];
-
-  Booz2ImuScaleMag();
-  ami601_status = AMI601_IDLE;
-#endif
-#ifdef USE_MICROMAG
   booz_imu.mag_unscaled.x = booz2_micromag_values[IMU_MAG_X_CHAN];
   booz_imu.mag_unscaled.y = booz2_micromag_values[IMU_MAG_Y_CHAN];
   booz_imu.mag_unscaled.z = booz2_micromag_values[IMU_MAG_Z_CHAN];
 
   Booz2ImuScaleMag();
-#endif
 }

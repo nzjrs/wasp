@@ -88,7 +88,6 @@
 /* p1.24          */
 //#define SERVO_RESET_PIN 24
 
-#define USE_AMI601
 #define RADIO_CONTROL
 
 /* Time */
@@ -108,8 +107,8 @@
 #define UART1_BAUD B57600
 
 /* I2C */
-#define USE_I2C0 1
-#define USE_I2C1 1
+#define USE_I2C0 1      /* Motor Controllers */
+#define USE_I2C1 0      /* AMI601 (Not used) */
 
 #define I2C0_SCLL 150 
 #define I2C0_SCLH 150
@@ -144,6 +143,7 @@
 #define MAX1168_EOC_VIC_SLOT 8
 #define SSP_VIC_SLOT 9
 #define I2C0_VIC_SLOT 10
-#define I2C1_VIC_SLOT 11
+/* #define I2C1_VIC_SLOT 11    AMI601 (Not used) */
+#define MICROMAG_DRDY_VIC_SLOT 11
 
 #endif /* CONFIG_BOOZ2_V1_0_H */
