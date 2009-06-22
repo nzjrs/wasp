@@ -51,7 +51,7 @@ static inline void main_periodic_task( void ) {
     });
 
     RunOnceEvery(10, {
-        Booz2MicromagScheduleRead();
+        micromag_schedule_read();
     });
 
     booz2_imu_periodic();
@@ -63,9 +63,13 @@ static inline void main_event_task( void )
 
     Booz2ImuEvent(on_imu_event);
     
-    Booz2ImuSpiEvent(booz2_max1168_read,booz2_micromag_read);
+    Booz2ImuSpiEvent(booz2_max1168_read,micromag_read);
 
-    Booz2MicromagEvent(on_mag_event);
+    if ( micromag_event() )
+    {
+        on_mag_event();
+        micromag_reset();
+    }
 
 }
 

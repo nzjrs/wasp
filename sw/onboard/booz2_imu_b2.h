@@ -4,7 +4,7 @@
 #include "booz2_imu.h"
 
 #include "booz2_max1168.h"
-#include "booz2_micromag.h"
+#include "arm7/micromag.h"
 
 #define BOOZ2_SPI_NONE          0
 #define BOOZ2_SPI_SLAVE_MAX1168 1

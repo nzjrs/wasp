@@ -10,7 +10,7 @@ void booz2_imu_impl_init(void) {
 
   booz2_max1168_init();
 
-  booz2_micromag_init();
+  micromag_init();
 
 }
 

@@ -144,7 +144,7 @@ STATIC_INLINE void booz2_main_periodic( void ) {
         comm_periodic_task(COMM_1);
         break;
     case 2:
-        Booz2MicromagScheduleRead();
+        micromag_schedule_read();
         break;
     case 3:
         booz_fms_periodic();
@@ -175,8 +175,13 @@ STATIC_INLINE void booz2_main_event( void ) {
     booz_ins_update_gps();
   }
 
-  Booz2ImuSpiEvent(booz2_max1168_read,booz2_micromag_read);
-  Booz2MicromagEvent(on_mag_event);
+  Booz2ImuSpiEvent(booz2_max1168_read,micromag_read);
+
+  if ( micromag_event() )
+  {
+      on_mag_event();
+      micromag_reset();
+  }
 
   comm_event_task(COMM_1);
 }
