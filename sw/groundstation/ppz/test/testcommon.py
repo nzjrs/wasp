@@ -13,10 +13,15 @@ XML = """<?xml version="1.0"?>
      <field name="a_float" type="float"/>
      <field name="a_array" type="uint8[3]"/>
    </message>
+   <message name="REQUEST_MESSAGE" id="5">
+     <field name="msgid" type="uint8"/>
+   </message>
    <periodic>
       <message name="TEST_MESSAGE" frequency="0.5"/>
    </periodic>
 </messages>"""
+NUM_MESSAGES = 3
+
 PONG_ID = 2
 PONG_NAME = "PONG"
 TEST_ID = 26

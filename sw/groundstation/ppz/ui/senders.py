@@ -1,30 +1,40 @@
+import gobject
 import gtk
 
 class _MessageSender(gtk.HBox):
+
+    __gsignals__ = {
+        "send-message" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+            gobject.TYPE_PYOBJECT,      #message
+            gobject.TYPE_PYOBJECT]),     #values (tuple)
+    }
+
     def __init__(self, messagefile=None):
         gtk.HBox.__init__(self, spacing=4)
 
-        self._messages = {}
-        self._model = gtk.ListStore(str, int)
+        self._model = gtk.ListStore(str, object)
 
-        cb = gtk.ComboBox(self._model)
+        self._cb = gtk.ComboBox(self._model)
         cell = gtk.CellRendererText()
-        cb.pack_start(cell, True)
-        cb.add_attribute(cell, 'text', 0)
-        self.pack_start(cb, expand=True, fill=True)
+        self._cb.pack_start(cell, True)
+        self._cb.add_attribute(cell, 'text', 0)
+        self.pack_start(self._cb, expand=True, fill=True)
 
-        btn = gtk.Button("Send")
-        btn.connect("clicked", self._on_btn_clicked, cb)
-        self.pack_start(btn, expand=False, fill=False)
+        self._btn = gtk.Button( stock=gtk.STOCK_EXECUTE )
+        #Change stock icon label
+        #http://faq.pygtk.org/index.py?req=show&file=faq09.005.htp
+        self._btn.get_children()[0].get_children()[0].get_children()[1].set_text( self.BUTTON_TEXT )
+        self._btn.connect("clicked", self._on_btn_clicked)
+        self.pack_start(self._btn, expand=False, fill=False)
 
         if messagefile:
             self.add_message_file(messagefile)
 
-    def _on_btn_clicked(self, btn, cb):
-        _iter = cb.get_active_iter()
+    def _on_btn_clicked(self, btn):
+        _iter = self._cb.get_active_iter()
         if _iter:
-            name = self._model.get_value(_iter, 0)
-            self.request_send_message(name)
+            msg = self._model.get_value(_iter, 1)
+            self.request_send_message(msg)
 
     def add_message_file(self, messagefile):
         raise NotImplementedError
@@ -34,29 +44,32 @@ class _MessageSender(gtk.HBox):
 
 class SimpleMessageSender(_MessageSender):
 
+    BUTTON_TEXT = "Send"
+
     def add_message_file(self, messagefile):
         if messagefile:
             for message in messagefile.get_messages():
-                if message and message.id not in self._messages:
-                            if len(message.fields) == 0:
-                                self._model.append( (message.name, message.id) )
-                                self._messages[message.id] = message
+                if len(message.fields) == 0:
+                    self._model.append( (message.name, message) )
 
     def request_send_message(self, msg):
-        print msg
+        self.emit("send-message", msg, ())
 
 class RequestMessageSender(_MessageSender):
 
+    BUTTON_TEXT = "Request Message"
+    REQUEST_MESSAGE_NAME = "REQUEST_MESSAGE"
+
     def add_message_file(self, messagefile):
+        self._rm = None
         if messagefile:
+            self._rm = messagefile.get_message_by_name( self.REQUEST_MESSAGE_NAME )
             for message in messagefile.get_messages():
-                if message and message.id not in self._messages:
-                            if len(message.fields) == 0:
-                                self._model.append( (message.name, message.id) )
-                                self._messages[message.id] = message
+                if message.name != self.REQUEST_MESSAGE_NAME:
+                    self._model.append( (message.name, message) )
 
     def request_send_message(self, msg):
-        print msg
+        self.emit("send-message", self._rm, (msg.id, ))
 
 if __name__ == "__main__":
     w = gtk.Window()

@@ -32,7 +32,7 @@ class MessageFileTest(unittest.TestCase):
 
     def testMessage(self):
         msgs = self.mf.get_messages()
-        self.failUnless( len(msgs) == 2 )
+        self.failUnless( len(msgs) == NUM_MESSAGES )
 
     def testGetMessageById(self):
         self.failUnless( self.mf.get_message_by_id(PONG_ID) )

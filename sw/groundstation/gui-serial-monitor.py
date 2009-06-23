@@ -9,7 +9,9 @@ import optparse
 import ppz
 import ppz.transport as transport
 import ppz.messages as messages
+
 import ppz.ui.treeview as treeview
+import ppz.ui.senders as senders
 
 class GObjectSerialMonitor(gobject.GObject):
 
@@ -53,7 +55,7 @@ class UI(GObjectSerialMonitor):
         rxtv = treeview.MessageTreeView(self._rxts, editable=False, show_dt=True)
 
         txts = treeview.MessageTreeStore()
-        for m in ("PING", "REQUEST_MESSAGE", "TEST_MESSAGE"):
+        for m in ("PING", "TEST_MESSAGE"):
             msg = messages_file.get_message_by_name(m)
             if msg:
                 txts.add_message(msg)
@@ -63,31 +65,24 @@ class UI(GObjectSerialMonitor):
         w.connect('delete-event', self._on_quit, serialsender)
 
         btn = gtk.Button("Send")
-        btn.connect("clicked", self._on_send_clicked, serialsender)
+        btn.connect("clicked", self._on_tv_send_clicked, serialsender)
+
+        rm = senders.RequestMessageSender(messages_file)
+        rm.connect("send-message", self._on_rm_send_clicked, serialsender)
 
         vb = gtk.VBox()
         vb.pack_start(gtk.Label("RX"), False, False)
         vb.pack_start(rxtv, True, True)
         vb.pack_start(gtk.Label("TX"), False, False)
-        vb.pack_start(self._txtv, True, True)
+        vb.pack_start(self._txtv, False, False)
         vb.pack_start(btn, False, False)
+        vb.pack_start(rm, False, False)
 
         w.add(vb)
         w.set_default_size(350, 500)
         w.show_all()
 
-    def on_serial_data_available(self, fd, condition, serial):
-
-        data = serial.read(1)
-        for header, payload in t.parse_many(data):
-            msg = m.get_message_by_id(header.msgid)
-            if msg:
-                self._rxts.update_message(msg, payload)
-
-        return True
-
-    def _on_send_clicked(self, btn, serial):
-        message, values = self._txtv.get_selected_message_and_values()
+    def _send_message(self, message, values, serial):
         if message:
             data = self._transport.pack_message_with_values(
                         transport.TransportHeaderFooter(acid=0x78), 
@@ -100,9 +95,26 @@ class UI(GObjectSerialMonitor):
                 for d in data:
                     print "    %#X" % ord(d)
 
+    def _on_tv_send_clicked(self, btn, serial):
+        message, values = self._txtv.get_selected_message_and_values()
+        self._send_message(message, values, serial)
+
+    def _on_rm_send_clicked(self, rm, message, values, serial):
+        self._send_message(message, values, serial)
+
     def _on_quit(self, win, event, serial):
         serial.disconnect_from_port()
         gtk.main_quit()
+
+    def on_serial_data_available(self, fd, condition, serial):
+
+        data = serial.read(1)
+        for header, payload in t.parse_many(data):
+            msg = m.get_message_by_id(header.msgid)
+            if msg:
+                self._rxts.update_message(msg, payload)
+
+        return True
 
 if __name__ == "__main__":
     thisdir = os.path.abspath(os.path.dirname(__file__))
