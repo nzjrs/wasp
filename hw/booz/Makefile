@@ -22,11 +22,10 @@ BRD_SRCS = \
     booz_gps.brd \
     booz_imu_xz.brd \
     booz_imu_yz.brd \
-    booz_power_board.brd\
-    test/test_baro_24.brd\
-#   booz_main.brd \
+    booz_main.brd \
+    booz_imu.brd
 #   booz_imu is mirrored
-#   booz_imu.brd \
+
 
 DIRS = .
 
