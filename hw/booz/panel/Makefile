@@ -8,7 +8,7 @@ _panel:
 	cd ..; make gerber; make -f Makefile.mirror gerber
 	$(GERBMERGE) $(CFG) $(DEF)
 
-_view:
+_view: _panel
 	$(GERBV) merged.*.ger
 
 clean:
