@@ -4,11 +4,11 @@ GERBV = gerbv
 CFG=layout.cfg
 DEF=layout.def
 
-_panel: 
+panel:
 	cd ..; make gerber; make -f Makefile.mirror gerber
 	$(GERBMERGE) $(CFG) $(DEF)
 
-_view: _panel
+view: panel
 	$(GERBV) merged.*.ger
 
 clean:
