@@ -46,9 +46,9 @@ dirs :
 
 ### GERBER GENERATION
 
-.PRECIOUS : %.cmp %.sol %.stc %.sts %.plc %.bor %.xln %.l02 %.l15
+.PRECIOUS : %.cmp %.sol %.stc %.sts %.plc %.pls %.bor %.xln %.l02 %.l15
 
-%.all: %.cmp %.sol %.stc %.sts %.plc %.xln %.bor %.l02 %.l15
+%.all: %.cmp %.sol %.stc %.sts %.plc %.pls %.xln %.bor %.l02 %.l15
 	touch $@
 
 # Component side
@@ -66,6 +66,9 @@ dirs :
 # Silkscreen comp. side
 %.plc : %.brd
 	eagle -m -X -N -d GERBER_RS274X -o $@ $< Dimension bPlace bDocu
+# Silkscreen solder side
+%.pls : %.brd
+	eagle -m -X -N -d GERBER_RS274X -o $@ $< Dimension tPlace tDocu
 # Drill data for NC drill st.
 # warning : eagle takes path of -R option from input file directory.
 %.xln : %.brd
