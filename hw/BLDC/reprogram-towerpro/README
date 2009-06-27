@@ -1,0 +1,35 @@
+How to Reprogram TowerPro Motor Controllers
+
+TowerPro 25A (Recommended)
+TowerPro w25A Brushless Speed Controller
+http://www.hobbycity.com/hobbycity/store/uh_viewItem.asp?idProduct=4860
+
+ --> Instructions - RCGroups, English
+     http://www.rcgroups.com/forums/showthread.php?t=766589
+ --> Information, Overview:
+     http://www.rcgroups.com/forums/showpost.php?p=12393158&postcount=402
+ --> More up to date picture
+     http://www.rcgroups.com/forums/showpost.php?p=12513199&postcount=437
+
+TowerProp 18A (Not sure if n18A = w18A)
+http://www.hobbycity.com/hobbycity/store/uh_viewItem.asp?idProduct=656
+
+ * http://forum.mikrokopter.de/topic-5506.html
+ * http://mikrokopter.de/ucwiki/TowerPro18A-I2C (link to code broken)
+ * http://forum.mikrokopter.de/topic-post120695.html
+ * http://forum.mikrokopter.de/topic-830.html
+
+Custom
+http://home.versanet.de/~b-konze/ (Quax)
+http://freenet-homepage.de/dg1sua/ (Jurgen)
+
+Arm-o-copter conversions (Not relevant, do not add I2C interface, I think)
+ --> Overview
+     http://www.armokopter.at/wiki/index.php?title=Anleitung_Motorsteller
+
+ --> Directions for Roxxy BLCTL
+     http://www.armokopter.at/forum/viewtopic.php?f=3&t=206
+
+Assembling BL-Ctl
+http://www.mikrokopter.de/ucwiki/en/BrushlessCtrl
+http://www.mikrokopter.de/ucwiki/en/BL-Ctrl_Manual
