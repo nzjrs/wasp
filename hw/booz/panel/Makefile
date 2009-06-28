@@ -15,4 +15,4 @@ zip: panel
 	zip pcb.zip merged.*.ger
 
 clean:
-	rm -f merged.* *~
+	rm -f merged.* *~ pcb.zip
