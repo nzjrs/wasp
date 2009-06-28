@@ -11,5 +11,8 @@ panel:
 view: panel
 	$(GERBV) merged.*.ger
 
+zip: panel
+	zip pcb.zip merged.*.ger
+
 clean:
 	rm -f merged.* *~
