@@ -1,0 +1,4 @@
+Record=SheetSymbol|SourceDocument=ExpansionMain.SchDoc|Designator=ADC|SchDesignator=ADC|FileName=I2CADC.SchDoc|SymbolType=Normal|RawFileName=I2CADC.SchDoc|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol
+Record=SheetSymbol|SourceDocument=ExpansionMain.SchDoc|Designator=SERVO|SchDesignator=SERVO|FileName=ServoDriver.SchDoc|SymbolType=Normal|RawFileName=ServoDriver.SchDoc|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol
+Record=SheetSymbol|SourceDocument=ExpansionMain.SchDoc|Designator=UART|SchDesignator=UART|FileName=Max3100Uart.SchDoc|SymbolType=Normal|RawFileName=Max3100Uart.SchDoc|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol
+Record=TopLevelDocument|FileName=ExpansionMain.SchDoc
