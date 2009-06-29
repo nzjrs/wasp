@@ -12,7 +12,7 @@ view: panel
 	$(GERBV) merged.*.ger
 
 zip: panel
-	zip pcb.zip merged.*.ger
+	zip pcb.zip merged.*
 
 clean:
 	rm -f merged.* *~ pcb.zip
