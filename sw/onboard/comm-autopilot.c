@@ -56,6 +56,12 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
 			        &booz_imu.mag.y,
 			        &booz_imu.mag.z);
             break;
+        case MESSAGE_ID_PPM:
+            MESSAGE_SEND_PPM(chan, ppm_pulses);
+            break;
+        case MESSAGE_ID_RC:
+            MESSAGE_SEND_RC(chan, rc_values);
+            break;
         case MESSAGE_ID_STATUS:
             MESSAGE_SEND_STATUS(chan, &rc_status, &booz_gps_state.fix );
             break;

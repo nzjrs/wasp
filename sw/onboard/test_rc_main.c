@@ -39,7 +39,18 @@ static inline void main_init( void ) {
 
 static inline void main_periodic_task( void ) {
     comm_periodic_task(COMM_1);
+
     rc_periodic_task();
+    if (rc_status == RC_OK)
+        led_on(RC_LED);
+    else
+        led_off(RC_LED);
+
+    RunOnceEvery(250, {
+        MESSAGE_SEND_PPM(COMM_1, ppm_pulses);
+        MESSAGE_SEND_RC(COMM_1, rc_values);
+    });
+
 }
 
 static inline void main_event_task( void )
@@ -47,50 +58,4 @@ static inline void main_event_task( void )
     comm_event_task(COMM_1);
     rc_event_task();
 }
-
-#if 0
-#define TICKS 30
-static inline void on_imu_event(void)
-{
-    static uint8_t cnt;
-
-    Booz2ImuScaleGyro();
-    Booz2ImuScaleAccel();
-
-    if (++cnt > TICKS) cnt = 0;
-
-    if (cnt == 0)
-    {
-        led_on(2);
-
-        MESSAGE_SEND_IMU_GYRO_RAW(
-                COMM_1,
-                &booz_imu.gyro_unscaled.p,
-                &booz_imu.gyro_unscaled.q,
-                &booz_imu.gyro_unscaled.r);
-
-        MESSAGE_SEND_IMU_ACCEL_RAW(
-                COMM_1,
-                &booz_imu.accel_unscaled.x,
-			    &booz_imu.accel_unscaled.y,
-			    &booz_imu.accel_unscaled.z);
-    }
-    else if (cnt == (TICKS / 2))
-    {
-        led_off(2);
-
-        MESSAGE_SEND_WASP_GYRO(
-                COMM_1,
-                &booz_imu.gyro.p,
-                &booz_imu.gyro.q,
-                &booz_imu.gyro.r);
-
-        MESSAGE_SEND_WASP_ACCEL(
-                COMM_1,
-                &booz_imu.accel.x,
-                &booz_imu.accel.y,
-                &booz_imu.accel.z);
-    }
-}
-#endif
 
