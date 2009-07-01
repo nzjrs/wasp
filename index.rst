@@ -14,6 +14,7 @@ Documentation
    sw/doc/onboard
    sw/doc/comm-protocol
    sw/doc/coding-standards
+   hw/doc/index
 
 
 
