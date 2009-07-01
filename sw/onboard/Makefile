@@ -156,7 +156,7 @@ generated/messages.h: ../messages.xml $(TOOLS)/gen-messages.py
 
 generated/build.h: $(SRCARM) $(TOOLS)/gen-build-info.py
 	@echo GENERATE $@
-	$(Q)$(TOOLS)/gen-build-info.py > $@
+	$(Q)$(TOOLS)/gen-build-info.py --target=$(TARGET) > $@
 
 # Create final output files (.hex, .eep) from ELF output file.
 # TODO: handling the .eeprom-section should be redundant

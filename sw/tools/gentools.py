@@ -11,3 +11,12 @@ def print_header(name, generatedfrom=None, generatedby=None):
 
 def print_footer(name):
     print "\n#endif /* %s */" % name
+
+def define_string(name, val, maxwidth=0):
+    val = val.strip()
+    if maxwidth and len(val) > maxwidth:
+        val = val.ljust(maxwidth)[0:maxwidth]
+    print '#define %s "%s"' % (name.upper(), val)
+
+def define_int(name, val):
+    print "#define %s %d" % (name.upper(), val)

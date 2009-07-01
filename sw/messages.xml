@@ -32,8 +32,9 @@
    </message>
 
    <message name="BUILD_INFO" id="9">
-     <field name="revision" type="char[40]"/>
+     <field name="revision" type="char[10]"/>
      <field name="branch" type="char[10]"/>
+     <field name="target" type="char[10]"/>
      <field name="dirty" type="uint8"/>
      <field name="time" type="uint32"/>
    </message>

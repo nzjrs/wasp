@@ -153,15 +153,17 @@ bool_t
 comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
 {
 #if INCLUDE_BUILD_INFO == 1
-    static char build_revision[40] = BUILD_REV;
-    static char build_branch[10] = BUILD_BRANCH;
-    static uint8_t build_dirty = BUILD_DIRTY;
-    static uint32_t build_time = BUILD_TIME;
+    static char build_revision[BUILD_STRING_LEN] =  BUILD_REV;
+    static char build_branch[BUILD_STRING_LEN] =    BUILD_BRANCH;
+    static char build_target[BUILD_STRING_LEN] =    BUILD_TARGET;
+    static uint8_t build_dirty =                    BUILD_DIRTY;
+    static uint32_t build_time =                    BUILD_TIME;
 #else
-    static char build_revision[40] = "N/A";
-    static char build_branch[10] = "N/A";
-    static uint8_t build_dirty = 0;
-    static uint32_t build_time = 0;
+    static char build_revision[BUILD_STRING_LEN] =  "N/A";
+    static char build_branch[BUILD_STRING_LEN] =    "N/A";
+    static char build_target[BUILD_STRING_LEN] =    "N/A";
+    static uint8_t build_dirty =                    0;
+    static uint32_t build_time =                    0;
 #endif
 
     bool_t ret = TRUE;
@@ -175,7 +177,7 @@ comm_send_message_by_id (CommChannel_t chan, uint8_t msgid)
             MESSAGE_SEND_COMM_STATUS(chan, &comm_status[chan].buffer_overrun, &comm_status[chan].parse_error )
             break;
         case MESSAGE_ID_BUILD_INFO:
-            MESSAGE_SEND_BUILD_INFO(chan, build_revision, build_branch, &build_dirty, &build_time )
+            MESSAGE_SEND_BUILD_INFO(chan, build_revision, build_branch, build_target, &build_dirty, &build_time )
             break;
         default:
             if (comm_callback_tx[chan])
