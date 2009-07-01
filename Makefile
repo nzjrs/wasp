@@ -12,8 +12,31 @@ GENERATED_FILES =							\
 	sw/onboard/generated/messages.h			\
 	$(BUILT_DOCDIR)/onboard/xml/index.xml
 
+################################################################################
+# Main targets
+################################################################################
+onboard:
+	@make -C sw/onboard/ all
+
+bootloader:
+	@make -C sw/bootloader/ all
+
 doc: mkdir $(GENERATED_FILES) html
 
+all: onboard bootloader doc
+
+clean:
+	-rm -rf $(BUILT_DOCDIR) $(DOCDIR)/.doctrees $(GENERATED_FILES)
+	@make -C sw/groundstation/ clean
+	@make -C sw/onboard/ clean
+	@make -C sw/bootloader/ clean
+
+test:
+	@make -C sw/groundstation/ test
+
+################################################################################
+# Dependencies
+################################################################################
 mkdir:
 	@mkdir -p $(BUILT_DOCDIR)
 
@@ -29,11 +52,4 @@ sw/onboard/generated/messages.h: sw/messages.xml
 html:
 	@$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) doc/built/html
 
-clean:
-	-rm -rf $(BUILT_DOCDIR) $(DOCDIR)/.doctrees $(GENERATED_FILES)
-	@make -C sw/groundstation/ clean
-
-test:
-	@make -C sw/groundstation/ test
-
-.PHONY: doc clean test
+.PHONY: doc clean test onboard bootloader
