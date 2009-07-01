@@ -150,8 +150,8 @@ class MacroWriter(_CWriter):
         for f in m.fields:
             if f.is_array:
                 offset = 0;
-                for i in range(f.length):
-                    print "\t\t_Put%sByAddr(_chan, (%s + %d)) \\" % (f.type.title(), f.name, offset)
+                for i in range(f.num_elements):
+                    print "\t\t_Put%sByAddr(_chan, &(%s[%d])) \\" % (f.type.title(), f.name, i)
                     offset += f.element_length
             else:
                 print "\t\t_Put%sByAddr(_chan, (%s)) \\" % (f.type.title(), f.name)

@@ -30,8 +30,8 @@ class Field:
         m = self.ARRAY_LENGTH.match(_type)
         if m:
             _type, _len = m.groups()
-            _len = self.TYPE_LENGTH[_type] * int(_len)
             self.num_elements = int(_len)
+            _len = self.TYPE_LENGTH[_type] * self.num_elements
             self.element_length = self.TYPE_LENGTH[_type]
             self.is_array = True
         else:
