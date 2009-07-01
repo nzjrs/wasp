@@ -9,7 +9,8 @@ do
 	echo "BUILDING $t"
 	make TARGET=$t > /dev/null
 	if [ $? -eq 0 ] ; then
-		echo "    [OK]"
+        size=`make TARGET=$t size | grep Total | cut --delimiter=" " -f 14`
+		echo "    [OK] (size: ${size}b)"
     else
         OK=1
 	fi
