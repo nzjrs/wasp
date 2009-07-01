@@ -15,14 +15,29 @@ bool_t test_message_rx (CommChannel_t chan, CommMessage_t *message);
 
 #define DA_COMM COMM_1
 
-#ifdef MESSAGE_ID_TEST_MESSAGE
-static uint8_t testarray[3] = {1,2,3};
+/*
+    <message name="TEST_MESSAGE" id="26">
+        <field name="a_uint8" type="uint8"></field>
+        <field name="a_int8" type="int8"></field>
+        <field name="a_uint16" type="uint16"></field>
+        <field name="a_int16" type="int16"></field>
+        <field name="a_uint32" type="uint32"></field>
+        <field name="a_int32" type="int32"></field>
+        <field name="a_float" type="float"></field>
+        <field name="array_uint16" type="uint16[2]"></field>
+        <field name="array_uint32" type="uint32[2]"></field>
+        <field name="array_float" type="float[2]"></field>
+        <field name="another_uint8" type="uint8"></field>
+    </message>
+*/
 static uint8_t u8 = 1; static uint8_t i8 = -1;
 static uint16_t u16 = 10; static int16_t i16 = -10;
 static uint32_t u32 = 100; static int32_t i32 = -100;
 static float f = 1.0;
-#endif
-
+static uint16_t array_u16[2] = {1,2};
+static uint32_t array_u32[2] = {3,4};
+static float array_float[2] = {5.0,6.0};
+static uint8_t another_u8 = 1;
 
 int main( void ) {
   main_init();
@@ -34,13 +49,12 @@ int main( void ) {
   return 0;
 }
 
-#ifdef MESSAGE_ID_TEST_MESSAGE
 bool_t
 test_message_tx ( CommChannel_t chan, uint8_t msgid )
 {
     if (msgid == MESSAGE_ID_TEST_MESSAGE)
     {
-        MESSAGE_SEND_TEST_MESSAGE (DA_COMM, &u8, &i8, &u16, &i16, &u32, &i32, &f, testarray );
+        MESSAGE_SEND_TEST_MESSAGE (DA_COMM, &u8, &i8, &u16, &i16, &u32, &i32, &f, array_u16, array_u32, array_float, &another_u8 );
         return TRUE;
     }
     return FALSE;
@@ -66,7 +80,6 @@ test_message_rx (CommChannel_t chan, CommMessage_t *message)
     }
     return FALSE;
 }
-#endif
 
 static inline void main_init( void ) {
     hw_init();
@@ -74,10 +87,8 @@ static inline void main_init( void ) {
     led_init();
 
     comm_init(DA_COMM);
-#ifdef MESSAGE_ID_TEST_MESSAGE
     comm_add_tx_callback(DA_COMM, test_message_tx);
     comm_add_rx_callback(DA_COMM, test_message_rx);
-#endif
 
     int_enable();
 }
@@ -87,10 +98,8 @@ static inline void main_periodic_task( void ) {
 
     RunOnceEvery(200, {
         led_toggle(4);
-#ifdef MESSAGE_ID_TEST_MESSAGE
-        MESSAGE_SEND_TEST_MESSAGE (DA_COMM, &u8, &i8, &u16, &i16, &u32, &i32, &f, testarray );
-#endif
-    })      
+        MESSAGE_SEND_TEST_MESSAGE (DA_COMM, &u8, &i8, &u16, &i16, &u32, &i32, &f, array_u16, array_u32, array_float, &another_u8 );
+    })
 }
 
 static inline void main_event_task( void ) {

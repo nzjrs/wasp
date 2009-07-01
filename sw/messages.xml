@@ -53,7 +53,10 @@
      <field name="a_uint32" type="uint32"></field>
      <field name="a_int32" type="int32"></field>
      <field name="a_float" type="float"></field>
-     <field name="a_array" type="uint8[3]"></field>
+     <field name="array_uint16" type="uint16[2]"></field>
+     <field name="array_uint32" type="uint32[2]"></field>
+     <field name="array_float" type="float[2]"></field>
+     <field name="another_uint8" type="uint8"></field>
    </message>
 
    <message name="WASP_GPS" id="27">
@@ -97,16 +100,13 @@
    <field name="mz"    type="int32" alt_unit="1" alt_unit_coef="0.0004883"/>
  </message>
 
-<!--
   <message name="PPM" id="34">
-    <field name="ppm_rate" type="uint8"></field>
     <field name="values" type="uint16[6]" unit="ticks"/>
   </message>
 
   <message name="RC" id="35">
-    <field name="values" type="int16[5]" unit="pprz" format="%d"/>
+    <field name="values" type="int16[6]" format="%d"/>
   </message>
--->
 
    <!-- Begin periodic messages -->
 
