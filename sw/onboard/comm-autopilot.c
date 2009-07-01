@@ -2,7 +2,7 @@
 
 #include "rc.h"
 #include "gps.h"
-#include "booz2_imu.h"
+#include "imu.h"
 
 bool_t
 comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )

@@ -15,11 +15,8 @@ SRCARM =                            \
     i2c.c                           \
     i2c_hw.c                        \
     actuators_buss_twi_blmc_hw.c    \
-    booz2_imu_b2.c                  \
-    booz2_imu_b2_hw.c               \
     booz2_max1168.c                 \
     booz2_max1168_hw.c              \
-    booz2_imu.c                     \
     booz2_analog_baro.c             \
     booz2_battery.c                 \
     booz2_analog.c                  \
@@ -56,7 +53,9 @@ SRCARM +=                           \
     arm7/lpcusb/usbinit.c           \
     arm7/comm_hw.c                  \
     arm7/ublox_gps_hw.c             \
-    arm7/micromag.c
+    arm7/micromag.c                 \
+    arm7/max1168.c                  \
+    arm7/imu_booz_hw.c
 
 ASRCARM =                           \
     crt0.S

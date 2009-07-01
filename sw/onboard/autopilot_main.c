@@ -39,8 +39,8 @@
 #include "comm.h"
 #include "comm-autopilot.h"
 
+#include "imu.h"
 
-#include "booz2_imu.h"
 #include "booz2_analog_baro.h"
 #include "booz2_battery.h"
 
@@ -60,9 +60,7 @@
 
 #include "autopilot_main.h"
 
-static inline void on_imu_event( void );
 static inline void on_baro_event( void );
-static inline void on_mag_event( void );
 
 uint32_t t0, t1, diff;
 
@@ -94,8 +92,8 @@ STATIC_INLINE void booz2_main_init( void ) {
   booz2_analog_init();
   booz2_analog_baro_init();
   booz2_battery_init();
-  booz2_imu_impl_init();
-  booz2_imu_init();
+
+  imu_init();
 
   booz_fms_init();
   booz2_autopilot_init();
@@ -117,7 +115,8 @@ STATIC_INLINE void booz2_main_periodic( void ) {
   static uint8_t _cnt = 0;
   //  t0 = T0TC;
 
-  booz2_imu_periodic();
+  imu_periodic_task();
+
   /* run control loops */
   booz2_autopilot_periodic();
   /* set actuators     */
@@ -144,9 +143,6 @@ STATIC_INLINE void booz2_main_periodic( void ) {
         comm_periodic_task(COMM_1);
         break;
     case 2:
-        micromag_schedule_read();
-        break;
-    case 3:
         booz_fms_periodic();
         break;
     }
@@ -159,11 +155,27 @@ STATIC_INLINE void booz2_main_periodic( void ) {
 }
 
 STATIC_INLINE void booz2_main_event( void ) {
+  uint8_t valid = 0;
 
   if (rc_event_task())
     booz2_autopilot_on_rc_event();
 
-  Booz2ImuEvent(on_imu_event);
+  valid = imu_event_task();
+  if ( (valid & IMU_ACC) || (valid & IMU_GYR) ) 
+  {
+      if (booz_ahrs.status == BOOZ_AHRS_UNINIT) {
+        // 150
+        booz_ahrs_aligner_run();
+        if (booz_ahrs_aligner.status == BOOZ_AHRS_ALIGNER_LOCKED)
+          booz_ahrs_align();
+      }
+      else {
+        booz_ahrs_propagate();
+        //    booz2_filter_attitude_update();
+        
+        booz_ins_propagate();
+      }
+  }
 
   Booz2AnalogBaroEvent(on_baro_event);
 
@@ -175,46 +187,9 @@ STATIC_INLINE void booz2_main_event( void ) {
     booz_ins_update_gps();
   }
 
-  Booz2ImuSpiEvent(booz2_max1168_read,micromag_read);
-
-  if ( micromag_event() )
-  {
-      on_mag_event();
-      micromag_reset();
-  }
-
   comm_event_task(COMM_1);
-}
-
-
-static inline void on_imu_event( void ) {
-
-  Booz2ImuScaleGyro();
-  Booz2ImuScaleAccel();
-
-  if (booz_ahrs.status == BOOZ_AHRS_UNINIT) {
-    // 150
-    booz_ahrs_aligner_run();
-    if (booz_ahrs_aligner.status == BOOZ_AHRS_ALIGNER_LOCKED)
-      booz_ahrs_align();
-  }
-  else {
-    booz_ahrs_propagate();
-    //    booz2_filter_attitude_update();
-    
-    booz_ins_propagate();
-  }
 }
 
 static inline void on_baro_event( void ) {
   booz_ins_update_baro();
-}
-
-
-static inline void on_mag_event(void) {
-  booz_imu.mag_unscaled.x = booz2_micromag_values[IMU_MAG_X_CHAN];
-  booz_imu.mag_unscaled.y = booz2_micromag_values[IMU_MAG_Y_CHAN];
-  booz_imu.mag_unscaled.z = booz2_micromag_values[IMU_MAG_Z_CHAN];
-
-  Booz2ImuScaleMag();
 }

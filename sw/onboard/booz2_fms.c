@@ -1,7 +1,8 @@
 #include "booz2_fms.h"
 
 #include "gps.h"
-#include "booz2_imu.h"
+#include "imu.h"
+
 #include "booz_ahrs.h"
 
 bool_t  booz_fms_on;

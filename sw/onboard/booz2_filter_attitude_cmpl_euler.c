@@ -1,6 +1,6 @@
 #include "booz2_filter_attitude_cmpl_euler.h"
+#include "imu.h"
 
-#include "booz2_imu.h"
 #include "booz_ahrs_aligner.h"
 
 #include "airframe.h"

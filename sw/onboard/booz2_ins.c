@@ -1,6 +1,7 @@
 #include "booz2_ins.h"
 
-#include "booz2_imu.h"
+#include "imu.h"
+
 #include "booz2_analog_baro.h"
 #include "gps.h"
 

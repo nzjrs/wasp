@@ -5,9 +5,7 @@
 #include "sys_time.h"
 #include "led.h"
 #include "comm.h"
-
-#include "booz2_imu.h"
-#include "booz2_imu_b2.h"
+#include "imu.h"
 
 #include "interrupt_hw.h"
 
@@ -17,7 +15,6 @@ static inline void main_periodic_task( void );
 static inline void main_event_task( void );
 
 static inline void on_imu_event(void);
-static inline void on_mag_event(void);
 
 int main( void ) {
     main_init();
@@ -31,14 +28,13 @@ int main( void ) {
 }
 
 static inline void main_init( void ) {
-  hw_init();
-  sys_time_init();
-  led_init();
+    hw_init();
+    sys_time_init();
+    led_init();
 
-  comm_init(COMM_1);
+    comm_init(COMM_1);
 
-  booz2_imu_impl_init();
-  booz2_imu_init();
+    imu_init();
 
   int_enable();
 }
@@ -50,36 +46,26 @@ static inline void main_periodic_task( void ) {
         led_toggle(3);
     });
 
-    RunOnceEvery(10, {
-        micromag_schedule_read();
-    });
-
-    booz2_imu_periodic();
-}
-
-static inline void main_event_task( void )
-{
-    comm_event_task(COMM_1);
-
-    Booz2ImuEvent(on_imu_event);
-    
-    Booz2ImuSpiEvent(booz2_max1168_read,micromag_read);
-
-    if ( micromag_event() )
-    {
-        on_mag_event();
-        micromag_reset();
-    }
+    imu_periodic_task();
 
 }
 
 #define TICKS 30
+
+static inline void main_event_task( void )
+{
+    uint8_t valid = 0;
+    comm_event_task(COMM_1);
+
+    valid = imu_event_task();
+    if ( (valid & IMU_ACC) || (valid & IMU_GYR) ) 
+        on_imu_event();
+
+}
+
 static inline void on_imu_event(void)
 {
     static uint8_t cnt;
-
-    Booz2ImuScaleGyro();
-    Booz2ImuScaleAccel();
 
     if (++cnt > TICKS) cnt = 0;
 
@@ -129,10 +115,3 @@ static inline void on_imu_event(void)
     }
 }
 
-static inline void on_mag_event(void) {
-  booz_imu.mag_unscaled.x = booz2_micromag_values[IMU_MAG_X_CHAN];
-  booz_imu.mag_unscaled.y = booz2_micromag_values[IMU_MAG_Y_CHAN];
-  booz_imu.mag_unscaled.z = booz2_micromag_values[IMU_MAG_Z_CHAN];
-
-  Booz2ImuScaleMag();
-}

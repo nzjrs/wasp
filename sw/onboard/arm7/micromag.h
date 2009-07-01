@@ -31,10 +31,10 @@
 #define MmReset()           SetBit(MM_RESET_IOCLR,MM_RESET_PIN)
 #define MmSet()             SetBit(MM_RESET_IOSET,MM_RESET_PIN)
 
-volatile uint8_t            booz2_micromag_status;
-volatile int16_t            booz2_micromag_values[MM_NB_AXIS];
-volatile uint8_t            booz2_micromag_cur_axe;
-uint8_t                     do_booz2_micromag_read;
+volatile uint8_t            micromag_status;
+volatile int16_t            micromag_values[MM_NB_AXIS];
+volatile uint8_t            micromag_cur_axe;
+volatile uint8_t            do_micromag_read;
 
 void
 micromag_init(void);
@@ -45,32 +45,32 @@ micromag_read(void);
 static inline void
 micromag_reset(void)
 {
-    booz2_micromag_status = MM_IDLE;
+    micromag_status = MM_IDLE;
 }
 
-static bool_t
+static inline bool_t
 micromag_event(void)
 {
-    return booz2_micromag_status == MM_DATA_AVAILABLE;
+    return micromag_status == MM_DATA_AVAILABLE;
 }
 
-static void
+static inline void
 micromag_schedule_read(void)
 {
-    do_booz2_micromag_read = TRUE;
+    do_micromag_read = TRUE;
 }
 
 
 static inline void
-micromag_OnSpiIt(void)
+micromag_got_interrupt_retrieve_values(void)
 {
-    switch (booz2_micromag_status) 
+    switch (micromag_status) 
     {
         case MM_SENDING_REQ:
             {
             /* read dummy control byte reply */
             uint8_t foo __attribute__ ((unused)) = SSPDR;
-            booz2_micromag_status = MM_WAITING_EOC;
+            micromag_status = MM_WAITING_EOC;
             MmUnselect();
             SpiClearRti();
             SpiDisableRti();
@@ -83,20 +83,20 @@ micromag_OnSpiIt(void)
             new_val = SSPDR << 8;
             new_val += SSPDR;
             if (abs(new_val) < 2000)
-	            booz2_micromag_values[booz2_micromag_cur_axe] = new_val;
+	            micromag_values[micromag_cur_axe] = new_val;
             MmUnselect();
             SpiClearRti();
             SpiDisableRti();
             SpiDisable();
-            booz2_micromag_cur_axe++;
-        	if (booz2_micromag_cur_axe > 2)
+            micromag_cur_axe++;
+        	if (micromag_cur_axe > 2)
             {
-	            booz2_micromag_cur_axe = 0;
-	            booz2_micromag_status = MM_DATA_AVAILABLE;
+	            micromag_cur_axe = 0;
+	            micromag_status = MM_DATA_AVAILABLE;
 	        }
 	        else
             {
-	            booz2_micromag_status = MM_IDLE;
+	            micromag_status = MM_IDLE;
             }
             }
             break;

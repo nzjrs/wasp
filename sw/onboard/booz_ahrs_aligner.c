@@ -1,7 +1,7 @@
 #include "booz_ahrs_aligner.h"
 #include "config.h"
-#include "booz2_imu.h"
 #include "led.h"
+#include "imu.h"
 
 struct BoozAhrsAligner booz_ahrs_aligner;
 

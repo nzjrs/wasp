@@ -1,7 +1,8 @@
 #include "booz2_hf_float.h"
 #include "booz2_ins.h"
 
-#include "booz2_imu.h"
+#include "imu.h"
+
 #include "booz_ahrs.h"
 #include "booz_geometry_mixed.h"
 
