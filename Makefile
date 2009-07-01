@@ -33,6 +33,7 @@ clean:
 
 test:
 	@make -C sw/groundstation/ test
+	@cd sw/onboard ; ./build-tests.sh
 
 ################################################################################
 # Dependencies
