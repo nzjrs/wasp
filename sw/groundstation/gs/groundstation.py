@@ -40,6 +40,9 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     CONFIG_CONNECT_NAME = "Connect_to_UAV_automatically"
     CONFIG_CONNECT_DEFAULT = "1"
+    CONFIG_LAT_DEFAULT = -43.520451
+    CONFIG_LON_DEFAULT = 172.582377
+    CONFIG_ZOOM_DEFAULT = 12
 
     def __init__(self, prefsfile, messagesfile):
         gtk.gdk.threads_init()
@@ -53,6 +56,9 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             sys.exit(1)
 
         self._tried_to_connect = False
+        self._home_lat = self.CONFIG_LAT_DEFAULT
+        self._home_lon = self.CONFIG_LON_DEFAULT
+        self._home_zoom = self.CONFIG_ZOOM_DEFAULT
 
         self._window = self._builder.get_object("window1")
         self._gps_coords = self._builder.get_object("gps_coords")
@@ -200,16 +206,39 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._sb.update_connected_indicator(False)
 
     def update_state_from_config(self):
-        c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)
-        if c == "1" and not self._tried_to_connect:
+        self._c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)
+        if self._c == "1" and not self._tried_to_connect:
             gobject.timeout_add_seconds(2, self._connect)
+
+        try:
+            self._home_lat = float(self.config_get("home_lat", self.CONFIG_LAT_DEFAULT))
+            self._home_lon = float(self.config_get("home_lon", self.CONFIG_LON_DEFAULT))
+            self._home_zoom = float(self.config_get("home_zoom", self.CONFIG_ZOOM_DEFAULT))
+        except Exception:
+            LOG.critical("Config error reading home position", exc_info=True)
+
+    def update_config_from_state(self):
+        self.config_set(self.CONFIG_CONNECT_NAME, self._c)
+        self.config_set("home_lat", self._home_lat)
+        self.config_set("home_lon", self._home_lon)
+        self.config_set("home_zoom", self._home_zoom)
 
     def get_preference_widgets(self):
         ck = self.build_checkbutton(self.CONFIG_CONNECT_NAME)
-        #all following items configuration is saved
-        items = [ck]
-        #the gui looks like
-        frame = self.build_frame(None, items)
+        e1 = self.build_entry("home_lat")
+        e2 = self.build_entry("home_lon")
+        e3 = self.build_entry("home_zoom")
+
+        items = [ck, e1, e2, e3]
+
+        sg = self.make_sizegroup()
+        frame = self.build_frame(None, [
+            ck,
+            self.build_label("Home Latitude", e1, sg),
+            self.build_label("Home Longitude", e2, sg),
+            self.build_label("Home Zoom", e3, sg)
+        ])
+
         return "Main Window", frame, items
 
     def on_window_destroy(self, widget):
@@ -230,7 +259,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                 self._source.send_message(rm, (m.id,))
 
     def on_menu_item_home_activate(self, widget):
-        self._map.set_mapcenter(-43.520451,172.582377,12)
+        self._map.set_mapcenter(self._home_lat, self._home_lon, self._home_zoom)
 
     def on_menu_item_zoom_in_activate(self, widget):
         self._map.set_zoom(self._map.props.zoom+1)
