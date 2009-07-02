@@ -30,13 +30,13 @@ LOG = logging.getLogger('groundstation')
 
 class Groundstation:
 
-    def __init__(self, uifile="data/groundstation.xml", prefsfile="prefs.ini"):
+    def __init__(self, uifile="data/groundstation.ui", prefsfile="prefs.ini"):
         gtk.gdk.threads_init()
         try:
             self._builder = gtk.Builder()
             self._builder.add_from_file(uifile)
         except Exception:
-            LOG.critical("Could not find xml file")
+            LOG.critical("Could not find xml file", exc_info=True)
             sys.exit(1)
         self._window = self._builder.get_object("window1")
         self._gps_coords = self._builder.get_object("gps_coords")
@@ -469,6 +469,3 @@ class Groundstation:
         self._window.show_all()
         gtk.main()
 
-if __name__ == "__main__":
-    gs = Groundstation()
-    gs.main()

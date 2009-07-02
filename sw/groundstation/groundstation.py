@@ -16,7 +16,7 @@ if __name__ == "__main__":
     prefs = os.path.join(confdir, "groundstation.ini")
 
     me = os.path.abspath(os.path.dirname(__file__))
-    ui = os.path.join(me, "data", "groundstation.xml")
+    ui = os.path.join(me, "data", "groundstation.ui")
 
     gs = groundstation.Groundstation(ui, prefs)
     gs.main()
