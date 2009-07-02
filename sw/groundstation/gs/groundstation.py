@@ -14,7 +14,6 @@ from gs.config import Config, ConfigurableIface
 from gs.source import UAVSource
 
 from gs.managers.turretmanager import TurretManager
-from gs.managers.sourcemanager import SourceManager
 from gs.managers.testmanager import TestManager
 from gs.managers.mapmanager import MapManager
 from gs.managers.graphmanager import GraphManager
@@ -56,7 +55,6 @@ class Groundstation(GtkBuilderWidget):
 
         self._source = UAVSource(self._config, self._messages)
 
-        self._sm = SourceManager(self._config)
         self._map = MapManager(self._config)
         self._tm = TurretManager(self._config)
         self._test = TestManager(self._config)
@@ -94,7 +92,6 @@ class Groundstation(GtkBuilderWidget):
         self._configurable = [
             self._source,
             self._map,
-            self._sm,
             self._gm,
             self._tm,
             self._test,
@@ -102,9 +99,6 @@ class Groundstation(GtkBuilderWidget):
         for c in self._configurable:
             if c:
                 c.update_state_from_config()
-
-#        for u in self._updateable:
-#            u.set_source_manager(self._sm)
 
         self._builder.get_object("main_left_vbox").pack_start(self._info.box, False, False)
         self._builder.get_object("vbox2").pack_start(self._msg, False, False)
@@ -170,7 +164,6 @@ class Groundstation(GtkBuilderWidget):
         m.destroy()
 
     def on_window_destroy(self, widget):
-        self._sm.get_source().quit()
         for c in self._configurable:
             if c:
                 c.update_config_from_state()
@@ -258,14 +251,9 @@ class Groundstation(GtkBuilderWidget):
                 obj.update_state_from_config()
             
     def on_menu_item_connect_activate(self, widget):
-        source = self._sm.get_source()
-        source.connect_to_craft()
-
         self._source.connect_to_uav()
 
     def on_menu_item_disconnect_activate(self, widget):
-        self._sm.get_source().disconnect_from_aircraft()
-
         self._source.disconnect_from_uav()
         
     def on_autopilot_enable_activate(self, widget):
@@ -390,15 +378,11 @@ class Groundstation(GtkBuilderWidget):
         if self._plane_view == None:
             self._plane_view = PlaneView()
         self._plane_view.show_all()
-#        self._updateable.append(self._plane_view)
-#        self._plane_view.set_source_manager(self._sm)
         
     def on_menu_item_horizon_view_activate(self, widget):
         if self._horizon_view == None:
             self._horizon_view = HorizonView()
         self._horizon_view.show_all()
-#        self._updateable.append(self._horizon_view)
-#        self._horizon_view.set_source_manager(self._sm)
 
     def on_menu_item_camera_view_activate(self, widget):
         if self._camera_window == None:
