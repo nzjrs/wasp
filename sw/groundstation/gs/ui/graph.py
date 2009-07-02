@@ -4,7 +4,6 @@ import sys
 import logging
 import gtk
 
-import gs.data as data
 import gs.ui.rtgraph as rtgraph
 
 LOG = logging.getLogger("graph")

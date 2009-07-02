@@ -1,8 +1,6 @@
 import gtk
 import gobject
 
-import gs.data as data
-
 class DBWidget(gtk.TreeView):
     def __init__(self, db):
         gtk.TreeView.__init__(self)
@@ -12,6 +10,7 @@ class DBWidget(gtk.TreeView):
         self.set_model(self._db_liststore)
 
     def _populate_treestore(self, db):
+        """
         types = []
         for k in data.DEFAULT_ATTRIBUTES:
             attrType = data.ATTRIBUTE_TYPE[k]
@@ -35,8 +34,11 @@ class DBWidget(gtk.TreeView):
 
             for row in db.execute(stmt):
                 self._db_liststore.append( row )
+        """
+        pass
 
     def _build_treeview(self):
+        """
         idx = 0
         for k in data.DEFAULT_ATTRIBUTES:
             col = gtk.TreeViewColumn(k.title())
@@ -45,4 +47,6 @@ class DBWidget(gtk.TreeView):
             col.add_attribute(cell, 'text', idx)
             self.append_column(col)
             idx += 1
+        """
+        pass
 

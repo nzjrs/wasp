@@ -5,7 +5,6 @@ import tempfile
 import os.path
 
 import gs.config as config
-import gs.data as data
 
 LOG = logging.getLogger('map')
 

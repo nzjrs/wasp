@@ -7,8 +7,6 @@ import osmgpsmap
 import gobject
 import logging
 
-import gs.data as data
-
 from gs.database import Database
 from gs.config import Config, ConfigurableIface
 from gs.source import UAVSource
@@ -467,12 +465,13 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         
         resp = dlg.run()
         if (resp == gtk.RESPONSE_OK):
-            filename = file_chooser.get_filename()
-            db = Database(filename)
-            track = []
-            for r in db.fetchall("SELECT %s, %s FROM flight_data" % (data.LAT, data.LON)):
-                track.append( (math.radians(r[0]),math.radians(r[1])) )
-            self._map.add_track(track)
+            pass
+            #filename = file_chooser.get_filename()
+            #db = Database(filename)
+            #track = []
+            #for r in db.fetchall("SELECT %s, %s FROM flight_data" % (data.LAT, data.LON)):
+            #    track.append( (math.radians(r[0]),math.radians(r[1])) )
+            #self._map.add_track(track)
         for c in sw.get_children():
             sw.remove(c)
         dlg.hide()

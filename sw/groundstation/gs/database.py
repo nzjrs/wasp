@@ -1,8 +1,6 @@
 import sqlite3
 import logging
 
-import gs.data as data
-
 LOG = logging.getLogger('database')
 
 class Database:
@@ -28,14 +26,14 @@ class Database:
             #type, and we get commas between fields
             stmt = "CREATE TABLE IF NOT EXISTS flight_data "
             sep = "("
-            for k in data.DEFAULT_ATTRIBUTES:
-                attrType = data.ATTRIBUTE_TYPE[k]
-                if attrType == str:
-                    t = "TEXT"
-                elif attrType == float:
-                    t = "REAL"
-                else:
-                    raise Exception("Unknown attribute type")
+            for k in ():
+                #attrType = data.ATTRIBUTE_TYPE[k]
+                #if attrType == str:
+                #    t = "TEXT"
+                #elif attrType == float:
+                #    t = "REAL"
+                #else:
+                #    raise Exception("Unknown attribute type")
 
                 stmt += "%s %s %s" % (sep, k, t)
                 sep = ","

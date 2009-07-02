@@ -1,7 +1,6 @@
 import gtk
 
 import gs.ui
-import gs.data as data
 import gs.ui.indicators as indicators
 
 class StatusBar(gtk.Statusbar):
