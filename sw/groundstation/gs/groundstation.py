@@ -78,8 +78,8 @@ class Groundstation(GtkBuilderWidget):
     
         #Create final UI elements
         self._create_map()
-        self._create_datatree()
-        self._create_graphs()
+#        self._create_datatree()
+#        self._create_graphs()
 
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface
@@ -111,42 +111,42 @@ class Groundstation(GtkBuilderWidget):
         self._map.connect("notify::show-trip-history", self.on_map_show_trip_history_property_change)
         self._map.connect("button-press-event", self.map_click_callback)
     
-    def _create_datatree(self):
-        data_treeview = self._builder.get_object("data_tree")
-
-        i = 0
-        for name in ("Name", "Value"):
-            col = gtk.TreeViewColumn(name)
-            data_treeview.append_column(col)
-            cell = gtk.CellRendererText()
-            col.pack_start(cell, True)
-            col.add_attribute(cell, 'text', i)
-            i += 1
-
-        self._telemetry_tree_model = TelemetryTreeModel()
-        data_treeview.set_model(self._telemetry_tree_model)
-        self._updateable.append(self._telemetry_tree_model)
-
-    def _create_graphs(self):
-        graphs_notebook = self._builder.get_object("plots_notebook")
-
-        self._accel_graph = Graph(self._window, graphs_notebook, 
-                                    lines=(data.AX, data.AY,data.AZ),
-                                    label="Acceleratons",
-                                    yrange=[0,1])
-        self._updateable.append(self._accel_graph)
-
-        self._attitude_graph = Graph(self._window, graphs_notebook,
-                                    lines=(data.PITCH, data.ROLL, data.YAW),
-                                    label="Attitudes",
-                                    yrange=[0,10])
-        self._updateable.append(self._attitude_graph)
-
-        self._rotational_graph = Graph(self._window, graphs_notebook,
-                                    lines=(data.P, data.Q, data.R),
-                                    label="Rotational Velocities",
-                                    yrange=[0,1])
-        self._updateable.append(self._rotational_graph)
+#    def _create_datatree(self):
+#        data_treeview = self._builder.get_object("data_tree")
+#
+#        i = 0
+#        for name in ("Name", "Value"):
+#            col = gtk.TreeViewColumn(name)
+#            data_treeview.append_column(col)
+#            cell = gtk.CellRendererText()
+#            col.pack_start(cell, True)
+#            col.add_attribute(cell, 'text', i)
+#            i += 1
+#
+#        self._telemetry_tree_model = TelemetryTreeModel()
+#        data_treeview.set_model(self._telemetry_tree_model)
+#        self._updateable.append(self._telemetry_tree_model)
+#
+#    def _create_graphs(self):
+#        graphs_notebook = self._builder.get_object("plots_notebook")
+#
+#        self._accel_graph = Graph(self._window, graphs_notebook, 
+#                                    lines=(data.AX, data.AY,data.AZ),
+#                                    label="Acceleratons",
+#                                    yrange=[0,1])
+#        self._updateable.append(self._accel_graph)
+#
+#        self._attitude_graph = Graph(self._window, graphs_notebook,
+#                                    lines=(data.PITCH, data.ROLL, data.YAW),
+#                                    label="Attitudes",
+#                                    yrange=[0,10])
+#        self._updateable.append(self._attitude_graph)
+#
+#        self._rotational_graph = Graph(self._window, graphs_notebook,
+#                                    lines=(data.P, data.Q, data.R),
+#                                    label="Rotational Velocities",
+#                                    yrange=[0,1])
+#        self._updateable.append(self._rotational_graph)
 
     def _error_message(self, message, secondary=None):
         m = gtk.MessageDialog(
