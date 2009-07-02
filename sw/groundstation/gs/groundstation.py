@@ -1,5 +1,5 @@
 import sys
-import os
+import os.path
 import datetime
 import math
 import gtk.gdk
@@ -17,6 +17,7 @@ from gs.managers.sourcemanager import SourceManager
 from gs.managers.testmanager import TestManager
 from gs.managers.mapmanager import MapManager
 from gs.managers.graphmanager import GraphManager
+from gs.ui import GtkBuilderWidget
 from gs.ui.graph import Graph
 from gs.ui.tree import DBWidget, TelemetryTreeModel
 from gs.ui.msgarea import MsgAreaController
@@ -25,19 +26,23 @@ from gs.ui.horizon import HorizonView
 from gs.ui.camera import CameraWindow
 from gs.ui.preferences import PreferencesWindow
 from gs.ui.statusbar import StatusBar
+from gs.ui.info import InfoBox
 
 LOG = logging.getLogger('groundstation')
 
-class Groundstation:
+class Groundstation(GtkBuilderWidget):
 
-    def __init__(self, uifile="data/groundstation.ui", prefsfile="prefs.ini"):
+    def __init__(self, prefsfile="prefs.ini"):
         gtk.gdk.threads_init()
+
         try:
-            self._builder = gtk.Builder()
-            self._builder.add_from_file(uifile)
+            me = os.path.abspath(__file__)
+            ui = os.path.join(os.path.dirname(me), "groundstation.ui")
+            GtkBuilderWidget.__init__(self, ui)
         except Exception:
-            LOG.critical("Could not find xml file", exc_info=True)
+            LOG.critical("Error loading ui file", exc_info=True)
             sys.exit(1)
+
         self._window = self._builder.get_object("window1")
         self._gps_coords = self._builder.get_object("gps_coords")
 
@@ -50,6 +55,7 @@ class Groundstation:
         self._gm = GraphManager(self._config, self._builder.get_object("graphs_box"), self._window)
         self._msg = MsgAreaController()
         self._sb = StatusBar()
+        self._info = InfoBox()
 
         #Setup all those elements that are updated whenever data arrives from
         #the UAV
@@ -91,6 +97,7 @@ class Groundstation:
         for u in self._updateable:
             u.set_source_manager(self._sm)
 
+        self._builder.get_object("main_left_vbox").pack_start(self._info.box, False, False)
         self._builder.get_object("vbox2").pack_start(self._msg, False, False)
         self._builder.get_object("vbox1").pack_start(self._sb, False, False)
         self._builder.get_object("menu_item_disconnect").set_sensitive(False)

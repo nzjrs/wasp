@@ -15,8 +15,5 @@ if __name__ == "__main__":
         os.makedirs(confdir)
     prefs = os.path.join(confdir, "groundstation.ini")
 
-    me = os.path.abspath(os.path.dirname(__file__))
-    ui = os.path.join(me, "data", "groundstation.ui")
-
-    gs = groundstation.Groundstation(ui, prefs)
+    gs = groundstation.Groundstation(prefs)
     gs.main()
