@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os.path
 import gtk
@@ -29,6 +30,8 @@ class InfoBox(gs.ui.GtkBuilderWidget):
 
         source.register_interest(self._on_status, 5, "STATUS")
         source.register_interest(self._on_time, 2, "TIME")
+        source.register_interest(self._on_build_info, 2, "BUILD_INFO")
+
 
     def _on_status(self, msg, payload):
         rc, gps = msg.unpack_printable_values(payload, joiner=None)
@@ -39,8 +42,20 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         runtime, = msg.unpack_printable_values(payload, joiner=None)
         self.get_resource("runtime_value").set_text(runtime)
 
-    def set_build_info(self, rev, branch, target, dirty, time):
-        self.get_resource("rev_value").set_text(rev)
+    def _on_build_info(self, msg, payload):
+        rev, branch, target, dirty, time = msg.unpack_printable_values(payload, joiner=None)
+
+        #gtk.Label does not like strings with embedded null
+        def denull(s):
+            return s.replace("\x00","")
+
+        self.get_resource("rev_value").set_text(denull(rev))
+        self.get_resource("branch_value").set_text(denull(branch))
+        self.get_resource("target_value").set_text(denull(target))
+        self.get_resource("dirty_value").set_text(dirty)
+
+        t = datetime.datetime.fromtimestamp(int(time))
+        self.get_resource("time_value").set_text(t.strftime("%d/%m/%Y %H:%M:%S"))
 
 
 if __name__ == "__main__":

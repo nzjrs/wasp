@@ -25,6 +25,9 @@ class _Source:
     def get_rx_message_treestore(self, *args, **kwargs):
         raise NotImplementedError    
 
+    def send_message(self, msg, values):
+        raise NotImplementedError
+
 class _MessageCb:
     def __init__(self, cb, max_freq, **kwargs):
         self.cb = cb
@@ -104,6 +107,14 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
         if self._rxts == None:
             self._rxts = treeview.MessageTreeStore()
         return self._rxts
+
+    def send_message(self, msg, values):
+        if msg:
+            data = self._transport.pack_message_with_values(
+                        transport.TransportHeaderFooter(acid=0x78), 
+                        msg,
+                        *values)
+            self._serialsender.write(data.tostring())
 
     def quit(self):
         self.disconnect_from_uav()

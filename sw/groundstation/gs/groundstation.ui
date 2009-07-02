@@ -325,16 +325,30 @@
               </object>
             </child>
             <child>
-              <object class="GtkMenuItem" id="menu_item_autopilot">
+              <object class="GtkMenuItem" id="menu_item_uav">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">_Autopilot</property>
+                <property name="label" translatable="yes">_UAV</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
                   <object class="GtkMenu" id="autopilot_menu">
                     <property name="visible">True</property>
                     <child>
+                      <object class="GtkImageMenuItem" id="menu_item_refresh_uav">
+                        <property name="label" translatable="yes">Refresh UAV Info</property>
+                        <property name="visible">True</property>
+                        <property name="image">image15</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_menu_item_refresh_uav_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="menuitem2">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkImageMenuItem" id="menu_item_autopilot_enable">
-                        <property name="label">Enable</property>
+                        <property name="label">Enable Autopilot</property>
                         <property name="visible">True</property>
                         <property name="image">image11</property>
                         <property name="use_stock">False</property>
@@ -345,7 +359,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="menu_item_autopilot_disable">
-                        <property name="label">Disable</property>
+                        <property name="label">Disable Autopilot</property>
                         <property name="visible">True</property>
                         <property name="sensitive">False</property>
                         <property name="image">image12</property>
@@ -353,6 +367,11 @@
                         <property name="accel_group">accelgroup1</property>
                         <property name="always_show_image">True</property>
                         <signal name="activate" handler="on_autopilot_disable_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separatormenuitem2">
+                        <property name="visible">True</property>
                       </object>
                     </child>
                     <child>
@@ -521,7 +540,7 @@
               <object class="GtkHBox" id="telemetry_hbox">
                 <property name="visible">True</property>
                 <child>
-                  <object class="GtkVBox" id="vbox3">
+                  <object class="GtkVBox" id="telemetry_left_vbox">
                     <property name="visible">True</property>
                     <property name="orientation">vertical</property>
                     <child>
@@ -2050,5 +2069,9 @@
   <object class="GtkImage" id="image9">
     <property name="visible">True</property>
     <property name="stock">gtk-missing-image</property>
+  </object>
+  <object class="GtkImage" id="image15">
+    <property name="visible">True</property>
+    <property name="stock">gtk-refresh</property>
   </object>
 </interface>

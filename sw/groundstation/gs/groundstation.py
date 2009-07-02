@@ -30,6 +30,7 @@ from gs.ui.info import InfoBox
 
 from ppz.messages import MessagesFile
 from ppz.ui.treeview import MessageTreeView
+from ppz.ui.senders import RequestMessageSender
 
 LOG = logging.getLogger('groundstation')
 
@@ -129,7 +130,12 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             sw = self._builder.get_object("telemetry_sw")
             rxtv = MessageTreeView(rxts, editable=False, show_dt=True)
             sw.add(rxtv)
-        
+
+            vb = self._builder.get_object("telemetry_left_vbox")
+            rm = RequestMessageSender(self._messages)
+            rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
+            vb.pack_start(rm, False, False)
+
 #        graphs_notebook = self._builder.get_object("plots_notebook")
 
 
@@ -213,6 +219,15 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._config.save()
         self._source.quit()
         gtk.main_quit()
+
+    def on_menu_item_refresh_uav_activate(self, widget):
+        rm = self._messages.get_message_by_name("REQUEST_MESSAGE")
+
+        #request a number of messages from the UAV
+        for n in ("BUILD_INFO", ):
+            m = self._messages.get_message_by_name(n)
+            if m:
+                self._source.send_message(rm, (m.id,))
 
     def on_menu_item_home_activate(self, widget):
         self._map.set_mapcenter(-43.520451,172.582377,12)
