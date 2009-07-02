@@ -11,6 +11,7 @@ import gs.data as data
 
 from gs.database import Database
 from gs.config import Config
+from gs.source import UAVSource
 
 from gs.managers.turretmanager import TurretManager
 from gs.managers.sourcemanager import SourceManager
@@ -47,6 +48,7 @@ class Groundstation(GtkBuilderWidget):
         self._gps_coords = self._builder.get_object("gps_coords")
 
         #The Main application elements
+        self._source = UAVSource()
         self._config = Config(filename=prefsfile)
         self._sm = SourceManager(self._config)
         self._map = MapManager(self._config)
@@ -166,6 +168,7 @@ class Groundstation(GtkBuilderWidget):
             if c:
                 c.update_config_from_state()
         self._config.save()
+        self._source.quit()
         gtk.main_quit()
 
     def on_menu_item_home_activate(self, widget):

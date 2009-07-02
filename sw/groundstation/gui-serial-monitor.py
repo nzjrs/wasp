@@ -17,6 +17,7 @@ class UI(monitor.GObjectSerialMonitor):
     def __init__(self, messages_file, serialsender, transport, debug=False):
         monitor.GObjectSerialMonitor.__init__(self, serialsender)
         self._debug = debug
+        self._messages_file = messages_file
         self._transport = transport
 
         self._rxts = treeview.MessageTreeStore()
@@ -77,8 +78,8 @@ class UI(monitor.GObjectSerialMonitor):
     def on_serial_data_available(self, fd, condition, serial):
 
         data = serial.read(1)
-        for header, payload in t.parse_many(data):
-            msg = m.get_message_by_id(header.msgid)
+        for header, payload in self._transport.parse_many(data):
+            msg =  self._messages_file.get_message_by_id(header.msgid)
             if msg:
                 self._rxts.update_message(msg, payload)
 
