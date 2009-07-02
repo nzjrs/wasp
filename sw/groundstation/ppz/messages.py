@@ -229,12 +229,12 @@ class PyMessage(Message):
             fvals = self.get_field_values(vals)
             assert len(fvals) == self.num_fields
 
-            pvals = [self.fields[i].get_printable_value(fvals[i]) for i in range(self.num_fields)]
-
-            if joiner:
-                return joiner.join(pvals)
-            else:
-                return pvals
+            #fastest way to do string concentation
+            #http://www.skymind.com/~ocrow/python_string/
+            #equivilent to
+            return joiner.join([
+                        self.fields[i].get_printable_value(fvals[i]) 
+                            for i in range(self.num_fields)])
         else:
             return ""
 

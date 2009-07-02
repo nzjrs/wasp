@@ -60,11 +60,6 @@
      <field name="another_uint8" type="uint8"></field>
    </message>
 
-   <message name="WASP_GPS" id="27">
-      <field name="fix" type="uint8" values="NONE|2D|3D"/>
-      <field name="sv" type="uint8"/>
-   </message>
-
   <message name="IMU_GYRO_RAW" id="28">
     <field name="gp" type="uint16" unit="adc"/>
     <field name="gq" type="uint16" unit="adc"/>
@@ -108,6 +103,15 @@
   <message name="RC" id="35">
     <field name="values" type="int16[6]" format="%d"/>
   </message>
+
+   <message name="GPS_LLH" id="36">
+      <field name="fix" type="uint8" values="NONE|2D|3D"/>
+      <field name="sv" type="uint8"/>
+      <field name="lat"  type="int32"/>
+      <field name="lon"  type="int32"/>
+      <field name="hsl"  type="int32"/>
+   </message>
+
 
    <!-- Begin periodic messages -->
 

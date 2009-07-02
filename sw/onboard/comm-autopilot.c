@@ -11,8 +11,13 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
 
     switch (msgid)
     {
-        case MESSAGE_ID_WASP_GPS:
-            MESSAGE_SEND_WASP_GPS( chan, &booz_gps_state.fix, &booz_gps_state.num_sv );
+        case MESSAGE_ID_GPS_LLH:
+            MESSAGE_SEND_GPS_LLH( COMM_1, 
+                &booz_gps_state.fix,
+                &booz_gps_state.num_sv,
+                &booz_gps_state.booz2_gps_lat,
+                &booz_gps_state.booz2_gps_lon,
+                &booz_gps_state.booz2_gps_hmsl);
             break;
         case MESSAGE_ID_IMU_GYRO_RAW:
             MESSAGE_SEND_IMU_GYRO_RAW(

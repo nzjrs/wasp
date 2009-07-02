@@ -25,7 +25,6 @@ static inline void main_init( void ) {
   sys_time_init();
   led_init();
 
-  /* Uart 1 */
   comm_init(COMM_1);
 
   gps_init();
@@ -36,8 +35,12 @@ static inline void main_init( void ) {
 static inline void main_periodic_task( void ) {
 
   RunOnceEvery(250, {
-    comm_send_ch(COMM_1, booz_gps_state.num_sv);
-    MESSAGE_SEND_WASP_GPS( COMM_1, &booz_gps_state.fix, &booz_gps_state.num_sv );
+    MESSAGE_SEND_GPS_LLH( COMM_1, 
+        &booz_gps_state.fix,
+        &booz_gps_state.num_sv,
+        &booz_gps_state.booz2_gps_lat,
+        &booz_gps_state.booz2_gps_lon,
+        &booz_gps_state.booz2_gps_hmsl);
   });
 
 
