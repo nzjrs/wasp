@@ -212,12 +212,18 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def _connect(self):
         self._tried_to_connect = True
-        self._source.connect_to_uav()
-        self._sb.update_connected_indicator(True)
+
+        ok = self._source.connect_to_uav()
+        self._sb.update_connected_indicator(ok)
+        self._info.set_connection_status(ok)
+
+        port, speed = self._source.get_connection_parameters()
+        self._info.set_connection_parameters(port, speed)
 
     def _disconnect(self):
         self._source.disconnect_from_uav()
         self._sb.update_connected_indicator(False)
+        self._info.set_connection_status(False)
 
     def update_state_from_config(self):
         self._c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)

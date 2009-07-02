@@ -28,6 +28,15 @@ class _Source:
     def send_message(self, msg, values):
         raise NotImplementedError
 
+    def connect_to_uav(self):
+        raise NotImplementedError
+
+    def disconnect_from_uav(self):
+        raise NotImplementedError
+
+    def get_connection_parameters(self):
+        raise NotImplementedError
+
 class _MessageCb:
     def __init__(self, cb, max_freq, **kwargs):
         self.cb = cb
@@ -89,7 +98,6 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
                 self._callbacks[msg.id] = [cb]
 
     def on_serial_data_available(self, fd, condition, serial):
-
         data = serial.read(1)
         for header, payload in self._transport.parse_many(data):
             msg = self._messages_file.get_message_by_id(header.msgid)
@@ -119,9 +127,14 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
     def quit(self):
         self.disconnect_from_uav()
 
+    def get_connection_parameters(self):
+        return self._port, self._speed
+
     def connect_to_uav(self):
         if self._port and self._speed:
-            self._serialsender.connect_to_port()
+            if self._serialsender.connect_to_port():
+                return True
+        return False
 
     def disconnect_from_uav(self):
         self._serialsender.disconnect_from_port()

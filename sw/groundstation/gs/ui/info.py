@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os.path
+import gobject
 import gtk
 
 import gs.ui
@@ -27,16 +28,32 @@ class InfoBox(gs.ui.GtkBuilderWidget):
             self.get_resource("status_image"),
             os.path.join(mydir,"icons","dashboard.svg")
         )
+        #change the comm icon
+        set_image_from_file(
+            self.get_resource("comm_image"),
+            os.path.join(mydir,"icons","radio.svg")
+        )
 
         source.register_interest(self._on_status, 5, "STATUS")
+        source.register_interest(self._on_comm_status, 5, "COMM_STATUS")
         source.register_interest(self._on_time, 2, "TIME")
         source.register_interest(self._on_build_info, 2, "BUILD_INFO")
 
+        gobject.timeout_add_seconds(1, self._check_messages_per_second)
+
+    def _check_messages_per_second(self):
+        self.get_resource("rate_value").set_text("%1.1f msgs/s" % 0.0)
+        return True
 
     def _on_status(self, msg, payload):
         rc, gps = msg.unpack_printable_values(payload, joiner=None)
         self.get_resource("rc_value").set_text(rc)
         self.get_resource("gps_value").set_text(gps)
+
+    def _on_comm_status(self, msg, payload):
+        overruns, errors = msg.unpack_printable_values(payload, joiner=None)
+        self.get_resource("overruns_value").set_text(overruns)
+        self.get_resource("errors_value").set_text(errors)
 
     def _on_time(self, msg, payload):
         runtime, = msg.unpack_printable_values(payload, joiner=None)
@@ -57,6 +74,16 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         t = datetime.datetime.fromtimestamp(int(time))
         self.get_resource("time_value").set_text(t.strftime("%d/%m/%Y %H:%M:%S"))
 
+    def set_connection_status(self, connected):
+        w = self.get_resource("connected_value")
+        if connected:
+            w.set_text("YES")
+        else:
+            w.set_text("NO")
+
+    def set_connection_parameters(self, port, speed):
+        self.get_resource("port_value").set_text(port)
+        self.get_resource("speed_value").set_text("%s baud" % speed)
 
 if __name__ == "__main__":
     i = InfoBox()
