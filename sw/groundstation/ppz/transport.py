@@ -15,7 +15,7 @@ class SerialTransport(libserial.SerialSender.SerialSender):
             try:
                 return self._serial.read(nbytes)
             except  serial.SerialTimeoutException:
-                print "Timeout"
+                pass
         return ""
     
     def write(self, data):
