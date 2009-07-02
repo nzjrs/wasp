@@ -37,6 +37,9 @@ class _Source:
     def get_connection_parameters(self):
         raise NotImplementedError
 
+    def get_messages_per_second(self):
+        raise NotImplementedError
+
 class _MessageCb:
     def __init__(self, cb, max_freq, **kwargs):
         self.cb = cb
@@ -47,13 +50,13 @@ class _MessageCb:
             self._dt = 1.0/max_freq
             self._lastt = datetime.datetime.now()
 
-    def call_cb(self, msg, payload):
+    def call_cb(self, msg, payload, time):
         if self.max_freq <= 0:
             self.cb(msg, payload, **self.kwargs)
         else:
             self._lastt, enough_time_passed, dt = utils.has_elapsed_time_passed(
                                             then=self._lastt,
-                                            now=datetime.datetime.now(),
+                                            now=time,
                                             dt=self._dt)
             if enough_time_passed:
                 try:
@@ -82,6 +85,10 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
         self._speed = None
         self._rxts = None
 
+        #track how many messages per second
+        self._lastt = datetime.datetime.now()
+        self._times = utils.MovingAverage(5, float)
+
         #dictionary of msgid : [list, of, _MessageCb objects]
         self._callbacks = {}
 
@@ -102,12 +109,16 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
         for header, payload in self._transport.parse_many(data):
             msg = self._messages_file.get_message_by_id(header.msgid)
             if msg:
+                time = datetime.datetime.now()
                 cbs = self._callbacks.get(msg.id, ())
                 for cb in cbs:
-                    cb.call_cb(msg, payload)
+                    cb.call_cb(msg, payload, time)
 
                 if self._rxts:
                     self._rxts.update_message(msg, payload)
+
+                self._times.add(utils.calculate_dt_seconds(self._lastt, time))
+                self._lastt = time
 
         return True
 
@@ -138,6 +149,12 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
 
     def disconnect_from_uav(self):
         self._serialsender.disconnect_from_port()
+
+    def get_messages_per_second(self):
+        try:
+            return 1.0/self._times.average()
+        except ZeroDivisionError:
+            return 0.0
 
     def update_state_from_config(self):
         self._port = self.config_get("serial_port", self.DEFAULT_PORT)

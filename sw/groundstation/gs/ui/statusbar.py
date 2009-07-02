@@ -1,3 +1,4 @@
+import gobject
 import gtk
 
 import gs.ui
@@ -33,6 +34,12 @@ class StatusBar(gtk.Statusbar):
 
         source.register_interest(self._on_gps, 0, "GPS_LLH")
 
+        gobject.timeout_add_seconds(1, self._check_messages_per_second, source)
+
+    def _check_messages_per_second(self, source):
+        self._ms.set_text("MSG/S: %.1f" % source.get_messages_per_second())
+        return True
+
     def _on_gps(self, msg, payload):
         fix,sv,lat,lon,hsl = msg.unpack_values(payload)
 
@@ -40,8 +47,6 @@ class StatusBar(gtk.Statusbar):
         lon = lon/1e7
 
         self._gps_coords.set_text("GPS: %.4f %s, %.4f %s" % (lat,"N",lon,"E"))
-
-#        self._ms.set_text("MSG/S: %.1f" % msgs)
 
     def update_connected_indicator(self, connected):
         if connected:
