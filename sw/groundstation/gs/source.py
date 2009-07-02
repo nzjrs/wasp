@@ -1,8 +1,10 @@
 import logging
+import datetime
 
 import libserial
 
 import gs.config as config
+import gs.utils as utils
 
 import ppz
 import ppz.transport as transport
@@ -17,15 +19,25 @@ class _Source:
         raise NotImplementedError
 
 class _MessageCb:
-    def __init__(self):
-        self.cbs = []
+    def __init__(self, cb, max_freq, **kwargs):
+        self.cb = cb
+        self.max_freq = max_freq
+        self.kwargs = kwargs
 
-    def add_cb(self, cb, **kwargs):
-        self.cbs.append( (cb, kwargs) )
+        if max_freq > 0:
+            self._dt = 1.0/max_freq
+            self._lastt = datetime.datetime.now()
 
-    def call_cbs(self, msg, payload):
-        for cb, kwargs in self.cbs:
-            cb(msg, payload, **kwargs)
+    def call_cb(self, msg, payload):
+        if self.max_freq <= 0:
+            self.cb(msg, payload, **self.kwargs)
+        else:
+            self._lastt, enough_time_passed, dt = utils.has_elapsed_time_passed(
+                                            then=self._lastt,
+                                            now=datetime.datetime.now(),
+                                            dt=self._dt)
+            if enough_time_passed:
+                self.cb(msg, payload, **self.kwargs)
 
 class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface):
 
@@ -47,22 +59,20 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
         self._port = None
         self._speed = None
 
-        #dictionary of msgid : _MessageCb objects
+        #dictionary of msgid : [list, of, _MessageCb objects]
         self._callbacks = {}
 
-    def register_interest(self, cb, *message_names, **user_data):
+    def register_interest(self, cb, max_frequency, *message_names, **user_data):
         for m in message_names:
             msg = self._messages_file.get_message_by_name(m)
             if not msg:
                 LOG.critical("Unknown message: %s" % m)
 
+            cb = _MessageCb(cb, max_frequency, **user_data)
             try:
-                mcb = self._callbacks[msg.id]
+                self._callbacks[msg.id].append(cb)
             except KeyError:
-                mcb = _MessageCb()
-                self._callbacks[msg.id] = mcb
-
-            mcb.add_cb(cb, **user_data)
+                self._callbacks[msg.id] = [cb]
 
     def on_serial_data_available(self, fd, condition, serial):
 
@@ -70,9 +80,9 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
         for header, payload in self._transport.parse_many(data):
             msg = self._messages_file.get_message_by_id(header.msgid)
             if msg:
-                mcb = self._callbacks.get(msg.id)
-                if mcb:
-                    mcb.call_cbs(msg, payload)
+                cbs = self._callbacks.get(msg.id, ())
+                for cb in cbs:
+                    cb.call_cb(msg, payload)
 
         return True
 

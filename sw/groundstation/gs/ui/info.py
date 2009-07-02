@@ -27,7 +27,7 @@ class InfoBox(gs.ui.GtkBuilderWidget):
             os.path.join(mydir,"icons","dashboard.svg")
         )
 
-        source.register_interest(self._on_status, "STATUS")
+        source.register_interest(self._on_status, 5, "STATUS")
 
     def _on_status(self, msg, payload):
         rc, gps = msg.unpack_printable_values(payload, joiner=None)
