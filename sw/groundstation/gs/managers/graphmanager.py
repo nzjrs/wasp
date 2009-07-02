@@ -21,8 +21,9 @@ class GraphManager(config.ConfigurableIface):
         self._hboxes = {}
 
     def _on_pause(self, sender, tweakScrollRate):
-        tweakScrollRate.setValue(0)
-        tweakScrollRate.refresh()
+        if tweakScrollRate:
+            tweakScrollRate.setValue(0)
+            tweakScrollRate.refresh()
 
     def _on_remove(self, sender, name):
         del(self._graphs[name])
