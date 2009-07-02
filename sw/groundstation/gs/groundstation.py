@@ -32,7 +32,12 @@ from ppz.messages import MessagesFile
 
 LOG = logging.getLogger('groundstation')
 
-class Groundstation(GtkBuilderWidget):
+class Groundstation(GtkBuilderWidget, ConfigurableIface):
+
+    CONFIG_SECTION = "MAIN"
+
+    CONFIG_CONNECT_NAME = "Connect_to_UAV_automatically"
+    CONFIG_CONNECT_DEFAULT = "1"
 
     def __init__(self, prefsfile, messagesfile):
         gtk.gdk.threads_init()
@@ -45,10 +50,13 @@ class Groundstation(GtkBuilderWidget):
             LOG.critical("Error loading ui file", exc_info=True)
             sys.exit(1)
 
+        self._tried_to_connect = False
+
         self._window = self._builder.get_object("window1")
         self._gps_coords = self._builder.get_object("gps_coords")
 
         self._config = Config(filename=prefsfile)
+        ConfigurableIface.__init__(self, self._config)
 
         self._messages = MessagesFile(path=messagesfile, debug=False)
         self._messages.parse()
@@ -90,6 +98,7 @@ class Groundstation(GtkBuilderWidget):
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface
         self._configurable = [
+            self,
             self._source,
             self._map,
             self._gm,
@@ -162,6 +171,28 @@ class Groundstation(GtkBuilderWidget):
             m.format_secondary_text(secondary)
         m.run()
         m.destroy()
+
+    def _connect(self):
+        self._tried_to_connect = True
+        self._source.connect_to_uav()
+        self._sb.update_connected_indicator(True)
+
+    def _disconnect(self):
+        self._source.disconnect_from_uav()
+        self._sb.update_connected_indicator(False)
+
+    def update_state_from_config(self):
+        c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)
+        if c == "1" and not self._tried_to_connect:
+            gobject.timeout_add_seconds(2, self._connect)
+
+    def get_preference_widgets(self):
+        ck = self.build_checkbutton(self.CONFIG_CONNECT_NAME)
+        #all following items configuration is saved
+        items = [ck]
+        #the gui looks like
+        frame = self.build_frame(None, items)
+        return "Main Window", frame, items
 
     def on_window_destroy(self, widget):
         for c in self._configurable:
@@ -251,10 +282,10 @@ class Groundstation(GtkBuilderWidget):
                 obj.update_state_from_config()
             
     def on_menu_item_connect_activate(self, widget):
-        self._source.connect_to_uav()
+        self._connect()
 
     def on_menu_item_disconnect_activate(self, widget):
-        self._source.disconnect_from_uav()
+        self._disconnect()
         
     def on_autopilot_enable_activate(self, widget):
         self._builder.get_object("menu_item_autopilot_disable").set_sensitive(True)

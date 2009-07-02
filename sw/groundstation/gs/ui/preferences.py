@@ -54,13 +54,20 @@ class PreferencesWindow:
             elif type(widget) == gtk.RadioButton:
                 if widget.get_active():
                     config.set(name, widget.props.label, section)
+            elif type(widget) == gtk.CheckButton:
+                if widget.get_active():
+                    config.set(name, "1", section)
+                else:
+                    config.set(name, "0", section)
+            else:
+                LOG.critical("Unknown preference widget: %s" % widget)
 
     def _load_widgets_from_config(self, config):
         for widget in self._configurable_widgets:
             name = widget.get_data("CONFIG_NAME")
             section = widget.get_data("CONFIG_SECTION")
             val = config.get(name, default=None, section=section)
-            if val:
+            if val != None:
                 if type(widget) == gtk.Entry:
                     widget.set_text(val)
                 elif type(widget) == gtk.ComboBox:
@@ -73,6 +80,14 @@ class PreferencesWindow:
                 elif type(widget) == gtk.RadioButton:
                     if name == val:
                         widget.set_active()
+                elif type(widget) == gtk.CheckButton:
+                    i = int(val)
+                    if i == 1:
+                        widget.set_active(True)
+                    elif i == 0:
+                        widget.set_active(False)
+                    else:
+                        LOG.critical("Unknown value for check config: %s" % val)
 
     def show(self, config):
         #preload the widgets

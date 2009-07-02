@@ -71,6 +71,13 @@ class ConfigurableIface:
         widget.set_data("CONFIG_SECTION", section)
         return widget
 
+    def build_checkbutton(self, name):
+        section = self.CONFIG_SECTION
+        widget = gtk.CheckButton(label=name.replace("_"," "))
+        widget.set_data("CONFIG_NAME", name)
+        widget.set_data("CONFIG_SECTION", section)
+        return widget
+
     def build_radio(self, name, item):
         button = gtk.RadioButton(label=item)
         section = self.CONFIG_SECTION
