@@ -74,10 +74,14 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map = MapManager(self._config, self._source)
         self._tm = TurretManager(self._config)
         self._test = TestManager(self._config)
-        self._gm = GraphManager(self._config, self._builder.get_object("graphs_box"), self._window)
+        self._gm = GraphManager(self._config, self._source, self._messages, self._builder.get_object("graphs_box"), self._window)
         self._msg = MsgAreaController()
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
+
+        self._builder.get_object("main_left_vbox").pack_start(self._info.box, False, False)
+        self._builder.get_object("vbox2").pack_start(self._msg, False, False)
+        self._builder.get_object("vbox1").pack_start(self._sb, False, False)
 
         #Setup all those elements that are updated whenever data arrives from
         #the UAV
@@ -106,8 +110,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     
         #Create other notebook tabs
         self._create_telemetry_ui()
-#        self._create_datatree()
-#        self._create_graphs()
+        self._create_graphs()
 
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface
@@ -123,14 +126,16 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             if c:
                 c.update_state_from_config()
 
-        self._builder.get_object("main_left_vbox").pack_start(self._info.box, False, False)
-        self._builder.get_object("vbox2").pack_start(self._msg, False, False)
-        self._builder.get_object("vbox1").pack_start(self._sb, False, False)
         self._builder.get_object("menu_item_disconnect").set_sensitive(False)
         self._builder.get_object("menu_item_autopilot_disable").set_sensitive(False)
         self._builder.connect_signals(self)
 
     def _create_telemetry_ui(self):
+        def on_gb_clicked(btn, _tv, _gm):
+            field = _tv.get_selected_field()
+            msg = _tv.get_selected_message()
+            _gm.add_graph(msg, field)
+
         rxts = self._source.get_rx_message_treestore()
         if rxts:
             sw = self._builder.get_object("telemetry_sw")
@@ -141,6 +146,9 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             rm = RequestMessageSender(self._messages)
             rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
             vb.pack_start(rm, False, False)
+
+            gb = self._builder.get_object("graph_button")
+            gb.connect("clicked", on_gb_clicked, rxtv, self._gm)
 
 #        graphs_notebook = self._builder.get_object("plots_notebook")
 
@@ -163,9 +171,17 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 #        data_treeview.set_model(self._telemetry_tree_model)
 #        self._updateable.append(self._telemetry_tree_model)
 #
-#    def _create_graphs(self):
-#        graphs_notebook = self._builder.get_object("plots_notebook")
-#
+    def _create_graphs(self):
+#        graphs_notebook = 
+
+        tm = self._messages.get_message_by_name("TIME")
+        tf = tm.get_field_by_name("t")
+
+        ag = Graph(self._source, tm, tf)
+
+        vb = self._builder.get_object("main_left_vbox")
+        vb.pack_start(ag, False, False)
+
 #        self._accel_graph = Graph(self._window, graphs_notebook, 
 #                                    lines=(data.AX, data.AY,data.AZ),
 #                                    label="Acceleratons",
@@ -355,13 +371,14 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     def on_menu_item_about_activate(self, widget):
         dlg = gtk.AboutDialog()
         dlg.set_authors(("Mark Cottrell", "John Stowers"))
-        dlg.set_version("0.1")
+        dlg.set_version("0.2")
         dlg.run()
         dlg.destroy()
         
     def on_menu_item_dock_all_activate(self, widget):
-        for p in (self._accel_graph, self._attitude_graph, self._rotational_graph):
-            p.dock_handler(True)
+        pass
+        #for p in (self._accel_graph, self._attitude_graph, self._rotational_graph):
+        #    p.dock_handler(True)
         
     def db_chooser_callback(self, widget):
         filename = widget.get_filename()

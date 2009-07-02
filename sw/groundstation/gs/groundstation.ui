@@ -446,59 +446,6 @@
                     <child>
                       <placeholder/>
                     </child>
-                    <child>
-                      <object class="GtkVPaned" id="vpaned1">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="orientation">vertical</property>
-                        <property name="position">200</property>
-                        <property name="position_set">True</property>
-                        <child>
-                          <object class="GtkScrolledWindow" id="treeview_holder">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="hscrollbar_policy">automatic</property>
-                            <property name="vscrollbar_policy">automatic</property>
-                            <child>
-                              <object class="GtkTreeView" id="data_tree">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                              </object>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="resize">False</property>
-                            <property name="shrink">True</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkNotebook" id="plots_notebook">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child type="tab">
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child type="tab">
-                              <placeholder/>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="resize">True</property>
-                            <property name="shrink">True</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="pack_type">end</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
                   </object>
                   <packing>
                     <property name="resize">False</property>
@@ -568,7 +515,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="button1">
+                      <object class="GtkButton" id="graph_button">
                         <property name="label" translatable="yes">Graph Selected</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
