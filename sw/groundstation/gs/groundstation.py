@@ -121,15 +121,14 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._builder.get_object("vbox1").pack_start(self._sb, False, False)
         self._builder.get_object("menu_item_disconnect").set_sensitive(False)
         self._builder.get_object("menu_item_autopilot_disable").set_sensitive(False)
-        self._builder.get_object("add_graph_menu_item").connect("activate", self._gm.on_add_graph)
         self._builder.connect_signals(self)
 
     def _create_telemetry_ui(self):
         rxts = self._source.get_rx_message_treestore()
         if rxts:
-            hb = self._builder.get_object("telemetry_hbox")
+            sw = self._builder.get_object("telemetry_sw")
             rxtv = MessageTreeView(rxts, editable=False, show_dt=True)
-            hb.pack_start(rxtv, False, False)
+            sw.add(rxtv)
         
 #        graphs_notebook = self._builder.get_object("plots_notebook")
 
