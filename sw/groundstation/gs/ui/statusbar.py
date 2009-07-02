@@ -2,23 +2,21 @@ import gtk
 
 import gs.ui
 import gs.data as data
-import gs.ui.source as source
 import gs.ui.indicators as indicators
 
-class StatusBar(gtk.Statusbar, source.PeriodicUpdateFromSource):
-    def __init__(self):
+class StatusBar(gtk.Statusbar):
+    def __init__(self, source):
         gtk.Statusbar.__init__(self)
-        source.PeriodicUpdateFromSource.__init__(self, freq=2)
 
         hb = gtk.HBox()
 
         #connected indicator
         self._c = indicators.ColorLabelBox("C:")
         hb.pack_start(self._c)
-        #status (error, warning, ok) indicator
+        #status indicator
         self._s = indicators.ColorLabelBox("S:")
         hb.pack_start(self._s)
-        #auto indicator
+        #autopilot indicator
         self._a = indicators.ColorLabelBox("A:")
         hb.pack_start(self._a)
         #manual indicator
@@ -34,26 +32,22 @@ class StatusBar(gtk.Statusbar, source.PeriodicUpdateFromSource):
         self.pack_start(hb, False, False)
         self.reorder_child(hb, 0)
 
-    def update_from_data(self, source):
-        la, lah, lo, loh, msgs, connected, err, warn = source.get_data(
-                data.LAT,data.LAT_HEM,data.LON,data.LON_HEM,
-                data.MSG_PER_SEC,
-                data.IS_CONNECTED,
-                data.ERROR,data.WARNING)
-        self._gps_coords.set_text("GPS: %.4f %s, %.4f %s" % (la,lah,lo,loh))
-        self._ms.set_text("MSG/S: %.1f" % msgs)
+        source.register_interest(self._on_gps, 0, "GPS_LLH")
 
-        #check for error or warning
+    def _on_gps(self, msg, payload):
+        fix,sv,lat,lon,hsl = msg.unpack_values(payload)
+
+        lat = lat/1e7
+        lon = lon/1e7
+
+        self._gps_coords.set_text("GPS: %.4f %s, %.4f %s" % (lat,"N",lon,"E"))
+
+#        self._ms.set_text("MSG/S: %.1f" % msgs)
+
+    def update_connected_indicator(self, connected):
         if connected:
             self._c.set_green()
         else:
             self._c.set_red()
-
-        if err:
-            self._s.set_red()
-        elif warn:
-            self._s.set_yellow()
-        else:
-            self._s.set_green()
 
 

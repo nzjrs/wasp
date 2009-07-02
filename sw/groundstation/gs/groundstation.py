@@ -55,12 +55,12 @@ class Groundstation(GtkBuilderWidget):
 
         self._source = UAVSource(self._config, self._messages)
 
-        self._map = MapManager(self._config)
+        self._map = MapManager(self._config, self._source)
         self._tm = TurretManager(self._config)
         self._test = TestManager(self._config)
         self._gm = GraphManager(self._config, self._builder.get_object("graphs_box"), self._window)
         self._msg = MsgAreaController()
-        self._sb = StatusBar()
+        self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
 
         #Setup all those elements that are updated whenever data arrives from

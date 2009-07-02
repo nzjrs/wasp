@@ -6,11 +6,10 @@ import os.path
 
 import gs.config as config
 import gs.data as data
-import gs.ui.source as source
 
 LOG = logging.getLogger('map')
 
-class MapManager(config.ConfigurableIface, source.PeriodicUpdateFromSource):
+class MapManager(config.ConfigurableIface):
 
     CONFIG_SECTION = "MAP"
 
@@ -31,18 +30,23 @@ class MapManager(config.ConfigurableIface, source.PeriodicUpdateFromSource):
         osmgpsmap.MAP_SOURCE_OPENSTREETMAP
     )
 
-    def __init__(self, conf):
+    def __init__(self, conf, source):
         config.ConfigurableIface.__init__(self, conf)
-        source.PeriodicUpdateFromSource.__init__(self, freq=2)
         self._map = None
         self._frame = gtk.Frame()
         self._cbs = {}
         self._kwargs = {}
 
-    def update_from_data(self, source):
-        connected, la, lo, heading = source.get_data(data.IS_CONNECTED,data.LAT,data.LON,data.HEADING)
-        if connected:
-            self._map.draw_gps(la, lo, heading)
+        source.register_interest(self._on_gps, 2, "GPS_LLH")
+
+    def _on_gps(self, msg, payload):
+        fix,sv,lat,lon,hsl = msg.unpack_values(payload)
+
+        lat = lat/1e7
+        lon = lon/1e7
+
+        if fix:
+            self._map.draw_gps(lat, lon, 0)
 
     def get_widget(self):
         return self._frame
