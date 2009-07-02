@@ -632,28 +632,28 @@
   </object>
   <object class="GtkSizeGroup" id="sizegroup1">
     <widgets>
-      <widget name="time_lbl"/>
-      <widget name="dirty_lbl"/>
-      <widget name="target_lbl"/>
-      <widget name="branch_lbl"/>
       <widget name="rev_lbl"/>
+      <widget name="branch_lbl"/>
+      <widget name="target_lbl"/>
+      <widget name="dirty_lbl"/>
+      <widget name="time_lbl"/>
     </widgets>
   </object>
   <object class="GtkSizeGroup" id="sizegroup2">
     <widgets>
-      <widget name="runtime_lbl"/>
-      <widget name="rc_lbl"/>
       <widget name="gps_lbl"/>
+      <widget name="rc_lbl"/>
+      <widget name="runtime_lbl"/>
     </widgets>
   </object>
   <object class="GtkSizeGroup" id="sizegroup3">
     <widgets>
-      <widget name="overruns_lbl"/>
-      <widget name="errors_lbl"/>
-      <widget name="rate_lbl"/>
-      <widget name="speed_lbl"/>
-      <widget name="port_lbl"/>
       <widget name="connected_lbl"/>
+      <widget name="port_lbl"/>
+      <widget name="speed_lbl"/>
+      <widget name="rate_lbl"/>
+      <widget name="errors_lbl"/>
+      <widget name="overruns_lbl"/>
     </widgets>
   </object>
 </interface>
