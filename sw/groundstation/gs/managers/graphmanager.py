@@ -20,8 +20,9 @@ class GraphManager(config.ConfigurableIface):
         self._graphs = {}
         self._hboxes = {}
 
-    def _on_pause(self, sender, graph):
-        graph.pause_toggle()
+    def _on_pause(self, sender, tweakScrollRate):
+        tweakScrollRate.setValue(0)
+        tweakScrollRate.refresh()
 
     def _on_remove(self, sender, name):
         del(self._graphs[name])
@@ -57,7 +58,7 @@ class GraphManager(config.ConfigurableIface):
         LOG.info("Saved %s graphs" % num)
         self.config_set("num_graphs", num)
 
-    def add_graph(self, msg, field):
+    def add_graph(self, msg, field, adjustable=True):
         name = "%s:%s" % (msg.name, field.name)
 
         LOG.info("Adding graph: %s" % name)
@@ -69,15 +70,23 @@ class GraphManager(config.ConfigurableIface):
 
         g = graph.Graph(self._source, msg, field)
         frame = gtk.Frame(name)
-        frame.add(g)
+
+        vb = gtk.VBox()
+        vb.pack_start(g, True, True)
+
+        tweak = None
+        if adjustable:
+            tweak = g.get_scroll_rate_widget()
+            vb.pack_start(tweak.widget, False, False)
+
+        frame.add(vb)
         hbox.pack_start(frame)
 
         bbox = gtk.VButtonBox()
         pa = gtk.Button(stock=gtk.STOCK_MEDIA_PAUSE)
-        pa.connect("clicked", self._on_pause, g)
+        pa.connect("clicked", self._on_pause, tweak)
         pr = gtk.Button(stock=gtk.STOCK_PRINT)
         rm = gtk.Button(stock=gtk.STOCK_REMOVE)
-        #CRASHY
         rm.connect("clicked", self._on_remove, name)
         bbox.pack_start(pa, False, False)
         bbox.pack_start(pr, False, False)

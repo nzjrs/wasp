@@ -171,18 +171,29 @@ class HScrollLineGraph(HScrollGraph):
                  gridSize     = 32,
                  scrollRate   = 50,
                  range        = (0,1),
+                 autoScale    = False,
                  pollInterval = 10,
                  bgColor      = None,
                  gridColor    = None,
                  ):
         HScrollGraph.__init__(self, size, channels, gridSize,
                               scrollRate, pollInterval, bgColor, gridColor)
-        self.range = range
+        self.autoScale = autoScale
+        self.range = list(range)
         self.penVectors = {}
 
     def graphChannel(self, channel):
         value = channel.getValue()
         if value is None:
+            return
+
+        if self.autoScale and value > self.range[1]:
+            self.range[1] = value
+            self.resized()
+            return
+        if self.autoScale and value < self.range[0]:
+            self.range[0] = value
+            self.resized()
             return
 
         # Scale the channel value to match a range of (0,1)

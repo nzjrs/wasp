@@ -110,11 +110,13 @@ class UI:
         w.add(vbox)
         w.set_border_width(5)
 
-        graph = rtgraph.HScrollLineGraph(channels=[
-            rtgraph.Channel(0, color=(1,0,0)),
-            rtgraph.Channel(0, color=(0,0.8,0)),
-            rtgraph.Channel(0, color=(0,0,1)),
-            ])
+        graph = rtgraph.HScrollLineGraph(
+                    autoScale=False,
+                    channels=[
+                        rtgraph.Channel(0, color=(1,0,0)),
+                        rtgraph.Channel(0, color=(0,0.8,0)),
+                        rtgraph.Channel(0, color=(0,0,1)),
+                    ])
         graph.show()
         frame = gtk.Frame()
         frame.add(graph)
@@ -123,7 +125,7 @@ class UI:
 
         tweaker = rtgraph.Tweak.List([
             rtgraph.Tweak.Quantity(graph.channels[0], 'value', name="Red"),
-            rtgraph.Tweak.Quantity(graph.channels[1], 'value', name="Green"),
+            rtgraph.Tweak.Quantity(graph.channels[1], 'value', name="Green", range=(-4,10)),
             rtgraph.Tweak.Quantity(graph.channels[2], 'value', name="Blue"),
             ])
         tweaker.show()

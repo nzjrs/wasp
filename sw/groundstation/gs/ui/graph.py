@@ -36,7 +36,8 @@ class Graph(rtgraph.HScrollLineGraph):
                     scrollRate=rate,
                     size=(width,height),
                     range=(ymin,ymax),
-                    channels=[RandomChannel(msg, field)]
+                    autoScale=True,
+                    channels=[FieldChannel(msg, field)]
         )
         source.register_interest(self._on_msg, 0, msg.name)
 
@@ -46,7 +47,6 @@ class Graph(rtgraph.HScrollLineGraph):
         for f in self.channels:
             f.update_msg_value(vals)
 
-    def pause_toggle(self):
-        pass
-
+    def get_scroll_rate_widget(self):
+        return self.getTweakControls()[0]
 
