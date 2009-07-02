@@ -28,11 +28,16 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         )
 
         source.register_interest(self._on_status, 5, "STATUS")
+        source.register_interest(self._on_time, 2, "TIME")
 
     def _on_status(self, msg, payload):
         rc, gps = msg.unpack_printable_values(payload, joiner=None)
         self.get_resource("rc_value").set_text(rc)
         self.get_resource("gps_value").set_text(gps)
+
+    def _on_time(self, msg, payload):
+        runtime, = msg.unpack_printable_values(payload, joiner=None)
+        self.get_resource("runtime_value").set_text(runtime)
 
     def set_build_info(self, rev, branch, target, dirty, time):
         self.get_resource("rev_value").set_text(rev)
