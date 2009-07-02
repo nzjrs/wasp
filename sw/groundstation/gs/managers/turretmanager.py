@@ -1,24 +1,21 @@
 import logging
 
 import gs.config as config
-import gs.data as data
-import gs.ui.source as source
 
 import libserial.SerialSender
 
 LOG = logging.getLogger('turret')
 
-class TurretManager(libserial.SerialSender.SerialSender, config.ConfigurableIface, source.PeriodicUpdateFromSource):
+class TurretManager(libserial.SerialSender.SerialSender, config.ConfigurableIface):
     CONFIG_SECTION = "TURRET"
     def __init__(self, conf):
         libserial.SerialSender.SerialSender.__init__(self, speed=9600)
         config.ConfigurableIface.__init__(self, conf)
-        source.PeriodicUpdateFromSource.__init__(self, freq=2)
 
         #cache the format string
-        self._gpggaString =  "$GPGGA,,%("+data.LAT+")s,%("+data.LAT_HEM+")s,"
-        self._gpggaString += "%("+data.LON+")s,%("+data.LON_HEM+")s,1,,,"
-        self._gpggaString += "%("+data.ALT+")s,M,,M,,,*75 \r\n"
+        self._gpggaString =  "$GPGGA,,%(lat)s,%(lat_hem)s,"
+        self._gpggaString += "%(lon)s,%(lon_hem)s,1,,,"
+        self._gpggaString += "%(alt)s,M,,M,,,*75 \r\n"
 
         LOG.debug("GGA String: %s" % self._gpggaString)
 
@@ -38,30 +35,4 @@ class TurretManager(libserial.SerialSender.SerialSender, config.ConfigurableIfac
 
     def get_data(self):
         return self._gpggaString
-
-    def update_from_data(self, kwargs):
-        """
-        Override send because turrent expects things in positive
-        southern eastern hemispheres, e.g.
-        $GPRMC,031723.000,A,4331.3467,S,17235.0691,E,
-        """
-        pass
-        #myargs = kwargs.copy()
-
-        #if kwargs[data.LAT_HEM] == "S":
-        #    myargs[data.LAT_HEM] = kwargs[data.LAT_HEM]
-        #    myargs[data.LAT] = kwargs[data.LAT]
-        #else:
-        #    myargs[data.LAT_HEM] = "S"
-        #    myargs[data.LAT] = -1.0*kwargs[data.LAT]
-
-        #if kwargs[data.LON_HEM] == "E":
-        #    myargs[data.LON_HEM] = kwargs[data.LON_HEM]
-        #    myargs[data.LON] = kwargs[data.LON]
-        #else:
-        #    myargs[data.LON_HEM] = "E"
-        #    myargs[data.LON] = -1.0*kwargs[data.LON]
-
-        #libserial.SerialSender.send(self, **myargs)
-
 

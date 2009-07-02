@@ -9,9 +9,6 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
-import gs.data as data
-import gs.ui.source as source
-
 C_DEG2RAD = math.pi / 180.0
 
 def drawText(msg):
@@ -26,10 +23,9 @@ def showMessage(x, y, msg, scale):
     drawText( msg )
     glPopMatrix()
 
-class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget, source.PeriodicUpdateFromSource):
+class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
     def __init__(self):
         gtk.DrawingArea.__init__(self)
-        source.PeriodicUpdateFromSource.__init__(self)
         
         glutInit()
         
@@ -368,7 +364,3 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget, source.PeriodicUpdateFromSo
         self.speed = speed
         self.queue_draw()
 
-    def update_from_data(self, source):
-        self.update(*source.get_data(data.PITCH, data.YAW, data.ROLL, data.ALT, data.GROUND_SPEED))
-
-        	

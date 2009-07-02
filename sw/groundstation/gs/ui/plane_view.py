@@ -5,13 +5,9 @@ import gtk.gtkgl
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-import gs.data as data
-import gs.ui.source as source
-
-class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget, source.PeriodicUpdateFromSource):
+class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
     def __init__(self):
         gtk.DrawingArea.__init__(self)
-        source.PeriodicUpdateFromSource.__init__(self)
         
         self.win = gtk.Window()
         
@@ -185,8 +181,5 @@ class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget, source.PeriodicUpdateFromSour
         self.yaw = yaw
         self.roll = roll
         self.queue_draw()
-
-    def update_from_data(self, source):
-        self.set_rotations(*source.get_data(data.PITCH, data.YAW, data.ROLL))
 
         	

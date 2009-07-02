@@ -19,7 +19,7 @@ from gs.managers.mapmanager import MapManager
 from gs.managers.graphmanager import GraphManager
 from gs.ui import GtkBuilderWidget
 from gs.ui.graph import Graph
-from gs.ui.tree import DBWidget, TelemetryTreeModel
+from gs.ui.tree import DBWidget
 from gs.ui.msgarea import MsgAreaController
 from gs.ui.plane_view import PlaneView
 from gs.ui.horizon import HorizonView

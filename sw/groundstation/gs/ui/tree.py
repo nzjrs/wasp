@@ -2,7 +2,6 @@ import gtk
 import gobject
 
 import gs.data as data
-import gs.ui.source as source
 
 class DBWidget(gtk.TreeView):
     def __init__(self, db):
@@ -46,34 +45,4 @@ class DBWidget(gtk.TreeView):
             col.add_attribute(cell, 'text', idx)
             self.append_column(col)
             idx += 1
-
-class TelemetryTreeModel(gtk.TreeStore, source.PeriodicUpdateFromSource):
-
-    CATEGORIES = {
-        "Rotational Velocities" :   (data.P, data.Q, data.R),
-        "Attitude Data"         :   (data.PITCH, data.YAW, data.ROLL),
-        "Position Data"         :   (data.LAT, data.LON, data.ALT),
-        "Status"                :   (data.MSG_PER_SEC, data.NUM_MSG_RX)
-    }
-
-    def __init__(self):
-        gtk.TreeStore.__init__(self, gobject.TYPE_STRING, gobject.TYPE_STRING)
-        source.PeriodicUpdateFromSource.__init__(self)
-
-        self._rowrefs = {}
-
-        for name, dat in self.CATEGORIES.items():
-            parent = self.append(None, [name,''])
-            for d in dat:
-                self._rowrefs[d] = self.append(parent, [d,''])
-
-    def update_from_data(self, source):
-        keys = self._rowrefs.keys()
-        data = source.get_data(*keys)
-
-        for i in range(0, len(keys)):
-            self.set_value(
-                    self._rowrefs[keys[i]], 
-                    1, 
-                    data[i])
 
