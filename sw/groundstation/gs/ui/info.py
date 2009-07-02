@@ -1,7 +1,10 @@
+import logging
 import os.path
 import gtk
 
 import gs.ui
+
+LOG = logging.getLogger("infobox")
 
 def set_image_from_file(image, filename):
     pb = gtk.gdk.pixbuf_new_from_file_at_size(
@@ -11,7 +14,7 @@ def set_image_from_file(image, filename):
     image.set_from_pixbuf(pb)
 
 class InfoBox(gs.ui.GtkBuilderWidget):
-    def __init__(self):
+    def __init__(self, source):
         mydir = os.path.dirname(os.path.abspath(__file__))
         uifile = os.path.join(mydir, "info.ui")
         gs.ui.GtkBuilderWidget.__init__(self, uifile)
@@ -23,6 +26,13 @@ class InfoBox(gs.ui.GtkBuilderWidget):
             self.get_resource("status_image"),
             os.path.join(mydir,"icons","dashboard.svg")
         )
+
+        source.register_interest(self._on_status, "STATUS")
+
+    def _on_status(self, msg, payload):
+        rc, gps = msg.unpack_printable_values(payload, joiner=None)
+        self.get_resource("rc_value").set_text(rc)
+        self.get_resource("gps_value").set_text(gps)
 
     def set_build_info(self, rev, branch, target, dirty, time):
         self.get_resource("rev_value").set_text(rev)

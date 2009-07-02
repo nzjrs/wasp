@@ -10,7 +10,7 @@ import logging
 import gs.data as data
 
 from gs.database import Database
-from gs.config import Config
+from gs.config import Config, ConfigurableIface
 from gs.source import UAVSource
 
 from gs.managers.turretmanager import TurretManager
@@ -29,11 +29,13 @@ from gs.ui.preferences import PreferencesWindow
 from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
 
+from ppz.messages import MessagesFile
+
 LOG = logging.getLogger('groundstation')
 
 class Groundstation(GtkBuilderWidget):
 
-    def __init__(self, prefsfile="prefs.ini"):
+    def __init__(self, prefsfile, messagesfile):
         gtk.gdk.threads_init()
 
         try:
@@ -47,9 +49,13 @@ class Groundstation(GtkBuilderWidget):
         self._window = self._builder.get_object("window1")
         self._gps_coords = self._builder.get_object("gps_coords")
 
-        #The Main application elements
         self._config = Config(filename=prefsfile)
-        self._source = UAVSource(self._config)
+
+        self._messages = MessagesFile(path=messagesfile, debug=False)
+        self._messages.parse()
+
+        self._source = UAVSource(self._config, self._messages)
+
         self._sm = SourceManager(self._config)
         self._map = MapManager(self._config)
         self._tm = TurretManager(self._config)
@@ -57,20 +63,20 @@ class Groundstation(GtkBuilderWidget):
         self._gm = GraphManager(self._config, self._builder.get_object("graphs_box"), self._window)
         self._msg = MsgAreaController()
         self._sb = StatusBar()
-        self._info = InfoBox()
+        self._info = InfoBox(self._source)
 
         #Setup all those elements that are updated whenever data arrives from
         #the UAV
-        self._updateable = [
-            self._sb,
-            self._map,
-            self._tm,
-            self._gm,
+#        self._updateable = [
+#            self._sb,
+#            self._map,
+#            self._tm,
+#            self._gm,
             #self._plane_view               get added when constructed
             #self._horizon_view             get added when constructed
             #self._*_graph                   added in create_graphs()
             #self._telemetry_tree_model     added in create_datatree()
-        ]
+#        ]
 
         #Lazy initialize the following when first needed
         self._plane_view = None
@@ -97,8 +103,8 @@ class Groundstation(GtkBuilderWidget):
             if c:
                 c.update_state_from_config()
 
-        for u in self._updateable:
-            u.set_source_manager(self._sm)
+#        for u in self._updateable:
+#            u.set_source_manager(self._sm)
 
         self._builder.get_object("main_left_vbox").pack_start(self._info.box, False, False)
         self._builder.get_object("vbox2").pack_start(self._msg, False, False)
@@ -384,15 +390,15 @@ class Groundstation(GtkBuilderWidget):
         if self._plane_view == None:
             self._plane_view = PlaneView()
         self._plane_view.show_all()
-        self._updateable.append(self._plane_view)
-        self._plane_view.set_source_manager(self._sm)
+#        self._updateable.append(self._plane_view)
+#        self._plane_view.set_source_manager(self._sm)
         
     def on_menu_item_horizon_view_activate(self, widget):
         if self._horizon_view == None:
             self._horizon_view = HorizonView()
         self._horizon_view.show_all()
-        self._updateable.append(self._horizon_view)
-        self._horizon_view.set_source_manager(self._sm)
+#        self._updateable.append(self._horizon_view)
+#        self._horizon_view.set_source_manager(self._sm)
 
     def on_menu_item_camera_view_activate(self, widget):
         if self._camera_window == None:

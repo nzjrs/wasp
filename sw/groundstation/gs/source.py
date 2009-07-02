@@ -13,8 +13,19 @@ DEBUG=False
 LOG = logging.getLogger('uavsource')
 
 class _Source:
-    def register_intrest(self, *messages, **user_data):
+    def register_interest(self, cb, *message_names, **user_data):
         raise NotImplementedError
+
+class _MessageCb:
+    def __init__(self):
+        self.cbs = []
+
+    def add_cb(self, cb, **kwargs):
+        self.cbs.append( (cb, kwargs) )
+
+    def call_cbs(self, msg, payload):
+        for cb, kwargs in self.cbs:
+            cb(msg, payload, **kwargs)
 
 class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface):
 
@@ -24,18 +35,34 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
     DEFAULT_SPEED = 57600
     DEFAULT_TIMEOUT = 1
 
-    def __init__(self, conf):
+    def __init__(self, conf, messages):
         self._serialsender = transport.SerialTransport(port="/dev/ttyUSB0", speed=57600, timeout=1)
         monitor.GObjectSerialMonitor.__init__(self, self._serialsender)
 
         config.ConfigurableIface.__init__(self, conf)
 
+        self._messages_file = messages
         self._transport = transport.Transport(check_crc=True, debug=DEBUG)
-        self._messages_file = messages.MessagesFile(path="/home/john/Programming/wasp.git/sw/messages.xml", debug=DEBUG)
-        self._messages_file.parse()
 
         self._port = None
         self._speed = None
+
+        #dictionary of msgid : _MessageCb objects
+        self._callbacks = {}
+
+    def register_interest(self, cb, *message_names, **user_data):
+        for m in message_names:
+            msg = self._messages_file.get_message_by_name(m)
+            if not msg:
+                LOG.critical("Unknown message: %s" % m)
+
+            try:
+                mcb = self._callbacks[msg.id]
+            except KeyError:
+                mcb = _MessageCb()
+                self._callbacks[msg.id] = mcb
+
+            mcb.add_cb(cb, **user_data)
 
     def on_serial_data_available(self, fd, condition, serial):
 
@@ -43,8 +70,9 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
         for header, payload in self._transport.parse_many(data):
             msg = self._messages_file.get_message_by_id(header.msgid)
             if msg:
-                print msg
-            #    self._rxts.update_message(msg, payload)
+                mcb = self._callbacks.get(msg.id)
+                if mcb:
+                    mcb.call_cbs(msg, payload)
 
         return True
 

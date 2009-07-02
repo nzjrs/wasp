@@ -63,7 +63,7 @@ class MessageTest(unittest.TestCase):
         d = self.pong.unpack_values(pl)
         self.failUnlessEqual(d, ())
 
-        pr = self.pong.unpack_printable_values(self, pl)
+        pr = self.pong.unpack_printable_values(pl)
         self.failUnlessEqual(pr, "")
 
     def testTestMessage(self):
