@@ -37,7 +37,10 @@ class _MessageCb:
                                             now=datetime.datetime.now(),
                                             dt=self._dt)
             if enough_time_passed:
-                self.cb(msg, payload, **self.kwargs)
+                try:
+                    self.cb(msg, payload, **self.kwargs)
+                except Exception:
+                    LOG.warn("Error calling callback for %s" % msg, exc_info=True)
 
 class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface):
 
