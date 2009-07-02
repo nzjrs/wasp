@@ -31,7 +31,7 @@ clean:
 	@make -C sw/onboard/ clean
 	@make -C sw/bootloader/ clean
 
-test:
+test: clean
 	@make -C sw/groundstation/ test
 	@cd sw/onboard ; ./build-tests.sh
 
