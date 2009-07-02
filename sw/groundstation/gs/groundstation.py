@@ -29,6 +29,7 @@ from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
 
 from ppz.messages import MessagesFile
+from ppz.ui.treeview import MessageTreeView
 
 LOG = logging.getLogger('groundstation')
 
@@ -89,9 +90,15 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._horizon_view = None
         self._camera_window = None
         self._prefs_window = None
+
+        #create the map
+        self._builder.get_object("map_holder").add(self._map.get_widget())
+        self._map.connect("notify::auto-center", self.on_map_autocenter_property_change)
+        self._map.connect("notify::show-trip-history", self.on_map_show_trip_history_property_change)
+        self._map.connect("button-press-event", self.map_click_callback)
     
-        #Create final UI elements
-        self._create_map()
+        #Create other notebook tabs
+        self._create_telemetry_ui()
 #        self._create_datatree()
 #        self._create_graphs()
 
@@ -117,11 +124,17 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._builder.get_object("add_graph_menu_item").connect("activate", self._gm.on_add_graph)
         self._builder.connect_signals(self)
 
-    def _create_map(self):
-        self._builder.get_object("map_holder").add(self._map.get_widget())
-        self._map.connect("notify::auto-center", self.on_map_autocenter_property_change)
-        self._map.connect("notify::show-trip-history", self.on_map_show_trip_history_property_change)
-        self._map.connect("button-press-event", self.map_click_callback)
+    def _create_telemetry_ui(self):
+        rxts = self._source.get_rx_message_treestore()
+        if rxts:
+            hb = self._builder.get_object("telemetry_hbox")
+            rxtv = MessageTreeView(rxts, editable=False, show_dt=True)
+            hb.pack_start(rxtv, False, False)
+        
+#        graphs_notebook = self._builder.get_object("plots_notebook")
+
+
+    
     
 #    def _create_datatree(self):
 #        data_treeview = self._builder.get_object("data_tree")

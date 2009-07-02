@@ -10,13 +10,20 @@ import ppz
 import ppz.transport as transport
 import ppz.messages as messages
 import ppz.monitor as monitor
+import ppz.ui.treeview as treeview
 
 DEBUG=False
 LOG = logging.getLogger('uavsource')
 
 class _Source:
-    def register_interest(self, cb, *message_names, **user_data):
+    def register_interest(self, *args, **kwargs):
         raise NotImplementedError
+
+    def quit(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def get_rx_message_treestore(self, *args, **kwargs):
+        raise NotImplementedError    
 
 class _MessageCb:
     def __init__(self, cb, max_freq, **kwargs):
@@ -61,6 +68,7 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
 
         self._port = None
         self._speed = None
+        self._rxts = None
 
         #dictionary of msgid : [list, of, _MessageCb objects]
         self._callbacks = {}
@@ -87,7 +95,15 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
                 for cb in cbs:
                     cb.call_cb(msg, payload)
 
+                if self._rxts:
+                    self._rxts.update_message(msg, payload)
+
         return True
+
+    def get_rx_message_treestore(self):
+        if self._rxts == None:
+            self._rxts = treeview.MessageTreeStore()
+        return self._rxts
 
     def quit(self):
         self.disconnect_from_uav()

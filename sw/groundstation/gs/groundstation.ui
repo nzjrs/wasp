@@ -534,11 +534,24 @@
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="graphs_box">
+              <object class="GtkHBox" id="telemetry_hbox">
                 <property name="visible">True</property>
-                <property name="spacing">5</property>
                 <child>
                   <placeholder/>
+                </child>
+                <child>
+                  <object class="GtkVBox" id="graphs_box">
+                    <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="pack_type">end</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
               </object>
               <packing>
@@ -548,7 +561,7 @@
             <child type="tab">
               <object class="GtkLabel" id="label34">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Graph</property>
+                <property name="label" translatable="yes">Telemetry</property>
               </object>
               <packing>
                 <property name="position">1</property>

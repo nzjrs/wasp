@@ -22,11 +22,6 @@ class GraphManager(config.ConfigurableIface, source.PeriodicUpdateFromSource):
         self._graphs = {}
         self._hboxes = {}
 
-        self._label = gtk.Label("Add Graphs")
-        self._box.pack_start(self._label)
-
-        self._box.show_all()
-
     def _on_pause(self, sender, graph):
         graph.pause_toggle()
 
@@ -107,10 +102,6 @@ class GraphManager(config.ConfigurableIface, source.PeriodicUpdateFromSource):
         self.config_set("num_graphs", num)
 
     def add_graph(self, name, *lines):
-        if self._label:
-            self._box.remove(self._label)
-            self._label = None
-
         LOG.info("Adding graph %s: %s" % (name, ','.join(lines)))
         #graph is a 
         # hbox
