@@ -18,7 +18,10 @@ class UI(monitor.GObjectSerialMonitor):
         monitor.GObjectSerialMonitor.__init__(self, serialsender)
         self._debug = debug
         self._messages_file = messages_file
+        self._serialsender = serialsender
         self._transport = transport
+
+        self._serialsender.connect_to_port()
 
         self._rxts = treeview.MessageTreeStore()
         rxtv = treeview.MessageTreeView(self._rxts, editable=False, show_dt=True)

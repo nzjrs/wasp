@@ -12,7 +12,6 @@ class GObjectSerialMonitor(gobject.GObject):
         self._watch = None   
 
         serialsender.connect("serial-connected", self._on_serial_connected)
-        serialsender.connect_to_port()
 
     def _on_serial_connected(self, serial, connected):
         #remove the old watch
@@ -28,6 +27,8 @@ class GObjectSerialMonitor(gobject.GObject):
                             serial,
                             priority=gobject.PRIORITY_HIGH
             )
+
+
 
     def on_serial_data_available(self, fd, condition, serial):
         raise NotImplementedError

@@ -48,8 +48,8 @@ class Groundstation(GtkBuilderWidget):
         self._gps_coords = self._builder.get_object("gps_coords")
 
         #The Main application elements
-        self._source = UAVSource()
         self._config = Config(filename=prefsfile)
+        self._source = UAVSource(self._config)
         self._sm = SourceManager(self._config)
         self._map = MapManager(self._config)
         self._tm = TurretManager(self._config)
@@ -86,6 +86,7 @@ class Groundstation(GtkBuilderWidget):
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface
         self._configurable = [
+            self._source,
             self._map,
             self._sm,
             self._gm,
@@ -254,8 +255,12 @@ class Groundstation(GtkBuilderWidget):
         source = self._sm.get_source()
         source.connect_to_craft()
 
+        self._source.connect_to_uav()
+
     def on_menu_item_disconnect_activate(self, widget):
         self._sm.get_source().disconnect_from_aircraft()
+
+        self._source.disconnect_from_uav()
         
     def on_autopilot_enable_activate(self, widget):
         self._builder.get_object("menu_item_autopilot_disable").set_sensitive(True)
