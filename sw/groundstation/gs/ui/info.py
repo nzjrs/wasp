@@ -4,15 +4,25 @@ import gtk
 import gs.ui
 
 def set_image_from_file(image, filename):
-    pass
+    pb = gtk.gdk.pixbuf_new_from_file_at_size(
+                    filename,
+                    *gtk.icon_size_lookup(gtk.ICON_SIZE_DIALOG)
+    )
+    image.set_from_pixbuf(pb)
 
 class InfoBox(gs.ui.GtkBuilderWidget):
     def __init__(self):
-        me = os.path.abspath(__file__)
-        uifile = os.path.join(os.path.dirname(me), "info.ui")
+        mydir = os.path.dirname(os.path.abspath(__file__))
+        uifile = os.path.join(mydir, "info.ui")
         gs.ui.GtkBuilderWidget.__init__(self, uifile)
 
-        self.box = self.get_resource("info_hbox")
+        self.box = self.get_resource("info_vbox")
+
+        #change the status icon
+        set_image_from_file(
+            self.get_resource("status_image"),
+            os.path.join(mydir,"icons","dashboard.svg")
+        )
 
     def set_build_info(self, rev, branch, target, dirty, time):
         self.get_resource("rev_value").set_text(rev)
