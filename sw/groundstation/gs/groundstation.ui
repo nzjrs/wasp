@@ -369,33 +369,6 @@
                         <signal name="activate" handler="on_autopilot_disable_activate"/>
                       </object>
                     </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="separatormenuitem2">
-                        <property name="visible">True</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="menu_item_record_flight">
-                        <property name="label">Record Flight Path</property>
-                        <property name="visible">True</property>
-                        <property name="image">image13</property>
-                        <property name="use_stock">False</property>
-                        <property name="accel_group">accelgroup1</property>
-                        <property name="always_show_image">True</property>
-                        <signal name="activate" handler="on_record_flight_activate"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="menu_item_stop_recording">
-                        <property name="label">Stop Recording</property>
-                        <property name="visible">True</property>
-                        <property name="image">image14</property>
-                        <property name="use_stock">False</property>
-                        <property name="accel_group">accelgroup1</property>
-                        <property name="always_show_image">True</property>
-                        <signal name="activate" handler="on_stop_record_flight"/>
-                      </object>
-                    </child>
                   </object>
                 </child>
               </object>
@@ -2019,16 +1992,6 @@
   <object class="GtkImage" id="image12">
     <property name="visible">True</property>
     <property name="stock">gtk-no</property>
-    <property name="icon-size">1</property>
-  </object>
-  <object class="GtkImage" id="image13">
-    <property name="visible">True</property>
-    <property name="stock">gtk-media-record</property>
-    <property name="icon-size">1</property>
-  </object>
-  <object class="GtkImage" id="image14">
-    <property name="visible">True</property>
-    <property name="stock">gtk-media-stop</property>
     <property name="icon-size">1</property>
   </object>
   <object class="GtkImage" id="image1">
