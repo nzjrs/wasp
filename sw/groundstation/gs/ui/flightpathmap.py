@@ -1,24 +1,22 @@
+import math
+import os.path
 import osmgpsmap
 import gtk
 
-    def record_flight_map_click_callback(self, osmMap, event, coordModel):
-        mouse_x = event.x
-        mouse_y = event.y
-        lat,lon = osmMap.get_co_ordinates(mouse_x, mouse_y)
-        lat = math.degrees(lat)
-        lon = math.degrees(lon)
-        if event.type == gtk.gdk._2BUTTON_PRESS and event.button == 1:
-            coordModel.prepend( (lat,lon,0) )
-            osmMap.draw_gps(lat,lon,0)
+import gs.ui
 
-    def on_stop_record_flight(self, widget):
-        pass
+class FlightPathEditor(gs.ui.GtkBuilderWidget):
+    def __init__(self, mainmap):
+        mydir = os.path.dirname(os.path.abspath(__file__))
+        uifile = os.path.join(mydir, "flightplan.ui")
+        gs.ui.GtkBuilderWidget.__init__(self, uifile)
 
-    def on_record_flight_activate(self, widget):
-        win  = self._builder.get_object("record_flight_window")
-        record_hbox  = self._builder.get_object("record_vbox")
-        coordview = self._builder.get_object("coordview")
-        lm = gtk.ListStore(float,float,float)
+        self._mainmap = mainmap
+        self._map = None
+        self.widget = self.get_resource("main_hbox")
+
+        self._model = gtk.ListStore(float,float,float)        
+        self.get_resource("coord_treeview").set_model(self._model)
 
         idx = 0
         for name in ("Lat","Lon","Alt"):
@@ -26,27 +24,45 @@ import gtk
             cell = gtk.CellRendererText()
             if (name == "Alt"):
                 cell.set_property('editable', True)
-                cell.connect('edited', self.cell_edited_cb, (lm, idx))
+                cell.connect('edited', self._cell_edited_cb, (self._model, idx))
                 col.pack_start(cell, True)
                 col.add_attribute(cell, "text", idx)
             else:
                 col.pack_start(cell, True)
                 col.add_attribute(cell, 'text', idx)
-            coordview.append_column(col)
+            self.get_resource("coord_treeview").append_column(col)
             idx += 1
 
-        m = osmgpsmap.GpsMap(
-                repo_uri=self._map.props.repo_uri,
-                proxy_uri=self._map.props.proxy_uri,
-                tile_cache=self._map.props.tile_cache)
+    def _cell_edited_cb(self, cell, path, new_text, model, col):
+        model
+        model[path][col] = float(new_text)
+        return
 
-        m.props.auto_center = False
-        record_hbox.pack_start(m)
-        m.connect("button-press-event", self.record_flight_map_click_callback, lm)
-        coordview.set_model(lm)
-        win.show_all()
-        m.set_mapcenter(self._map.props.latitude, self._map.props.longitude, self._map.props.zoom)
-        
-    def on_record_flight_window_delete(self, widget, event):
-        widget.hide_all()
-        return True
+    def _map_click_callback(self, osmMap, event):
+        mouse_x = event.x
+        mouse_y = event.y
+        lat,lon = osmMap.get_co_ordinates(mouse_x, mouse_y)
+        lat = math.degrees(lat)
+        lon = math.degrees(lon)
+        if event.type == gtk.gdk._2BUTTON_PRESS and event.button == 1:
+            self._model.append( (lat,lon,0) )
+            osmMap.draw_gps(lat,lon,0)
+
+    def show_map(self):
+        if self._map == None:
+            self._map = osmgpsmap.GpsMap(
+                    repo_uri=self._mainmap.props.repo_uri,
+                    proxy_uri=self._mainmap.props.proxy_uri,
+                    tile_cache=self._mainmap.props.tile_cache
+            )
+            self._map.connect("button-press-event", self._map_click_callback)
+            self.widget.pack_start(self._map, True, True)
+
+        self._map.props.auto_center = False
+        self._map.set_mapcenter(
+                    self._mainmap.props.latitude,
+                    self._mainmap.props.longitude,
+                    self._mainmap.props.zoom
+        )
+        self._map.show()
+

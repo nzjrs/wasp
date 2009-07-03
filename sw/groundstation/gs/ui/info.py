@@ -21,7 +21,7 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         uifile = os.path.join(mydir, "info.ui")
         gs.ui.GtkBuilderWidget.__init__(self, uifile)
 
-        self.box = self.get_resource("info_vbox")
+        self.widget = self.get_resource("info_vbox")
 
         #change the status icon
         set_image_from_file(
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     i = InfoBox()
 
     w = gtk.Window()
-    w.add(i.box)
+    w.add(i.widget)
     w.show_all()
     w.connect("delete-event", lambda *a: gtk.main_quit())
 

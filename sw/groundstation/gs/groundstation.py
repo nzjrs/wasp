@@ -25,6 +25,7 @@ from gs.ui.camera import CameraWindow
 from gs.ui.preferences import PreferencesWindow
 from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
+from gs.ui.flightpathmap import FlightPathEditor
 
 from ppz.messages import MessagesFile
 from ppz.ui.treeview import MessageTreeView
@@ -76,23 +77,13 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._msg = MsgAreaController()
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
+        self._fp = FlightPathEditor(self._map)
 
-        self._builder.get_object("main_left_vbox").pack_start(self._info.box, False, False)
-        self._builder.get_object("vbox2").pack_start(self._msg, False, False)
-        self._builder.get_object("vbox1").pack_start(self._sb, False, False)
+        self._builder.get_object("main_left_vbox").pack_start(self._info.widget, False, False)
+        self._builder.get_object("main_map_vbox").pack_start(self._msg, False, False)
+        self._builder.get_object("window_vbox").pack_start(self._sb, False, False)
+        self._builder.get_object("autopilot_hbox").pack_start(self._fp.widget, True, True)
 
-        #Setup all those elements that are updated whenever data arrives from
-        #the UAV
-#        self._updateable = [
-#            self._sb,
-#            self._map,
-#            self._tm,
-#            self._gm,
-            #self._plane_view               get added when constructed
-            #self._horizon_view             get added when constructed
-            #self._*_graph                   added in create_graphs()
-            #self._telemetry_tree_model     added in create_datatree()
-#        ]
 
         #Lazy initialize the following when first needed
         self._plane_view = None
@@ -108,7 +99,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     
         #Create other notebook tabs
         self._create_telemetry_ui()
-        self._create_graphs()
 
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface
@@ -148,56 +138,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             gb = self._builder.get_object("graph_button")
             gb.connect("clicked", on_gb_clicked, rxtv, self._gm)
 
-#        graphs_notebook = self._builder.get_object("plots_notebook")
-
-
-    
-    
-#    def _create_datatree(self):
-#        data_treeview = self._builder.get_object("data_tree")
-#
-#        i = 0
-#        for name in ("Name", "Value"):
-#            col = gtk.TreeViewColumn(name)
-#            data_treeview.append_column(col)
-#            cell = gtk.CellRendererText()
-#            col.pack_start(cell, True)
-#            col.add_attribute(cell, 'text', i)
-#            i += 1
-#
-#        self._telemetry_tree_model = TelemetryTreeModel()
-#        data_treeview.set_model(self._telemetry_tree_model)
-#        self._updateable.append(self._telemetry_tree_model)
-#
-    def _create_graphs(self):
-#        graphs_notebook = 
-
-        tm = self._messages.get_message_by_name("TIME")
-        tf = tm.get_field_by_name("t")
-
-        ag = Graph(self._source, tm, tf)
-
-        vb = self._builder.get_object("main_left_vbox")
-        vb.pack_start(ag, False, False)
-
-#        self._accel_graph = Graph(self._window, graphs_notebook, 
-#                                    lines=(data.AX, data.AY,data.AZ),
-#                                    label="Acceleratons",
-#                                    yrange=[0,1])
-#        self._updateable.append(self._accel_graph)
-#
-#        self._attitude_graph = Graph(self._window, graphs_notebook,
-#                                    lines=(data.PITCH, data.ROLL, data.YAW),
-#                                    label="Attitudes",
-#                                    yrange=[0,10])
-#        self._updateable.append(self._attitude_graph)
-#
-#        self._rotational_graph = Graph(self._window, graphs_notebook,
-#                                    lines=(data.P, data.Q, data.R),
-#                                    label="Rotational Velocities",
-#                                    yrange=[0,1])
-#        self._updateable.append(self._rotational_graph)
-
     def _error_message(self, message, secondary=None):
         m = gtk.MessageDialog(
                     self._window,
@@ -219,6 +159,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         port, speed = self._source.get_connection_parameters()
         self._info.set_connection_parameters(port, speed)
+
+        self._fp.show_map()
 
     def _disconnect(self):
         self._source.disconnect_from_uav()
@@ -498,11 +440,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             self._camera_window = CameraWindow()
         self._camera_window.start()
         self._camera_window.show()
-
-    def cell_edited_cb(self, cell, path, new_text, user_data):
-        ls, col = user_data
-        ls[path][col] = float(new_text)
-        return
 
     def on_menu_item_clear_path_activate(self, widget):
         self._map.clear_gps()

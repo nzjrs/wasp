@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<interface>
+  <requires lib="gtk+" version="2.16"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkHBox" id="main_hbox">
+    <property name="visible">True</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <object class="GtkVBox" id="vbox1">
+        <property name="visible">True</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkScrolledWindow" id="treeview_sw">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="hscrollbar_policy">never</property>
+            <child>
+              <object class="GtkTreeView" id="coord_treeview">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="button4">
+            <property name="label" translatable="yes">Delete Selected Waypoint</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">image_delete</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="button5">
+            <property name="label" translatable="yes">Clear all Waypoints</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">image_clear</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="button3">
+            <property name="label" translatable="yes">Upload to UAV</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">image_saveas</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">False</property>
+        <property name="pack_type">end</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+  </object>
+  <object class="GtkImage" id="image_saveas">
+    <property name="visible">True</property>
+    <property name="stock">gtk-save-as</property>
+  </object>
+  <object class="GtkImage" id="image_delete">
+    <property name="visible">True</property>
+    <property name="stock">gtk-delete</property>
+  </object>
+  <object class="GtkImage" id="image_clear">
+    <property name="visible">True</property>
+    <property name="stock">gtk-clear</property>
+  </object>
+</interface>
