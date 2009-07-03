@@ -31,6 +31,16 @@ class GraphManager(config.ConfigurableIface):
         self._box.remove(hb)
         del(self._hboxes[name])
 
+    def _on_print(self, sender, graph, name):
+        def on_print_page(operation, context, page_nr):
+            cr = context.get_cairo_context()
+            graph.drawIntoCairoContext(cr, name=name)
+
+        print_op = gtk.PrintOperation()
+        print_op.set_n_pages(1)
+        print_op.connect("draw_page", on_print_page)
+        res = print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
+
     def update_state_from_config(self):
         num = self.config_get("num_graphs", 0)
         if num:
@@ -87,6 +97,7 @@ class GraphManager(config.ConfigurableIface):
         pa = gtk.Button(stock=gtk.STOCK_MEDIA_PAUSE)
         pa.connect("clicked", self._on_pause, tweak)
         pr = gtk.Button(stock=gtk.STOCK_PRINT)
+        pr.connect("clicked", self._on_print, g, name)
         rm = gtk.Button(stock=gtk.STOCK_REMOVE)
         rm.connect("clicked", self._on_remove, name)
         bbox.pack_start(pa, False, False)
