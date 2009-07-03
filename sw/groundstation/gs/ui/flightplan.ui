@@ -69,6 +69,20 @@
             <property name="position">3</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkButton" id="show_map_btn">
+            <property name="label" translatable="yes">Show Map</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">image1</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -89,5 +103,10 @@
   <object class="GtkImage" id="image_clear">
     <property name="visible">True</property>
     <property name="stock">gtk-clear</property>
+  </object>
+  <object class="GtkImage" id="image1">
+    <property name="visible">True</property>
+    <property name="xpad">2</property>
+    <property name="stock">gtk-media-record</property>
   </object>
 </interface>

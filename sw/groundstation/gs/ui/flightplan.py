@@ -5,7 +5,7 @@ import gtk
 
 import gs.ui
 
-class FlightPathEditor(gs.ui.GtkBuilderWidget):
+class FlightPlanEditor(gs.ui.GtkBuilderWidget):
     def __init__(self, mainmap):
         mydir = os.path.dirname(os.path.abspath(__file__))
         uifile = os.path.join(mydir, "flightplan.ui")
@@ -33,6 +33,8 @@ class FlightPathEditor(gs.ui.GtkBuilderWidget):
             self.get_resource("coord_treeview").append_column(col)
             idx += 1
 
+        self.get_resource("show_map_btn").connect("clicked", self.show_map)
+
     def _cell_edited_cb(self, cell, path, new_text, model, col):
         model
         model[path][col] = float(new_text)
@@ -48,7 +50,7 @@ class FlightPathEditor(gs.ui.GtkBuilderWidget):
             self._model.append( (lat,lon,0) )
             osmMap.draw_gps(lat,lon,0)
 
-    def show_map(self):
+    def show_map(self, *args):
         if self._map == None:
             self._map = osmgpsmap.GpsMap(
                     repo_uri=self._mainmap.props.repo_uri,

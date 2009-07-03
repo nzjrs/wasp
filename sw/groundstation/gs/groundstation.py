@@ -25,7 +25,7 @@ from gs.ui.camera import CameraWindow
 from gs.ui.preferences import PreferencesWindow
 from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
-from gs.ui.flightpathmap import FlightPathEditor
+from gs.ui.flightplan import FlightPlanEditor
 
 from ppz.messages import MessagesFile
 from ppz.ui.treeview import MessageTreeView
@@ -77,7 +77,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._msg = MsgAreaController()
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
-        self._fp = FlightPathEditor(self._map)
+        self._fp = FlightPlanEditor(self._map)
 
         self._builder.get_object("main_left_vbox").pack_start(self._info.widget, False, False)
         self._builder.get_object("main_map_vbox").pack_start(self._msg, False, False)
@@ -159,8 +159,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         port, speed = self._source.get_connection_parameters()
         self._info.set_connection_parameters(port, speed)
-
-        self._fp.show_map()
 
     def _disconnect(self):
         self._source.disconnect_from_uav()
