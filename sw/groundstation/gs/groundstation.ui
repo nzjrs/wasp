@@ -392,6 +392,20 @@
                         <signal name="activate" handler="on_menu_item_about_activate"/>
                       </object>
                     </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separatormenuitem2">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="menu_item_log">
+                        <property name="label" translatable="yes">View Log</property>
+                        <property name="visible">True</property>
+                        <property name="image">image13</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_menu_item_log_activate"/>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>
@@ -542,25 +556,6 @@
               </packing>
             </child>
             <child>
-              <object class="GtkTextView" id="textview1">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-              </object>
-              <packing>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child type="tab">
-              <object class="GtkLabel" id="label35">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Log</property>
-              </object>
-              <packing>
-                <property name="position">2</property>
-                <property name="tab_fill">False</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkHBox" id="autopilot_hbox">
                 <property name="visible">True</property>
                 <child>
@@ -568,7 +563,7 @@
                 </child>
               </object>
               <packing>
-                <property name="position">3</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child type="tab">
@@ -577,7 +572,7 @@
                 <property name="label" translatable="yes">Autopilot</property>
               </object>
               <packing>
-                <property name="position">3</property>
+                <property name="position">2</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>
@@ -1931,10 +1926,6 @@
     <property name="stock">gtk-save-as</property>
     <property name="icon-size">1</property>
   </object>
-  <object class="GtkImage" id="add_image">
-    <property name="visible">True</property>
-    <property name="stock">gtk-add</property>
-  </object>
   <object class="GtkImage" id="image10">
     <property name="visible">True</property>
     <property name="stock">gtk-clear</property>
@@ -1961,5 +1952,14 @@
   <object class="GtkImage" id="image15">
     <property name="visible">True</property>
     <property name="stock">gtk-refresh</property>
+  </object>
+  <object class="GtkImage" id="add_image">
+    <property name="visible">True</property>
+    <property name="stock">gtk-add</property>
+  </object>
+  <object class="GtkImage" id="image13">
+    <property name="visible">True</property>
+    <property name="stock">gtk-file</property>
+    <property name="icon-size">1</property>
   </object>
 </interface>

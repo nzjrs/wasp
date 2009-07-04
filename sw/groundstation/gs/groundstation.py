@@ -26,6 +26,7 @@ from gs.ui.preferences import PreferencesWindow
 from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
 from gs.ui.flightplan import FlightPlanEditor
+from gs.ui.log import LogBuffer, LogWindow
 
 from ppz.messages import MessagesFile
 from ppz.ui.treeview import MessageTreeView
@@ -45,6 +46,13 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def __init__(self, prefsfile, messagesfile):
         gtk.gdk.threads_init()
+
+        #connect our log buffer to the python logging subsystem
+        self._logbuffer = LogBuffer()
+        handler = logging.StreamHandler(self._logbuffer)
+        defaultFormatter = logging.Formatter(self._logbuffer.FORMAT)
+        handler.setFormatter(defaultFormatter)
+        logging.root.addHandler(handler)
 
         try:
             me = os.path.abspath(__file__)
@@ -217,6 +225,10 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             m = self._messages.get_message_by_name(n)
             if m:
                 self._source.send_message(rm, (m.id,))
+
+    def on_menu_item_log_activate(self, widget):
+        w = LogWindow(self._logbuffer)
+        w.show_all()
 
     def on_menu_item_home_activate(self, widget):
         self._map.set_mapcenter(self._home_lat, self._home_lon, self._home_zoom)
