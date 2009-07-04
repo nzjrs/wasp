@@ -6,12 +6,29 @@ class LogWindow(gtk.Window):
         gtk.Window.__init__(self)
 
         tv = gtk.TextView(buf)
+        tv.props.editable = False
+        tv.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse('black'))
+
         sw = gtk.ScrolledWindow()
+        sw.get_vadjustment().connect("changed", self._scroll_changed)
+        sw.get_vadjustment().connect("value-changed", self._scroll_value_changed)
+
         sw.add(tv)
 
         self.add(sw)
         self.set_default_size(600, 500)
         self.set_title("Log Messages")
+
+    # The following code is taken from pychess project;
+    # it keeps the scroller at the bottom of the text
+    # Thanks to Thomas Dybdahl Ahle who sent it to me
+    def _scroll_changed(self, vadjust):
+        if not hasattr(vadjust, "need_scroll") or vadjust.need_scroll:
+            vadjust.set_value(vadjust.upper-vadjust.page_size)
+            vadjust.need_scroll = True
+
+    def _scroll_value_changed(self, vadjust):
+        vadjust.need_scroll = abs(vadjust.value + vadjust.page_size - vadjust.upper) < vadjust.step_increment
 
 class LogBuffer(gtk.TextBuffer):
     """
