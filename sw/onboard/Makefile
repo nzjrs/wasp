@@ -13,8 +13,6 @@ SRCARM =                            \
     booz2_commands.c                \
     rc.c                            \
     actuators_buss_twi_blmc_hw.c    \
-    booz2_max1168.c                 \
-    booz2_max1168_hw.c              \
     booz2_analog_baro.c             \
     booz2_battery.c                 \
     booz2_analog.c                  \
