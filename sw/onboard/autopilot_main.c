@@ -30,7 +30,6 @@
 #include "interrupt_hw.h"
 
 #include "booz2_commands.h"
-#include "i2c.h"
 #include "actuators.h"
 #include "actuators_buss_twi_blmc_hw.h"
 
@@ -79,7 +78,6 @@ STATIC_INLINE void booz2_main_init( void ) {
   sys_time_init();
   led_init();
 
-  i2c_init();
   actuators_init();
 
   rc_init();

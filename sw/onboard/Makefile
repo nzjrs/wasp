@@ -12,8 +12,6 @@ SRCARM =                            \
     math/pprz_geodetic_float.c      \
     booz2_commands.c                \
     rc.c                            \
-    i2c.c                           \
-    i2c_hw.c                        \
     actuators_buss_twi_blmc_hw.c    \
     booz2_max1168.c                 \
     booz2_max1168_hw.c              \
@@ -55,7 +53,8 @@ SRCARM +=                           \
     arm7/ublox_gps_hw.c             \
     arm7/micromag.c                 \
     arm7/max1168.c                  \
-    arm7/imu_booz_hw.c
+    arm7/imu_booz_hw.c              \
+    arm7/i2c_hw.c
 
 ASRCARM =                           \
     crt0.S

@@ -8,7 +8,6 @@
 #include "generated/messages.h"
 #include "comm.h"
 
-#include "i2c.h"
 #include "actuators.h"
 
 static inline void main_init( void );
@@ -34,7 +33,6 @@ static inline void main_init( void ) {
 
   comm_init(COMM_1);
 
-  i2c_init();
   actuators_init();
 
   int_enable();

@@ -4,7 +4,8 @@
 #include <string.h>
 #include "std.h"
 #include "config.h"
-#include "i2c.h"
+
+#include "arm7/i2c_hw.h"
 
 #include "airframe.h"
 #include "booz2_supervision.h"
@@ -52,15 +53,6 @@ extern uint8_t twi_blmc_nb_err;
 extern volatile bool_t  buss_twi_blmc_i2c_done;
 extern volatile uint8_t buss_twi_blmc_idx;
 extern const uint8_t buss_twi_blmc_addr[];
-
-#define ActuatorsBussTwiBlmcNext() {			\
-    buss_twi_blmc_idx++;				\
-    if (buss_twi_blmc_idx < BUSS_TWI_BLMC_NB) {		\
-      ActuatorsBussTwiBlmcSend();			\
-    }							\
-    else						\
-      buss_twi_blmc_status = BUSS_TWI_BLMC_STATUS_IDLE;	\
-  }
 
 #define ActuatorsBussTwiBlmcSend() {					             \
     i2c_buf[0] = buss_twi_blmc_motor_power[buss_twi_blmc_idx];		             \
