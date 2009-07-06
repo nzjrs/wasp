@@ -1,26 +1,8 @@
 import array
-import serial
-import libserial.SerialSender
 
 STX = 0x99
 #6 non payload bytes; STX, LEN, MSGID, ACID, CK_A, CK_B
 NUM_NON_PAYLOAD_BYTES = 6
-
-class SerialTransport(libserial.SerialSender.SerialSender):
-    """
-    Reads data from the serial port 
-    """
-    def read(self, nbytes=5):
-        if self.is_open():
-            try:
-                return self._serial.read(nbytes)
-            except  serial.SerialTimeoutException:
-                pass
-        return ""
-    
-    def write(self, data):
-        if self.is_open():
-            self._serial.write(data)
 
 class TransportHeaderFooter:
 

@@ -6,6 +6,7 @@ import os.path
 import optparse
 import ppz
 import ppz.transport as transport
+import ppz.communication as communication
 import ppz.messages as messages
 
 if __name__ == "__main__":
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     options, args = parser.parse_args()
 
     m = messages.MessagesFile(path=options.messages, debug=options.debug)
-    s = transport.SerialTransport(port=options.port, speed=options.speed, timeout=options.timeout)
+    s = communication.SerialCommunication(port=options.port, speed=options.speed, timeout=options.timeout)
     t = transport.Transport(check_crc=options.crc, debug=options.debug)
 
     s.connect_to_port()

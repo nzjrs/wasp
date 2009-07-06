@@ -9,6 +9,7 @@ import gs.utils as utils
 
 import ppz
 import ppz.transport as transport
+import ppz.communication as communication
 import ppz.messages as messages
 import ppz.monitor as monitor
 import ppz.ui.treeview as treeview
@@ -79,7 +80,7 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
     PING_TIME = 3
 
     def __init__(self, conf, messages):
-        self._serialsender = transport.SerialTransport(port="/dev/ttyUSB0", speed=57600, timeout=1)
+        self._serialsender = communication.SerialCommunication(port="/dev/ttyUSB0", speed=57600, timeout=1)
         monitor.GObjectSerialMonitor.__init__(self, self._serialsender)
 
         config.ConfigurableIface.__init__(self, conf)
