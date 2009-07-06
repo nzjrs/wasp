@@ -13,7 +13,6 @@ from gs.source import UAVSource
 
 from gs.managers.turretmanager import TurretManager
 from gs.managers.testmanager import TestManager
-from gs.managers.mapmanager import MapManager
 from gs.managers.graphmanager import GraphManager
 from gs.ui import GtkBuilderWidget
 from gs.ui.graph import Graph
@@ -27,6 +26,7 @@ from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
 from gs.ui.flightplan import FlightPlanEditor
 from gs.ui.log import LogBuffer, LogWindow
+from gs.ui.map import Map
 
 from ppz.messages import MessagesFile
 from ppz.ui.treeview import MessageTreeView
@@ -78,7 +78,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         self._source = UAVSource(self._config, self._messages)
 
-        self._map = MapManager(self._config, self._source)
+        self._map = Map(self._config, self._source)
         self._tm = TurretManager(self._config)
         self._test = TestManager(self._config)
         self._gm = GraphManager(self._config, self._source, self._messages, self._builder.get_object("graphs_box"), self._window)
@@ -103,7 +103,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._builder.get_object("map_holder").add(self._map.get_widget())
         self._map.connect("notify::auto-center", self.on_map_autocenter_property_change)
         self._map.connect("notify::show-trip-history", self.on_map_show_trip_history_property_change)
-        self._map.connect("button-press-event", self.map_click_callback)
     
         #Create other notebook tabs
         self._create_telemetry_ui()
@@ -468,13 +467,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def on_menu_item_show_path_toggled(self, widget):
         self._map.props.show_trip_history = widget.get_active()
-
-    def map_click_callback(self, widget, event):
-        mouse_x = event.x
-        mouse_y = event.y
-        lat,lon = self._map.get_co_ordinates(mouse_x, mouse_y)
-        if event.type == gtk.gdk._2BUTTON_PRESS and event.button == 1:
-            self._map.draw_gps(lat,lon,0)
 
     def main(self):
         self._window.show_all()

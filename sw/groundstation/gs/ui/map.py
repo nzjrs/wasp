@@ -1,14 +1,15 @@
 import gtk
 import logging
-import osmgpsmap
 import tempfile
 import os.path
+
+import osmgpsmap
 
 import gs.config as config
 
 LOG = logging.getLogger('map')
 
-class MapManager(config.ConfigurableIface):
+class Map(config.ConfigurableIface):
 
     CONFIG_SECTION = "MAP"
 
