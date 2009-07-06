@@ -101,12 +101,15 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
 
         #track the ping time
         self._sendping = None
-        self._gotpong = None
+        self._pingtime = 0
         self._pingmsg = messages.get_message_by_name("PING")
         self.register_interest(self._got_pong, 0, "PONG")
+        gobject.timeout_add_seconds(2, self._do_ping)
 
     def _got_pong(self, msg, payload):
-        self._gotpong = datetime.datetime.now()
+        #calculate difference in send and rx in milliseconds
+        self._pingtime = utils.calculate_dt_seconds(self._sendping, datetime.datetime.now())
+        self._pingtime *= 1000.0
 
     def _do_ping(self):
         self._sendping = datetime.datetime.now()
@@ -178,8 +181,8 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
             return 0.0
 
     def get_ping_time(self):
-        if self._sendping and self._gotpong:
-            return utils.calculate_dt_seconds(self._sendping, self._gotpong) * 1000.0
+        if self._sendping:
+            return self._pingtime
         else:
             return 0.0
 
