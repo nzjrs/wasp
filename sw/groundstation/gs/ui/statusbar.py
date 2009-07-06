@@ -23,12 +23,17 @@ class StatusBar(gtk.Statusbar):
         self._m = indicators.ColorLabelBox("M:")
         hb.pack_start(self._m)
 
+        #msgs/second        
+        self._ms = gs.ui.make_label("MSG/S: ?", 10)
+        hb.pack_start(self._ms, False, False)
+        #ping time
+        self._pt = gs.ui.make_label("PING: ?", 12)
+        hb.pack_start(self._pt, False, False)
+
+        #GPS LLA
         self._gps_coords = gs.ui.make_label("GPS: +180.0000 N, +180.0000 E")
         hb.pack_start(self._gps_coords, False, False)
-
-        self._ms = gs.ui.make_label("MSG/S: 0", 15)
-        hb.pack_start(self._ms, False, False)
-        
+       
         self.pack_start(hb, False, False)
         self.reorder_child(hb, 0)
 
@@ -38,6 +43,7 @@ class StatusBar(gtk.Statusbar):
 
     def _check_messages_per_second(self, source):
         self._ms.set_text("MSG/S: %.1f" % source.get_messages_per_second())
+        self._pt.set_text("PING: %.1f ms" %  source.get_ping_time())
         return True
 
     def _on_gps(self, msg, payload):

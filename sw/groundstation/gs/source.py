@@ -1,5 +1,6 @@
 import logging
 import datetime
+import gobject
 
 import libserial
 
@@ -40,6 +41,9 @@ class _Source:
     def get_messages_per_second(self):
         raise NotImplementedError
 
+    def get_ping_time(self):
+        raise NotImplementedError
+
 class _MessageCb:
     def __init__(self, cb, max_freq, **kwargs):
         self.cb = cb
@@ -72,6 +76,8 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
     DEFAULT_SPEED = 57600
     DEFAULT_TIMEOUT = 1
 
+    PING_TIME = 3
+
     def __init__(self, conf, messages):
         self._serialsender = transport.SerialTransport(port="/dev/ttyUSB0", speed=57600, timeout=1)
         monitor.GObjectSerialMonitor.__init__(self, self._serialsender)
@@ -85,12 +91,26 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
         self._speed = None
         self._rxts = None
 
+        #dictionary of msgid : [list, of, _MessageCb objects]
+        self._callbacks = {}
+
         #track how many messages per second
         self._lastt = datetime.datetime.now()
         self._times = utils.MovingAverage(5, float)
 
-        #dictionary of msgid : [list, of, _MessageCb objects]
-        self._callbacks = {}
+        #track the ping time
+        self._sendping = None
+        self._gotpong = None
+        self._pingmsg = messages.get_message_by_name("PING")
+        self.register_interest(self._got_pong, 0, "PONG")
+
+    def _got_pong(self, msg, payload):
+        self._gotpong = datetime.datetime.now()
+
+    def _do_ping(self):
+        self._sendping = datetime.datetime.now()
+        self.send_message(self._pingmsg, ())
+        return True
 
     def register_interest(self, cb, max_frequency, *message_names, **user_data):
         for m in message_names:
@@ -154,6 +174,12 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
         try:
             return 1.0/self._times.average()
         except ZeroDivisionError:
+            return 0.0
+
+    def get_ping_time(self):
+        if self._sendping and self._gotpong:
+            return utils.calculate_dt_seconds(self._sendping, self._gotpong) * 1000.0
+        else:
             return 0.0
 
     def update_state_from_config(self):
