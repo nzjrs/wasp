@@ -67,7 +67,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._home_lon = self.CONFIG_LON_DEFAULT
         self._home_zoom = self.CONFIG_ZOOM_DEFAULT
 
-        self._window = self._builder.get_object("window1")
+        self._window = self._builder.get_object("main_window")
         self._gps_coords = self._builder.get_object("gps_coords")
 
         self._config = Config(filename=prefsfile)
@@ -82,13 +82,13 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._tm = TurretManager(self._config)
         self._test = TestManager(self._config)
         self._gm = GraphManager(self._config, self._source, self._messages, self._builder.get_object("graphs_box"), self._window)
-        self._msg = MsgAreaController()
+        self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
         self._fp = FlightPlanEditor(self._map)
 
         self._builder.get_object("main_left_vbox").pack_start(self._info.widget, False, False)
-        self._builder.get_object("main_map_vbox").pack_start(self._msg, False, False)
+        self._builder.get_object("main_map_vbox").pack_start(self._msgarea, False, False)
         self._builder.get_object("window_vbox").pack_start(self._sb, False, False)
         self._builder.get_object("autopilot_hbox").pack_start(self._fp.widget, True, True)
 
@@ -239,63 +239,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map.set_zoom(self._map.props.zoom-1)    
 
     def on_menu_item_cache_map_activate(self, widget):
-
-        def update_download_count(msg, msgarea, gpsmap):
-            remaining = gpsmap.get_property("tiles-queued")
-            msg.update_text(
-                    primary_text=None,
-                    secondary_text="%s tiles remaining" % remaining)
-            if remaining > 0:
-                return True
-            else:
-                msgarea.clear()
-                return False
-
-        dlg = self._builder.get_object("cache_maps_dialog")
-
-        #widgets
-        pt1la = self._builder.get_object("pt1_lat_entry")
-        pt1lo = self._builder.get_object("pt1_lon_entry")
-        pt2la = self._builder.get_object("pt2_lat_entry")
-        pt2lo = self._builder.get_object("pt2_lon_entry")
-        z = self._map.get_property("zoom")
-        mz = self._map.get_property("max-zoom")
-
-        #preload with the current bounding box
-        pt1_lat, pt1_lon,pt2_lat,pt2_lon = self._map.get_bbox()
-        pt1la.set_text(str(math.degrees(pt1_lat)))
-        pt1lo.set_text(str(math.degrees(pt1_lon)))
-        pt2la.set_text(str(math.degrees(pt2_lat)))
-        pt2lo.set_text(str(math.degrees(pt2_lon)))
-
-        #get the zoom ranges
-        zoom_start = self._builder.get_object("zoom_start_spinbutton")
-        zoom_stop = self._builder.get_object("zoom_stop_spinbutton")
-        
-        #default to caching from current -> current + 2
-        zoom_start.set_range(1, mz)
-        zoom_start.set_value(z)
-        zoom_stop.set_range(1, mz)
-        zoom_stop.set_value(min(z+2,mz))
-
-        resp = dlg.run()
-        if resp == gtk.RESPONSE_OK:
-            self._map.download_maps(
-                        math.radians(float(pt1la.get_text())),
-                        math.radians(float(pt1lo.get_text())),
-                        math.radians(float(pt2la.get_text())),
-                        math.radians(float(pt2lo.get_text())),
-                        int(zoom_start.get_value()),
-                        int(zoom_stop.get_value()))
-            
-            msg = self._msg.new_from_text_and_icon(
-                                gtk.STOCK_CONNECT,
-                                "Caching Map Tiles",
-                                "Calculating...")
-            msg.show_all()
-            gobject.timeout_add(500, update_download_count, msg, self._msg, self._map)
-
-        dlg.hide()
+        self._map.show_cache_dialog(self._msgarea)
 
     def on_menu_item_preferences_activate(self, widget):
         if not self._prefs_window:

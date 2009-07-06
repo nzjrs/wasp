@@ -1,15 +1,19 @@
-import gtk
+import math
+import os.path
 import logging
 import tempfile
-import os.path
+
+import gobject
+import gtk
 
 import osmgpsmap
 
+import gs.ui
 import gs.config as config
 
 LOG = logging.getLogger('map')
 
-class Map(config.ConfigurableIface):
+class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
     CONFIG_SECTION = "MAP"
 
@@ -32,6 +36,11 @@ class Map(config.ConfigurableIface):
 
     def __init__(self, conf, source):
         config.ConfigurableIface.__init__(self, conf)
+
+        mydir = os.path.dirname(os.path.abspath(__file__))
+        uifile = os.path.join(mydir, "map.ui")
+        gs.ui.GtkBuilderWidget.__init__(self, uifile)
+
         self._map = None
         self._frame = gtk.Frame()
         self._cbs = {}
@@ -136,6 +145,67 @@ class Map(config.ConfigurableIface):
         ])
 
         return "Map", frame, items
+
+    def show_cache_dialog(self, msgarea):
+
+        def update_download_count(msg, msgarea, gpsmap):
+            remaining = gpsmap.get_property("tiles-queued")
+            msg.update_text(
+                    primary_text=None,
+                    secondary_text="%s tiles remaining" % remaining)
+            if remaining > 0:
+                return True
+            else:
+                msgarea.clear()
+                return False
+
+        dlg = self.get_resource("cache_maps_dialog")
+
+        #widgets
+        pt1la = self.get_resource("pt1_lat_entry")
+        pt1lo = self.get_resource("pt1_lon_entry")
+        pt2la = self.get_resource("pt2_lat_entry")
+        pt2lo = self.get_resource("pt2_lon_entry")
+        z = self._map.props.zoom
+        mz = self._map.props.max_zoom
+
+        LOG.debug("Showing cache dialog for zoom %d -> %d" % (z, mz))
+
+        #preload with the current bounding box
+        pt1_lat, pt1_lon,pt2_lat,pt2_lon = self._map.get_bbox()
+        pt1la.set_text(str(math.degrees(pt1_lat)))
+        pt1lo.set_text(str(math.degrees(pt1_lon)))
+        pt2la.set_text(str(math.degrees(pt2_lat)))
+        pt2lo.set_text(str(math.degrees(pt2_lon)))
+
+        #get the zoom ranges
+        zoom_start = self.get_resource("zoom_start_spinbutton")
+        zoom_stop = self.get_resource("zoom_stop_spinbutton")
+        
+        #default to caching from current -> current + 2
+        zoom_start.set_range(1, mz)
+        zoom_start.set_value(z)
+        zoom_stop.set_range(1, mz)
+        zoom_stop.set_value(min(z+2,mz))
+
+        resp = dlg.run()
+        if resp == gtk.RESPONSE_OK:
+            self._map.download_maps(
+                        math.radians(float(pt1la.get_text())),
+                        math.radians(float(pt1lo.get_text())),
+                        math.radians(float(pt2la.get_text())),
+                        math.radians(float(pt2lo.get_text())),
+                        int(zoom_start.get_value()),
+                        int(zoom_stop.get_value()))
+            
+            msg = msgarea.new_from_text_and_icon(
+                                gtk.STOCK_CONNECT,
+                                "Caching Map Tiles",
+                                "Calculating...")
+            msg.show_all()
+            gobject.timeout_add(500, update_download_count, msg, msgarea, self._map)
+
+        dlg.hide()
 
     def __getattr__(self, name):
         #delegate all calls to the actual map widget
