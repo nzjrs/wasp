@@ -80,8 +80,8 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
     PING_TIME = 3
 
     def __init__(self, conf, messages):
-        self._serialsender = communication.SerialCommunication(port="/dev/ttyUSB0", speed=57600, timeout=1)
-        monitor.GObjectSerialMonitor.__init__(self, self._serialsender)
+        self.serial = communication.SerialCommunication(port="/dev/ttyUSB0", speed=57600, timeout=1)
+        monitor.GObjectSerialMonitor.__init__(self, self.serial)
 
         config.ConfigurableIface.__init__(self, conf)
 
@@ -157,7 +157,7 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
                         transport.TransportHeaderFooter(acid=0x78), 
                         msg,
                         *values)
-            self._serialsender.write(data.tostring())
+            self.serial.write(data.tostring())
 
     def quit(self):
         self.disconnect_from_uav()
@@ -167,12 +167,12 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
 
     def connect_to_uav(self):
         if self._port and self._speed:
-            if self._serialsender.connect_to_port():
+            if self.serial.connect_to_port():
                 return True
         return False
 
     def disconnect_from_uav(self):
-        self._serialsender.disconnect_from_port()
+        self.serial.disconnect_from_port()
 
     def get_messages_per_second(self):
         try:

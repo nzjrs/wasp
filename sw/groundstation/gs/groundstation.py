@@ -77,6 +77,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._messages.parse()
 
         self._source = UAVSource(self._config, self._messages)
+        self._source.serial.connect("serial-connected", self._on_serial_connected)
 
         self._map = Map(self._config, self._source)
         self._tm = TurretManager(self._config)
@@ -157,20 +158,23 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         m.run()
         m.destroy()
 
+    def _on_serial_connected(self, serial, connected):
+        conn_menu = self.get_resource("menu_item_connect")
+        disconn_menu = self.get_resource("menu_item_disconnect")
+
+        if connected:
+            conn_menu.set_sensitive(False)
+            disconn_menu.set_sensitive(True)
+        else:
+            disconn_menu.set_sensitive(False)
+            conn_menu.set_sensitive(True)
+
     def _connect(self):
         self._tried_to_connect = True
-
-        ok = self._source.connect_to_uav()
-        self._sb.update_connected_indicator(ok)
-        self._info.set_connection_status(ok)
-
-        port, speed = self._source.get_connection_parameters()
-        self._info.set_connection_parameters(port, speed)
+        self._source.connect_to_uav()
 
     def _disconnect(self):
         self._source.disconnect_from_uav()
-        self._sb.update_connected_indicator(False)
-        self._info.set_connection_status(False)
 
     def update_state_from_config(self):
         self._c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)

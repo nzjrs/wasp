@@ -34,6 +34,8 @@ class InfoBox(gs.ui.GtkBuilderWidget):
             os.path.join(mydir,"icons","radio.svg")
         )
 
+        source.serial.connect("serial-connected", self._on_serial_connected, source)
+
         source.register_interest(self._on_status, 5, "STATUS")
         source.register_interest(self._on_comm_status, 5, "COMM_STATUS")
         source.register_interest(self._on_time, 2, "TIME")
@@ -44,6 +46,16 @@ class InfoBox(gs.ui.GtkBuilderWidget):
     def _check_messages_per_second(self, source):
         self.get_resource("rate_value").set_text("%.1f msgs/s" % source.get_messages_per_second())
         return True
+
+    def _on_serial_connected(self, serial, connected, source):
+        if connected:
+            self.get_resource("connected_value").set_text("YES")
+
+            port, speed = source.get_connection_parameters()
+            self.get_resource("port_value").set_text(port)
+            self.get_resource("speed_value").set_text("%s baud" % speed)
+        else:
+            self.get_resource("connected_value").set_text("NO")
 
     def _on_status(self, msg, payload):
         rc, gps = msg.unpack_printable_values(payload, joiner=None)
@@ -73,17 +85,6 @@ class InfoBox(gs.ui.GtkBuilderWidget):
 
         t = datetime.datetime.fromtimestamp(int(time))
         self.get_resource("time_value").set_text(t.strftime("%d/%m/%Y %H:%M:%S"))
-
-    def set_connection_status(self, connected):
-        w = self.get_resource("connected_value")
-        if connected:
-            w.set_text("YES")
-        else:
-            w.set_text("NO")
-
-    def set_connection_parameters(self, port, speed):
-        self.get_resource("port_value").set_text(port)
-        self.get_resource("speed_value").set_text("%s baud" % speed)
 
 if __name__ == "__main__":
     i = InfoBox()

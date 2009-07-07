@@ -37,9 +37,17 @@ class StatusBar(gtk.Statusbar):
         self.pack_start(hb, False, False)
         self.reorder_child(hb, 0)
 
+        source.serial.connect("serial-connected", self._on_serial_connected)
+
         source.register_interest(self._on_gps, 0, "GPS_LLH")
 
         gobject.timeout_add_seconds(1, self._check_messages_per_second, source)
+
+    def _on_serial_connected(self, serial, connected):
+        if connected:
+            self._c.set_green()
+        else:
+            self._c.set_red()
 
     def _check_messages_per_second(self, source):
         self._ms.set_text("MSG/S: %.1f" % source.get_messages_per_second())
@@ -54,10 +62,5 @@ class StatusBar(gtk.Statusbar):
 
         self._gps_coords.set_text("GPS: %.4f %s, %.4f %s" % (lat,"N",lon,"E"))
 
-    def update_connected_indicator(self, connected):
-        if connected:
-            self._c.set_green()
-        else:
-            self._c.set_red()
 
 
