@@ -245,6 +245,15 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkImageMenuItem" id="menu_item_centre">
+                        <property name="label" translatable="yes">Centre on UAV</property>
+                        <property name="visible">True</property>
+                        <property name="image">image14</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_menu_item_centre_activate"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkImageMenuItem" id="menu_item_home">
                         <property name="label">Home</property>
                         <property name="visible">True</property>
@@ -1677,6 +1686,11 @@
   <object class="GtkImage" id="image13">
     <property name="visible">True</property>
     <property name="stock">gtk-file</property>
+    <property name="icon-size">1</property>
+  </object>
+  <object class="GtkImage" id="image14">
+    <property name="visible">True</property>
+    <property name="stock">gtk-justify-center</property>
     <property name="icon-size">1</property>
   </object>
 </interface>

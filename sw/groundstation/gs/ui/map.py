@@ -146,6 +146,9 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
         return "Map", frame, items
 
+    def centre(self):
+        self._map.set_zoom(self._map.props.max_zoom)
+
     def show_cache_dialog(self, msgarea):
 
         def update_download_count(msg, msgarea, gpsmap):
