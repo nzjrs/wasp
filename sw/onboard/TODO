@@ -1,4 +1,2 @@
-* Move i2c to hw
-* Collapse imu* into imu.h and imu_hw
 * Actuators abstraction. 
 * Analog abstraction, or perhaps just a battery abstraction...
