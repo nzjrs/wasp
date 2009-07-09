@@ -1,9 +1,8 @@
 #include "std.h"
 #include "config/config.h"
-#include "init_hw.h"
+#include "init.h"
 #include "sys_time.h"
 #include "led.h"
-#include "interrupt_hw.h"
 
 #include "generated/messages.h"
 #include "comm.h"

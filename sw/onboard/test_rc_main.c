@@ -1,14 +1,11 @@
 #include <inttypes.h>
 
 #include "std.h"
-#include "init_hw.h"
+#include "init.h"
 #include "sys_time.h"
 #include "led.h"
 #include "comm.h"
 #include "rc.h"
-
-#include "interrupt_hw.h"
-
 
 static inline void main_init( void );
 static inline void main_periodic_task( void );

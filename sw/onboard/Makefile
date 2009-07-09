@@ -36,6 +36,7 @@ SRCARM =                            \
 
 # Arch sources
 SRCARM +=                           \
+    arm7/init_hw.c                  \
     arm7/armVIC.c                   \
     arm7/sys_time_hw.c              \
     arm7/led_hw.c                   \

@@ -1,10 +1,9 @@
 #include <inttypes.h>
 
 #include "std.h"
-#include "init_hw.h"
+#include "init.h"
 #include "sys_time.h"
 #include "led.h"
-#include "interrupt_hw.h"
 #include "comm.h"
 
 static inline void main_init( void );

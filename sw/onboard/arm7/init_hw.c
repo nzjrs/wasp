@@ -22,26 +22,19 @@
  *
  */
 
-/*
- *\brief ARM7 low level hardware initialisation 
- * PLL, MAM, VIC
- *
- */
-
-#ifndef INIT_HW_H
-#define INIT_HW_H
-
 #include <inttypes.h>
 #include "config/config.h"
+#include "arm7/armVIC.h"
 #include "LPC21xx.h"
+
+#include "init.h"
 
 /* declare functions and values from crt0.S & the linker control file */
 extern void reset(void);
 /* extern void exit(void); */
 extern void abort(void);
 
-
-static inline void hw_init(void) {
+void hw_init(void) {
   /* set PLL multiplier & divisor. */
   /* values computed from config.h */
   PLLCFG = PLLCFG_MSEL | PLLCFG_PSEL;
@@ -93,4 +86,13 @@ static inline void hw_init(void) {
 
 }
 
-#endif /* INIT_HW_H */
+void int_enable(void)
+{
+    enableIRQ();
+}
+
+void int_disable(void)
+{
+    disableIRQ();
+}
+

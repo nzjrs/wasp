@@ -24,10 +24,9 @@
 
 #include <inttypes.h>
 
-#include "init_hw.h"
+#include "init.h"
 #include "sys_time.h"
 #include "led.h"
-#include "interrupt_hw.h"
 
 #include "booz2_commands.h"
 #include "actuators.h"

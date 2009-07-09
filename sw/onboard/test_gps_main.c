@@ -1,8 +1,7 @@
 #include "std.h"
-#include "init_hw.h"
+#include "init.h"
 #include "sys_time.h"
 #include "led.h"
-#include "interrupt_hw.h"
 #include "comm.h"
 #include "gps.h"
 
