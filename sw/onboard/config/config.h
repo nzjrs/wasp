@@ -1,8 +1,6 @@
 #ifndef CONFIG_BOOZ2_V1_0_H
 #define CONFIG_BOOZ2_V1_0_H
 
-#define FLOAT_T float
-
 /* USB */
 #define USE_USB_SERIAL 0
 

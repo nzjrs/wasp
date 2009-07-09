@@ -30,7 +30,7 @@
 
 #include "std.h"
 #include "LPC21xx.h"
-#include "config.h"
+#include "config/config.h"
 
 #define SpiEnable() {		\
     SetBit(SSPCR1, SSE);	\

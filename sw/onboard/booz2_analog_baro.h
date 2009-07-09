@@ -26,7 +26,7 @@
 #define BOOZ2_ANALOG_BARO_H
 
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 #include "booz2_analog.h"
 
 extern void booz2_analog_baro_init( void );

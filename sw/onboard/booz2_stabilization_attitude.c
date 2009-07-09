@@ -3,7 +3,7 @@
 #include "booz2_stabilization_attitude_ref_traj_euler.h"
 #include "booz2_stabilization.h"
 #include "booz_ahrs.h"
-#include "airframe.h"
+#include "config/airframe.h"
 #include "rc.h"
 
 struct booz_ieuler booz_stabilization_att_sp;

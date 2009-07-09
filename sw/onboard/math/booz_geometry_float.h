@@ -10,22 +10,22 @@
 
 #if 0
 struct booz_fquat {
-  FLOAT_T qi;
-  FLOAT_T qx;
-  FLOAT_T qy;
-  FLOAT_T qz;
+  float qi;
+  float qx;
+  float qy;
+  float qz;
 };
 
 struct booz_fvect {
-  FLOAT_T x;
-  FLOAT_T y;
-  FLOAT_T z;
+  float x;
+  float y;
+  float z;
 };
 
 struct booz_feuler {
-  FLOAT_T phi;
-  FLOAT_T theta;
-  FLOAT_T psi;
+  float phi;
+  float theta;
+  float psi;
 };
 #endif
 
@@ -34,16 +34,16 @@ struct booz_feuler {
 
 #if 0
 #define BOOZ_FEULER_OF_QUAT_ALT(e,q) {					\
-    const FLOAT_T qi2 = q.qi*q.qi;					\
-    const FLOAT_T qx2 = q.qx*q.qx;					\
-    const FLOAT_T qy2 = q.qy*q.qy;					\
-    const FLOAT_T qz2 = q.qz*q.qz;					\
-    const FLOAT_T qiqx = q.qi*q.qx;					\
-    const FLOAT_T qiqy = q.qi*q.qy;					\
-    const FLOAT_T qiqz = q.qi*q.qz;					\
-    const FLOAT_T qxqy = q.qx*q.qy;					\
-    const FLOAT_T qxqz = q.qx*q.qz;					\
-    const FLOAT_T qyqz = q.qy*q.qz;					\
+    const float qi2 = q.qi*q.qi;					\
+    const float qx2 = q.qx*q.qx;					\
+    const float qy2 = q.qy*q.qy;					\
+    const float qz2 = q.qz*q.qz;					\
+    const float qiqx = q.qi*q.qx;					\
+    const float qiqy = q.qi*q.qy;					\
+    const float qiqz = q.qi*q.qz;					\
+    const float qxqy = q.qx*q.qy;					\
+    const float qxqz = q.qx*q.qz;					\
+    const float qyqz = q.qy*q.qz;					\
     e.phi   =  atan2( 2.*(qiqx + qyqz), qi2-qx2-qy2+qz2 );		\
     e.theta =  asin( 2.*(qiqy - qxqz ));				\
     e.psi   =  atan2( 2.*(qiqz + qxqy), qi2+qx2-qy2-qz2 );		\

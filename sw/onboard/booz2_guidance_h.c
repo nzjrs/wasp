@@ -8,7 +8,7 @@
 #include "booz2_ins.h"
 #include "booz2_navigation.h"
 
-#include "airframe.h"
+#include "config/airframe.h"
 #include "rc.h"
 
 uint8_t booz2_guidance_h_mode;

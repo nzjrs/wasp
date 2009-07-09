@@ -48,7 +48,7 @@
 
 #include <string.h>
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 #include "LPC21xx.h"
 #include "arm7/armVIC.h"
 #include "arm7/usb_ser_hw.h"

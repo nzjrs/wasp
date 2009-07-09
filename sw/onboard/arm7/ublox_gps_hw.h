@@ -2,7 +2,7 @@
 #define BOOZ2_GPS_H
 
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 #include "pprz_geodetic_int.h"
 
 struct Booz_gps_state {

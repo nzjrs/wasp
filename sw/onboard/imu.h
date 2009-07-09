@@ -7,7 +7,7 @@
 
 /* FIXME: Include these as config/airframe.h
  * For IMU_XXX scale constants */
-#include "airframe.h"
+#include "config/airframe.h"
 
 typedef struct __IMU {
     struct Int32Rates gyro;

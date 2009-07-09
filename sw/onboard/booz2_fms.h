@@ -24,7 +24,7 @@
 #define BOOZ2_FMS_H
 
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 #include "gps.h"
 #include "booz_geometry_int.h"
 #include "booz2_autopilot.h"

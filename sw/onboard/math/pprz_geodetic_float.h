@@ -1,37 +1,36 @@
 #ifndef PPRZ_GEODETIC_FLOAT_H
 #define PPRZ_GEODETIC_FLOAT_H
 
-#include "config.h"
 #include "pprz_geodetic.h"
 #include "pprz_algebra_float.h"
 
 /* Earth Centered Earth Fixed in meters */
 struct EcefCoor_f {
-  FLOAT_T x;
-  FLOAT_T y;
-  FLOAT_T z;
+  float x;
+  float y;
+  float z;
 };
 
 /* lon, lat in radians */
 /* alt in meters       */
 struct LlaCoor_f {
-  FLOAT_T lon;
-  FLOAT_T lat;
-  FLOAT_T alt;
+  float lon;
+  float lat;
+  float alt;
 };
 
 /* North East Down local tangeant plane */
 struct NedCoor_f {
-  FLOAT_T x;
-  FLOAT_T y;
-  FLOAT_T z;
+  float x;
+  float y;
+  float z;
 };
 
 /* East North Down local tangeant plane */
 struct EnuCoor_f {
-  FLOAT_T x;
-  FLOAT_T y;
-  FLOAT_T z;
+  float x;
+  float y;
+  float z;
 };
 
 /* Local tangeant plane reference */

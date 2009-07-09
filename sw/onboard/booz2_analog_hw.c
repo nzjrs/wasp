@@ -1,4 +1,4 @@
-#include "config.h"
+#include "config/config.h"
 #include "booz2_analog.h"
 
 #include "arm7/armVIC.h"

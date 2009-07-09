@@ -1,5 +1,5 @@
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 
 #include "comm.h"
 #include "arm7/comm_hw.h"

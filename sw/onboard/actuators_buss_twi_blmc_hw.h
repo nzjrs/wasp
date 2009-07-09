@@ -3,11 +3,11 @@
 
 #include <string.h>
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 
 #include "arm7/i2c_hw.h"
 
-#include "airframe.h"
+#include "config/airframe.h"
 #include "booz2_supervision.h"
 
 #ifdef KILL_MOTORS

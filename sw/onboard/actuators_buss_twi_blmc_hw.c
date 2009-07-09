@@ -1,7 +1,7 @@
 #include "arm7/i2c_hw.h"
 #include "actuators.h"
 
-#include "config.h"
+#include "config/config.h"
 
 uint8_t twi_blmc_nb_err;
 

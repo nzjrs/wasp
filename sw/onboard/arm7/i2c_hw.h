@@ -3,7 +3,7 @@
 
 #include "LPC21xx.h"
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 #include "interrupt_hw.h"
 
 #define I2C_BUF_LEN     16

@@ -28,7 +28,7 @@
 #include "std.h"
 #include "types.h"
 #include "LPC21xx.h"
-#include "config.h"
+#include "config/config.h"
 
 #define UART0_RX_BUFFER_SIZE 128        // UART0 receive buffer size
 #define UART0_TX_BUFFER_SIZE 128        // UART0 transmit buffer size

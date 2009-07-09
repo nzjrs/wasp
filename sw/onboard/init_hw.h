@@ -32,7 +32,7 @@
 #define INIT_HW_H
 
 #include <inttypes.h>
-#include "config.h"
+#include "config/config.h"
 #include "LPC21xx.h"
 
 /* declare functions and values from crt0.S & the linker control file */

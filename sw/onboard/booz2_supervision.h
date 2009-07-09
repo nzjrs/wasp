@@ -1,7 +1,7 @@
 #ifndef BOOZ2_SUPERVISION_H
 #define BOOZ2_SUPERVISION_H
 
-#include "airframe.h"
+#include "config/airframe.h"
 
 #if defined SUPERVISION_FRONT_ROTOR_CW
 #define TRIM_FRONT ( SUPERVISION_TRIM_E-SUPERVISION_TRIM_R)

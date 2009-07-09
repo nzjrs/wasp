@@ -1,5 +1,5 @@
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 #include "gps.h"
 #include "arm7/uart_hw.h"
 #include "arm7/ubx_protocol.h"

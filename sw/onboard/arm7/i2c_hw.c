@@ -24,7 +24,7 @@
 
 #include "LPC21xx.h"
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 #include "interrupt_hw.h"
 
 #include "arm7/i2c_hw.h"

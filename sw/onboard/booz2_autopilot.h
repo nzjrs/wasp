@@ -28,7 +28,7 @@
 #include "std.h"
 
 #include "booz_geometry_int.h"
-#include "airframe.h"
+#include "config/airframe.h"
 #include "booz2_ins.h"
 
 #define BOOZ2_AP_MODE_FAILSAFE          0

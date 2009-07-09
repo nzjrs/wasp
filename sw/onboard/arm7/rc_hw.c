@@ -1,5 +1,5 @@
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 
 #include "arm7/led_hw.h"
 

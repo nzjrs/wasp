@@ -4,7 +4,7 @@
 
 #include "booz2_ins.h"
 
-#include "flight_plan.h"
+#include "config/flight_plan.h"
 
 #include "pprz_algebra_int.h"
 

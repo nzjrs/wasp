@@ -3,7 +3,7 @@
 
 #include "std.h"
 
-#include "airframe.h"
+#include "config/airframe.h"
 
 /* decivolts */
 extern uint8_t booz2_battery_voltage;

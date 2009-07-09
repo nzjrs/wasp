@@ -1,5 +1,5 @@
 #include "booz_ahrs_aligner.h"
-#include "config.h"
+#include "config/config.h"
 #include "led.h"
 #include "imu.h"
 

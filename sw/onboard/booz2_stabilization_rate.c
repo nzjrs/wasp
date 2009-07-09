@@ -4,7 +4,7 @@
 
 #include "booz2_stabilization.h"
 #include "rc.h"
-#include "airframe.h"
+#include "config/airframe.h"
 #include "imu.h"
 
 struct Int32Rates booz2_stabilization_rate_measure;

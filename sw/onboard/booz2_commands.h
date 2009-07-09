@@ -24,7 +24,7 @@
 #define BOOZ2_COMMANDS_H
 
 #include "std.h"
-#include "airframe.h"
+#include "config/airframe.h"
 
 extern pprz_t booz2_commands[COMMANDS_NB];
 extern const pprz_t booz2_commands_failsafe[COMMANDS_NB];

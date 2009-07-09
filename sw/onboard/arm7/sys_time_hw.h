@@ -31,7 +31,7 @@
 #define SYS_TIME_HW_H
 
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 #include "LPC21xx.h"
 
 /* T0 prescaler, set T0_CLK to 15MHz, T0_CLK = PCLK / T0PCLK_DIV */

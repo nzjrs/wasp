@@ -29,7 +29,7 @@
 #define ACTUATORS_H
 
 #include "std.h"
-#include "airframe.h"
+#include "config/airframe.h"
 
 /** Must be defined by specific hardware implementation */
 extern void actuators_init( void );

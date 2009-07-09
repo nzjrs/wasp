@@ -1,41 +1,40 @@
 #ifndef PPRZ_ALGEBRA_DOUBLE_H
 #define PPRZ_ALGEBRA_DOUBLE_H
 
-#include "config.h"
 #include "pprz_algebra.h"
 
 struct DoubleVect2 {
-  FLOAT_T x;
-  FLOAT_T y;
+  float x;
+  float y;
 };
 
 struct DoubleVect3 {
-  FLOAT_T x;
-  FLOAT_T y;
-  FLOAT_T z;
+  float x;
+  float y;
+  float z;
 };
 
 struct DoubleQuat {
-  FLOAT_T qi;
-  FLOAT_T qx;
-  FLOAT_T qy;
-  FLOAT_T qz;
+  float qi;
+  float qx;
+  float qy;
+  float qz;
 };
 
 struct DoubleMat33 {
-  FLOAT_T m[3*3];
+  float m[3*3];
 };
 
 struct DoubleEulers {
-  FLOAT_T phi;
-  FLOAT_T theta;
-  FLOAT_T psi;
+  float phi;
+  float theta;
+  float psi;
 };
 
 struct DoubleRates {
-  FLOAT_T p;
-  FLOAT_T q;
-  FLOAT_T r;
+  float p;
+  float q;
+  float r;
 };
 
 

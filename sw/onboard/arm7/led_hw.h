@@ -2,7 +2,7 @@
 #define LED_HW_H
 
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 #include "LPC21xx.h"
 
 #define __LED_DIR(i) IO ## i ## DIR

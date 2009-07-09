@@ -1,5 +1,5 @@
 #include "std.h"
-#include "config.h"
+#include "config/config.h"
 #include "init_hw.h"
 #include "sys_time.h"
 #include "led.h"

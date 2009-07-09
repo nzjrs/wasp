@@ -1,5 +1,4 @@
 TARGET          ?= autopilot_main
-CONFIG          = john
 OBJDIR          = bin
 ARCH            = arm7
 Q               = @
@@ -74,7 +73,7 @@ REMOVE      = rm -f
 COPY        = cp
 
 # Compiler flags.
-CFLAGS = -I conf-$(CONFIG) -I math -I $(ARCH)/include
+CFLAGS = -I. -I math -I $(ARCH)/include
 CFLAGS += -Os
 # CFLAGS += -malignment-traps
 CFLAGS += -Winline
@@ -143,7 +142,7 @@ upload: $(OBJDIR)/$(TARGET).elf bootloader
 generated: generated/radio.h generated/build.h generated/messages.h
 
 # Radio header
-generated/radio.h: conf-$(CONFIG)/radio.xml $(TOOLS)/gen-radio.py
+generated/radio.h: config/radio.xml $(TOOLS)/gen-radio.py
 	@echo GENERATE $@
 	$(Q)$(TOOLS)/gen-radio.py $< > $@
 

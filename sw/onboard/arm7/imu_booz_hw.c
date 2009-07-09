@@ -1,7 +1,7 @@
 #include "std.h"
 
-#include "config.h"
-#include "airframe.h"
+#include "config/config.h"
+#include "config/airframe.h"
 
 #include "imu.h"
 #include "arm7/imu_booz_hw.h"
