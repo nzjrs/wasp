@@ -18,9 +18,6 @@ from gs.ui import GtkBuilderWidget
 from gs.ui.graph import Graph
 from gs.ui.tree import DBWidget
 from gs.ui.msgarea import MsgAreaController
-from gs.ui.plane_view import PlaneView
-from gs.ui.horizon import HorizonView
-from gs.ui.camera import CameraWindow
 from gs.ui.preferences import PreferencesWindow
 from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
@@ -387,17 +384,35 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def on_menu_item_plane_view_activate(self, widget):
         if self._plane_view == None:
-            self._plane_view = PlaneView()
+            try:
+                from gs.ui.plane_view import PlaneView
+                self._plane_view = PlaneView()
+            except:
+                LOG.warning("Could not initialize plane view", exc_info=True)
+                return
+
         self._plane_view.show_all()
         
     def on_menu_item_horizon_view_activate(self, widget):
         if self._horizon_view == None:
-            self._horizon_view = HorizonView()
+            try:
+                from gs.ui.horizon import HorizonView
+                self._horizon_view = HorizonView()
+            except:
+                LOG.warning("Could not initialize horizon view", exc_info=True)
+                return
+
         self._horizon_view.show_all()
 
     def on_menu_item_camera_view_activate(self, widget):
         if self._camera_window == None:
-            self._camera_window = CameraWindow()
+            try:
+                from gs.ui.camera import CameraWindow
+                self._camera_window = CameraWindow()
+            except:
+                LOG.warning("Could not initialize camera window", exc_info=True)
+                return
+
         self._camera_window.start()
         self._camera_window.show()
 
