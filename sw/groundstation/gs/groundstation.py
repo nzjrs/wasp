@@ -3,7 +3,6 @@ import os.path
 import datetime
 import math
 import gtk.gdk
-import osmgpsmap
 import gobject
 import logging
 

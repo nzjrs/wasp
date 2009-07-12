@@ -1,6 +1,12 @@
 import math
 import os.path
-import osmgpsmap
+
+try:
+    import osmgpsmap
+    MAP_AVAILABLE = osmgpsmap.__version__ >= "0.4.0"
+except:
+    MAP_AVAILABLE = False
+    
 import gtk
 
 import gs.ui
@@ -51,6 +57,9 @@ class FlightPlanEditor(gs.ui.GtkBuilderWidget):
             osmMap.draw_gps(lat,lon,0)
 
     def show_map(self, *args):
+        if not MAP_AVAILABLE:
+            return
+
         if self._map == None:
             self._map = osmgpsmap.GpsMap(
                     repo_uri=self._mainmap.props.repo_uri,

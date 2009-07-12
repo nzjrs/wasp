@@ -6,7 +6,12 @@ import tempfile
 import gobject
 import gtk
 
-import osmgpsmap
+try:
+    import osmgpsmap
+    MAP_AVAILABLE = osmgpsmap.__version__ >= "0.4.0"
+except:
+    MAP_AVAILABLE = False
+    class DummyMap: pass
 
 import gs.ui
 import gs.config as config
@@ -17,23 +22,6 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
     CONFIG_SECTION = "MAP"
 
-    SOURCE_OSM = "OSM"
-    SOURCE_OAM = "OAM"
-    SOURCE_OTHER = "Predefined"
-    URI = osmgpsmap.MAP_SOURCE_OPENSTREETMAP
-    PROXY = os.environ.get("http_proxy", "")
-    CACHE = tempfile.gettempdir()
-    ALL_MAP_SOURCES = (
-        osmgpsmap.MAP_SOURCE_GOOGLE_HYBRID, 
-        osmgpsmap.MAP_SOURCE_MAPS_FOR_FREE,
-        osmgpsmap.MAP_SOURCE_OPENSTREETMAP_RENDERER, 
-        osmgpsmap.MAP_SOURCE_GOOGLE_SATTELITE,
-        osmgpsmap.MAP_SOURCE_OPENAERIALMAP,
-        osmgpsmap.MAP_SOURCE_VIRTUAL_EARTH_SATTELITE,
-        osmgpsmap.MAP_SOURCE_GOOGLE_SATTELITE_QUAD,
-        osmgpsmap.MAP_SOURCE_OPENSTREETMAP
-    )
-
     def __init__(self, conf, source):
         config.ConfigurableIface.__init__(self, conf)
 
@@ -43,10 +31,14 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
         self._map = None
         self._frame = gtk.Frame()
+        self._lbl = None
         self._cbs = {}
         self._kwargs = {}
 
-        source.register_interest(self._on_gps, 2, "GPS_LLH")
+        if MAP_AVAILABLE:
+            source.register_interest(self._on_gps, 2, "GPS_LLH")
+        else:
+            LOG.warning("Map disabled. You need osmgpsmap >= 0.4.0")
 
     def _on_gps(self, msg, payload):
         fix,sv,lat,lon,hsl = msg.unpack_values(payload)
@@ -64,6 +56,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         self._cbs[signal] = (func, args)
 
     def update_state_from_config(self):
+        """
         LOG.debug(self.config_get("source", self.SOURCE_OSM))
 
         kwargs = {
@@ -116,14 +109,26 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
             self._frame.add(self._map)
             self._kwargs = kwargs
+        """
+        if not self._map:
+            if MAP_AVAILABLE:
+                pass
+            else:
+                self._map = gtk.Label("Map Disabled")
+
+            self._frame.add(self._map)
 
     def update_config_from_state(self):
+        """
         self.config_set("source",   self._kwargs.get("source", self.SOURCE_OSM))
         self.config_set("cache",    self._kwargs.get("cache", self.CACHE))
         self.config_set("uri",      self._kwargs.get("uri", self.URI))
         self.config_set("proxy",    self._kwargs.get("proxy", self.PROXY))
+        """
+        pass
 
     def get_preference_widgets(self):
+        """
         sources =       self.build_radio_group("source", self.SOURCE_OSM, self.SOURCE_OAM, self.SOURCE_OTHER)
         predefined =    self.build_combo("uri", *self.ALL_MAP_SOURCES)
         proxy =         self.build_entry("proxy")
@@ -145,6 +150,8 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         ])
 
         return "Map", frame, items
+        """
+        return "",None,()
 
     def centre(self):
         self._map.set_zoom(self._map.props.max_zoom)
@@ -212,5 +219,6 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
     def __getattr__(self, name):
         #delegate all calls to the actual map widget
+        print name
         return getattr(self._map, name)
 

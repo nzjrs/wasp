@@ -1,7 +1,10 @@
 #!/usr/bin/env python2.5
+import sys
 import os.path
 import logging
 import optparse
+
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
 logging.basicConfig(
     level=logging.DEBUG,
