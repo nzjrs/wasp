@@ -1,2 +1,6 @@
+Groundstation tools for monitoring UAV telemetry
+
+Run these like follows
 ./run.sh ./groundstation.py
-./run.sh ./booz-serial-monitor.py
+./run.sh ./tools/console-serial-monitor.py
+./run.sh ./tools/gui-serial-monitor.py

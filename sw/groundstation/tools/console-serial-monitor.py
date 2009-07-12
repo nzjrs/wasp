@@ -11,7 +11,7 @@ import ppz.messages as messages
 
 if __name__ == "__main__":
     thisdir = os.path.abspath(os.path.dirname(__file__))
-    default_messages = os.path.join(thisdir, "..", "messages.xml")
+    default_messages = os.path.join(thisdir, "..", "..", "messages.xml")
 
     parser = optparse.OptionParser()
     ppz.setup_comm_optparse_options(parser, default_messages)
