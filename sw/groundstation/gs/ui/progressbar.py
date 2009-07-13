@@ -1,5 +1,7 @@
 import gtk
 
+import gs.utils as utils
+
 gtk.rc_parse_string("""
     style "plain-progress-bar" {
         engine "murrine" {
@@ -12,7 +14,7 @@ gtk.rc_parse_string("""
 
 
 class ProgressBar(gtk.HBox):
-    def __init__(self, range):
+    def __init__(self, range, average=0):
         gtk.HBox.__init__(self, False, 5)
         try:
             self._min, self._max = range
@@ -21,6 +23,10 @@ class ProgressBar(gtk.HBox):
             self._auto = True
             self._min = 0.0
             self._max = 0.0
+        if average:
+            self._avg = utils.MovingAverage(average)
+        else:
+            self._avg = None
 
         self._lblmin = gtk.Label("%.1f" % self._min)
         self._bar = gtk.ProgressBar()
@@ -34,6 +40,10 @@ class ProgressBar(gtk.HBox):
     def set_value(self, value):
         val = float(value)
         self._bar.set_text("%.1f" % val)
+
+        if self._avg:
+            self._avg.add(val)
+            val = self._avg.average()
 
         if self._auto:
             if val < self._min:
