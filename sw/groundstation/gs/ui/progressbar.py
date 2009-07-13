@@ -1,5 +1,16 @@
 import gtk
 
+gtk.rc_parse_string("""
+    style "plain-progress-bar" {
+        engine "murrine" {
+            animation = FALSE
+            progressbarstyle = 0
+        }
+    }
+    widget "*.PlainProgress" style "plain-progress-bar"
+    """)
+
+
 class ProgressBar(gtk.HBox):
     def __init__(self, range):
         gtk.HBox.__init__(self, False, 5)
@@ -13,6 +24,7 @@ class ProgressBar(gtk.HBox):
 
         self._lblmin = gtk.Label("%.1f" % self._min)
         self._bar = gtk.ProgressBar()
+        self._bar.set_name("PlainProgress")
         self._lblmax = gtk.Label("%.1f" % self._max)
 
         self.pack_start(self._lblmin, False)
