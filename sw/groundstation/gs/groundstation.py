@@ -7,7 +7,7 @@ import gobject
 import logging
 
 from gs.database import Database
-from gs.config import Config, ConfigurableIface
+from gs.config import Config, ConfigurableIface, ConfigWindow
 from gs.source import UAVSource
 
 from gs.managers.turretmanager import TurretManager
@@ -17,7 +17,6 @@ from gs.ui import GtkBuilderWidget
 from gs.ui.graph import Graph
 from gs.ui.tree import DBWidget
 from gs.ui.msgarea import MsgAreaController
-from gs.ui.preferences import PreferencesWindow
 from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
 from gs.ui.flightplan import FlightPlanEditor
@@ -246,7 +245,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def on_menu_item_preferences_activate(self, widget):
         if not self._prefs_window:
-            self._prefs_window = PreferencesWindow(self._window, self._configurable)
+            self._prefs_window = ConfigWindow(self._window, self._configurable)
 
         resp = self._prefs_window.show(self._config)
         #If the user clicked ok to the dialog, update all 
