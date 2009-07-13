@@ -46,8 +46,9 @@ class PreferencesWindow:
                 config.set(name, widget.get_text(), section)
             elif type(widget) == gtk.ComboBox:
                 idx = widget.get_active()
+                model_idx = widget.get_data("MODEL_DATA_INDEX")
                 if idx >= 0:
-                    text = widget.get_model()[idx][0]
+                    text = widget.get_model()[idx][model_idx]
                 else:
                     text = ""
                 config.set(name, text, section)
@@ -73,8 +74,9 @@ class PreferencesWindow:
                 elif type(widget) == gtk.ComboBox:
                     idx = 0
                     mod = widget.get_model()
+                    model_idx = widget.get_data("MODEL_DATA_INDEX")
                     for i in range(0, len(mod)):
-                        if mod[i][0] == val:
+                        if mod[i][model_idx] == val:
                             idx = i
                     widget.set_active(idx)
                 elif type(widget) == gtk.RadioButton:
