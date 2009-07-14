@@ -86,6 +86,7 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
 
         if use_test_source:
             self.serial = communication.DummySerialCommunication(messages, self._transport, self._transport_header)
+            LOG.info("Test source enabled")
         else:
             self.serial = communication.SerialCommunication(port="/dev/ttyUSB0", speed=57600, timeout=1)
 

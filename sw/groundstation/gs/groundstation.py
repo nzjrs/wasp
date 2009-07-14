@@ -49,6 +49,10 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         handler.setFormatter(defaultFormatter)
         logging.root.addHandler(handler)
 
+        LOG.info("Groundstation loading")
+        LOG.info("Restored preferences: %s" % prefsfile)
+        LOG.info("Messages file: %s" % messagesfile)
+
         try:
             mydir = os.path.dirname(os.path.abspath(__file__))
             ui = os.path.join(mydir, "groundstation.ui")

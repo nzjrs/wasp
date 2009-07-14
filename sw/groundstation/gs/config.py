@@ -130,8 +130,6 @@ class Config:
         self._config = ConfigParser.ConfigParser()
         self._config.read(self._filePath)
 
-        LOG.info("Restored config from %s" % filename)
-
     def get(self, key, default, section="DEFAULT"):
         try:
             value = self._config.get(section,key)
