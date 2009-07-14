@@ -18,8 +18,8 @@ def set_image_from_file(image, filename):
 class InfoBox(gs.ui.GtkBuilderWidget):
     def __init__(self, source):
         mydir = os.path.dirname(os.path.abspath(__file__))
-        uifile = os.path.join(mydir, "info.ui")
-        gs.ui.GtkBuilderWidget.__init__(self, uifile)
+        ui = os.path.join(mydir, "info.ui")
+        gs.ui.GtkBuilderWidget.__init__(self, ui)
 
         self.widget = self.get_resource("info_vbox")
 

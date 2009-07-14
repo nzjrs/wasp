@@ -50,12 +50,17 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         logging.root.addHandler(handler)
 
         try:
-            me = os.path.abspath(__file__)
-            ui = os.path.join(os.path.dirname(me), "groundstation.ui")
+            mydir = os.path.dirname(os.path.abspath(__file__))
+            ui = os.path.join(mydir, "groundstation.ui")
             GtkBuilderWidget.__init__(self, ui)
         except Exception:
             LOG.critical("Error loading ui file", exc_info=True)
             sys.exit(1)
+
+        icon = gtk.gdk.pixbuf_new_from_file_at_size(
+                    os.path.join(mydir, "ui", "icons", "rocket.svg"),
+                    48, 48)
+        gtk.window_set_default_icon(icon)
 
         self._tried_to_connect = False
         self._home_lat = self.CONFIG_LAT_DEFAULT
@@ -271,6 +276,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def on_menu_item_about_activate(self, widget):
         dlg = gtk.AboutDialog()
+        dlg.set_name("UAV Groundstation")
         dlg.set_authors(("Mark Cottrell", "John Stowers"))
         dlg.set_version("0.2")
         dlg.run()
