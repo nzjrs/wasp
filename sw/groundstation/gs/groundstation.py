@@ -39,7 +39,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     CONFIG_LON_DEFAULT = 172.582377
     CONFIG_ZOOM_DEFAULT = 12
 
-    def __init__(self, prefsfile, messagesfile):
+    def __init__(self, prefsfile, messagesfile, use_test_source):
         gtk.gdk.threads_init()
 
         #connect our log buffer to the python logging subsystem
@@ -71,7 +71,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._messages = MessagesFile(path=messagesfile, debug=False)
         self._messages.parse()
 
-        self._source = UAVSource(self._config, self._messages)
+        self._source = UAVSource(self._config, self._messages, use_test_source)
         self._source.serial.connect("serial-connected", self._on_serial_connected)
 
         self._map = Map(self._config, self._source)

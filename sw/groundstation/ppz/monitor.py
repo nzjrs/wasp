@@ -21,7 +21,7 @@ class GObjectSerialMonitor(gobject.GObject):
         if connected:
             #add new watch
             self._watch = gobject.io_add_watch(
-                            serial.get_serial().fileno(), 
+                            serial.get_fd(), 
                             gobject.IO_IN | gobject.IO_PRI,
                             self.on_serial_data_available,
                             serial,

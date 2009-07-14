@@ -79,14 +79,18 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
 
     PING_TIME = 3
 
-    def __init__(self, conf, messages):
-        self.serial = communication.SerialCommunication(port="/dev/ttyUSB0", speed=57600, timeout=1)
-        monitor.GObjectSerialMonitor.__init__(self, self.serial)
-
-        config.ConfigurableIface.__init__(self, conf)
-
+    def __init__(self, conf, messages, use_test_source):
         self._messages_file = messages
         self._transport = transport.Transport(check_crc=True, debug=DEBUG)
+        self._transport_header = transport.TransportHeaderFooter(acid=0x78)
+
+        if use_test_source:
+            self.serial = communication.DummySerialCommunication(messages, self._transport, self._transport_header)
+        else:
+            self.serial = communication.SerialCommunication(port="/dev/ttyUSB0", speed=57600, timeout=1)
+
+        monitor.GObjectSerialMonitor.__init__(self, self.serial)
+        config.ConfigurableIface.__init__(self, conf)
 
         self._port = None
         self._speed = None
@@ -154,7 +158,7 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
     def send_message(self, msg, values):
         if msg:
             data = self._transport.pack_message_with_values(
-                        transport.TransportHeaderFooter(acid=0x78), 
+                        self._transport_header, 
                         msg,
                         *values)
             self.serial.write(data.tostring())

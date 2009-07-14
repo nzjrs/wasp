@@ -25,10 +25,13 @@ if __name__ == "__main__":
     parser = optparse.OptionParser()
     parser.add_option("-m", "--messages",
                     default=default_messages,
-                    help="messages xml file", metavar="FILE")
+                    help="Messages xml file", metavar="FILE")
     parser.add_option("-p", "--preferences",
                     default=prefs,
-                    help="user preferences file", metavar="FILE")
+                    help="User preferences file", metavar="FILE")
+    parser.add_option("-t", "--use-test-source",
+                    action="store_true", default=False,
+                    help="Dont connect to the UAV, use a test source")
 
     options, args = parser.parse_args()
 
@@ -37,6 +40,7 @@ if __name__ == "__main__":
 
     gs = groundstation.Groundstation(
             options.preferences,
-            options.messages
+            options.messages,
+            options.use_test_source
     )
     gs.main()
