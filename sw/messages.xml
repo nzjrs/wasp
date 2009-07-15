@@ -29,6 +29,7 @@
    <message name="STATUS" id="8">
      <field name="rc" type="uint8" values="OK|LOST|REALLY_LOST"/>
      <field name="gps" type="uint8" values="NO_FIX|2D_FIX|3D_FIX"/>
+     <field name="vsupply" type="uint8" unit="decivolt"/>
    </message>
 
    <message name="BUILD_INFO" id="9">

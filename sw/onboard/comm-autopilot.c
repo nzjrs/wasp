@@ -4,6 +4,8 @@
 #include "gps.h"
 #include "imu.h"
 
+#include "booz2_battery.h"
+
 bool_t
 comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
 {
@@ -68,7 +70,11 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
             MESSAGE_SEND_RC(chan, rc_values);
             break;
         case MESSAGE_ID_STATUS:
-            MESSAGE_SEND_STATUS(chan, &rc_status, &booz_gps_state.fix );
+            MESSAGE_SEND_STATUS(
+                    chan,
+                    &rc_status,
+                    &booz_gps_state.fix,
+                    &booz2_battery_voltage);
             break;
         default:
             ret = FALSE;
