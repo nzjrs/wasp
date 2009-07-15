@@ -135,76 +135,86 @@ void booz2_autopilot_set_mode(uint8_t new_autopilot_mode) {
   
 }
 
-#define BOOZ2_AUTOPILOT_CHECK_IN_FLIGHT() {				\
-    if (booz2_autopilot_in_flight) {					\
-      if (booz2_autopilot_in_flight_counter > 0) {			\
-	if (rc_values[RADIO_THROTTLE] < BOOZ2_AUTOPILOT_THROTTLE_TRESHOLD) { \
-	  booz2_autopilot_in_flight_counter--;				\
-	  if (booz2_autopilot_in_flight_counter == 0) {			\
-	    booz2_autopilot_in_flight = FALSE;				\
-	  }								\
-	}								\
-	else {	/* rc throttle > threshold */				\
-	  booz2_autopilot_in_flight_counter = BOOZ2_AUTOPILOT_IN_FLIGHT_TIME; \
-        }								\
-      }									\
-    }									\
-    else { /* not in flight */						\
-      if (booz2_autopilot_in_flight_counter < BOOZ2_AUTOPILOT_IN_FLIGHT_TIME && \
-	  booz2_autopilot_motors_on) {					\
-	if (rc_values[RADIO_THROTTLE] > BOOZ2_AUTOPILOT_THROTTLE_TRESHOLD) { \
-	  booz2_autopilot_in_flight_counter++;				\
-	  if (booz2_autopilot_in_flight_counter == BOOZ2_AUTOPILOT_IN_FLIGHT_TIME) \
-	    booz2_autopilot_in_flight = TRUE;				\
-	}								\
-	else { /*  rc throttle < threshold */				\
-	  booz2_autopilot_in_flight_counter = 0;			\
-	}								\
-      }									\
-    }									\
-  }
+static inline void booz2_autopilot_check_in_flight(void)
+{
+    if (booz2_autopilot_in_flight) 
+    {
+        if (booz2_autopilot_in_flight_counter > 0) 
+        {
+            if (rc_values[RADIO_THROTTLE] < BOOZ2_AUTOPILOT_THROTTLE_TRESHOLD) 
+            {
+                booz2_autopilot_in_flight_counter--;
+                if (booz2_autopilot_in_flight_counter == 0) 
+                {
+                    booz2_autopilot_in_flight = FALSE;
+                }
+            }
+            else
+            {	/* rc throttle > threshold */
+                booz2_autopilot_in_flight_counter = BOOZ2_AUTOPILOT_IN_FLIGHT_TIME;
+            }
+        }
+    }
+    else
+    { /* not in flight */
+        if (booz2_autopilot_in_flight_counter < BOOZ2_AUTOPILOT_IN_FLIGHT_TIME &&
+            booz2_autopilot_motors_on) 
+        {
+            if (rc_values[RADIO_THROTTLE] > BOOZ2_AUTOPILOT_THROTTLE_TRESHOLD) 
+            {
+                booz2_autopilot_in_flight_counter++;
+                if (booz2_autopilot_in_flight_counter == BOOZ2_AUTOPILOT_IN_FLIGHT_TIME)
+                    booz2_autopilot_in_flight = TRUE;
+            }
+            else
+            { /*  rc throttle < threshold */
+                booz2_autopilot_in_flight_counter = 0;
+            }
+        }
+    }
+}
 
-#define BOOZ2_AUTOPILOT_CHECK_MOTORS_ON() {				\
-    if (booz2_autopilot_motors_on) {					\
-      if (rc_values[RADIO_THROTTLE] < BOOZ2_AUTOPILOT_THROTTLE_TRESHOLD && \
-	  (rc_values[RADIO_YAW] > BOOZ2_AUTOPILOT_YAW_TRESHOLD ||	\
-	   rc_values[RADIO_YAW] < -BOOZ2_AUTOPILOT_YAW_TRESHOLD)) {	\
-	if ( booz2_autopilot_motors_on_counter > 0) {			\
-	  booz2_autopilot_motors_on_counter--;				\
-	  if (booz2_autopilot_motors_on_counter == 0)			\
-	    booz2_autopilot_motors_on = FALSE;				\
-	}								\
-      }									\
-      else { /* sticks not in the corner */				\
-	booz2_autopilot_motors_on_counter = BOOZ2_AUTOPILOT_MOTOR_ON_TIME; \
-      }									\
-    }									\
-    else { /* motors off */						\
-      if (rc_values[RADIO_THROTTLE] < BOOZ2_AUTOPILOT_THROTTLE_TRESHOLD && \
-	  (rc_values[RADIO_YAW] > BOOZ2_AUTOPILOT_YAW_TRESHOLD ||	\
-	   rc_values[RADIO_YAW] < -BOOZ2_AUTOPILOT_YAW_TRESHOLD)) {	\
-	if ( booz2_autopilot_motors_on_counter <  BOOZ2_AUTOPILOT_MOTOR_ON_TIME) { \
-	  booz2_autopilot_motors_on_counter++;				\
-	  if (booz2_autopilot_motors_on_counter == BOOZ2_AUTOPILOT_MOTOR_ON_TIME) \
-	    booz2_autopilot_motors_on = TRUE;				\
-	}								\
-      }									\
-      else {								\
-	booz2_autopilot_motors_on_counter = 0;				\
-      }									\
-    }									\
-  }
-
-
+static inline void booz2_autopilot_check_motors_on(void)
+{
+    if (booz2_autopilot_motors_on)
+    {
+        if (rc_values[RADIO_THROTTLE] < BOOZ2_AUTOPILOT_THROTTLE_TRESHOLD &&
+            (rc_values[RADIO_YAW] > BOOZ2_AUTOPILOT_YAW_TRESHOLD ||
+             rc_values[RADIO_YAW] < -BOOZ2_AUTOPILOT_YAW_TRESHOLD)) 
+        {
+            if ( booz2_autopilot_motors_on_counter > 0) 
+            {
+                booz2_autopilot_motors_on_counter--;
+                if (booz2_autopilot_motors_on_counter == 0)
+                    booz2_autopilot_motors_on = FALSE;
+            }
+        }
+        else
+        { /* sticks not in the corner */
+            booz2_autopilot_motors_on_counter = BOOZ2_AUTOPILOT_MOTOR_ON_TIME;
+        }
+    }
+    else
+    { /* motors off */
+        if (rc_values[RADIO_THROTTLE] < BOOZ2_AUTOPILOT_THROTTLE_TRESHOLD &&
+            (rc_values[RADIO_YAW] > BOOZ2_AUTOPILOT_YAW_TRESHOLD ||
+             rc_values[RADIO_YAW] < -BOOZ2_AUTOPILOT_YAW_TRESHOLD))
+        {
+            if ( booz2_autopilot_motors_on_counter <  BOOZ2_AUTOPILOT_MOTOR_ON_TIME) 
+            {
+                booz2_autopilot_motors_on_counter++;
+                if (booz2_autopilot_motors_on_counter == BOOZ2_AUTOPILOT_MOTOR_ON_TIME)
+                    booz2_autopilot_motors_on = TRUE;
+            }
+        }
+        else
+        {
+            booz2_autopilot_motors_on_counter = 0;
+        }
+    }
+}
 
 void booz2_autopilot_on_rc_event(void) {
-
-#if 0
-      DOWNLINK_SEND_BOOZ_DEBUG(&rc_values[RADIO_THROTTLE],	\
-			       &rc_values[RADIO_ROLL],		\
-			       &rc_values[RADIO_PITCH],		\
-			       &rc_values[RADIO_YAW]);		
-#endif
 
   /* I think this should be hidden in rc code */
   /* the ap gets a mode everytime - the rc filters it */
@@ -220,8 +230,8 @@ void booz2_autopilot_on_rc_event(void) {
     booz2_autopilot_set_mode(BOOZ2_AP_MODE_KILL);
 #endif
 
-  BOOZ2_AUTOPILOT_CHECK_MOTORS_ON();
-  BOOZ2_AUTOPILOT_CHECK_IN_FLIGHT();
+  booz2_autopilot_check_motors_on();
+  booz2_autopilot_check_in_flight();
 
   booz2_guidance_v_read_rc();
   booz2_guidance_h_read_rc(booz2_autopilot_in_flight);
