@@ -1,3 +1,4 @@
+#include "arm7/armVIC.h"
 #include "arm7/max1168.h"
 
 static void EXTINT0_ISR(void) __attribute__((naked));

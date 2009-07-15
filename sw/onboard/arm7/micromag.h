@@ -12,7 +12,6 @@
 
 #include "std.h"
 #include "LPC21xx.h"
-#include "interrupt_hw.h" 
 #include "arm7/spi_hw.h"
 
 #define MM_NB_AXIS          3

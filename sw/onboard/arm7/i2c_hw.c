@@ -25,8 +25,8 @@
 #include "LPC21xx.h"
 #include "std.h"
 #include "config/config.h"
-#include "interrupt_hw.h"
 
+#include "arm7/armVIC.h"
 #include "arm7/i2c_hw.h"
 
 /* default clock speed 37.5KHz with our 15MHz PCLK 

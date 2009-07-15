@@ -1,3 +1,4 @@
+#include "arm7/armVIC.h"
 #include "arm7/micromag.h"
 
 static void         EXTINT_ISR(void) __attribute__((naked));

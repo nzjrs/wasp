@@ -4,6 +4,7 @@
 #include "config/airframe.h"
 
 #include "imu.h"
+#include "arm7/armVIC.h"
 #include "arm7/imu_booz_hw.h"
 #include "arm7/max1168.h"
 #include "arm7/micromag.h"

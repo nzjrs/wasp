@@ -9,7 +9,6 @@
 
 #include "std.h"
 #include "LPC21xx.h"
-#include "interrupt_hw.h"  
 #include "arm7/spi_hw.h"
 
 #define MAX1168_ERR_ISR_STATUS      0
