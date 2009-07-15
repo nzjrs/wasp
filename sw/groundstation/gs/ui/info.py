@@ -35,8 +35,8 @@ class InfoBox(gs.ui.GtkBuilderWidget):
             os.path.join(mydir,"icons","radio.svg")
         )
 
-        pb = progressbar.ProgressBar(range=(9,14), average=5)
-        self.get_resource("batt_hbox").pack_start(pb, True)
+        self.pb = progressbar.ProgressBar(range=(8,15), average=5)
+        self.get_resource("batt_hbox").pack_start(self.pb, True)
 
         source.serial.connect("serial-connected", self._on_serial_connected, source)
 
@@ -62,9 +62,13 @@ class InfoBox(gs.ui.GtkBuilderWidget):
             self.get_resource("connected_value").set_text("NO")
 
     def _on_status(self, msg, payload):
-        rc, gps = msg.unpack_printable_values(payload, joiner=None)
-        self.get_resource("rc_value").set_text(rc)
-        self.get_resource("gps_value").set_text(gps)
+        rc, gps, bv = msg.unpack_values(payload)
+        self.get_resource("rc_value").set_text(
+                msg.get_field_by_name("rc").get_printable_value(rc))
+        self.get_resource("gps_value").set_text(
+                msg.get_field_by_name("gps").get_printable_value(gps))
+
+        self.pb.set_value(bv/10.0)
 
     def _on_comm_status(self, msg, payload):
         overruns, errors = msg.unpack_printable_values(payload, joiner=None)
