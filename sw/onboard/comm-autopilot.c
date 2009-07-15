@@ -42,22 +42,22 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
 			        &booz_imu.mag_unscaled.y,
 			        &booz_imu.mag_unscaled.z);
             break;
-        case MESSAGE_ID_WASP_GYRO:
-            MESSAGE_SEND_WASP_GYRO(
+        case MESSAGE_ID_IMU_GYRO:
+            MESSAGE_SEND_IMU_GYRO(
                     chan,
                     &booz_imu.gyro.p,
                     &booz_imu.gyro.q,
                     &booz_imu.gyro.r);
             break;
-        case MESSAGE_ID_WASP_ACCEL:
-            MESSAGE_SEND_WASP_ACCEL(
+        case MESSAGE_ID_IMU_ACCEL:
+            MESSAGE_SEND_IMU_ACCEL(
                     chan,
                     &booz_imu.accel.x,
                     &booz_imu.accel.y,
                     &booz_imu.accel.z);
             break;
-        case MESSAGE_ID_WASP_MAG:
-            MESSAGE_SEND_WASP_MAG(
+        case MESSAGE_ID_IMU_MAG:
+            MESSAGE_SEND_IMU_MAG(
                     chan,
                     &booz_imu.mag.x,
 			        &booz_imu.mag.y,

@@ -92,19 +92,19 @@ static inline void on_imu_event(void)
     {
         led_off(2);
 
-        MESSAGE_SEND_WASP_GYRO(
+        MESSAGE_SEND_IMU_GYRO(
                 COMM_1,
                 &booz_imu.gyro.p,
                 &booz_imu.gyro.q,
                 &booz_imu.gyro.r);
 
-        MESSAGE_SEND_WASP_ACCEL(
+        MESSAGE_SEND_IMU_ACCEL(
                 COMM_1,
                 &booz_imu.accel.x,
                 &booz_imu.accel.y,
                 &booz_imu.accel.z);
 
-        MESSAGE_SEND_WASP_MAG(
+        MESSAGE_SEND_IMU_MAG(
                 COMM_1,
                 &booz_imu.mag.x,
 			    &booz_imu.mag.y,

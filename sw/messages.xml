@@ -79,19 +79,19 @@
     <field name="mz" type="int16" unit="adc"/>
   </message>
 
- <message name="WASP_GYRO" id="31">
+ <message name="IMU_GYRO" id="31">
    <field name="gp"    type="int32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
    <field name="gq"    type="int32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
    <field name="gr"    type="int32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
  </message>
 
- <message name="WASP_ACCEL" id="32">
+ <message name="IMU_ACCEL" id="32">
    <field name="ax"    type="int32" alt_unit="m/s2" alt_unit_coef="0.0009766"/>
    <field name="ay"    type="int32" alt_unit="m/s2" alt_unit_coef="0.0009766"/>
    <field name="az"    type="int32" alt_unit="m/s2" alt_unit_coef="0.0009766"/>
  </message>
 
- <message name="WASP_MAG" id="33">
+ <message name="IMU_MAG" id="33">
    <field name="mx"    type="int32" alt_unit="1" alt_unit_coef="0.0004883"/>
    <field name="my"    type="int32" alt_unit="1" alt_unit_coef="0.0004883"/>
    <field name="mz"    type="int32" alt_unit="1" alt_unit_coef="0.0004883"/>
