@@ -5,6 +5,7 @@ import gobject
 import gtk
 
 import gs.ui
+import gs.ui.progressbar as progressbar
 
 LOG = logging.getLogger("infobox")
 
@@ -33,6 +34,9 @@ class InfoBox(gs.ui.GtkBuilderWidget):
             self.get_resource("comm_image"),
             os.path.join(mydir,"icons","radio.svg")
         )
+
+        pb = progressbar.ProgressBar(range=(9,14), average=5)
+        self.get_resource("batt_hbox").pack_start(pb, True)
 
         source.serial.connect("serial-connected", self._on_serial_connected, source)
 
