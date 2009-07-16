@@ -276,7 +276,7 @@
                           <object class="GtkLabel" id="runtime_lbl">
                             <property name="visible">True</property>
                             <property name="xalign">0</property>
-                            <property name="label" translatable="yes">Runtime:</property>
+                            <property name="label" translatable="yes">Runtime: </property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -337,7 +337,7 @@
                           <object class="GtkLabel" id="gps_lbl">
                             <property name="visible">True</property>
                             <property name="xalign">0</property>
-                            <property name="label" translatable="yes">GPS:</property>
+                            <property name="label" translatable="yes">GPS: </property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -359,6 +359,68 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkHBox" id="hbox15">
+                        <property name="visible">True</property>
+                        <child>
+                          <object class="GtkLabel" id="in_flight_lbl">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">In Flight: </property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="in_flight_value">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkHBox" id="hbox16">
+                        <property name="visible">True</property>
+                        <child>
+                          <object class="GtkLabel" id="autopilot_mode_lbl">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">Autopilot: </property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="autopilot_mode_value">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="position">4</property>
                       </packing>
                     </child>
                     <child>
@@ -392,7 +454,7 @@
                         </child>
                       </object>
                       <packing>
-                        <property name="position">3</property>
+                        <property name="position">5</property>
                       </packing>
                     </child>
                   </object>
@@ -666,11 +728,11 @@
   </object>
   <object class="GtkSizeGroup" id="sizegroup1">
     <widgets>
-      <widget name="time_lbl"/>
-      <widget name="dirty_lbl"/>
-      <widget name="target_lbl"/>
-      <widget name="branch_lbl"/>
       <widget name="rev_lbl"/>
+      <widget name="branch_lbl"/>
+      <widget name="target_lbl"/>
+      <widget name="dirty_lbl"/>
+      <widget name="time_lbl"/>
     </widgets>
   </object>
   <object class="GtkSizeGroup" id="sizegroup2">
@@ -678,16 +740,18 @@
       <widget name="runtime_lbl"/>
       <widget name="rc_lbl"/>
       <widget name="gps_lbl"/>
+      <widget name="in_flight_lbl"/>
+      <widget name="autopilot_mode_lbl"/>
     </widgets>
   </object>
   <object class="GtkSizeGroup" id="sizegroup3">
     <widgets>
-      <widget name="overruns_lbl"/>
-      <widget name="errors_lbl"/>
-      <widget name="rate_lbl"/>
-      <widget name="speed_lbl"/>
-      <widget name="port_lbl"/>
       <widget name="connected_lbl"/>
+      <widget name="port_lbl"/>
+      <widget name="speed_lbl"/>
+      <widget name="rate_lbl"/>
+      <widget name="errors_lbl"/>
+      <widget name="overruns_lbl"/>
     </widgets>
   </object>
 </interface>
