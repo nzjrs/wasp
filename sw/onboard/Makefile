@@ -56,7 +56,7 @@ SRCARM +=                           \
     arm7/servos_4017_hw.c
 
 ASRCARM =                           \
-    crt0.S
+    arm7/crt0.S
 
 MCU         = arm7tdmi
 THUMB       = -mthumb
@@ -189,6 +189,7 @@ $(OBJDIR)/%.o : %.c
 # Assemble: create object files from assembler source files. ARM-only
 $(AOBJARM) : $(OBJDIR)/%.o : %.S
 	@echo AS $@
+	$(Q)test -d $(dir $@) || mkdir -p $(dir $@)
 	$(Q)$(CC) -c $(ALL_ASFLAGS) $< -o $@
 
 clean:
