@@ -75,25 +75,20 @@
 // damit, we have two of them now
 //#define POWER_SWITCH_LED 3
 
-/* 4017 servo driver on CAM connector */
-/* P0.28 aka MAT0.2  */
-//#define SERVO_CLOCK_PIN  28
-//#define SERVO_CLOCK_PINSEL PINSEL0
-//#define SERVO_CLOCK_PINSEL_VAL 0x02
-//#define SERVO_CLOCK_PINSEL_BIT 10
-/* p1.23          */
-//#define SERVO_DATA_PIN  23
-/* p1.24          */
-//#define SERVO_RESET_PIN 24
-
-#define RADIO_CONTROL
+/* Servos: 4017 servo driver on CAM connector */
+#define USE_SERVOS_4017         0
+#define SERVO_CLOCK_PIN         28          /* P0.28 aka MAT0.2  */
+#define SERVO_CLOCK_PINSEL      PINSEL0
+#define SERVO_CLOCK_PINSEL_VAL  0x02
+#define SERVO_CLOCK_PINSEL_BIT  10
+#define SERVO_DATA_PIN          23          /* p1.23 */
+#define SERVO_RESET_PIN         24          /* p1.24 */
 
 /* Time */
 #define PERIODIC_TASK_PERIOD SYS_TICS_OF_SEC((1./512.))
 
-/* Radio Control 
- * Futaba is falling edge clocked whereas JR is rising edge
- */
+/* Radio Control : Futaba is falling edge clocked whereas JR is rising edge */
+#define RADIO_CONTROL 1
 #define RC_FUTABA 0
 #define RC_JR     1
 #define RADIO_CONTROL_TYPE RC_FUTABA

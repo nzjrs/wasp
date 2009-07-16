@@ -29,14 +29,13 @@
 #define ACTUATORS_H
 
 #include "std.h"
-#include "config/airframe.h"
 
-/** Must be defined by specific hardware implementation */
-extern void actuators_init( void );
+typedef uint8_t ActuatorID_t;
 
-/** Temporary storage (for debugging purpose, downlinked via telemetry) */
-extern uint16_t actuators[SERVOS_NB];
+void actuators_init( void );
 
-#include "actuators_buss_twi_blmc_hw.h"
+void actuators_set( ActuatorID_t id, uint8_t value );
+
+void actuators_commit( void );
 
 #endif /* ACTUATORS_H */

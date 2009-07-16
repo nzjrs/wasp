@@ -51,10 +51,11 @@ extern bool_t  booz2_autopilot_motors_on;
 extern bool_t  booz2_autopilot_in_flight;
 extern uint8_t booz2_autopilot_tol;
 
-extern void booz2_autopilot_init(void);
-extern void booz2_autopilot_periodic(void);
-extern void booz2_autopilot_on_rc_event(void);
-extern void booz2_autopilot_set_mode(uint8_t new_autopilot_mode);
+void booz2_autopilot_init(void);
+void booz2_autopilot_periodic(void);
+void booz2_autopilot_on_rc_event(void);
+void booz2_autopilot_set_mode(uint8_t new_autopilot_mode);
+void booz2_autopilot_set_actuators(void);
 
 #ifndef BOOZ2_MODE_MANUAL
 #define BOOZ2_MODE_MANUAL BOOZ2_AP_MODE_RATE_DIRECT

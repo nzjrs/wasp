@@ -28,9 +28,7 @@
 #include "sys_time.h"
 #include "led.h"
 
-#include "booz2_commands.h"
 #include "actuators.h"
-#include "actuators_buss_twi_blmc_hw.h"
 
 #include "rc.h"
 
@@ -117,7 +115,7 @@ STATIC_INLINE void booz2_main_periodic( void ) {
   /* run control loops */
   booz2_autopilot_periodic();
   /* set actuators     */
-  SetActuatorsFromCommands(booz2_autopilot_motors_on);
+  booz2_autopilot_set_actuators();
 
   /* Run the following tasks 10x times slower than the periodic rate */
   _cnt++;

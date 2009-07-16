@@ -7,7 +7,9 @@
 #include "sys_time.h"
 #include "arm7/sys_time_hw.h"
 #include "arm7/led_hw.h"
-#include "arm7/rc_hw.h"
+
+#include "arm7/rc_hw.h"             /* ppm_isr */
+#include "arm7/servos_4017_hw.h"    /* servos_4017_isr */
 
 uint16_t cpu_time_sec;
 uint32_t cpu_time_ticks;
@@ -28,6 +30,14 @@ void TIMER0_ISR ( void ) {
       /* clear interrupt */
       T0IR = TIR_CR2I;
     }
+#endif
+#if USE_SERVOS_4017
+    if (T0IR&TIR_MR1I) {
+        servos_4017_isr();
+      /* clear interrupt */
+      T0IR = TIR_MR1I;
+    }
+
 #endif
   }
   VICVectAddr = 0x00000000;

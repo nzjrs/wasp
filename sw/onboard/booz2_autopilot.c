@@ -25,11 +25,12 @@
 #include "booz2_autopilot.h"
 
 #include "rc.h"
-#include "booz2_commands.h"
+#include "actuators.h"
 #include "booz2_navigation.h"
 #include "booz2_guidance_h.h"
 #include "booz2_guidance_v.h"
 #include "booz2_stabilization.h"
+#include "booz2_supervision.h"
 
 uint8_t booz2_autopilot_mode;
 uint8_t booz2_autopilot_mode_auto2;
@@ -38,6 +39,9 @@ bool_t  booz2_autopilot_in_flight;
 uint8_t booz2_autopilot_tol;
 uint32_t booz2_autopilot_motors_on_counter;
 uint32_t booz2_autopilot_in_flight_counter;
+
+int32_t booz2_commands[COMMANDS_NB];
+int32_t booz2_commands_failsafe[COMMANDS_NB] = COMMANDS_FAILSAFE;
 
 #define BOOZ2_AUTOPILOT_MOTOR_ON_TIME     40
 #define BOOZ2_AUTOPILOT_IN_FLIGHT_TIME    40
@@ -54,25 +58,54 @@ void booz2_autopilot_init(void) {
   booz2_autopilot_tol = 0;
 }
 
+static inline void booz2_autopilot_set_commands( int32_t *in_cmd, uint8_t in_flight, uint8_t motors_on )
+{
+    booz2_commands[COMMAND_PITCH]  = in_cmd[COMMAND_PITCH];
+    booz2_commands[COMMAND_ROLL]   = in_cmd[COMMAND_ROLL];
+    booz2_commands[COMMAND_YAW]    = (in_flight) ? in_cmd[COMMAND_YAW] : 0;
+    booz2_commands[COMMAND_THRUST] = (motors_on) ? in_cmd[COMMAND_THRUST] : 0;
+}
 
 void booz2_autopilot_periodic(void) {
   
-  if ( !booz2_autopilot_motors_on ||
-       booz2_autopilot_mode == BOOZ2_AP_MODE_FAILSAFE ||
-       booz2_autopilot_mode == BOOZ2_AP_MODE_KILL ) {
-    SetCommands(booz2_commands_failsafe, 
-		booz2_autopilot_in_flight, booz2_autopilot_motors_on);
-  }
-  else {
-    RunOnceEvery(50, nav_periodic_task_10Hz())
-    booz2_guidance_v_run( booz2_autopilot_in_flight );
-    booz2_guidance_h_run( booz2_autopilot_in_flight );
-    SetCommands(booz2_stabilization_cmd, 
-		booz2_autopilot_in_flight, booz2_autopilot_motors_on);
-  }
+    if ( !booz2_autopilot_motors_on ||
+         booz2_autopilot_mode == BOOZ2_AP_MODE_FAILSAFE ||
+         booz2_autopilot_mode == BOOZ2_AP_MODE_KILL ) 
+    {
+        booz2_autopilot_set_commands(
+            booz2_commands_failsafe, 
+            booz2_autopilot_in_flight,
+            booz2_autopilot_motors_on);
+    }
+    else
+    {
+        RunOnceEvery(50, nav_periodic_task_10Hz())
+        booz2_guidance_v_run( booz2_autopilot_in_flight );
+        booz2_guidance_h_run( booz2_autopilot_in_flight );
+        booz2_autopilot_set_commands(
+            booz2_stabilization_cmd, 
+            booz2_autopilot_in_flight,
+            booz2_autopilot_motors_on);
+    }
 
 }
 
+//#define KILL_MOTORS 1
+
+void booz2_autopilot_set_actuators(void)
+{
+#ifdef KILL_MOTORS
+    pprz_t mixed_commands[SERVOS_NB] = {0,0,0,0};
+#else
+    pprz_t mixed_commands[SERVOS_NB];
+    BOOZ2_SUPERVISION_RUN(mixed_commands, booz2_commands, booz2_autopilot_motors_on);
+#endif
+    actuators_set(SERVO_FRONT, mixed_commands[SERVO_FRONT]);
+    actuators_set(SERVO_BACK, mixed_commands[SERVO_BACK]);
+    actuators_set(SERVO_RIGHT, mixed_commands[SERVO_RIGHT]);
+    actuators_set(SERVO_LEFT, mixed_commands[SERVO_LEFT]);
+    actuators_commit();
+}
 
 void booz2_autopilot_set_mode(uint8_t new_autopilot_mode) {
 
