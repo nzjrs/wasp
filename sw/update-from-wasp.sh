@@ -7,14 +7,14 @@ WASP_DIR=/home/john/Programming/wasp.git/
 PPZ_SW_DIR=$PPZ_DIR/wasp/src
 WASP_SW_DIR=$WASP_DIR/sw/onboard
 
-PPZ_MESSAGES=$PPZ_SW_DIR/config/messages.xml
-WASP_MESSAGES=$WASP_SW_DIR/config/messages.xml
-
 PPZ_TOOLS_DIR=$PPZ_DIR/wasp/tools
 WASP_TOOLS_DIR=$WASP_DIR/sw/tools
 
 PPZ_MESSAGES_DOT_PY=$PPZ_TOOLS_DIR/messages.py
 WASP_MESSAGES_DOT_PY=$WASP_DIR/sw/groundstation/ppz/messages.py
+
+PPZ_SETTINGS_DOT_PY=$PPZ_TOOLS_DIR/settings.py
+WASP_SETTINGS_DOT_PY=$WASP_DIR/sw/groundstation/ppz/settings.py
 
 #make sure that we are copying code from the correct wasp branch
 BRANCH=`GIT_DIR=$PPZ_DIR/.git git symbolic-ref HEAD | cut -d / -f 3`
@@ -29,11 +29,6 @@ then
 		--exclude='/generated*' 		\
 		$PPZ_SW_DIR/ $WASP_SW_DIR/
 
-	echo "COPYING MESSAGES  FROM $PPZ_MESSAGES to $WASP_MESSAGES"
-	rsync								\
-		--verbose						\
-		$PPZ_MESSAGES $WASP_MESSAGES
-
 	echo "COPYING TOOLS FROM $PPZ_TOOLS_DIR/ to $WASP_TOOLS_DIR/"
  	rsync								\
 		--archive						\
@@ -41,12 +36,18 @@ then
 		--cvs-exclude					\
 		--exclude='*.pyc'				\
 		--exclude='messages.py'			\
+		--exclude='settings.py'			\
 		$PPZ_TOOLS_DIR/ $WASP_TOOLS_DIR/
 
 	echo "COPYING MESSAGES.py FROM $PPZ_MESSAGES_DOT_PY to $WASP_MESSAGES_DOT_PY"
 	rsync								\
 		--verbose						\
         $PPZ_MESSAGES_DOT_PY $WASP_MESSAGES_DOT_PY
+
+	echo "COPYING SETTINGS.py FROM $PPZ_SETTINGS_DOT_PY to $WASP_SETTINGS_DOT_PY"
+	rsync								\
+		--verbose						\
+        $PPZ_SETTINGS_DOT_PY $WASP_SETTINGS_DOT_PY
 
     #now commit here with the same message
     COMMIT_FILE=`mktemp`
