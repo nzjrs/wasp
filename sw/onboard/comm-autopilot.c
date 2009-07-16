@@ -5,6 +5,7 @@
 #include "imu.h"
 
 #include "booz2_battery.h"
+#include "booz2_autopilot.h"
 
 bool_t
 comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
@@ -74,7 +75,9 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
                     chan,
                     &rc_status,
                     &booz_gps_state.fix,
-                    &booz2_battery_voltage);
+                    &booz2_battery_voltage,
+                    &booz2_autopilot_in_flight,
+                    &booz2_autopilot_mode);
             break;
         default:
             ret = FALSE;
