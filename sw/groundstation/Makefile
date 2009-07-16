@@ -2,11 +2,11 @@ ME = $(shell pwd | sed -e 's/\//\\\//g')
 DFILE = "groundstation.desktop"
 
 test:
-	@PYTHONPATH=. python ppz/test/test.py
-	@PYTHONPATH=. python ppz/test/test_ui.py
+	@PYTHONPATH=. python wasp/test/test.py
+	@PYTHONPATH=. python wasp/test/test_ui.py
 
 clean:
-	@rm -rf ppz/test/html/
+	@rm -rf wasp/test/html/
 
 install:
 	@echo "Installing .desktop file in "$(HOME)"/.local/share/applications/"$(DFILE)

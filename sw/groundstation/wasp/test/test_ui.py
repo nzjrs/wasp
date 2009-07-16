@@ -3,8 +3,8 @@ import time
 import gtk
 import unittest
 
-import ppz.ui.treeview as treeview
-import ppz.ui.senders as senders
+import wasp.ui.treeview as treeview
+import wasp.ui.senders as senders
 
 #common constants to test against
 from testcommon import *

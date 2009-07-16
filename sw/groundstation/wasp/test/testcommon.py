@@ -1,4 +1,4 @@
-import ppz.messages as messages
+import wasp.messages as messages
 
 XML = """<?xml version="1.0"?>
 <messages>

@@ -7,12 +7,12 @@ import libserial
 import gs.config as config
 import gs.utils as utils
 
-import ppz
-import ppz.transport as transport
-import ppz.communication as communication
-import ppz.messages as messages
-import ppz.monitor as monitor
-import ppz.ui.treeview as treeview
+import wasp
+import wasp.transport as transport
+import wasp.communication as communication
+import wasp.messages as messages
+import wasp.monitor as monitor
+import wasp.ui.treeview as treeview
 
 DEBUG=False
 LOG = logging.getLogger('uavsource')

@@ -5,14 +5,14 @@ import gtk
 
 import os.path
 import optparse
-import ppz
-import ppz.transport as transport
-import ppz.communication as communication
-import ppz.messages as messages
-import ppz.monitor as monitor
+import wasp
+import wasp.transport as transport
+import wasp.communication as communication
+import wasp.messages as messages
+import wasp.monitor as monitor
 
-import ppz.ui.treeview as treeview
-import ppz.ui.senders as senders
+import wasp.ui.treeview as treeview
+import wasp.ui.senders as senders
 
 class UI(monitor.GObjectSerialMonitor):
     def __init__(self, messages_file, serialsender, transport, debug=False):
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     default_messages = os.path.join(thisdir, "..", "..", "onboard", "config", "messages.xml")
 
     parser = optparse.OptionParser()
-    ppz.setup_comm_optparse_options(parser, default_messages)
+    wasp.setup_comm_optparse_options(parser, default_messages)
     parser.add_option("-d", "--debug",
                     action="store_true",
                     help="print extra debugging information")

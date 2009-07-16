@@ -1,9 +1,9 @@
 import os.path
 import unittest
 
-import ppz
-import ppz.messages as messages
-import ppz.transport as transport
+import wasp
+import wasp.messages as messages
+import wasp.transport as transport
 
 #common constants to test against
 from testcommon import *
@@ -238,7 +238,7 @@ if __name__ == "__main__":
     if cov:
         cov.stop()
         cov.html_report(
-                morfs=(ppz,ppz.messages, ppz.transport),
+                morfs=(wasp,wasp.messages, wasp.transport),
                 directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "html"))
 
 

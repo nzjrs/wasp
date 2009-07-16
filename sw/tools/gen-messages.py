@@ -5,10 +5,9 @@ import xmlobject
 import gentools
 
 try:
-    import ppz.messages as messages
+    import wasp.messages as messages
 except ImportError:
     import messages
-
 
 import string
 import optparse
@@ -18,7 +17,7 @@ import sys
 
 class CField(messages.Field):
 
-    def get_ppz_type(self):
+    def get_wasp_type(self):
         if self.type == "char":
             return self.type
         else:
@@ -165,7 +164,7 @@ class MacroWriter(_CWriter):
         offset = 0
         for f in m.fields:
             print "#define MESSAGE_%s_GET_FROM_BUFFER_%s(_payload)" % (m.name, f.name),
-            _type = f.get_ppz_type()
+            _type = f.get_wasp_type()
             if f.is_array:
                 l = f.length * f.element_length
                 print "(%s *)((uint8_t*)_payload+%d)" % (_type, offset)
@@ -219,7 +218,7 @@ class FunctionWriter(_CWriter):
     def _print_pack_function(self, m):
         name = m.name.lower()
         print "static inline void message_send_%s(" % name,
-        print ", ".join(["%s %s" % (f.get_ppz_type(), f.name) for f in m.fields]), ")"
+        print ", ".join(["%s %s" % (f.get_wasp_type(), f.name) for f in m.fields]), ")"
         print "{"
         print "}"
 

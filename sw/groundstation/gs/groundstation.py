@@ -23,9 +23,9 @@ from gs.ui.flightplan import FlightPlanEditor
 from gs.ui.log import LogBuffer, LogWindow
 from gs.ui.map import Map
 
-from ppz.messages import MessagesFile
-from ppz.ui.treeview import MessageTreeView
-from ppz.ui.senders import RequestMessageSender
+from wasp.messages import MessagesFile
+from wasp.ui.treeview import MessageTreeView
+from wasp.ui.senders import RequestMessageSender
 
 LOG = logging.getLogger('groundstation')
 

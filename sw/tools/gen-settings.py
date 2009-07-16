@@ -5,7 +5,7 @@ import xmlobject
 import gentools
 
 try:
-    import ppz.settings as settings
+    import wasp.settings as settings
 except ImportError:
     import settings
 

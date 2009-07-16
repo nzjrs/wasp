@@ -4,17 +4,17 @@
 import time
 import os.path
 import optparse
-import ppz
-import ppz.transport as transport
-import ppz.communication as communication
-import ppz.messages as messages
+import wasp
+import wasp.transport as transport
+import wasp.communication as communication
+import wasp.messages as messages
 
 if __name__ == "__main__":
     thisdir = os.path.abspath(os.path.dirname(__file__))
     default_messages = os.path.join(thisdir, "..", "..", "onboard", "config", "messages.xml")
 
     parser = optparse.OptionParser()
-    ppz.setup_comm_optparse_options(parser, default_messages)
+    wasp.setup_comm_optparse_options(parser, default_messages)
 
     parser.add_option("-d", "--debug",
                     action="store_true",

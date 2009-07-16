@@ -11,10 +11,10 @@ PPZ_TOOLS_DIR=$PPZ_DIR/wasp/tools
 WASP_TOOLS_DIR=$WASP_DIR/sw/tools
 
 PPZ_MESSAGES_DOT_PY=$PPZ_TOOLS_DIR/messages.py
-WASP_MESSAGES_DOT_PY=$WASP_DIR/sw/groundstation/ppz/messages.py
+WASP_MESSAGES_DOT_PY=$WASP_DIR/sw/groundstation/wasp/messages.py
 
 PPZ_SETTINGS_DOT_PY=$PPZ_TOOLS_DIR/settings.py
-WASP_SETTINGS_DOT_PY=$WASP_DIR/sw/groundstation/ppz/settings.py
+WASP_SETTINGS_DOT_PY=$WASP_DIR/sw/groundstation/wasp/settings.py
 
 #make sure that we are copying code from the correct wasp branch
 BRANCH=`GIT_DIR=$PPZ_DIR/.git git symbolic-ref HEAD | cut -d / -f 3`
