@@ -148,7 +148,7 @@ generated/radio.h: config/radio.xml $(TOOLS)/gen-radio.py
 	@echo GENERATE $@
 	$(Q)$(TOOLS)/gen-radio.py $< > $@
 
-generated/messages.h: ../messages.xml $(TOOLS)/gen-messages.py
+generated/messages.h: config/messages.xml $(TOOLS)/gen-messages.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-messages.py --messages=$< > $@
 

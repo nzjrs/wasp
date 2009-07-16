@@ -15,7 +15,7 @@ import gs.groundstation as groundstation
 
 if __name__ == "__main__":
     thisdir = os.path.abspath(os.path.dirname(__file__))
-    default_messages = os.path.join(thisdir, "..", "messages.xml")
+    default_messages = os.path.join(thisdir, "..", "onboard", "config", "messages.xml")
 
     confdir = os.environ.get("XDG_CONFIG_HOME", os.path.join(os.environ['HOME'], ".config", "ppz"))
     if not os.path.exists(confdir):

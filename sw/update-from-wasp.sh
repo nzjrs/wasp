@@ -7,8 +7,8 @@ WASP_DIR=/home/john/Programming/wasp.git/
 PPZ_SW_DIR=$PPZ_DIR/wasp/src
 WASP_SW_DIR=$WASP_DIR/sw/onboard
 
-PPZ_MESSAGES=$PPZ_DIR/wasp/messages.xml
-WASP_MESSAGES=$WASP_DIR/sw/messages.xml
+PPZ_MESSAGES=$PPZ_SW_DIR/config/messages.xml
+WASP_MESSAGES=$WASP_SW_DIR/config/messages.xml
 
 PPZ_TOOLS_DIR=$PPZ_DIR/wasp/tools
 WASP_TOOLS_DIR=$WASP_DIR/sw/tools
