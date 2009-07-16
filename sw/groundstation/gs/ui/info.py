@@ -62,13 +62,15 @@ class InfoBox(gs.ui.GtkBuilderWidget):
             self.get_resource("connected_value").set_text("NO")
 
     def _on_status(self, msg, payload):
-        rc, gps, bv, in_flight, autopilot_mode = msg.unpack_values(payload)
+        rc, gps, bv, in_flight, motors_on, autopilot_mode = msg.unpack_values(payload)
         self.get_resource("rc_value").set_text(
                 msg.get_field_by_name("rc").get_printable_value(rc))
         self.get_resource("gps_value").set_text(
                 msg.get_field_by_name("gps").get_printable_value(gps))
         self.get_resource("in_flight_value").set_text(
                 msg.get_field_by_name("in_flight").get_printable_value(in_flight))
+        self.get_resource("motors_on_value").set_text(
+                msg.get_field_by_name("motors_on").get_printable_value(motors_on))
         self.get_resource("autopilot_mode_value").set_text(
                 msg.get_field_by_name("autopilot_mode").get_printable_value(autopilot_mode))
 
