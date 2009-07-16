@@ -77,6 +77,7 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
                     &booz_gps_state.fix,
                     &booz2_battery_voltage,
                     &booz2_autopilot_in_flight,
+                    &booz2_autopilot_motors_on,
                     &booz2_autopilot_mode);
             break;
         default:
