@@ -87,12 +87,13 @@ CFLAGS += -Wstrict-prototypes -Wmissing-declarations
 CFLAGS += -Wmissing-prototypes -Wnested-externs 
 CFLAGS += -std=gnu99
 CFLAGS += -fshort-enums
+CFLAGS += -ffunction-sections
 
 INCLUDE_BUILD_INFO ?= 1
 CFLAGS += -DINCLUDE_BUILD_INFO=$(INCLUDE_BUILD_INFO)
 
 # Linker flags.
-LDFLAGS = -n -nostartfiles -Wl,-Map=$(OBJDIR)/$(TARGET).map,--cref
+LDFLAGS = -n -nostartfiles -Wl,-Map=$(OBJDIR)/$(TARGET).map,--cref,-gc-sections
 LDFLAGS += -lc
 LDFLAGS += -lm
 LDFLAGS += -lc -lgcc 
