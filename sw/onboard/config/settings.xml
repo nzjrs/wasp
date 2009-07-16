@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<settings>
+  <section name="TESTSECTION">
+    <setting name="TEST1" type="uint8" value="123"/>
+    <setting name="TEST2" type="uint8"/>
+  </section>
+  <section name="TESTSECTION2">
+    <setting name="TEST1" type="uint8" value="123"/>
+    <setting name="TEST2" type="uint8"/>
+    <setting name="IMU_MAG_X_SENS" value="22.008352" integer="16"/>
+    <setting name="IMU_MAG_Y_SENS" value="-21.79885" integer="16"/>
+    <setting name="IMU_MAG_Z_SENS" value="-14.675745" integer="16"/>
+  </section>
+</settings>
+

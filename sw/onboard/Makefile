@@ -141,7 +141,7 @@ upload: $(OBJDIR)/$(TARGET).elf bootloader
 	$(Q)$(LPC21IAP)  $(OBJDIR)/$(TARGET).elf
 
 # All generated headers
-generated: generated/radio.h generated/build.h generated/messages.h
+generated: generated/radio.h generated/build.h generated/messages.h generated/settings.h
 
 # Radio header
 generated/radio.h: config/radio.xml $(TOOLS)/gen-radio.py
@@ -151,6 +151,10 @@ generated/radio.h: config/radio.xml $(TOOLS)/gen-radio.py
 generated/messages.h: ../messages.xml $(TOOLS)/gen-messages.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-messages.py --messages=$< > $@
+
+generated/settings.h: config/settings.xml $(TOOLS)/gen-settings.py
+	@echo GENERATE $@
+	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-settings.py --settings=$< > $@
 
 generated/build.h: $(SRCARM) $(TOOLS)/gen-build-info.py
 	@echo GENERATE $@
