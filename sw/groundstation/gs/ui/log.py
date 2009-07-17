@@ -60,7 +60,8 @@ class LogBuffer(gtk.TextBuffer):
         try:
             try:
                 level = msg[1:10].strip()
-                self.insert_with_tags_by_name(self.get_end_iter(), msg, level)
+                #need to str, it explodes with unicode
+                self.insert_with_tags_by_name(self.get_end_iter(), str(msg), str(level))
             except IndexError:
                 self.insert_with_tags_by_name(self.get_end_iter(), msg, 'INFO')
             overflow = self.get_line_count() - self.MAX_LINE_COUNT
