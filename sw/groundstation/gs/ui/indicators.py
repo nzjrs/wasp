@@ -1,4 +1,4 @@
-import glib
+import gobject
 import gtk
 
 import gs.ui
@@ -65,7 +65,7 @@ class FadingColorBox(ColorBox):
         self._fade_time = fade_time
 
         tick = 1000/self.FPS
-        self._timout = glib.timeout_add(tick, self._animate)
+        self._timout = gobject.timeout_add(tick, self._animate)
         self._animating = False
 
         #caclulate the fade increment

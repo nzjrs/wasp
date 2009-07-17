@@ -17,7 +17,7 @@ if __name__ == "__main__":
     thisdir = os.path.abspath(os.path.dirname(__file__))
     default_messages = os.path.join(thisdir, "..", "onboard", "config", "messages.xml")
 
-    confdir = os.environ.get("XDG_CONFIG_HOME", os.path.join(os.environ['HOME'], ".config", "wasp"))
+    confdir = os.environ.get("XDG_CONFIG_HOME", os.path.join(os.environ.get("HOME","."), ".config", "wasp"))
     if not os.path.exists(confdir):
         os.makedirs(confdir)
     prefs = os.path.join(confdir, "groundstation.ini")

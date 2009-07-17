@@ -7,6 +7,7 @@ test:
 
 clean:
 	@rm -rf wasp/test/html/
+	@find . -name '*.pyc' -exec rm -f {} \;
 
 install:
 	@echo "Installing .desktop file in "$(HOME)"/.local/share/applications/"$(DFILE)
