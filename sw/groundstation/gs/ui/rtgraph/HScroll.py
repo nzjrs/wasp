@@ -2,7 +2,13 @@ from __future__ import division
 
 from Graph import PolledGraph
 import Tweak
-import gtk, os
+import pango, gtk, os
+
+class _Label:
+    def __init__(self, context, value, y):
+        self.layout = pango.Layout(context)
+        self.layout.set_text("%.1f" % value)
+        self.y = y
 
 class HScrollGraph(PolledGraph):
     """A graph that shows time on the horizontal axis, multiple channels
@@ -20,10 +26,12 @@ class HScrollGraph(PolledGraph):
                  pollInterval = 10,
                  bgColor      = None,
                  gridColor    = None,
+                 axisLabel    = False
                  ):
         PolledGraph.__init__(self, size, channels, pollInterval, bgColor, gridColor)
         self.gridSize = gridSize
         self.scrollRate = scrollRate
+        self.axisLabel = axisLabel
         self.gridPhase = 0.0       # Number of pixels we've scrolled, modulo gridSize
 
         # Normally we copy from backbuffer to backbuffer when scrolling.
@@ -45,25 +53,40 @@ class HScrollGraph(PolledGraph):
 
     def drawBackground(self):
         """Draw our grid pixmap and backing store"""
-        # Create a grid pixmap as wide as our grid and as high as our window,
-        # used to quickly initialize new areas of the graph with our grid pattern.
-        self.gridPixmap = gtk.gdk.Pixmap(self.window, self.gridSize, self.height)
-        self.initGrid(self.gridPixmap, self.gridSize, self.height)
-
+        self.initGrid(self.gridSize, self.height)
         # Initialize the backing store
         self.drawGrid(0, self.width)
 
-    def initGrid(self, drawable, width, height):
+        if self.axisLabel:
+            self.width -= 20
+
+            steps = self.height // self.gridSize
+            drange = (self.range[1] - self.range[0]) / float(steps)
+
+            pc = self.get_pango_context()
+            labels = []
+            for y in range(0, self.height, self.gridSize):
+                labels.append( _Label(pc, float(y), y) )
+
+            self.labels = labels
+        else:
+            self.labels = []
+
+    def initGrid(self, width, height):
         """Draw our grid on the given drawable"""
-        drawable.draw_rectangle(self.bgGc, True, 0, 0, width, height)
+        # Create a grid pixmap as wide as our grid and as high as our window,
+        # used to quickly initialize new areas of the graph with our grid pattern.
+        self.gridPixmap = gtk.gdk.Pixmap(self.window, self.gridSize, self.height)
+
+        self.gridPixmap.draw_rectangle(self.bgGc, True, 0, 0, width, height)
 
         # Horizontal grid lines
         for y in range(0, height, self.gridSize):
-            drawable.draw_rectangle(self.gridGc, True, 0, y, width, 1)
+            self.gridPixmap.draw_rectangle(self.gridGc, True, 0, y, width, 1)
 
         # Vertical grid lines
         for x in range(0, width, self.gridSize):
-            drawable.draw_rectangle(self.gridGc, True, x, 0, 1, height)
+            self.gridPixmap.draw_rectangle(self.gridGc, True, x, 0, 1, height)
 
     def drawGrid(self, x, width):
         """Draw grid lines on our backing store, using the current gridPhase,
@@ -138,8 +161,13 @@ class HScrollGraph(PolledGraph):
                 channel.hasChanged(self)
                 self.graphChannel(channel)
 
-            # Schedule an expose event to blit the whole backbuffer to the screen
-            self.queue_draw_area(0, 0, self.width, self.height)
+            # Draw the axis labels into the graph
+            for l in self.labels:
+                self.backingPixmap.draw_layout(gc, self.width+1, l.y, l.layout)
+
+            # Schedule an expose event to blit the changed part of the 
+            # backbuffer to the screen
+            self.queue_draw_area(newPixels, 0, self.width, self.height)
 
         else:
             # Even if we're not scrolling, we should update the graph if the channel
@@ -172,12 +200,14 @@ class HScrollLineGraph(HScrollGraph):
                  scrollRate   = 50,
                  range        = (0,1),
                  autoScale    = False,
+                 axisLabel    = False,
                  pollInterval = 10,
                  bgColor      = None,
                  gridColor    = None,
                  ):
         HScrollGraph.__init__(self, size, channels, gridSize,
-                              scrollRate, pollInterval, bgColor, gridColor)
+                              scrollRate, pollInterval, bgColor, 
+                              gridColor, axisLabel)
         self.autoScale = autoScale
         self.range = list(range)
         self.penVectors = {}
