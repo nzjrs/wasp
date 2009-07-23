@@ -38,18 +38,34 @@ class DummySerialCommunication(gobject.GObject):
         self._transport = transport
         self._header = header
 
+        self._sendcache = {}
+
         #Write messages to the pipe, so that it is read and processed by
         #the groundstation
         #
-        #TIME at 0.1hz
+        #TIME at 1hz
         self._t = 0
         gobject.timeout_add(int(1000/0.1), self._do_time)
-        #STATUS at 0.5hz
-        gobject.timeout_add(int(1000/0.5), self._do_status)
+        #STATUS, COMM_STATUS at 0.5hz
+        self._generic_send(int(1000/0.5), "STATUS")
+        self._generic_send(int(1000/0.5), "COMM_STATUS")
         #IMU at 10hz
-        gobject.timeout_add(int(1000/10), self._do_imu)
+        self._generic_send(int(1000/10), "IMU_ACCEL_RAW")
+        self._generic_send(int(1000/10), "IMU_MAG_RAW")
+        self._generic_send(int(1000/10), "IMU_GYRO_RAW")
         #AHRS at 10hz
         gobject.timeout_add(int(1000/10), self._do_ahrs)
+
+    def _do_generic_send(self, msgname):
+        msg, vals = self._sendcache[msgname]
+        self._send(msg, *vals)
+        return True
+
+    def _generic_send(self, freq, msgname):
+        msg = self._messages.get_message_by_name(msgname)
+        if msg:
+            self._sendcache[msgname] = (msg, msg.get_default_values())
+            gobject.timeout_add(freq, self._do_generic_send, msgname)
 
     def _send(self, msg, *vals):
         data = self._transport.pack_message_with_values(
@@ -63,17 +79,6 @@ class DummySerialCommunication(gobject.GObject):
         self._t += 10
         msg = self._messages.get_message_by_name("TIME")
         return self._send(msg, self._t)
-
-    def _do_status(self):
-        msg = self._messages.get_message_by_name("STATUS")
-        return self._send(msg, 0, 0, 0, 0, 0, 0)
-
-    def _do_imu(self):
-        msg = self._messages.get_message_by_name("IMU_ACCEL_RAW")
-        self._send(msg, 1000, 2000, 3000)
-        msg = self._messages.get_message_by_name("IMU_GYRO_RAW")
-        self._send(msg, 4000, 5000, 6000)
-        return True
 
     def _do_ahrs(self):
         return True

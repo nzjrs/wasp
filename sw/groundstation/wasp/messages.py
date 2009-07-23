@@ -238,6 +238,9 @@ class PyMessage(Message):
         else:
             return ""
 
+    def get_default_values(self):
+        return [ f.get_default_value() for f in self.fields ]
+
 class MessagesFile:
     def __init__(self, **kwargs):
         self._debug = kwargs.get("debug", False)
