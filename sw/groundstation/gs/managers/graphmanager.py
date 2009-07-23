@@ -156,16 +156,18 @@ class GraphManager(config.ConfigurableIface):
 
     def add_graph(self, msg, field, adjustable=True):
         name = "%s:%s" % (msg.name, field.name)
-        LOG.info("Adding graph: %s" % name)
 
-        gh = _GraphHolder(
-                graph.Graph(self._source, msg, field),
-                name,
-                adjustable,
-                self._on_pause,
-                self._on_print,
-                self._on_remove)
+        if name not in self._graphs:
+            LOG.info("Adding graph: %s" % name)
 
-        self._box.pack_start(gh)
-        self._graphs[name] = gh
+            gh = _GraphHolder(
+                    graph.Graph(self._source, msg, field),
+                    name,
+                    adjustable,
+                    self._on_pause,
+                    self._on_print,
+                    self._on_remove)
+
+            self._box.pack_start(gh)
+            self._graphs[name] = gh
 
