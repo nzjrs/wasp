@@ -60,17 +60,19 @@ class HScrollGraph(PolledGraph):
         if self.axisLabel:
             self.width -= 20
 
-            steps = self.height // self.gridSize
-            drange = (self.range[1] - self.range[0]) / float(steps)
+    def drawAxis(self):
+        """Draw axis labels"""
+        if self.axisLabel:
 
             pc = self.get_pango_context()
             labels = []
             for y in range(0, self.height, self.gridSize):
                 labels.append( _Label(pc, float(y), y) )
 
-            self.labels = labels
-        else:
-            self.labels = []
+            # Draw the axis labels into the graph
+            for l in labels:
+                self.backingPixmap.draw_layout(self.gc, self.width+1, l.y, l.layout)
+
 
     def initGrid(self, width, height):
         """Draw our grid on the given drawable"""
@@ -161,10 +163,6 @@ class HScrollGraph(PolledGraph):
                 channel.hasChanged(self)
                 self.graphChannel(channel)
 
-            # Draw the axis labels into the graph
-            for l in self.labels:
-                self.backingPixmap.draw_layout(gc, self.width+1, l.y, l.layout)
-
             # Schedule an expose event to blit the changed part of the 
             # backbuffer to the screen
             self.queue_draw_area(newPixels, 0, self.width, self.height)
@@ -212,19 +210,23 @@ class HScrollLineGraph(HScrollGraph):
         self.range = list(range)
         self.penVectors = {}
 
+    def rescale(self, val, idx):
+        self.range[idx] = val
+
+        self.drawBackground()
+        self.drawAxis()
+#        self.drawAxis()
+        self.resized()
+
     def graphChannel(self, channel):
         value = channel.getValue()
         if value is None:
             return
 
         if self.autoScale and value > self.range[1]:
-            self.range[1] = value
-            self.resized()
-            return
+            return self.rescale(value, 1)
         if self.autoScale and value < self.range[0]:
-            self.range[0] = value
-            self.resized()
-            return
+            return self.rescale(value, 0)
 
         # Scale the channel value to match a range of (0,1)
         scaled = (value - self.range[0]) / (self.range[1] - self.range[0])

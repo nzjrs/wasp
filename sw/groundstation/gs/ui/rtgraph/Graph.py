@@ -51,17 +51,22 @@ class Graph(gtk.DrawingArea):
             # Default gtk 'mid' color
             self.gridGc = self.get_style().mid_gc[gtk.STATE_NORMAL]
 
+        self.gc = self.get_style().fg_gc[gtk.STATE_NORMAL]
+
     def gtkConfigureEvent(self, widget=None, event=None):
         """Called when the widget is created or resized, we use it
            to create an appropriately sized backing store pixmap and
            grid pixmap.
            """
         x, y, self.width, self.height = self.get_allocation()
+
+
         self.initStyle()
 
         # Make the backing pixmap the size of our whole widget
         self.backingPixmap = gtk.gdk.Pixmap(self.window, self.width, self.height)
         self.drawBackground()
+        self.drawAxis()
 
         # Any extra resize handling the subclass needs
         self.resized()
@@ -86,6 +91,10 @@ class Graph(gtk.DrawingArea):
 
     def drawBackground(self):
         """Hook for subclasses to initialize backingPixmap after a resize"""
+        pass
+
+    def drawAxis(self):
+        """Hook for subclasses to draw axis labels after a rescale or resize"""
         pass
 
     def resized(self):
