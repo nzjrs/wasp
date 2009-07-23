@@ -7,6 +7,93 @@ import gs.config as config
 
 LOG = logging.getLogger('graphmanager')
 
+class _GraphRange(gtk.VBox):
+    def __init__(self, graph):
+        gtk.VBox.__init__(self)
+
+        graph.connect("range-changed", self._on_range_changed)
+
+        mal = gtk.Label("Max:")
+        self.maxadj = gtk.Adjustment()
+        self._update_adjustment(self.maxadj)
+        masb = gtk.SpinButton(self.maxadj)
+        masb.props.digits = 1
+
+        mil = gtk.Label("Min:")
+        self.minadj = gtk.Adjustment()
+        self._update_adjustment(self.minadj)
+        misb = gtk.SpinButton(self.minadj)
+        misb.props.digits = 1
+
+        self.pack_start(mal, False)
+        self.pack_start(masb, False)
+        self.pack_start(mil, False)
+        self.pack_start(misb, False)
+
+    def _update_adjustment(self, adj, value=0.0, lower=0.0, upper=0.0):
+        adj.lower = lower
+        adj.page_increment = 1.0
+        adj.step_increment = 0.1
+        adj.upper = upper
+        adj.value = value
+
+    def _on_range_changed(self, graph, min_, max_):
+        self._update_adjustment(self.maxadj, value=max_, lower=min_, upper=(max_*1.5))
+        self._update_adjustment(self.minadj, value=min_, lower=(min_*1.5), upper=max_)
+
+    def _on_max_spinbutton_changed(self, adj, graph):
+        pass
+
+class _GraphHolder(gtk.HBox):
+    """
+    Composite widget holding a rtgraph and controls
+
+    graph is a hbox:
+
+    frame      |
+     [\___  ]  | vertical buttons (pause, remove, etc)
+     [    \ ]  | range widgets
+    """
+
+    def __init__(self, g, name, adjustable, on_pause, on_print, on_remove):
+        gtk.HBox.__init__(self, spacing=5)
+
+        frame = gtk.Frame(name)
+
+        vb = gtk.VBox()
+        vb.pack_start(g, True, True)
+
+        tweak = None
+        if adjustable:
+            tweak = g.get_scroll_rate_widget()
+            vb.pack_start(tweak.widget, False, False)
+
+        frame.add(vb)
+        self.pack_start(frame)
+
+        vb = gtk.VBox()
+
+        bbox = gtk.VButtonBox()
+        vb.pack_start(bbox, True, True)
+
+        pa = gtk.Button(stock=gtk.STOCK_MEDIA_PAUSE)
+        pa.connect("clicked", on_pause, tweak)
+        pr = gtk.Button(stock=gtk.STOCK_PRINT)
+        pr.connect("clicked", on_print, g, name)
+        rm = gtk.Button(stock=gtk.STOCK_REMOVE)
+        rm.connect("clicked", on_remove, name)
+        bbox.pack_start(pa, False, False)
+        bbox.pack_start(pr, False, False)
+        bbox.pack_start(rm, False, False)
+        bbox.set_layout(gtk.BUTTONBOX_END)
+
+        if adjustable:
+            r = _GraphRange(g)
+            vb.pack_start(r, False, False)
+
+        self.pack_start(vb, False, False)
+        self.show_all()
+
 class GraphManager(config.ConfigurableIface):
 
     CONFIG_SECTION = "GRAPHMANAGER"
@@ -18,7 +105,6 @@ class GraphManager(config.ConfigurableIface):
         self._box = box
         self._main_window = main_window
         self._graphs = {}
-        self._hboxes = {}
 
     def _on_pause(self, sender, tweakScrollRate):
         if tweakScrollRate:
@@ -26,10 +112,9 @@ class GraphManager(config.ConfigurableIface):
             tweakScrollRate.refresh()
 
     def _on_remove(self, sender, name):
+        gh = self._graphs[name]
+        self._box.remove(gh)
         del(self._graphs[name])
-        hb = self._hboxes[name]
-        self._box.remove(hb)
-        del(self._hboxes[name])
 
     def _on_print(self, sender, graph, name):
         def on_print_page(operation, context, page_nr):
@@ -71,46 +156,16 @@ class GraphManager(config.ConfigurableIface):
 
     def add_graph(self, msg, field, adjustable=True):
         name = "%s:%s" % (msg.name, field.name)
-
         LOG.info("Adding graph: %s" % name)
-        #graph is a 
-        # hbox
-        #   frame | vertical buttons (pause, remove, etc)
-        hbox = gtk.HBox()
-        hbox.set_spacing(5)
 
-        g = graph.Graph(self._source, msg, field)
-        frame = gtk.Frame(name)
+        gh = _GraphHolder(
+                graph.Graph(self._source, msg, field),
+                name,
+                adjustable,
+                self._on_pause,
+                self._on_print,
+                self._on_remove)
 
-        vb = gtk.VBox()
-        vb.pack_start(g, True, True)
-
-        tweak = None
-        if adjustable:
-            tweak = g.get_scroll_rate_widget()
-            vb.pack_start(tweak.widget, False, False)
-
-        frame.add(vb)
-        hbox.pack_start(frame)
-
-        bbox = gtk.VButtonBox()
-        pa = gtk.Button(stock=gtk.STOCK_MEDIA_PAUSE)
-        pa.connect("clicked", self._on_pause, tweak)
-        pr = gtk.Button(stock=gtk.STOCK_PRINT)
-        pr.connect("clicked", self._on_print, g, name)
-        rm = gtk.Button(stock=gtk.STOCK_REMOVE)
-        rm.connect("clicked", self._on_remove, name)
-        bbox.pack_start(pa, False, False)
-        bbox.pack_start(pr, False, False)
-        bbox.pack_start(rm, False, False)
-
-        bbox.set_layout(gtk.BUTTONBOX_END)
-        hbox.pack_start(bbox, False, False)
-
-        self._box.pack_start(hbox)
-        self._graphs[name] = g
-        self._hboxes[name] = hbox
-
-        hbox.show_all()
-
+        self._box.pack_start(gh)
+        self._graphs[name] = gh
 

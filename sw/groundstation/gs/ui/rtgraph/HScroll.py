@@ -241,8 +241,18 @@ class HScrollLineGraph(HScrollGraph):
         self.range = list(range)
         self.penVectors = {}
 
+        self.emit("range-changed", *self.range)
+
+    def adjustRangeMinimum(self, val):
+        self.rescale(val, 0)
+
+    def adjustRangeMaximum(self, val):
+        self.rescale(val, 1)
+
     def rescale(self, val, idx):
         self.range[idx] = val
+
+        self.emit("range-changed", *self.range)
 
         self.drawBackground()
         self.drawAxis()

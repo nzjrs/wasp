@@ -4,6 +4,13 @@ class Graph(gtk.DrawingArea):
     """An abstract animated graph widget. Provides double-buffering,
        basic event handlers, and a common method for dealing with channels.
        """
+
+    __gsignals__ = {
+        "range-changed" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+            gobject.TYPE_FLOAT,         #range min
+            gobject.TYPE_FLOAT]),       #range max
+        }
+
     def __init__(self,
                  size         = None,
                  channels     = None,
