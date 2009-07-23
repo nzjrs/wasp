@@ -76,7 +76,6 @@ class Graph(gtk.DrawingArea):
 
     def drawIntoCairoContext(self, context, name="", offset_x=20, offset_y=20):
         """Draws the backing pixmap into the cairo context (for printing)"""
-        #w,h = self.backingPixmap.get_size()
         context.set_source_pixmap(self.backingPixmap, offset_x, offset_y)
         context.paint()
 
