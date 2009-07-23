@@ -24,7 +24,7 @@ class Graph(gtk.DrawingArea):
 
         # Until we've been mapped onto the screen and configured by gtk,
         # our width and height are undefined
-        self.width = self.height = None
+        self.width = self.gheight = None
 
     def makeColorGC(self, color):
         """Make a new GC with the given (red, green, blue) color
@@ -59,6 +59,9 @@ class Graph(gtk.DrawingArea):
            grid pixmap.
            """
         x, y, self.width, self.height = self.get_allocation()
+
+        self.gwidth = self.width
+        self.gheight = self.height
 
 
         self.initStyle()

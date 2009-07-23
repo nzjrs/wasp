@@ -7,8 +7,12 @@ import pango, gtk, os
 class _Label:
     def __init__(self, context, value, y):
         self.layout = pango.Layout(context)
-        self.layout.set_text("%.1f" % value)
-        self.y = y
+        self.set_value(value)
+        self.y = y - (self.height // 2)
+
+    def set_value(self, value):
+        self.layout.set_text("%+2.2f" % value)
+        self.width, self.height = self.layout.get_pixel_size()
 
 class HScrollGraph(PolledGraph):
     """A graph that shows time on the horizontal axis, multiple channels
@@ -51,34 +55,59 @@ class HScrollGraph(PolledGraph):
            """
         pass
 
+    def clearAxis(self):
+        #clear right hand side rectangle, if any
+        if self.gwidth != self.width:
+            self.backingPixmap.draw_rectangle(self.bgGc, True, self.gwidth, 0, self.width - self.gwidth, self.height)
+
+        #clear bottom rectangle, if any
+        if self.gheight != self.height:
+            self.backingPixmap.draw_rectangle(self.bgGc, True, 0, self.gheight, self.width, self.height)
+
     def drawBackground(self):
         """Draw our grid pixmap and backing store"""
-        self.initGrid(self.gridSize, self.height)
-        # Initialize the backing store
-        self.drawGrid(0, self.width)
-
         if self.axisLabel:
-            self.width -= 20
+
+            #guess a default text width
+            lw = _Label(self.get_pango_context(), 0.0, 0).width
+
+            self.gwidth = self.width - (lw + 1)
+            self.gheight = self.height - 0
+
+        self.initGrid(self.gridSize, self.gheight)
+        # Initialize the backing store
+        self.drawGrid(0, self.gwidth)
 
     def drawAxis(self):
         """Draw axis labels"""
         if self.axisLabel:
+            self.clearAxis()
 
             pc = self.get_pango_context()
-            labels = []
-            for y in range(0, self.height, self.gridSize):
-                labels.append( _Label(pc, float(y), y) )
+
+            top = self.range[1]
+            nsteps = self.gheight // self.gridSize
+            step = (self.range[1] - self.range[0]) / float(nsteps)
+
+            #skip don't label the top grid
+            grids = range(self.gridSize, self.gheight, self.gridSize)
+            value = top - step
 
             # Draw the axis labels into the graph
-            for l in labels:
-                self.backingPixmap.draw_layout(self.gc, self.width+1, l.y, l.layout)
+            labels = []
+            for y in grids:
+                l = _Label(pc, value, y)
+                self.backingPixmap.draw_layout(self.gc, self.gwidth+1, l.y, l.layout)
+                value -= step
 
+            # blit the labels to the screen
+            self.queue_draw_area(self.gwidth, 0, self.width, self.gheight)
 
     def initGrid(self, width, height):
         """Draw our grid on the given drawable"""
         # Create a grid pixmap as wide as our grid and as high as our window,
         # used to quickly initialize new areas of the graph with our grid pattern.
-        self.gridPixmap = gtk.gdk.Pixmap(self.window, self.gridSize, self.height)
+        self.gridPixmap = gtk.gdk.Pixmap(self.window, self.gridSize, self.gheight)
 
         self.gridPixmap.draw_rectangle(self.bgGc, True, 0, 0, width, height)
 
@@ -92,7 +121,7 @@ class HScrollGraph(PolledGraph):
 
     def drawGrid(self, x, width):
         """Draw grid lines on our backing store, using the current gridPhase,
-           to the rectangle (x, 0, width, self.height)
+           to the rectangle (x, 0, width, self.gheight)
            """
         srcOffset = (x + int(self.gridPhase)) % self.gridSize
         gc = self.get_style().fg_gc[gtk.STATE_NORMAL]
@@ -103,7 +132,7 @@ class HScrollGraph(PolledGraph):
             if columnWidth > width:
                 columnWidth = width
             self.backingPixmap.draw_drawable(gc, self.gridPixmap, srcOffset, 0, x, 0,
-                                             columnWidth, self.height)
+                                             columnWidth, self.gheight)
             x += columnWidth
             width -= columnWidth
 
@@ -113,7 +142,7 @@ class HScrollGraph(PolledGraph):
             if columnWidth > width:
                 columnWidth = width
             self.backingPixmap.draw_drawable(gc, self.gridPixmap, 0, 0, x, 0,
-                                             columnWidth, self.height)
+                                             columnWidth, self.gheight)
             x += self.gridSize
             width -= self.gridSize
 
@@ -121,7 +150,7 @@ class HScrollGraph(PolledGraph):
         """Update the graph, given a time delta from the last call to this function"""
 
         # Can't update if we aren't mapped
-        if not (self.width and self.height):
+        if not (self.gwidth and self.gheight):
             return
 
         # Calculate the new gridPhase and the number of freshly exposed pixels,
@@ -141,16 +170,16 @@ class HScrollGraph(PolledGraph):
                 # We can't safely copy from and to the same pixmap, copy this
                 # via a temporary off-screen buffer.
                 self.tempPixmap.draw_drawable(gc, self.backingPixmap, newPixels, 0, 0, 0,
-                                              self.width - newPixels, self.height)
+                                              self.gwidth - newPixels, self.gheight)
                 self.backingPixmap.draw_drawable(gc, self.tempPixmap, 0, 0, 0, 0,
-                                                 self.width - newPixels, self.height)
+                                                 self.gwidth - newPixels, self.gheight)
             else:
                 # Copy directly from and to the backbuffer
                 self.backingPixmap.draw_drawable(gc, self.backingPixmap, newPixels, 0, 0, 0,
-                                                 self.width - newPixels, self.height)
+                                                 self.gwidth - newPixels, self.gheight)
 
             # Draw a blank grid in the new area
-            self.drawGrid(self.width - newPixels, newPixels)
+            self.drawGrid(self.gwidth - newPixels, newPixels)
 
             # Let subclasses update their positions to account for our scrolling
             self.exposedPixels(newPixels)
@@ -165,7 +194,7 @@ class HScrollGraph(PolledGraph):
 
             # Schedule an expose event to blit the changed part of the 
             # backbuffer to the screen
-            self.queue_draw_area(newPixels, 0, self.width, self.height)
+            self.queue_draw_area(newPixels, 0, self.gwidth, self.gheight)
 
         else:
             # Even if we're not scrolling, we should update the graph if the channel
@@ -174,7 +203,7 @@ class HScrollGraph(PolledGraph):
             for channel in self.channels:
                 if channel.hasChanged(self):
                     self.graphChannel(channel)
-            self.queue_draw_area(self.width-1, 0, 1, self.height)
+            self.queue_draw_area(self.gwidth-1, 0, 1, self.gheight)
 
     def exposedPixels(self, nPixels):
         """Called when the graph scrolls, with the number of pixels it has scrolled by.
@@ -215,7 +244,6 @@ class HScrollLineGraph(HScrollGraph):
 
         self.drawBackground()
         self.drawAxis()
-#        self.drawAxis()
         self.resized()
 
     def graphChannel(self, channel):
@@ -233,7 +261,7 @@ class HScrollLineGraph(HScrollGraph):
         scaled = min(1.5, max(-0.5, scaled))
 
         # Calculate a current pen position, always at the right side of the graph
-        penVector = (self.width-1, int((self.height-1) * (1-scaled)))
+        penVector = (self.gwidth-1, int((self.gheight-1) * (1-scaled)))
 
         # If we have both a new pen vector and an old pen vector, we can draw a line
         if self.penVectors.has_key(channel):
@@ -275,5 +303,5 @@ class HScrollAreaGraph(HScrollLineGraph):
         self.backingPixmap.draw_polygon(channel.getGC(self), True, (
             (oldPenVector[0], oldPenVector[1]),
             (penVector[0], penVector[1]),
-            (penVector[0], self.height-1),
-            (oldPenVector[0], self.height-1)))
+            (penVector[0], self.gheight-1),
+            (oldPenVector[0], self.gheight-1)))

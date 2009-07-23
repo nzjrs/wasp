@@ -19,7 +19,7 @@ class StaticGridGraph(PolledGraph):
            so the grid can be quickly redrawn for each frame.
            """
         self.gridPixmap = gtk.gdk.Pixmap(self.window, self.width, self.height)
-        self.initGrid(self.gridPixmap, self.width, self.height)
+        self.initGrid(self.gridPixmap, self.gwidth, self.gheight)
         self.blitGrid()
 
     def initGrid(self, drawable, width, height):
@@ -30,7 +30,7 @@ class StaticGridGraph(PolledGraph):
 
     def blitGrid(self):
         """Blit our grid pixmap to the backbuffer, erasing current channel lines"""
-        self.backingPixmap.draw_drawable(self.bgGc, self.gridPixmap, 0,0,0,0, self.width, self.height)
+        self.backingPixmap.draw_drawable(self.bgGc, self.gridPixmap, 0,0,0,0, self.gwidth, self.gheight)
 
     def integrate(self, dt):
         """Updates any channels that have changed"""
@@ -40,7 +40,7 @@ class StaticGridGraph(PolledGraph):
             self.blitGrid()
             for channel in changedChannels:
                 self.graphChannel(channel)
-            self.queue_draw_area(0, 0, self.width, self.height)
+            self.queue_draw_area(0, 0, self.gwidth, self.gheight)
             self.graphedChannels = list(self.channels)
 
     def resized(self):

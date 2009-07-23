@@ -49,8 +49,8 @@ class IsometricVectorGraph(StaticGridGraph):
         drawable.draw_rectangle(self.bgGc, True, 0, 0, width, height)
 
         # Determine the center of the graph and a reasonable size for it
-        self.center = (self.width * 0.5, self.height * 0.5)
-        self.scale = min(self.width, self.height) * 0.45
+        self.center = (self.gwidth * 0.5, self.gheight * 0.5)
+        self.scale = min(self.gwidth, self.gheight) * 0.45
 
         # Draw x, y, and z axes
         origin = self.mapVector((0,0,0))

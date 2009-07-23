@@ -36,7 +36,7 @@ class PolarVectorGraph(StaticGridGraph):
 
         # Calculate a center and radius for our new size
         self.pixelRadius = min(width, height)/2 - 4
-        self.center = (self.width/2, self.height/2)
+        self.center = (self.gwidth/2, self.gheight/2)
 
         for radius in self.radiusGrids:
             # Draw a circle at this radius.
