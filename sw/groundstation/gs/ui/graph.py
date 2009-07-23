@@ -37,6 +37,7 @@ class Graph(rtgraph.HScrollLineGraph):
                     size=(width,height),
                     range=(ymin,ymax),
                     autoScale=True,
+                    axisLabel=True,
                     channels=[FieldChannel(msg, field)]
         )
         source.register_interest(self._on_msg, 0, msg.name)

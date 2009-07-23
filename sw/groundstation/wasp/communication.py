@@ -66,7 +66,7 @@ class DummySerialCommunication(gobject.GObject):
 
     def _do_status(self):
         msg = self._messages.get_message_by_name("STATUS")
-        return self._send(msg, 0, 0)
+        return self._send(msg, 0, 0, 0, 0, 0, 0)
 
     def _do_imu(self):
         msg = self._messages.get_message_by_name("IMU_ACCEL_RAW")

@@ -67,10 +67,10 @@ class HScrollGraph(PolledGraph):
     def drawBackground(self):
         """Draw our grid pixmap and backing store"""
         if self.axisLabel:
-
             #guess a default text width
             lw = _Label(self.get_pango_context(), 0.0, 0).width
-
+            #restrict the graph width to a subregion of the total pixmap. The
+            #axis labels are now drawn on the right of this
             self.gwidth = self.width - (lw + 1)
             self.gheight = self.height - 0
 
@@ -87,21 +87,23 @@ class HScrollGraph(PolledGraph):
 
             top = self.range[1]
             nsteps = self.gheight // self.gridSize
-            step = (self.range[1] - self.range[0]) / float(nsteps)
 
-            #skip don't label the top grid
-            grids = range(self.gridSize, self.gheight, self.gridSize)
-            value = top - step
+            if nsteps:
+                step = (self.range[1] - self.range[0]) / float(nsteps)
 
-            # Draw the axis labels into the graph
-            labels = []
-            for y in grids:
-                l = _Label(pc, value, y)
-                self.backingPixmap.draw_layout(self.gc, self.gwidth+1, l.y, l.layout)
-                value -= step
+                #skip don't label the top grid
+                grids = range(self.gridSize, self.gheight, self.gridSize)
+                value = top - step
 
-            # blit the labels to the screen
-            self.queue_draw_area(self.gwidth, 0, self.width, self.gheight)
+                # Draw the axis labels into the graph
+                labels = []
+                for y in grids:
+                    l = _Label(pc, value, y)
+                    self.backingPixmap.draw_layout(self.gc, self.gwidth+1, l.y, l.layout)
+                    value -= step
+
+                # blit the labels to the screen
+                self.queue_draw_area(self.gwidth, 0, self.width, self.gheight)
 
     def initGrid(self, width, height):
         """Draw our grid on the given drawable"""
@@ -150,7 +152,7 @@ class HScrollGraph(PolledGraph):
         """Update the graph, given a time delta from the last call to this function"""
 
         # Can't update if we aren't mapped
-        if not (self.gwidth and self.gheight):
+        if not (self.width and self.height):
             return
 
         # Calculate the new gridPhase and the number of freshly exposed pixels,

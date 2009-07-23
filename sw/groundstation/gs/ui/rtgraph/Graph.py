@@ -24,7 +24,7 @@ class Graph(gtk.DrawingArea):
 
         # Until we've been mapped onto the screen and configured by gtk,
         # our width and height are undefined
-        self.width = self.gheight = None
+        self.width = self.height = None
 
     def makeColorGC(self, color):
         """Make a new GC with the given (red, green, blue) color
