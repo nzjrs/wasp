@@ -13,7 +13,7 @@ from gs.source import UAVSource
 from gs.managers.turretmanager import TurretManager
 from gs.managers.testmanager import TestManager
 from gs.managers.graphmanager import GraphManager
-from gs.ui import GtkBuilderWidget
+from gs.ui import GtkBuilderWidget, get_icon_pixbuf
 from gs.ui.graph import Graph
 from gs.ui.tree import DBWidget
 from gs.ui.msgarea import MsgAreaController
@@ -61,9 +61,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             LOG.critical("Error loading ui file", exc_info=True)
             sys.exit(1)
 
-        icon = gtk.gdk.pixbuf_new_from_file_at_size(
-                    os.path.join(mydir, "ui", "icons", "rocket.svg"),
-                    48, 48)
+        icon = get_icon_pixbuf("rocket.svg")
         gtk.window_set_default_icon(icon)
 
         self._tried_to_connect = False
