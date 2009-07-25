@@ -128,6 +128,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._builder.get_object("menu_item_autopilot_disable").set_sensitive(False)
         self._builder.connect_signals(self)
 
+        self._window.show_all()
+
     def _create_telemetry_ui(self):
         def on_gb_clicked(btn, _tv, _gm):
             field = _tv.get_selected_field()
@@ -441,6 +443,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map.props.show_trip_history = widget.get_active()
 
     def main(self):
-        self._window.show_all()
+        gtk.gdk.threads_enter()
         gtk.main()
+        gtk.gdk.threads_leave()
 

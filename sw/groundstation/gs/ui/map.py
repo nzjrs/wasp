@@ -24,7 +24,10 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
     DEFAULT_PROXY = os.environ.get("http_proxy", "")
     DEFAULT_CACHE = tempfile.gettempdir()
-    DEFAULT_SOURCE = "1"
+    if os.name == "nt":
+        DEFAULT_SOURCE = "0"
+    else:
+        DEFAULT_SOURCE = "1"
 
     def __init__(self, conf, source):
         config.ConfigurableIface.__init__(self, conf)
