@@ -13,7 +13,7 @@ from gs.source import UAVSource
 from gs.managers.turretmanager import TurretManager
 from gs.managers.testmanager import TestManager
 from gs.managers.graphmanager import GraphManager
-from gs.ui import GtkBuilderWidget
+from gs.ui import GtkBuilderWidget, get_icon_pixbuf
 from gs.ui.graph import Graph
 from gs.ui.tree import DBWidget
 from gs.ui.msgarea import MsgAreaController
@@ -61,9 +61,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             LOG.critical("Error loading ui file", exc_info=True)
             sys.exit(1)
 
-        icon = gtk.gdk.pixbuf_new_from_file_at_size(
-                    os.path.join(mydir, "ui", "icons", "rocket.svg"),
-                    48, 48)
+        icon = get_icon_pixbuf("rocket.svg")
         gtk.window_set_default_icon(icon)
 
         self._tried_to_connect = False
@@ -129,6 +127,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._builder.get_object("menu_item_disconnect").set_sensitive(False)
         self._builder.get_object("menu_item_autopilot_disable").set_sensitive(False)
         self._builder.connect_signals(self)
+
+        self._window.show_all()
 
     def _create_telemetry_ui(self):
         def on_gb_clicked(btn, _tv, _gm):
@@ -443,6 +443,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map.props.show_trip_history = widget.get_active()
 
     def main(self):
-        self._window.show_all()
+        gtk.gdk.threads_enter()
         gtk.main()
+        gtk.gdk.threads_leave()
 

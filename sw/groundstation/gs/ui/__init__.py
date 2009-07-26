@@ -1,4 +1,8 @@
+import logging
+import os.path
 import gtk
+
+LOG = logging.getLogger('gs.ui')
 
 def make_label(text, width=None):
     l = gtk.Label(text)
@@ -10,6 +14,23 @@ def make_label(text, width=None):
     l.set_alignment(0.0, 0.5)
     l.set_padding(5, 0)
     return l
+
+def get_icon_pixbuf(name, size=gtk.ICON_SIZE_DIALOG):
+    mydir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(mydir, "..", "..", "data", "icons", name)
+    try:
+        pb = gtk.gdk.pixbuf_new_from_file_at_size(
+                        os.path.abspath(filename),
+                        *gtk.icon_size_lookup(size)
+        )
+    except Exception:
+        LOG.warn("Error loading icon: %s" % filename, exc_info=True)
+        pb = gtk.icon_theme_get_default().load_icon(
+                    gtk.STOCK_MISSING_IMAGE, 
+                    gtk.icon_size_lookup(size)[0],
+                    0)
+
+    return pb
 
 class GtkBuilderWidget:
     def __init__(self, uifile):

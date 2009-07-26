@@ -9,13 +9,6 @@ import gs.ui.progressbar as progressbar
 
 LOG = logging.getLogger("infobox")
 
-def set_image_from_file(image, filename):
-    pb = gtk.gdk.pixbuf_new_from_file_at_size(
-                    filename,
-                    *gtk.icon_size_lookup(gtk.ICON_SIZE_DIALOG)
-    )
-    image.set_from_pixbuf(pb)
-
 class InfoBox(gs.ui.GtkBuilderWidget):
     def __init__(self, source):
         mydir = os.path.dirname(os.path.abspath(__file__))
@@ -25,15 +18,12 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         self.widget = self.get_resource("info_vbox")
 
         #change the status icon
-        set_image_from_file(
-            self.get_resource("status_image"),
-            os.path.join(mydir,"icons","dashboard.svg")
-        )
+        self.get_resource("status_image").set_from_pixbuf(
+                gs.ui.get_icon_pixbuf("dashboard.svg"))
+
         #change the comm icon
-        set_image_from_file(
-            self.get_resource("comm_image"),
-            os.path.join(mydir,"icons","radio.svg")
-        )
+        self.get_resource("comm_image").set_from_pixbuf(
+                gs.ui.get_icon_pixbuf("radio.svg"))
 
         self.pb = progressbar.ProgressBar(range=(8,15), average=5)
         self.get_resource("batt_hbox").pack_start(self.pb, True)
