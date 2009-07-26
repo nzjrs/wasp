@@ -43,6 +43,21 @@
      <field name="time" type="uint32"/>
    </message>
 
+   <message name="GET_SETTING" id="10">
+     <field name="id" type="uint8"/>
+   </message>
+
+   <message name="SETTING_UINT8" id="11">
+     <field name="id" type="uint8"/>
+     <field name="type" type="uint8"/>
+     <field name="value" type="uint8"/>
+   </message>
+
+   <message name="SETTING_FLOAT" id="12">
+     <field name="id" type="uint8"/>
+     <field name="value" type="float"/>
+   </message>
+
    <!-- Begin custom messages at 25 -->
 
    <message name="COMM_STATUS" id="25">

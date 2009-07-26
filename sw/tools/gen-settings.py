@@ -38,6 +38,8 @@ if __name__ == "__main__":
         parser.error("invalid xml\n%s" % traceback.format_exc())
 
     gentools.print_header(H, generatedfrom=settings_path)
-    settings.print_ids()
+    print '#include "std.h"\n'
     settings.print_defines()
+    settings.print_values()
+    settings.print_typedefs()
     gentools.print_footer(H)

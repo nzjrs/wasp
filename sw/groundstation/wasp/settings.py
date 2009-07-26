@@ -39,6 +39,9 @@ def convert_float_to_rational_fraction_approximation(xi, maxsize=10000):
     return p,q
 
 class _Setting:
+
+    SUPPORTED_TYPES = ("uint8","float")
+
     def __init__(self, section_name, x):
         self.name = "%s_%s" % (section_name, x.name.upper())
         try:
@@ -51,10 +54,36 @@ class _Setting:
         except AttributeError:
             self.rational_approximation = 0
 
-    def print_id(self, i):
-        print "#define SETTING_ID_%s %d" % (self.name, i)
+        try:
+            self.get = int(x.get)
+        except AttributeError:
+            self.get = 0
 
-    def print_define(self):
+        try:
+            self.set = int(x.set)
+        except AttributeError:
+            self.set = 0
+
+        self.type = None
+        if self.set or self.get:
+            try:
+                type_ = x.type;
+            except AttributeError:
+                pass
+            if type_ not in _Setting.SUPPORTED_TYPES:
+                raise Exception("Get/Set of setting with type = %s not supported" % self.type)
+            self.type = type_
+
+        self.id_str = "SETTING_ID_%s" % self.name
+
+    def print_id(self, i):
+        print "#define %s %d" % (self.id_str, i)
+
+    def print_type(self):
+        if self.type:
+            print "#define SETTING_TYPE_%s %s" % (self.name, self.type)
+
+    def print_value(self):
         print "#define %s %s" % (self.name, self.value)
         if self.rational_approximation:
             val = float(self.value)
@@ -91,18 +120,51 @@ class Settings:
     def __init__(self, x):
         self.sections = [_Section(s) for s in xmlobject.ensure_list(x.section)]
 
-    def print_ids(self):
+        self.settible = []
+        self.gettible = []
+        for sect in self.sections:
+            for s in sect.settings:
+                if s.set:
+                    self.settible.append(s)
+                if s.get:
+                    self.gettible.append(s)
+
+    def _print_set_or_get(self, name="set", settings=()):
+        i = 0
+        print "typedef enum {"
+        for s in settings:
+            print "\t%s_%s = %s," % (name.upper(), s.name, s.id_str)
+            i+= 1
+        print "} Setting%stable_t;" % name.title()
+        print "#define NUM_SETTING_%sTABLE = %d" % (name.upper(), i)
+
+
+    def print_typedefs(self):
+        #self._print_set_or_get("set", self.settible)
+        #print
+        #self._print_set_or_get("get", self.gettible)
+        #print
+        print "typedef enum {"
+        for t in _Setting.SUPPORTED_TYPES:
+            print "\tSETTING_TYPE_%s," % t.upper()
+        print "} SettingType_t;"
+        print
+        print "typedef bool_t (*SettingSetterCallback_t)(uint8_t chan, void *data);"
+        print "typedef bool_t (*SettingGetterCallback_t)(uint8_t chan, void *data);"
+
+    def print_defines(self):
         i = 1
         for sect in self.sections:
             for s in sect.settings:
                 s.print_id(i)
+                s.print_type()
                 i += 1
         print
 
-    def print_defines(self):
+    def print_values(self):
         for sect in self.sections:
             for s in sect.settings:
-                s.print_define()
+                s.print_value()
             print
         print
                 

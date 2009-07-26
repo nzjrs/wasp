@@ -5,9 +5,9 @@
 #include "imu.h"
 #include "analog.h"
 #include "altimeter.h"
+#include "settings.h"
 
 #include "booz2_autopilot.h"
-
 #include "booz2_ins.h"
 
 bool_t
@@ -102,5 +102,43 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
     }
 
     return ret;
+}
+
+bool_t 
+comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
+{
+    if (message)
+    {
+        void *value;
+        Type_t type;
+        uint8_t id, u8;
+        uint8_t *payload = message->payload;
+
+        id = 0;
+        value = NULL;
+        switch (message->msgid)
+        {
+            case MESSAGE_ID_GET_SETTING:
+                id = MESSAGE_GET_SETTING_GET_FROM_BUFFER_id(payload);
+                if ( settings_get(id, &type, value) )
+                {
+                    ;
+                }
+                return TRUE;
+                break;
+            case MESSAGE_ID_SETTING_UINT8:
+                id = MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_id(payload);
+                type = MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_type(payload);
+                u8 = MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_value(payload);
+                value = &u8;
+                break;
+            default:
+                return FALSE;
+                break;
+        }
+        settings_set(id, type, value);
+        return TRUE;
+    }
+    return FALSE;
 }
 

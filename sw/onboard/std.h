@@ -46,7 +46,17 @@ typedef uint8_t bool_t;
 typedef uint8_t unit_t;
 
 /* RC commands */
-typedef int16_t pprz_t; 
+typedef int16_t pprz_t;
+
+typedef enum {
+    TYPE_UINT8,
+    TYPE_INT8,
+    TYPE_UINT16,
+    TYPE_INT16,
+    TYPE_UINT32,
+    TYPE_INT32,
+    TYPE_FLOAT,
+} Type_t;
 
 /* Flags for inidicating if a subsytem has been initialised or not */
 typedef enum {
