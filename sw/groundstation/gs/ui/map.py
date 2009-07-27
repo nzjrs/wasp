@@ -60,6 +60,9 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         return self._frame
 
     def connect(self, signal, func, *args):
+        """
+        Defer connecting to signals on the map object until it is created
+        """
         self._cbs[signal] = (func, args)
 
     def update_state_from_config(self):
@@ -83,6 +86,13 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
                 LOG.info("Map %s URI: %s" % (self._source, self._map.props.repo_uri))
                 LOG.info("Proxy: %s" % self._map.props.proxy_uri)
                 LOG.info("Cache: %s" % self._map.props.tile_cache)
+
+                while True:
+                    try:
+                        signal, (func, args) = self._cbs.popitem()
+                        self._map.connect(signal, func, *args)
+                    except KeyError:
+                        break
 
             else:
                 self._map = gtk.Label("Map Disabled")
