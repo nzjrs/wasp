@@ -76,8 +76,11 @@ class _Setting:
 
         self.id_str = "SETTING_ID_%s" % self.name
 
-    def print_id(self, i):
-        print "#define %s %d" % (self.id_str, i)
+    def set_id(self, id_):
+        self.id = id_
+
+    def print_id(self):
+        print "#define %s %d" % (self.id_str, self.id)
 
     def print_type(self):
         if self.type:
@@ -122,12 +125,15 @@ class Settings:
 
         self.settible = []
         self.gettible = []
+        i = 1;
         for sect in self.sections:
             for s in sect.settings:
+                s.set_id(i)
                 if s.set:
                     self.settible.append(s)
                 if s.get:
                     self.gettible.append(s)
+                i += 1
 
     def _print_set_or_get(self, name="set", settings=()):
         i = 0
@@ -153,12 +159,10 @@ class Settings:
         print "typedef bool_t (*SettingGetterCallback_t)(uint8_t chan, void *data);"
 
     def print_defines(self):
-        i = 1
         for sect in self.sections:
             for s in sect.settings:
-                s.print_id(i)
+                s.print_id()
                 s.print_type()
-                i += 1
         print
 
     def print_values(self):
@@ -167,4 +171,24 @@ class Settings:
                 s.print_value()
             print
         print
-                
+
+class SettingsFile:
+    def __init__(self, **kwargs):
+        path = kwargs.get("path")
+        if path and not os.path.exists(path):
+            raise Exception("Could not find message file")
+
+        try:
+            x = xmlobject.XMLFile(**kwargs)
+            self.settings = Settings(x.root)
+
+            settings = []
+            for sect in self.settings.sections:
+                for s in sect.settings:
+                    settings.append(s)
+            self.all_settings = settings
+        except:
+            self.settings = None
+            self.all_settings = []
+
+

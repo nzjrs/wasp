@@ -15,7 +15,7 @@ def refresh_gui(delay=0):
 		gtk.main_iteration_do(block=False)
 	time.sleep(delay)
 
-class TreeviewTest(unittest.TestCase):
+class MessageTreeviewTest(unittest.TestCase):
     def setUp(self):
         self.mf = get_mf()
 
@@ -24,6 +24,18 @@ class TreeviewTest(unittest.TestCase):
         for m in self.mf.get_messages():
             ts.add_message(m)
         tv = treeview.MessageTreeView(ts)
+
+        refresh_gui()
+
+class SettingsTreeviewTest(unittest.TestCase):
+    def setUp(self):
+        self.sf = get_sf()
+
+    def testConstruct(self):
+        ts = treeview.SettingsTreeStore()
+        for s in self.sf.all_settings:
+            ts.add_setting(s)
+        tv = treeview.SettingsTreeView(ts, show_all=True)
 
         refresh_gui()
 

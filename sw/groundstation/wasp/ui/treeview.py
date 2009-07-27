@@ -178,3 +178,48 @@ class MessageTreeView(gtk.TreeView):
 
         return message, values
 
+class SettingsTreeStore(gtk.ListStore):
+
+    NAME_IDX,       \
+    ID_IDX,         \
+    SUPPORTS_GET,   \
+    SUPPORTS_SET,   \
+    VALUE_IDX =     range(5)
+
+    def __init__(self):
+        gtk.ListStore.__init__(self,
+                str,        #NAME, full setting name
+                int,        #ID, setting ID
+                bool,       #SUPPORTS_GET,
+                bool,       #SUPPORTS_SET,
+                object)     #VALUE, value of setting
+
+        self._setting_ids = {}
+
+    def add_setting(self, setting):
+        if setting.id not in self._setting_ids:
+            self._setting_ids[setting.id] = self.append( (setting.name, setting.id, setting.get == 1, setting.set == 1, 0) )
+
+class SettingsTreeView(gtk.TreeView):
+    def __init__(self, settingtreemodel, show_all=False):
+        gtk.TreeView.__init__(self, settingtreemodel)
+
+        self.insert_column_with_attributes(-1, "Name",
+                gtk.CellRendererText(),
+                text=SettingsTreeStore.NAME_IDX)
+
+        if show_all:
+            for name,id_ in (   ("ID",  SettingsTreeStore.ID_IDX),
+                                ("GET", SettingsTreeStore.SUPPORTS_GET),
+                                ("SET", SettingsTreeStore.SUPPORTS_SET)):
+                self.insert_column_with_attributes(-1, name,
+                        gtk.CellRendererText(),
+                        text=id_)
+
+    def selected_setting_supports_get(self):
+        return False
+
+    def selected_setting_supports_set(self):
+        return False
+
+

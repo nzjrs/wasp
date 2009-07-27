@@ -1,4 +1,23 @@
 import wasp.messages as messages
+import wasp.settings as settings
+
+SETTINGS_XML = """<?xml version="1.0"?>
+<settings>
+  <section name="TESTSECTION">
+    <setting name="TEST1" type="uint8" value="123"/>
+    <setting name="TEST2" type="uint8"/>
+  </section>
+  <section name="TESTSECTION2">
+    <setting name="TEST1" type="uint8" value="123"/>
+    <setting name="TEST2" type="uint8"/>
+    <setting name="IMU_MAG_X_SENS" value="22.008352" integer="16"/>
+    <setting name="IMU_MAG_Y_SENS" value="-21.79885" integer="16"/>
+    <setting name="IMU_MAG_Z_SENS" value="-14.675745" integer="16"/>
+  </section>
+  <section name="TESTSECTION3">
+    <setting name="TESTSETGET" type="uint8" value="456" set="1" get="1"/>
+  </section>
+</settings>"""
 
 XML = """<?xml version="1.0"?>
 <messages>
@@ -41,4 +60,7 @@ def get_mf():
     mf = messages.MessagesFile(raw=XML, debug=False)
     mf.parse()
     return mf
+
+def get_sf():
+    return settings.SettingsFile(raw=SETTINGS_XML)
 
