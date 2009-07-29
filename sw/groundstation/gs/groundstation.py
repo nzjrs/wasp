@@ -136,14 +136,45 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._window.show_all()
 
     def _create_settings_ui(self):
+        def on_gs_clicked(btn, _tv):
+            setting = _tv.get_selected_setting()
+
+            #get the message to get settings
+            msg = self._messages.get_message_by_name("GET_SETTING")
+
+            #send it
+            self._source.send_message(msg, (setting.id,))
+            #print setting,self,msg
+
+            #self.emit("send-message", self._rm, (msg.id, ))
+
+        def on_selection_changed(_ts, _tv, _btn):
+            setting = _tv.get_selected_setting()
+            if setting and setting.get:
+                _btn.set_sensitive(True)
+            else:
+                _btn.set_sensitive(False)
+
         ts = SettingsTreeStore()
         for s in self._settings.all_settings:
             ts.add_setting(s)
 
         tv = SettingsTreeView(ts, show_all=True)
+        btn = self._builder.get_object("setting_get_button")
 
-        self._builder.get_object("settings_hbox").pack_start(tv, True, True)
+        btn.connect(
+                "clicked",
+                on_gs_clicked,
+                tv)
 
+        tv.get_selection().connect(
+                "changed",
+                on_selection_changed,
+                tv,
+                btn)
+
+        btn.set_sensitive(False)
+        self._builder.get_object("settings_left_vbox").pack_start(tv, True, True)
 
     def _create_telemetry_ui(self):
         def on_gb_clicked(btn, _tv, _gm):

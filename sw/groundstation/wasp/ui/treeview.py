@@ -184,7 +184,7 @@ class SettingsTreeStore(gtk.ListStore):
     ID_IDX,         \
     SUPPORTS_GET,   \
     SUPPORTS_SET,   \
-    VALUE_IDX =     range(5)
+    OBJECT_IDX =    range(5)
 
     def __init__(self):
         gtk.ListStore.__init__(self,
@@ -192,13 +192,13 @@ class SettingsTreeStore(gtk.ListStore):
                 int,        #ID, setting ID
                 bool,       #SUPPORTS_GET,
                 bool,       #SUPPORTS_SET,
-                object)     #VALUE, value of setting
+                object)     #OBJECT, the setting object
 
         self._setting_ids = {}
 
     def add_setting(self, setting):
         if setting.id not in self._setting_ids:
-            self._setting_ids[setting.id] = self.append( (setting.name, setting.id, setting.get == 1, setting.set == 1, 0) )
+            self._setting_ids[setting.id] = self.append( (setting.name, setting.id, setting.get == 1, setting.set == 1, setting) )
 
 class SettingsTreeView(gtk.TreeView):
     def __init__(self, settingtreemodel, show_all=False):
@@ -216,10 +216,12 @@ class SettingsTreeView(gtk.TreeView):
                         gtk.CellRendererText(),
                         text=id_)
 
-    def selected_setting_supports_get(self):
-        return False
+    def get_selected_setting(self):
+        model, _iter = self.get_selection().get_selected()
 
-    def selected_setting_supports_set(self):
-        return False
+        #make sure something selected
+        if not _iter:
+            return None
 
+        return model.get_value(_iter, SettingsTreeStore.OBJECT_IDX)
 

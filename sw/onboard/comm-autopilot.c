@@ -1,5 +1,6 @@
 #include "comm-autopilot.h"
 
+#include "led.h"
 #include "rc.h"
 #include "gps.h"
 #include "imu.h"
@@ -124,6 +125,8 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
                 {
                     ;
                 }
+                u8 = 1;
+                MESSAGE_SEND_DEBUG(COMM_1, &u8);
                 return TRUE;
                 break;
             case MESSAGE_ID_SETTING_UINT8:
