@@ -116,6 +116,12 @@
       <field name="hsl"  type="int32"/>
    </message>
 
+   <message name="ALTIMETER" id="37">
+      <field name="altitude" type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+      <field name="status" type="uint8" values="UNINITIAIZED|INITIALIZING|INITIALIZED"/>
+      <field name="baro_offset" type="uint16"/>
+      <field name="baro_value" type="uint16"/>
+   </message>
 
    <!-- Begin periodic messages -->
 
@@ -124,6 +130,7 @@
       <message name="STATUS" frequency="0.5"></message>
       <message name="TIME" frequency="0.1"></message>
       <message name="GPS_LLH" frequency="0.1"></message>
+      <message name="ALTIMETER" frequency="5"></message>
    </periodic>
 
 </messages>

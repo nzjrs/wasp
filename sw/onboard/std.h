@@ -48,6 +48,13 @@ typedef uint8_t unit_t;
 /* RC commands */
 typedef int16_t pprz_t; 
 
+/* Flags for inidicating if a subsytem has been initialised or not */
+typedef enum {
+    STATUS_UNINITIAIZED,
+    STATUS_INITIALIZING,
+    STATUS_INITIALIZED
+} SystemStatus_t;
+
 #define MAX_PPRZ 9600
 #define MIN_PPRZ -MAX_PPRZ
 

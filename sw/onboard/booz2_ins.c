@@ -1,11 +1,9 @@
 #include "booz2_ins.h"
 
 #include "imu.h"
-
-#include "booz2_analog_baro.h"
+#include "altimeter.h"
 #include "gps.h"
 
-#include "config/airframe.h"
 #include "booz_geometry_mixed.h"
 
 #if USE_VFF
@@ -57,7 +55,7 @@ void booz_ins_init() {
 void booz_ins_propagate() {
 
 #if USE_VFF
-  if (booz2_analog_baro_status == BOOZ2_ANALOG_BARO_RUNNING && booz_ins_baro_initialised) {
+  if (altimeter_status == STATUS_INITIALIZED && booz_ins_baro_initialised) {
     float accel_float = BOOZ_ACCEL_F_OF_I(booz_imu.accel.z);
     b2_vff_propagate(accel_float);
     booz_ins_ltp_accel.z = BOOZ_ACCEL_I_OF_F(b2_vff_zdotdot);
@@ -78,16 +76,17 @@ void booz_ins_propagate() {
 void booz_ins_update_baro() {
 
 #if USE_VFF
-  if (booz2_analog_baro_status == BOOZ2_ANALOG_BARO_RUNNING) {
+  if (altimeter_status == STATUS_INITIALIZED) {
+    uint32_t alt = altimeter_get_altitude();
     if (!booz_ins_baro_initialised) {
-      booz_ins_qfe = booz2_analog_baro_value;
+      booz_ins_qfe = alt;
       booz_ins_baro_initialised = TRUE;
     }
-    booz_ins_baro_alt = (((int32_t)booz2_analog_baro_value - booz_ins_qfe) * BOOZ_INS_BARO_SENS_NUM)/BOOZ_INS_BARO_SENS_DEN;
+    booz_ins_baro_alt = alt - booz_ins_qfe;
     float alt_float = BOOZ_POS_F_OF_I(booz_ins_baro_alt);
     if (booz_ins_vff_realign) {
       booz_ins_vff_realign = FALSE;
-      booz_ins_qfe = booz2_analog_baro_value;
+      booz_ins_qfe = alt;
       b2_vff_realign(0.);
     }
     b2_vff_update(alt_float);

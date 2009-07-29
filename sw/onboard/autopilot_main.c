@@ -36,9 +36,8 @@
 #include "comm-autopilot.h"
 
 #include "imu.h"
-
-#include "booz2_analog_baro.h"
-#include "booz2_battery.h"
+#include "analog.h"
+#include "altimeter.h"
 
 #include "booz2_fms.h"
 #include "booz2_autopilot.h"
@@ -55,8 +54,6 @@
 #include "booz2_ins.h"
 
 #include "autopilot_main.h"
-
-static inline void on_baro_event( void );
 
 uint32_t t0, t1, diff;
 
@@ -84,9 +81,8 @@ STATIC_INLINE void booz2_main_init( void ) {
 
   gps_init();
 
-  booz2_analog_init();
-  booz2_analog_baro_init();
-  booz2_battery_init();
+  analog_init();
+  altimeter_init();
 
   imu_init();
 
@@ -172,9 +168,10 @@ STATIC_INLINE void booz2_main_event( void ) {
       }
   }
 
-  Booz2AnalogBaroEvent(on_baro_event);
+  if ( altimeter_event_task() )
+    booz_ins_update_baro();
 
-  if (gps_event_task()) {
+  if ( gps_event_task() ) {
     if (booz_gps_state.fix == GPS_FIX_3D)
         led_on(GPS_LED);
     else
@@ -185,6 +182,4 @@ STATIC_INLINE void booz2_main_event( void ) {
   comm_event_task(COMM_1);
 }
 
-static inline void on_baro_event( void ) {
-  booz_ins_update_baro();
-}
+

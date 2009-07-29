@@ -10,10 +10,6 @@ SRCARM =                            \
     math/pprz_geodetic_int.c        \
     math/pprz_geodetic_float.c      \
     rc.c                            \
-    booz2_analog_baro.c             \
-    booz2_battery.c                 \
-    booz2_analog.c                  \
-    booz2_analog_hw.c               \
     booz2_autopilot.c               \
     booz_ahrs_aligner.c             \
     booz2_filter_attitude_cmpl_euler.c \
@@ -53,7 +49,9 @@ SRCARM +=                           \
     arm7/i2c_hw.c                   \
     arm7/actuators_hw.c             \
     arm7/buss_twi_blmc_hw.c         \
-    arm7/servos_4017_hw.c
+    arm7/servos_4017_hw.c           \
+    arm7/analog_hw.c                \
+    arm7/altimeter_analog_baro_hw.c
 
 ASRCARM =                           \
     arm7/crt0.S

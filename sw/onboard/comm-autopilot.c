@@ -3,9 +3,12 @@
 #include "rc.h"
 #include "gps.h"
 #include "imu.h"
+#include "analog.h"
+#include "altimeter.h"
 
-#include "booz2_battery.h"
 #include "booz2_autopilot.h"
+
+#include "booz2_ins.h"
 
 bool_t
 comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
@@ -71,14 +74,27 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
             MESSAGE_SEND_RC(chan, rc_values);
             break;
         case MESSAGE_ID_STATUS:
+            {
+            uint8_t bat = analog_read_battery();
             MESSAGE_SEND_STATUS(
                     chan,
                     &rc_status,
                     &booz_gps_state.fix,
-                    &booz2_battery_voltage,
+                    &bat,
                     &booz2_autopilot_in_flight,
                     &booz2_autopilot_motors_on,
                     &booz2_autopilot_mode);
+            }
+            break;
+        case MESSAGE_ID_ALTIMETER:
+            {
+            int32_t alt = altimeter_get_altitude();
+            MESSAGE_SEND_ALTIMETER(COMM_1,
+                    &alt,
+                    &altimeter_status,
+                    &booz2_analog_baro_offset,
+                    &booz2_analog_baro_value);
+            }
             break;
         default:
             ret = FALSE;

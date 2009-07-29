@@ -22,23 +22,23 @@
  *
  */
 
-#include "booz2_analog_baro.h"
+#include "std.h"
+#include "config/airframe.h"
 
-#include "arm7/led_hw.h"
+#include "altimeter.h"
+#include "arm7/altimeter_analog_baro_hw.h"
 
-// pressure on AD0.1 on P0.28
-// offset on DAC on P0.25
+SystemStatus_t altimeter_status;
 
-uint16_t booz2_analog_baro_status;
 uint16_t booz2_analog_baro_offset;
 uint16_t booz2_analog_baro_value;
 uint16_t booz2_analog_baro_value_filtered;
 bool_t   booz2_analog_baro_data_available;
 
 
-void booz2_analog_baro_init( void ) {
+void altimeter_init( void ) {
 
-  booz2_analog_baro_status = BOOZ2_ANALOG_BARO_UNINIT;
+  altimeter_status = STATUS_UNINITIAIZED;
 
   booz2_analog_baro_offset = 1023;
   Booz2AnalogSetDAC(booz2_analog_baro_offset);
@@ -51,8 +51,21 @@ void booz2_analog_baro_init( void ) {
 #endif
 }
 
+uint8_t
+altimeter_event_task(void)
+{
+    uint8_t ret = FALSE;
+    if (booz2_analog_baro_data_available) 
+    {
+      ret = TRUE;
+      booz2_analog_baro_data_available = FALSE;
+    }
+    return ret;
+}
 
-
-
-
+int32_t
+altimeter_get_altitude(void)
+{ 
+    return (booz2_analog_baro_value * BOOZ_INS_BARO_SENS_NUM)/BOOZ_INS_BARO_SENS_DEN;
+}
 
