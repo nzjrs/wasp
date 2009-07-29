@@ -32,6 +32,13 @@ def get_icon_pixbuf(name, size=gtk.ICON_SIZE_DIALOG):
 
     return pb
 
+def get_ui_file(name):
+    mydir = os.path.dirname(os.path.abspath(__file__))
+    ui = os.path.abspath(os.path.join(mydir, name))
+    if not os.path.exists(ui):
+        raise Exception("Could not find ui file: %s" % ui)
+    return ui
+
 class GtkBuilderWidget:
     def __init__(self, uifile):
         self._builder = gtk.Builder()

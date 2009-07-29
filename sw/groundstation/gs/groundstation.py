@@ -22,10 +22,11 @@ from gs.ui.info import InfoBox
 from gs.ui.flightplan import FlightPlanEditor
 from gs.ui.log import LogBuffer, LogWindow
 from gs.ui.map import Map
+from gs.ui.settings import SettingsController
 
 from wasp.messages import MessagesFile
 from wasp.settings import SettingsFile
-from wasp.ui.treeview import MessageTreeView, SettingsTreeView, SettingsTreeStore
+from wasp.ui.treeview import MessageTreeView
 from wasp.ui.senders import RequestMessageSender
 
 LOG = logging.getLogger('groundstation')
@@ -77,18 +78,19 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._config = Config(filename=prefsfile)
         ConfigurableIface.__init__(self, self._config)
 
-        self._messages = MessagesFile(path=messagesfile, debug=False)
-        self._messages.parse()
+        self._messagesfile = MessagesFile(path=messagesfile, debug=False)
+        self._messagesfile.parse()
 
-        self._settings = SettingsFile(path=settingsfile)
-
-        self._source = UAVSource(self._config, self._messages, use_test_source)
+        self._source = UAVSource(self._config, self._messagesfile, use_test_source)
         self._source.serial.connect("serial-connected", self._on_serial_connected)
+
+        self._settingsfile = SettingsFile(path=settingsfile)
+        self._settings = SettingsController(self._source, self._settingsfile, self._messagesfile)
 
         self._map = Map(self._config, self._source)
         self._tm = TurretManager(self._config)
         self._test = TestManager(self._config)
-        self._gm = GraphManager(self._config, self._source, self._messages, self._builder.get_object("graphs_box"), self._window)
+        self._gm = GraphManager(self._config, self._source, self._messagesfile, self._builder.get_object("graphs_box"), self._window)
         self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
@@ -98,7 +100,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._builder.get_object("main_map_vbox").pack_start(self._msgarea, False, False)
         self._builder.get_object("window_vbox").pack_start(self._sb, False, False)
         self._builder.get_object("autopilot_hbox").pack_start(self._fp.widget, True, True)
-
+        self._builder.get_object("settings_hbox").pack_start(self._settings.widget, True, True)
 
         #Lazy initialize the following when first needed
         self._plane_view = None
@@ -113,7 +115,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     
         #Create other notebook tabs
         self._create_telemetry_ui()
-        self._create_settings_ui()
 
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface
@@ -135,47 +136,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         self._window.show_all()
 
-    def _create_settings_ui(self):
-        def on_gs_clicked(btn, _tv):
-            setting = _tv.get_selected_setting()
-
-            #get the message to get settings
-            msg = self._messages.get_message_by_name("GET_SETTING")
-
-            #send it
-            self._source.send_message(msg, (setting.id,))
-            #print setting,self,msg
-
-            #self.emit("send-message", self._rm, (msg.id, ))
-
-        def on_selection_changed(_ts, _tv, _btn):
-            setting = _tv.get_selected_setting()
-            if setting and setting.get:
-                _btn.set_sensitive(True)
-            else:
-                _btn.set_sensitive(False)
-
-        ts = SettingsTreeStore()
-        for s in self._settings.all_settings:
-            ts.add_setting(s)
-
-        tv = SettingsTreeView(ts, show_all=True)
-        btn = self._builder.get_object("setting_get_button")
-
-        btn.connect(
-                "clicked",
-                on_gs_clicked,
-                tv)
-
-        tv.get_selection().connect(
-                "changed",
-                on_selection_changed,
-                tv,
-                btn)
-
-        btn.set_sensitive(False)
-        self._builder.get_object("settings_left_vbox").pack_start(tv, True, True)
-
     def _create_telemetry_ui(self):
         def on_gb_clicked(btn, _tv, _gm):
             field = _tv.get_selected_field()
@@ -189,7 +149,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             sw.add(rxtv)
 
             vb = self._builder.get_object("telemetry_left_vbox")
-            rm = RequestMessageSender(self._messages)
+            rm = RequestMessageSender(self._messagesfile)
             rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
             vb.pack_start(rm, False, False)
 
@@ -271,11 +231,11 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         gtk.main_quit()
 
     def on_menu_item_refresh_uav_activate(self, widget):
-        rm = self._messages.get_message_by_name("REQUEST_MESSAGE")
+        rm = self._messagesfile.get_message_by_name("REQUEST_MESSAGE")
 
         #request a number of messages from the UAV
         for n in ("BUILD_INFO", ):
-            m = self._messages.get_message_by_name(n)
+            m = self._messagesfile.get_message_by_name(n)
             if m:
                 self._source.send_message(rm, (m.id,))
 
