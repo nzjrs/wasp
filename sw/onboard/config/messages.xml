@@ -55,6 +55,7 @@
 
    <message name="SETTING_FLOAT" id="12">
      <field name="id" type="uint8"/>
+     <field name="type" type="uint8"/>
      <field name="value" type="float"/>
    </message>
 
