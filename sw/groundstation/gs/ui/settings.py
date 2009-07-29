@@ -41,16 +41,8 @@ class SettingsController(gs.ui.GtkBuilderWidget):
         self.get_resource("setting_left_vbox").pack_start(tv, True, True)
 
         #listen for settings messages
-        source.register_interest(self._on_setting, 20, "SETTING_UINT8")
-        source.register_interest(self._on_setting, 20, "SETTING_FLOAT")
-        source.register_interest(self._on_debug, 20, "DEBUG")
-
-    def _on_debug(self, msg, payload):
-        value, = msg.unpack_values(payload)
-
-        lbl = self.get_resource("label").set_text("DEBUG: %d" % value)
-
-        LOG.debug("Got DEBUG: %d" % value)
+        source.register_interest(self._on_setting, 0, "SETTING_UINT8")
+        source.register_interest(self._on_setting, 0, "SETTING_FLOAT")
 
     def _on_setting(self, msg, payload):
         LOG.debug("Got settings")

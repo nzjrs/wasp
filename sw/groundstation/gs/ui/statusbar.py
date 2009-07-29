@@ -38,10 +38,12 @@ class StatusBar(gtk.Statusbar):
         #ping time
         self._pt = gs.ui.make_label("PING: ?", 12)
         hb.pack_start(self._pt, False, False)
-
         #GPS LLA
         self._gps_coords = gs.ui.make_label("GPS: +180.0000 N, +180.0000 E")
         hb.pack_start(self._gps_coords, False, False)
+        #debug
+        self._debug = gs.ui.make_label("")
+        hb.pack_start(self._debug, True, True)
        
         self.pack_start(hb, False, False)
         self.reorder_child(hb, 0)
@@ -49,6 +51,7 @@ class StatusBar(gtk.Statusbar):
         source.serial.connect("serial-connected", self._on_serial_connected)
 
         source.register_interest(self._on_gps, 0, "GPS_LLH")
+        source.register_interest(self._on_debug, 0, "DEBUG")
 
         gobject.timeout_add_seconds(1, self._check_messages_per_second, source)
 
@@ -64,6 +67,10 @@ class StatusBar(gtk.Statusbar):
         self._ms.set_text("MSG/S: %.1f" % source.get_messages_per_second())
         self._pt.set_text("PING: %.1f ms" %  source.get_ping_time())
         return True
+
+    def _on_debug(self, msg, payload):
+        value, = msg.unpack_values(payload)
+        self._debug.set_text("DEBUG: %d" % value)
 
     def _on_gps(self, msg, payload):
         fix,sv,lat,lon,hsl = msg.unpack_values(payload)
