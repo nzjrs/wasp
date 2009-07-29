@@ -24,7 +24,8 @@ from gs.ui.log import LogBuffer, LogWindow
 from gs.ui.map import Map
 
 from wasp.messages import MessagesFile
-from wasp.ui.treeview import MessageTreeView
+from wasp.settings import SettingsFile
+from wasp.ui.treeview import MessageTreeView, SettingsTreeView, SettingsTreeStore
 from wasp.ui.senders import RequestMessageSender
 
 LOG = logging.getLogger('groundstation')
@@ -39,7 +40,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     CONFIG_LON_DEFAULT = 172.582377
     CONFIG_ZOOM_DEFAULT = 12
 
-    def __init__(self, prefsfile, messagesfile, use_test_source):
+    def __init__(self, prefsfile, messagesfile, settingsfile, use_test_source):
         gtk.gdk.threads_init()
 
         #connect our log buffer to the python logging subsystem
@@ -52,6 +53,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         LOG.info("Groundstation loading")
         LOG.info("Restored preferences: %s" % prefsfile)
         LOG.info("Messages file: %s" % messagesfile)
+        LOG.info("Settings file: %s" % settingsfile)
 
         try:
             mydir = os.path.dirname(os.path.abspath(__file__))
@@ -77,6 +79,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         self._messages = MessagesFile(path=messagesfile, debug=False)
         self._messages.parse()
+
+        self._settings = SettingsFile(path=settingsfile)
 
         self._source = UAVSource(self._config, self._messages, use_test_source)
         self._source.serial.connect("serial-connected", self._on_serial_connected)
@@ -109,6 +113,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     
         #Create other notebook tabs
         self._create_telemetry_ui()
+        self._create_settings_ui()
 
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface
@@ -129,6 +134,16 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._builder.connect_signals(self)
 
         self._window.show_all()
+
+    def _create_settings_ui(self):
+        ts = SettingsTreeStore()
+        for s in self._settings.all_settings:
+            ts.add_setting(s)
+
+        tv = SettingsTreeView(ts, show_all=True)
+
+        self._builder.get_object("settings_hbox").pack_start(tv, True, True)
+
 
     def _create_telemetry_ui(self):
         def on_gb_clicked(btn, _tv, _gm):

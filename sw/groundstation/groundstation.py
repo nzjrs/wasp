@@ -16,6 +16,7 @@ import gs.groundstation as groundstation
 if __name__ == "__main__":
     thisdir = os.path.abspath(os.path.dirname(__file__))
     default_messages = os.path.join(thisdir, "..", "onboard", "config", "messages.xml")
+    default_settings = os.path.join(thisdir, "..", "onboard", "config", "settings.xml")
 
     confdir = os.environ.get("XDG_CONFIG_HOME", os.path.join(os.environ.get("HOME","."), ".config", "wasp"))
     if not os.path.exists(confdir):
@@ -26,6 +27,9 @@ if __name__ == "__main__":
     parser.add_option("-m", "--messages",
                     default=default_messages,
                     help="Messages xml file", metavar="FILE")
+    parser.add_option("-s", "--settings",
+                    default=default_settings,
+                    help="Settings xml file", metavar="FILE")
     parser.add_option("-p", "--preferences",
                     default=prefs,
                     help="User preferences file", metavar="FILE")
@@ -39,8 +43,9 @@ if __name__ == "__main__":
         parser.error("could not find messages.xml")
 
     gs = groundstation.Groundstation(
-            options.preferences,
-            options.messages,
+            os.path.abspath(options.preferences),
+            os.path.abspath(options.messages),
+            os.path.abspath(options.settings),
             options.use_test_source
     )
     gs.main()
