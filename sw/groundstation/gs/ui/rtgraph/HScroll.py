@@ -14,6 +14,9 @@ class _Label:
         self.layout.set_text("%+2.2f" % value)
         self.width, self.height = self.layout.get_pixel_size()
 
+    def can_fit(self, maxy):
+        return self.y > 0
+
 class HScrollGraph(PolledGraph):
     """A graph that shows time on the horizontal axis, multiple channels
        of data on the Y axis, and scrolls horizontally so current data
@@ -42,6 +45,11 @@ class HScrollGraph(PolledGraph):
         # This breaks under the win32 implementation of GDK, so use a temporary
         # buffer then.
         self.useTemporaryPixmap = os.name == "nt"
+
+    def _get_gridlines_y(self):
+        #first gridline is at the bottom (y = gheight), subsequent gridlines
+        #are every gridSize pizels
+        return range(self.gheight, 0, -self.gridSize)
 
     def resized(self):
         PolledGraph.resized(self)
@@ -74,7 +82,10 @@ class HScrollGraph(PolledGraph):
             self.gwidth = self.width - (lw + 1)
             self.gheight = self.height - 0
 
-        self.initGrid(self.gridSize, self.gheight)
+        # Create a grid pixmap as wide as our grid and as high as our window,
+        # used to quickly initialize new areas of the graph with our grid pattern.
+        self.gridPixmap = gtk.gdk.Pixmap(self.window, self.gwidth, self.gheight)
+        self.initGrid(self.gridPixmap, self.gwidth, self.gheight)
         # Initialize the backing store
         self.drawGrid(0, self.gwidth)
 
@@ -82,44 +93,41 @@ class HScrollGraph(PolledGraph):
         """Draw axis labels"""
         if self.axisLabel:
             self.clearAxis()
-
             pc = self.get_pango_context()
 
-            top = self.range[1]
-            nsteps = self.gheight // self.gridSize
+            #calculate the gridlines pixel co-ords and the real values they
+            #represent
+            gridy = self._get_gridlines_y()
+            topf = float(gridy[0])
+            range_ = self.range[1] - self.range[0]
+            gridstep = [ (((topf-y)/topf)*range_)+self.range[0] for y in gridy]
 
-            if nsteps:
-                step = (self.range[1] - self.range[0]) / float(nsteps)
+            if gridy:
+                #skip over the top grid
+                for i in range(1, len(gridy)):
+                    y = gridy[i]
+                    gridval = gridstep[i]
 
-                #skip don't label the top grid
-                grids = range(self.gridSize, self.gheight, self.gridSize)
-                value = top - step
+                    print y,gridval
 
-                # Draw the axis labels into the graph
-                labels = []
-                for y in grids:
-                    l = _Label(pc, value, y)
-                    self.backingPixmap.draw_layout(self.gc, self.gwidth+1, l.y, l.layout)
-                    value -= step
+                    l = _Label(pc, gridval, y)
+                    if l.can_fit(maxy=self.gheight):
+                        self.backingPixmap.draw_layout(self.gc, self.gwidth+1, l.y, l.layout)
 
                 # blit the labels to the screen
                 self.queue_draw_area(self.gwidth, 0, self.width, self.gheight)
 
-    def initGrid(self, width, height):
+    def initGrid(self, gridPixmap, width, height):
         """Draw our grid on the given drawable"""
-        # Create a grid pixmap as wide as our grid and as high as our window,
-        # used to quickly initialize new areas of the graph with our grid pattern.
-        self.gridPixmap = gtk.gdk.Pixmap(self.window, self.gridSize, self.gheight)
+        gridPixmap.draw_rectangle(self.bgGc, True, 0, 0, width, height)
 
-        self.gridPixmap.draw_rectangle(self.bgGc, True, 0, 0, width, height)
-
-        # Horizontal grid lines
-        for y in range(0, height, self.gridSize):
-            self.gridPixmap.draw_rectangle(self.gridGc, True, 0, y, width, 1)
+        # Horizontal grid lines (-ve, grid anchored at bottom)
+        for y in self._get_gridlines_y():
+            gridPixmap.draw_rectangle(self.gridGc, True, 0, y, width, 1)
 
         # Vertical grid lines
         for x in range(0, width, self.gridSize):
-            self.gridPixmap.draw_rectangle(self.gridGc, True, x, 0, 1, height)
+            gridPixmap.draw_rectangle(self.gridGc, True, x, 0, 1, height)
 
     def drawGrid(self, x, width):
         """Draw grid lines on our backing store, using the current gridPhase,
@@ -254,8 +262,8 @@ class HScrollLineGraph(HScrollGraph):
 
         self.emit("range-changed", *self.range)
 
-        self.drawBackground()
-        self.drawAxis()
+        print "rescalse"
+
         self.resized()
 
     def graphChannel(self, channel):
@@ -293,6 +301,11 @@ class HScrollLineGraph(HScrollGraph):
 
         # Invalidate saved pen vectors
         self.penVectors = {}
+
+        self.drawBackground()
+        self.drawAxis()
+
+        print "resized"
 
     def exposedPixels(self, nPixels):
         """Scrolls our old pen vectors along with the graph,

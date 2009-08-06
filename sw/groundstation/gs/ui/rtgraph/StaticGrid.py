@@ -18,7 +18,7 @@ class StaticGridGraph(PolledGraph):
            a separate pixmap, then draws that to the backbuffer,
            so the grid can be quickly redrawn for each frame.
            """
-        self.gridPixmap = gtk.gdk.Pixmap(self.window, self.width, self.height)
+        self.gridPixmap = gtk.gdk.Pixmap(self.window, self.gwidth, self.gheight)
         self.initGrid(self.gridPixmap, self.gwidth, self.gheight)
         self.blitGrid()
 
