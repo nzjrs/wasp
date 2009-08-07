@@ -55,6 +55,17 @@ class DummySerialCommunication(gobject.GObject):
         self._generic_send(int(1000/10), "IMU_GYRO_RAW")
         #AHRS at 10hz
         gobject.timeout_add(int(1000/10), self._do_ahrs)
+        #GPS at 4 Hz
+        gobject.timeout_add(int(1000/4), self._do_gps)
+
+    def _do_gps(self):
+
+        lat = int(-43.520451 * 1e7)
+        lon = int(172.582377 * 1e7)
+        alt = int(10)
+
+        msg = self._messages.get_message_by_name("GPS_LLH")
+        return self._send(msg, 2, 5, lat, lon, alt)
 
     def _do_generic_send(self, msgname):
         msg, vals = self._sendcache[msgname]
