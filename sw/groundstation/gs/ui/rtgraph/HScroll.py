@@ -84,8 +84,7 @@ class HScrollGraph(PolledGraph):
 
         # Create a grid pixmap as wide as our grid and as high as our window,
         # used to quickly initialize new areas of the graph with our grid pattern.
-        self.gridPixmap = gtk.gdk.Pixmap(self.window, self.gwidth, self.gheight)
-        self.initGrid(self.gridPixmap, self.gwidth, self.gheight)
+        self.initGrid(self.gridSize, self.gheight)
         # Initialize the backing store
         self.drawGrid(0, self.gwidth)
 
@@ -115,17 +114,18 @@ class HScrollGraph(PolledGraph):
                 # blit the labels to the screen
                 self.queue_draw_area(self.gwidth, 0, self.width, self.gheight)
 
-    def initGrid(self, gridPixmap, width, height):
+    def initGrid(self, width, height):
         """Draw our grid on the given drawable"""
-        gridPixmap.draw_rectangle(self.bgGc, True, 0, 0, width, height)
+        self.gridPixmap = gtk.gdk.Pixmap(self.window, width, height)
+        self.gridPixmap.draw_rectangle(self.bgGc, True, 0, 0, width, height)
 
         # Horizontal grid lines (-ve, grid anchored at bottom)
         for y in self._get_gridlines_y():
-            gridPixmap.draw_rectangle(self.gridGc, True, 0, y, width, 1)
+            self.gridPixmap.draw_rectangle(self.gridGc, True, 0, y, width, 1)
 
         # Vertical grid lines
         for x in range(0, width, self.gridSize):
-            gridPixmap.draw_rectangle(self.gridGc, True, x, 0, 1, height)
+            self.gridPixmap.draw_rectangle(self.gridGc, True, x, 0, 1, height)
 
     def drawGrid(self, x, width):
         """Draw grid lines on our backing store, using the current gridPhase,
