@@ -111,6 +111,10 @@ class AltWidget(custom.GdkWidget):
         self.alt_pixel_x = x
         self.queue_draw()
 
+    def update_pixel_x_and_altitude(self, x, alt):
+        self.alt_pixel_x = x
+        self.update_altitude(alt)
+
 class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
     CONFIG_SECTION = "MAP"
@@ -165,7 +169,11 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         if fix:
             if MAP_AVAILABLE:
                 self._map.draw_gps(lat, lon, 0)
-            self._alt.update_altitude(hsl)
+
+                px, py = self._map.geographic_to_screen(self.lat, self.lon)
+                self._alt.update_pixel_x_and_altitude(px, hsl)
+            else:
+                self._alt.update_altitude(hsl)
 
     def get_widget(self):
         return self._pane
@@ -207,7 +215,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
                     except KeyError:
                         break
 
-                self._map.connect('button-release-event', self._on_map_button_release)
+                self._map.connect_after('button-release-event', self._on_map_button_release)
                 self._map.connect('size-allocate', self._on_map_size_allocate)
 
             else:
