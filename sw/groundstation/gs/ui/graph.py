@@ -40,14 +40,17 @@ class Graph(rtgraph.HScrollLineGraph):
                     axisLabel=True,
                     channels=[FieldChannel(msg, field)]
         )
-        source.register_interest(self._on_msg, 0, msg.name)
+        self._source = source
+        self._source.register_interest(self._on_msg, 0, msg.name)
 
     def _on_msg(self, msg, payload):
         vals = msg.unpack_values(payload)
-
         for f in self.channels:
             f.update_msg_value(vals)
 
     def get_scroll_rate_widget(self):
         return self.getTweakControls()[0]
+
+    def delete(self):
+        self._source.unregister_interest(self._on_msg)
 

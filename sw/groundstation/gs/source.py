@@ -21,6 +21,9 @@ class _Source:
     def register_interest(self, *args, **kwargs):
         raise NotImplementedError
 
+    def unregister_interest(self, *args, **kwargs):
+        raise NotImplementedError
+
     def quit(self, *args, **kwargs):
         raise NotImplementedError
 
@@ -132,6 +135,19 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
                 self._callbacks[msg.id].append(cb)
             except KeyError:
                 self._callbacks[msg.id] = [cb]
+
+    def unregister_interest(self, cb):
+        fid = None
+        fcb = None
+        for msgid in self._callbacks:
+            for mcb in self._callbacks[msgid]:
+                if mcb.cb == cb:
+                    mcb.cb = None
+                    fid = msgid
+                    fcb = mcb
+
+        if fid and fcb:
+            self._callbacks[fid].remove(fcb)
 
     def on_serial_data_available(self, fd, condition, serial):
         data = serial.read(1)

@@ -58,6 +58,8 @@ class _GraphHolder(gtk.HBox):
     def __init__(self, g, name, adjustable, on_pause, on_print, on_remove):
         gtk.HBox.__init__(self, spacing=5)
 
+        self.graph = g
+
         frame = gtk.Frame(name)
 
         vb = gtk.VBox()
@@ -113,6 +115,7 @@ class GraphManager(config.ConfigurableIface):
 
     def _on_remove(self, sender, name):
         gh = self._graphs[name]
+        gh.graph.delete()
         self._box.remove(gh)
         del(self._graphs[name])
 
