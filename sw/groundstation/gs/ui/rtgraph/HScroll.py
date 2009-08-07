@@ -108,8 +108,6 @@ class HScrollGraph(PolledGraph):
                     y = gridy[i]
                     gridval = gridstep[i]
 
-                    print y,gridval
-
                     l = _Label(pc, gridval, y)
                     if l.can_fit(maxy=self.gheight):
                         self.backingPixmap.draw_layout(self.gc, self.gwidth+1, l.y, l.layout)
@@ -259,11 +257,7 @@ class HScrollLineGraph(HScrollGraph):
 
     def rescale(self, val, idx):
         self.range[idx] = val
-
         self.emit("range-changed", *self.range)
-
-        print "rescalse"
-
         self.resized()
 
     def graphChannel(self, channel):
@@ -304,8 +298,6 @@ class HScrollLineGraph(HScrollGraph):
 
         self.drawBackground()
         self.drawAxis()
-
-        print "resized"
 
     def exposedPixels(self, nPixels):
         """Scrolls our old pen vectors along with the graph,
