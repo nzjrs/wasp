@@ -42,8 +42,6 @@ class AltWidget(custom.GdkWidget):
         self.linegc.set_line_attributes(1, gtk.gdk.LINE_SOLID,
                                     gtk.gdk.CAP_BUTT, gtk.gdk.JOIN_MITER)
 
-        print gtk.gdk.color_parse("navajowhite")
-
         self.redgc = drawable.new_gc(
                         foreground=self.get_color(drawable, r=1.0, g=0.0, b=0.0),
                         fill=gtk.gdk.SOLID,
@@ -132,7 +130,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         gs.ui.GtkBuilderWidget.__init__(self, uifile)
 
         self._map = None
-        self._frame = gtk.Frame()
+        self._pane = gtk.VPaned()
         self._lbl = None
         self._alt = AltWidget()
         self._cbs = {}
@@ -165,11 +163,12 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         self.lon = lon
 
         if fix:
-            self._map.draw_gps(lat, lon, 0)
+            if MAP_AVAILABLE:
+                self._map.draw_gps(lat, lon, 0)
             self._alt.update_altitude(hsl)
 
     def get_widget(self):
-        return self._frame
+        return self._pane
 
     def connect(self, signal, func, *args):
         """
@@ -194,6 +193,8 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
                             map_source=int(self._source),
                             proxy_uri=self._proxy,
                             tile_cache=self._cache)
+                #minimum size of one tile
+                self._map.set_size_request(-1, 256)
 
                 LOG.info("Map %s URI: %s" % (self._source, self._map.props.repo_uri))
                 LOG.info("Proxy: %s" % self._map.props.proxy_uri)
@@ -212,10 +213,9 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
             else:
                 self._map = gtk.Label("Map Disabled")
 
-            vb = gtk.VBox()
-            vb.pack_start(self._map, True, True)
-            vb.pack_start(self._alt, False, False)
-            self._frame.add(vb)
+            self._pane.pack1(self._map, resize=True, shrink=False)
+            self._pane.pack2(self._alt, resize=False, shrink=False)
+            self._pane.set_position(1000)
 
     def update_config_from_state(self):
         self.config_set("cache", self._cache)
