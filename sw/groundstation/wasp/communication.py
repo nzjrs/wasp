@@ -2,7 +2,10 @@ import random
 import os
 import gobject
 import serial
+
 import libserial.SerialSender
+
+import wasp
 
 class SerialCommunication(libserial.SerialSender.SerialSender):
     """
@@ -57,12 +60,20 @@ class DummySerialCommunication(gobject.GObject):
         gobject.timeout_add(int(1000/10), self._do_ahrs)
         #GPS at 4 Hz
         gobject.timeout_add(int(1000/4), self._do_gps)
+        self._alt = wasp.NoisySine(freq=0.5, value_type=int)
+        self._lat = -43.520451
+        self._lon = 172.582377
 
     def _do_gps(self):
 
-        lat = int(-43.520451 * 1e7)
-        lon = int(172.582377 * 1e7)
-        alt = int(10)
+        if random.randint(0,4) == 4:
+            self._lat += (random.random()*0.0001)
+        if random.randint(0,4) == 4:
+            self._lon += (random.random()*0.0001)
+
+        lat = int(self._lat * 1e7)
+        lon = int(self._lon * 1e7)
+        alt = self._alt.value()
 
         msg = self._messages.get_message_by_name("GPS_LLH")
         return self._send(msg, 2, 5, lat, lon, alt)
