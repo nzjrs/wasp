@@ -11,16 +11,25 @@ class StatusBar(gtk.Statusbar):
         hb = gtk.HBox()
 
         #connected indicator
-        self._c = indicators.ColorLabelBox("C:")
+        self._c = indicators.ColorLabelBox("C:",
+                                red_message="Communication not connected",
+                                green_message="Communication connected")
         hb.pack_start(self._c)
         #status indicator
-        self._s = indicators.ColorLabelBox("S:")
-        hb.pack_start(self._s)
+        #self._s = indicators.ColorLabelBox("S:",
+        #                        red_message="UAV Error",
+        #                        yellow_message="UAV Warning",
+        #                        green_message="UAV OK")
+        #hb.pack_start(self._s)
         #autopilot indicator
-        self._a = indicators.ColorLabelBox("A:")
+        self._a = indicators.ColorLabelBox("A:",
+                                red_message="Autopilot disabled",
+                                green_message="Autopilot enabled")
         hb.pack_start(self._a)
         #manual indicator
-        self._m = indicators.ColorLabelBox("M:")
+        self._m = indicators.ColorLabelBox("M:",
+                                red_message="Manual control disabled",
+                                green_message="Manual control enabled")
         hb.pack_start(self._m)
 
         #msgs/second        
@@ -46,8 +55,10 @@ class StatusBar(gtk.Statusbar):
     def _on_serial_connected(self, serial, connected):
         if connected:
             self._c.set_green()
+            self._c.set_tooltip_text("")
         else:
             self._c.set_red()
+            self._c.set_tooltip_text("Communication disconnected")
 
     def _check_messages_per_second(self, source):
         self._ms.set_text("MSG/S: %.1f" % source.get_messages_per_second())

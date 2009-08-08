@@ -10,8 +10,11 @@ class _Colorable:
     YELLOW      = 0xFFFF00FF
     RED         = 0xFF0000FF
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self._color = self.BLANK
+        self._redmsg = kwargs.get("red_message")
+        self._yellowmsg = kwargs.get("yellow_message")
+        self._greenmsg = kwargs.get("green_message")
 
     def set_red(self):
         if self._color != self.RED:
@@ -41,27 +44,31 @@ class ColorBox(gtk.Image, _Colorable):
     RED_PB = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8, width=16, height=16)
     RED_PB.fill(pixel=_Colorable.RED)
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         gtk.Image.__init__(self)
-        _Colorable.__init__(self)
+        _Colorable.__init__(self, **kwargs)
 
     def set_color(self, color):
-        if color == self.GREEN:
-            self.set_from_pixbuf(self.GREEN_PB)
+        if color == self.RED:
+            self.set_from_pixbuf(self.RED_PB)
+            self.set_tooltip_text(self._redmsg)
         elif color == self.YELLOW:
             self.set_from_pixbuf(self.YELLOW_PB)
-        elif color == self.RED:
-            self.set_from_pixbuf(self.RED_PB)
+            self.set_tooltip_text(self._yellowmsg)
+        elif color == self.GREEN:
+            self.set_from_pixbuf(self.GREEN_PB)
+            self.set_tooltip_text(self._greenmsg)
         else:
             self.clear()
+            self.set_tooltip_text(None)
 
 
 class FadingColorBox(ColorBox):
 
     FPS = 10
 
-    def __init__(self, fade_time=2):
-        ColorBox.__init__(self)
+    def __init__(self, fade_time=2, **kwargs):
+        ColorBox.__init__(self, **kwargs)
         self._fade_time = fade_time
 
         tick = 1000/self.FPS
@@ -98,14 +105,14 @@ class FadingColorBox(ColorBox):
 
 class ColorLabelBox(gtk.HBox, _Colorable):
 
-    def __init__(self, text="", right=False):
+    def __init__(self, text="", right=False, **kwargs):
         gtk.HBox.__init__(self)
         _Colorable.__init__(self)
 
         if text and not right:
             self.pack_start(gs.ui.make_label(text, 0), False, True)
 
-        self._box = ColorBox()
+        self._box = ColorBox(**kwargs)
         self._box.set_red()
         self.pack_start(self._box)
 
@@ -140,20 +147,23 @@ class ColorLabel(gtk.EventBox, _Colorable):
                 (_Colorable.RED & 0x00FF0000) >> 8,
                 _Colorable.RED & 0x0000FF00, 0)
 
-    def __init__(self, text):
+    def __init__(self, text, **kwargs):
         gtk.EventBox.__init__(self)
-        _Colorable.__init__(self)
+        _Colorable.__init__(self, **kwargs)
 
-        label = gtk.Label(text)
-        self.add(label)
+        self.label = gtk.Label(text)
+        self.add(self.label)
 
     def set_color(self, color):
         if color == self.GREEN:
             self.modify_bg(gtk.STATE_NORMAL, self.GREEN_COLOR)
+            self.label.set_tooltip_text(self._greenmsg)
         elif color == self.YELLOW:
             self.modify_bg(gtk.STATE_NORMAL, self.YELLOW_COLOR)
+            self.label.set_tooltip_text(self._yellowmsg)
         elif color == self.RED:
             self.modify_bg(gtk.STATE_NORMAL, self.RED_COLOR)
+            self.label.set_tooltip_text(self._redmsg)
         else:
             #FIXME: Not supported...
             pass
@@ -168,13 +178,19 @@ if __name__ == "__main__":
 
     vb = gtk.VBox()
 
-    box = ColorLabelBox("box")
+    color_messages = {
+        "red_message":"red",
+        "yellow_message":"yellow",
+        "green_message":"green"
+    }
+
+    box = ColorLabelBox("box", **color_messages)
     box.set_red()
 
-    lbl = ColorLabel("test")
+    lbl = ColorLabel("test", **color_messages)
     lbl.set_yellow()
 
-    fade = FadingColorBox()
+    fade = FadingColorBox(**color_messages)
     fade.set_green()
 
     def change(btn, box, lbl):
