@@ -46,8 +46,10 @@ class _Setting:
         self.name = "%s_%s" % (section_name, x.name.upper())
         try:
             self.value = x.value
+            self.default_value_string = self.value
         except AttributeError:
             self.value = 0
+            self.default_value_string = "Unknown"
 
         try:
             self.rational_approximation = int(x.integer)
