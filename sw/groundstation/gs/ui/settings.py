@@ -9,11 +9,38 @@ LOG = logging.getLogger("settings")
 class _EditSetting(gtk.Frame):
     def __init__(self, setting):
         gtk.Frame.__init__(self, label=setting.name)
-
+        self.set_border_width(5)
         self._setting = setting
 
-        self._vb = gtk.VBox()
-        self.add(self._vb)
+        self._box = gtk.HBox(spacing=10)
+        self.add(self._box)
+
+        #create a slider and a spin entry
+        min_, default, max_, step = setting.get_value_adjustment()
+        adj = gtk.Adjustment(
+                    value=float(default),
+                    lower=float(min_),
+                    upper=float(max_),
+                    step_incr=float(step),
+                    page_incr=10.0*step)
+
+        slider = gtk.HScale(adj)
+        spin = gtk.SpinButton(adj)
+
+        if type(default) == float:
+            slider.set_digits(1)
+            spin.set_digits(1)
+        else:
+            slider.set_digits(0)
+            spin.set_digits(0)
+
+        self._box.pack_start(slider,True)
+        self._box.pack_start(spin,False)
+
+        #send button
+        send = gtk.Button(stock=gtk.STOCK_EXECUTE)
+        self._box.pack_start(send, False)
+
 
 class _EditSettingsManager(gtk.VBox):
     def __init__(self):

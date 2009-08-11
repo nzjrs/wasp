@@ -78,6 +78,26 @@ class _Setting:
 
         self.id_str = "SETTING_ID_%s" % self.name
 
+    def format_value(self, val=None):
+        if val:
+            return self.type(val)
+        else:
+            return self.type()
+
+    def get_value_adjustment(self):
+        """
+        Returns min, default, max, adjustment
+        """
+        if self.type == "uint8":
+            return 0, int(self.value), 255, 1
+        elif self.type == "float":
+            return -100.0, float(self.value), 100.0, 0.1
+        else:
+            raise Exception("Type not supported")
+
+    def get_default_value(self):
+        return self.format_value(self.value)
+
     def set_id(self, id_):
         self.id = id_
 
