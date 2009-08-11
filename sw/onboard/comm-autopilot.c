@@ -135,6 +135,11 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
                 type = MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_type(payload);
                 u8 = MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_value(payload);
                 value = &u8;
+
+                if ( settings_set(id, type, value) )
+                {
+                    ;
+                }
                 break;
             default:
                 return FALSE;
