@@ -1,5 +1,6 @@
 # vim: ai ts=4 sts=4 et sw=4
 
+import sys
 import re
 import os.path
 
@@ -40,7 +41,22 @@ def convert_float_to_rational_fraction_approximation(xi, maxsize=10000):
 
 class _Setting:
 
-    SUPPORTED_TYPES = ("uint8","float")
+    #Converted to an enum to fake dynamic typing, python -> c with consistent
+    #type identifiers
+    TYPES = {
+        "uint8" :   ("SETTING_TYPE_UINT8", 0),
+        "float" :   ("SETTING_TYPE_FLOAT", 1),
+    }
+
+    TYPE_PYTHON = {
+        "uint8" :   int,
+        "float" :   float,
+    }
+
+    TYPE_RANGES = {
+        "uint8" :   (0,255),
+        "float" :   (-100.0, 100.0),
+    }
 
     def __init__(self, section_name, x):
         self.name = "%s_%s" % (section_name, x.name.upper())
@@ -71,29 +87,48 @@ class _Setting:
             try:
                 type_ = x.type;
             except AttributeError:
-                pass
-            if type_ not in _Setting.SUPPORTED_TYPES:
+                raise
+            if type_ not in self.TYPES:
                 raise Exception("Get/Set of setting with type = %s not supported" % self.type)
             self.type = type_
+            self.python_type = self.TYPE_PYTHON[self.type]
+            self.type_enum, self.type_enum_value = self.TYPES[self.type]
+
+        if self.set:
+            self.min, self.max = self.TYPE_RANGES[self.type]
+            try:
+                self.min = self.python_type(x.min)
+            except AttributeError:
+                pass
+            try:
+                self.max = self.python_type(x.max)
+            except AttributeError:
+                pass
+        else:
+            self.min = -1.0 * float(sys.maxint)
+            self.max = float(sys.maxint)
 
         self.id_str = "SETTING_ID_%s" % self.name
 
     def format_value(self, val=None):
         if val:
-            return self.type(val)
+            return self.python_type(val)
         else:
-            return self.type()
+            return self.python_type()
 
     def get_value_adjustment(self):
         """
         Returns min, default, max, adjustment
         """
         if self.type == "uint8":
-            return 0, int(self.value), 255, 1
+            step = 1
         elif self.type == "float":
-            return -100.0, float(self.value), 100.0, 0.1
+            step = 0.1
         else:
             raise Exception("Type not supported")
+
+        default = self.python_type(self.value)
+        return self.min, default, self.max, step
 
     def get_default_value(self):
         return self.format_value(self.value)
@@ -106,7 +141,7 @@ class _Setting:
 
     def print_type(self):
         if self.type:
-            print "#define SETTING_TYPE_%s %s" % (self.name, self.type)
+            print "#define SETTING_TYPE_%s %s" % (self.name, self.type_enum)
 
     def print_value(self):
         print "#define %s %s" % (self.name, self.value)
@@ -168,23 +203,30 @@ class Settings:
 
 
     def print_typedefs(self):
-        #self._print_set_or_get("set", self.settible)
-        #print
-        #self._print_set_or_get("get", self.gettible)
-        #print
         print "typedef enum {"
-        for t in _Setting.SUPPORTED_TYPES:
-            print "\tSETTING_TYPE_%s," % t.upper()
+        for t,(n,v) in _Setting.TYPES.items():
+            print "\t%s = %d," % (n, v)
         print "} SettingType_t;"
         print
         print "typedef bool_t (*SettingSetterCallback_t)(uint8_t chan, void *data);"
         print "typedef bool_t (*SettingGetterCallback_t)(uint8_t chan, void *data);"
+        print
 
     def print_defines(self):
+        min_ = -1
+        max_ = 0
+
         for sect in self.sections:
             for s in sect.settings:
                 s.print_id()
                 s.print_type()
+                if min_ == -1:
+                    min_ = s.id
+                max_ = max(s.id, max_)
+
+        print
+        print "#define SETTING_ID_MIN %s" % min_
+        print "#define SETTING_ID_MAX %d" % max_
         print
 
     def print_values(self):
