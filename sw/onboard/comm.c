@@ -3,6 +3,7 @@
  */
 
 #include "comm.h"
+#include "settings.h"
 #include "sys_time.h"
 #include "generated/build.h"
 
@@ -200,7 +201,7 @@ comm_event_task ( CommChannel_t chan )
         CommMessage_t *msg = &comm_message[chan];
 
         /* handle standard messages directly in the comm layer */
-        switch ( comm_message[chan].msgid )
+        switch ( msg->msgid )
         {
             case MESSAGE_ID_PING:
                 MESSAGE_SEND_PONG(chan);
@@ -216,7 +217,7 @@ comm_event_task ( CommChannel_t chan )
                 break;
             default:
                 if (comm_callback_rx[chan])
-                    ret = comm_callback_rx[chan](chan, &comm_message[chan]);
+                    ret = comm_callback_rx[chan](chan, msg);
                 else
                     ret = FALSE;
                 break;
