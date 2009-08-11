@@ -31,6 +31,10 @@ class _Colorable:
             self.set_color(self.GREEN)
         self._color = self.GREEN
 
+    def set_blank(self):
+        self.set_color(self.BLANK)
+        self._color = self.BLANK
+
     def set_color(self):
         raise NotImplementedError
 
@@ -86,6 +90,19 @@ class FadingColorBox(ColorBox):
         self._pb.fill(pixel=self._color - int(opacity))
         self.set_from_pixbuf(self._pb)
 
+    def set_red(self):
+        self.set_color(self.RED)
+
+    def set_yellow(self):
+        self.set_color(self.YELLOW)
+
+    def set_green(self):
+        self.set_color(self.GREEN)
+
+    def set_blank(self):
+        self._update(255.0)
+        self._animating = False
+
     def set_color(self, color):
         self._color = color
         self._opacity = 0.0
@@ -105,19 +122,27 @@ class FadingColorBox(ColorBox):
 
 class ColorLabelBox(gtk.HBox, _Colorable):
 
-    def __init__(self, text="", right=False, **kwargs):
+    def __init__(self, text=None, right=False, fade=False, **kwargs):
         gtk.HBox.__init__(self)
         _Colorable.__init__(self)
 
-        if text and not right:
-            self.pack_start(gs.ui.make_label(text, 0), False, True)
+        if text != None:
+            self._label = gs.ui.make_label(text, 0)
+        else:
+            self._label = None
 
-        self._box = ColorBox(**kwargs)
+        if text != None and not right:
+            self.pack_start(self._label, False, True)
+
+        if fade:
+            self._box = FadingColorBox(**kwargs)
+        else:
+            self._box = ColorBox(**kwargs)
         self._box.set_red()
         self.pack_start(self._box)
 
-        if text and right:
-            self.pack_start(gs.ui.make_label(text, 0), False, True)
+        if text != None and right:
+            self.pack_start(self._label, False, True)
 
     def set_red(self):
         self._box.set_red()
@@ -128,8 +153,15 @@ class ColorLabelBox(gtk.HBox, _Colorable):
     def set_green(self):
         self._box.set_green()
 
+    def set_blank(self):
+        self._box.set_blank()
+
     def set_color(self, color):
         self._box.set_color(color)
+
+    def set_text(self, text):
+        if self._label:
+            self._label.set_text(text)
 
 class ColorLabel(gtk.EventBox, _Colorable):
 
@@ -167,6 +199,9 @@ class ColorLabel(gtk.EventBox, _Colorable):
         else:
             #FIXME: Not supported...
             pass
+
+    def set_text(self, text):
+        self.label.set_text(text)
 
 
 

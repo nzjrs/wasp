@@ -42,7 +42,9 @@ class StatusBar(gtk.Statusbar):
         self._gps_coords = gs.ui.make_label("GPS: +180.0000 N, +180.0000 E")
         hb.pack_start(self._gps_coords, False, False)
         #debug
-        self._debug = gs.ui.make_label("")
+        self._debug = indicators.ColorLabelBox(text="", fade=True)
+        self._debug.set_blank()
+
         hb.pack_start(self._debug, True, True)
        
         self.pack_start(hb, False, False)
@@ -71,6 +73,7 @@ class StatusBar(gtk.Statusbar):
     def _on_debug(self, msg, payload):
         value, = msg.unpack_values(payload)
         self._debug.set_text("DEBUG: %d" % value)
+        self._debug.set_green()
 
     def _on_gps(self, msg, payload):
         fix,sv,lat,lon,hsl = msg.unpack_values(payload)
