@@ -10,6 +10,8 @@
 
 #include "booz2_autopilot.h"
 #include "booz2_ins.h"
+#include "booz2_guidance_h.h"
+#include "booz2_guidance_v.h"
 
 bool_t
 comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
@@ -96,6 +98,12 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
                     &booz2_analog_baro_offset,
                     &booz2_analog_baro_value);
             }
+            break;
+        case MESSAGE_ID_AUTOPILOT:
+            MESSAGE_SEND_AUTOPILOT(COMM_1,
+                    &booz2_autopilot_mode,
+                    &booz2_guidance_h_mode,
+                    &booz2_guidance_v_mode);
             break;
         default:
             ret = FALSE;
