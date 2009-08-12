@@ -73,10 +73,10 @@ class DummySerialCommunication(gobject.GObject):
 
         lat = int(self._lat * 1e7)
         lon = int(self._lon * 1e7)
-        alt = self._alt.value()
+        alt = self._alt.value() * 1000.0
 
         msg = self._messages.get_message_by_name("GPS_LLH")
-        return self._send(msg, 2, 5, lat, lon, alt)
+        return self._send(msg, 2, 5, lat, lon, alt, 1, 1)
 
     def _do_generic_send(self, msgname):
         msg, vals = self._sendcache[msgname]

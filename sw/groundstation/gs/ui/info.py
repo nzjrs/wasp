@@ -24,7 +24,7 @@ class InfoBox(gs.ui.GtkBuilderWidget):
                 gs.ui.get_icon_pixbuf("radio.svg"))
 
         self.pb = progressbar.ProgressBar(range=(8,15), average=5)
-        self.get_resource("batt_hbox").pack_start(self.pb, True)
+        self.get_resource("batt_hbox").pack_start(self.pb, False)
 
         source.serial.connect("serial-connected", self._on_serial_connected, source)
 

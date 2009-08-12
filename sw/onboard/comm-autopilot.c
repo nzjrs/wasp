@@ -26,7 +26,9 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
                     &booz_gps_state.num_sv,
                     &booz_gps_state.booz2_gps_lat,
                     &booz_gps_state.booz2_gps_lon,
-                    &booz_gps_state.booz2_gps_hmsl);
+                    &booz_gps_state.booz2_gps_hmsl,
+                    &booz_gps_state.booz2_gps_hacc,
+                    &booz_gps_state.booz2_gps_vacc);
             break;
         case MESSAGE_ID_IMU_GYRO_RAW:
             MESSAGE_SEND_IMU_GYRO_RAW(

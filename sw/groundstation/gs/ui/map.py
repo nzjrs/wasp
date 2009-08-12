@@ -158,10 +158,13 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         self._alt.update_pixel_x(allocation.width/2)
 
     def _on_gps(self, msg, payload):
-        fix,sv,lat,lon,hsl = msg.unpack_values(payload)
+        fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_values(payload)
 
+        #scale 1e7 from UBlox protocol datasheet
         lat = lat/1e7
         lon = lon/1e7
+        #convert from mm to m
+        hsl = hsl/1000.0
 
         self.lat = lat
         self.lon = lon

@@ -22,9 +22,9 @@ struct Booz_gps_state {
   /* UBX NAV POSLLH */
   int32_t  booz2_gps_lon;
   int32_t  booz2_gps_lat;
-  int32_t  booz2_gps_hmsl;
-  uint32_t booz2_gps_vacc;
-  uint32_t booz2_gps_hacc;
+  int32_t  booz2_gps_hmsl;       /* height above mean seal level (mm)   */
+  uint32_t booz2_gps_vacc;       /* vertical accuracy (mm)              */
+  uint32_t booz2_gps_hacc;       /* horizontal accuracy (mm)            */
   /* UBX NAV VELNED */
   int32_t  booz2_gps_vel_n;
   int32_t  booz2_gps_vel_e;

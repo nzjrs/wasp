@@ -63,6 +63,8 @@ gps_event_task(void)
                 booz_gps_state.booz2_gps_lon = UBX_NAV_POSLLH_LON(ubx_msg_buf);
                 booz_gps_state.booz2_gps_lat = UBX_NAV_POSLLH_LAT(ubx_msg_buf);
                 booz_gps_state.booz2_gps_hmsl = UBX_NAV_POSLLH_HMSL(ubx_msg_buf);
+                booz_gps_state.booz2_gps_hacc = UBX_NAV_POSLLH_Hacc(ubx_msg_buf);
+                booz_gps_state.booz2_gps_vacc = UBX_NAV_POSLLH_Vacc(ubx_msg_buf);
             }
             else if (ubx_id == UBX_NAV_SOL_ID) {
                 uint8_t fix = UBX_NAV_SOL_GPSfix(ubx_msg_buf);

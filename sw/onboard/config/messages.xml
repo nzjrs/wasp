@@ -139,7 +139,9 @@
       <field name="sv" type="uint8"/>
       <field name="lat"  type="int32"/>
       <field name="lon"  type="int32"/>
-      <field name="hsl"  type="int32"/>
+      <field name="hsl"  type="int32" unit="mm"/>
+      <field name="hacc"  type="int32" unit="mm"/>
+      <field name="vacc"  type="int32" unit="mm"/>
    </message>
 
    <message name="ALTIMETER" id="37">

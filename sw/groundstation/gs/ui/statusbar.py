@@ -76,7 +76,7 @@ class StatusBar(gtk.Statusbar):
         self._debug.set_green()
 
     def _on_gps(self, msg, payload):
-        fix,sv,lat,lon,hsl = msg.unpack_values(payload)
+        fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_values(payload)
 
         lat = lat/1e7
         lon = lon/1e7
