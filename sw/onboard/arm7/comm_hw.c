@@ -10,12 +10,20 @@
 void
 comm_init ( CommChannel_t chan )
 {
+#if USE_UART0
+    if ( chan == COMM_0 ) {
+        uart0_init_tx();
+        comm_channel_used[chan] = TRUE;
+    }
+#endif
+#if USE_UART1
     if ( chan == COMM_1 ) {
         uart1_init_tx();
         comm_channel_used[chan] = TRUE;
     }
+#endif
 #if USE_USB_SERIAL
-    else if ( chan == COMM_2 ) {
+    if ( chan == COMM_USB ) {
         VCOM_init();
         comm_channel_used[chan] = TRUE;
     }
@@ -36,37 +44,56 @@ comm_init ( CommChannel_t chan )
 bool_t
 comm_ch_available ( CommChannel_t chan )
 {
+#if USE_UART0
+    if (chan == COMM_0) {
+        return Uart0ChAvailable();
+    }
+#endif
+#if USE_UART1
     if (chan == COMM_1) {
         return Uart1ChAvailable();
     }
+#endif
 #if USE_USB_SERIAL
-    else if (chan == COMM_2)
+    if (chan == COMM_USB)
         return VCOM_check_available();
 #endif
-    else
-        return FALSE;
+    return FALSE;
 }
 
 uint8_t
 comm_get_ch( CommChannel_t chan )
 {
+#if USE_UART0
+    if (chan == COMM_0) {
+        return Uart0Getch();
+    }
+#endif
+#if USE_UART1
     if (chan == COMM_1) {
         return Uart1Getch();
     }
+#endif
 #if USE_USB_SERIAL
-    else if (chan == COMM_2)
+    if (chan == COMM_USB)
         return VCOM_getchar();
 #endif
-    else return '\0';
+    return '\0';
 }
 
 void
 comm_send_ch( CommChannel_t chan, uint8_t ch )
 {
+#if USE_UART0
+    if (chan == COMM_0)
+        uart0_transmit(ch);
+#endif
+#if USE_UART1
     if (chan == COMM_1)
         uart1_transmit(ch);
+#endif
 #if USE_USB_SERIAL
-    else if (chan == COMM_2)
+    if (chan == COMM_USB)
         VCOM_putchar(ch);
 #endif
 }
@@ -74,14 +101,19 @@ comm_send_ch( CommChannel_t chan, uint8_t ch )
 bool_t
 comm_check_free_space ( CommChannel_t chan, uint8_t len )
 {
+#if USE_UART0
+    if (chan == COMM_0)
+        return uart0_check_free_space(len);
+#endif
+#if USE_UART1
     if (chan == COMM_1)
         return uart1_check_free_space(len);
+#endif
 #if USE_USB_SERIAL
-    else if (chan == COMM_2)
+    if (chan == COMM_USB)
         return VCOM_check_free_space(len);
 #endif
-    else
-        return FALSE;
+    return FALSE;
 }
 
 void
