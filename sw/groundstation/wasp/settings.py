@@ -118,7 +118,7 @@ class _Setting:
         #A dynamic type can be set or get, so gets assingned an ID and has more
         #code generated
         self.dynamic = (self.type and self.set) or (self.type and self.get)
-
+        self.id = -1
         self.id_str = "SETTING_ID_%s" % self.name
 
     def format_value(self, val=None):
@@ -174,6 +174,9 @@ class _Setting:
 
     def __str__(self):
         return "<Setting: %s>" % self.name
+
+    def __hash__(self):
+        return hash(self.name)
 
 class _Section:
     def __init__(self, x):

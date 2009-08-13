@@ -194,11 +194,11 @@ class SettingsTreeStore(gtk.ListStore):
                 bool,       #SUPPORTS_SET,
                 object)     #OBJECT, the setting object
 
-        self._setting_ids = {}
+        self._settings = {}
 
     def add_setting(self, setting):
-        if setting.id not in self._setting_ids:
-            self._setting_ids[setting.id] = self.append( (setting.name, setting.id, setting.get == 1, setting.set == 1, setting) )
+        if setting not in self._settings:
+            self._settings[setting] = self.append( (setting.name, setting.id, setting.get == 1, setting.set == 1, setting) )
 
 class SettingsTreeView(gtk.TreeView):
     def __init__(self, settingtreemodel, show_all=False):
@@ -209,8 +209,7 @@ class SettingsTreeView(gtk.TreeView):
                 text=SettingsTreeStore.NAME_IDX)
 
         if show_all:
-            for name,id_ in (   ("ID",  SettingsTreeStore.ID_IDX),
-                                ("GET", SettingsTreeStore.SUPPORTS_GET),
+            for name,id_ in (   ("GET", SettingsTreeStore.SUPPORTS_GET),
                                 ("SET", SettingsTreeStore.SUPPORTS_SET)):
                 self.insert_column_with_attributes(-1, name,
                         gtk.CellRendererText(),
