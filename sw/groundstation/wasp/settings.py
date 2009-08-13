@@ -82,8 +82,15 @@ class _Setting:
         except AttributeError:
             self.set = 0
 
+        try:
+            self.doc = x.doc
+        except AttributeError:
+            self.doc = ""
+
         self.type = None
         if self.set or self.get:
+            #if this setting is to be set or retrieved over comms, then it needs
+            #to specify a type
             try:
                 type_ = x.type;
             except AttributeError:
@@ -107,6 +114,10 @@ class _Setting:
         else:
             self.min = -1.0 * float(sys.maxint)
             self.max = float(sys.maxint)
+
+        #A dynamic type can be set or get, so gets assingned an ID and has more
+        #code generated
+        self.dynamic = (self.type and self.set) or (self.type and self.get)
 
         self.id_str = "SETTING_ID_%s" % self.name
 
@@ -185,22 +196,13 @@ class Settings:
         i = 1;
         for sect in self.sections:
             for s in sect.settings:
-                s.set_id(i)
                 if s.set:
                     self.settible.append(s)
                 if s.get:
                     self.gettible.append(s)
-                i += 1
-
-    def _print_set_or_get(self, name="set", settings=()):
-        i = 0
-        print "typedef enum {"
-        for s in settings:
-            print "\t%s_%s = %s," % (name.upper(), s.name, s.id_str)
-            i+= 1
-        print "} Setting%stable_t;" % name.title()
-        print "#define NUM_SETTING_%sTABLE = %d" % (name.upper(), i)
-
+                if s.dynamic:
+                    s.set_id(i)
+                    i += 1
 
     def print_typedefs(self):
         print "typedef enum {"
@@ -218,11 +220,12 @@ class Settings:
 
         for sect in self.sections:
             for s in sect.settings:
-                s.print_id()
-                s.print_type()
-                if min_ == -1:
-                    min_ = s.id
-                max_ = max(s.id, max_)
+                if s.dynamic:
+                    s.print_id()
+                    s.print_type()
+                    if min_ == -1:
+                        min_ = s.id
+                    max_ = max(s.id, max_)
 
         print
         print "#define SETTING_ID_MIN %s" % min_

@@ -161,6 +161,7 @@ class SettingsController(gs.ui.GtkBuilderWidget):
             self.get_resource("value_value").set_text(setting.default_value_string)
             self.get_resource("can_set_value").set_text(self.MSGS[setting.set])
             self.get_resource("can_get_value").set_text(self.MSGS[setting.get])
+            self.get_resource("doc_value").set_text(setting.doc)
 
             if setting.set or setting.get:
                 edit_btn.set_sensitive(True)
