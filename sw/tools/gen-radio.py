@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
-import xmlobject
 import gentools
+
+try:
+    import wasp.xmlobject as xmlobject
+except ImportError:
+    import xmlobject
 
 import os.path
 import sys

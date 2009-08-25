@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # vim: ai ts=4 sts=4 et sw=4
 
-import xmlobject
 import gentools
 
 try:
     import wasp.settings as settings
+    import wasp.xmlobject as xmlobject
 except ImportError:
     import settings
+    import xmlobject
 
 import string
 import optparse

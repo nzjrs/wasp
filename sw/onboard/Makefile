@@ -147,7 +147,7 @@ generated: generated/radio.h generated/build.h generated/messages.h generated/se
 # Radio header
 generated/radio.h: config/radio.xml $(TOOLS)/gen-radio.py
 	@echo GENERATE $@
-	$(Q)$(TOOLS)/gen-radio.py $< > $@
+	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-radio.py $< > $@
 
 generated/messages.h: config/messages.xml $(TOOLS)/gen-messages.py
 	@echo GENERATE $@
@@ -159,7 +159,7 @@ generated/settings.h: config/settings.xml $(TOOLS)/gen-settings.py
 
 generated/build.h: $(SRCARM) $(TOOLS)/gen-build-info.py
 	@echo GENERATE $@
-	$(Q)$(TOOLS)/gen-build-info.py --target=$(TARGET) > $@
+	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-build-info.py --target=$(TARGET) > $@
 
 # Create final output files (.hex, .eep) from ELF output file.
 # TODO: handling the .eeprom-section should be redundant
