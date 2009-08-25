@@ -11,7 +11,8 @@ static inline void main_periodic_task( void );
 static inline void main_event_task( void );
 
 #define USE_DA_USB 0
-#define USE_DA_UART 1
+#define USE_DA_UART0 1
+#define USE_DA_UART1 1
 
 
 int main( void ) {
@@ -29,8 +30,13 @@ static inline void main_init( void ) {
   sys_time_init();
   led_init();
 
-#if USE_DA_UART
-  /* Uart 1 */
+#if USE_DA_UART0
+  /* Uart 0 (aka gps) */
+  comm_init(COMM_0);
+#endif
+
+#if USE_DA_UART1
+  /* Uart 1 (aka telemetry) */
   comm_init(COMM_1);
 #endif
 
@@ -48,7 +54,11 @@ static inline void main_periodic_task( void ) {
   RunOnceEvery(200, {
     led_toggle(4);
 
-#if USE_DA_UART
+#if USE_DA_UART0
+    comm_send_ch(COMM_0, c);
+#endif
+
+#if USE_DA_UART1
     comm_send_ch(COMM_1, c);
 #endif
 
