@@ -2,14 +2,7 @@
 #define COMM_H
 
 #include "std.h"
-#include "generated/messages.h"
-
-typedef enum {
-    COMM_0,
-    COMM_1,
-    COMM_USB,
-    COMM_NB
-} CommChannel_t;
+#include "messages.h"
 
 typedef enum {
     STATE_UNINIT,

@@ -6,6 +6,7 @@
 #include "settings.h"
 #include "sys_time.h"
 #include "generated/build.h"
+#include "generated/messages.h"
 
 CommRXMessageCallback_t  comm_callback_rx[COMM_NB];
 CommTXMessageCallback_t  comm_callback_tx[COMM_NB];
@@ -242,11 +243,13 @@ comm_periodic_task ( CommChannel_t chan )
     {
         p = &periodic[i];
 
-        if (p->cnt == p->target) {
-            comm_send_message_by_id(chan, p->msgid);
-            p->cnt = 0;
-        } else
-            p->cnt += 1;
+        if (chan == p->chan) {
+            if (p->cnt == p->target) {
+                comm_send_message_by_id(p->chan, p->msgid);
+                p->cnt = 0;
+            } else
+                p->cnt += 1;
+        }
     }
             
 }

@@ -49,31 +49,29 @@ static inline void main_init( void ) {
 }
 
 static inline void main_periodic_task( void ) {
-    RunOnceEvery(10, {
+    static uint8_t c = 'a';
+
+  RunOnceEvery(200, {
+    led_toggle(4);
+
 #if USE_DA_UART0
-        comm_periodic_task(COMM_0);
+    comm_send_ch(COMM_0, c);
 #endif
 
 #if USE_DA_UART1
-        comm_periodic_task(COMM_1);
+    comm_send_ch(COMM_1, c);
 #endif
 
 #if USE_DA_USB
-        comm_periodic_task(COMM_USB);
+    comm_send_ch(COMM_USB, c);
 #endif
+
+    c = (c < 'z' ? c + 1 : 'a');
+
   });
+
 }
 
 static inline void main_event_task( void ) {
-#if USE_DA_UART0
-    comm_event_task(COMM_0);
-#endif
 
-#if USE_DA_UART1
-    comm_event_task(COMM_1);
-#endif
-
-#if USE_DA_USB
-    comm_event_task(COMM_USB);
-#endif
 }

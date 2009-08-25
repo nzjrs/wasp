@@ -25,23 +25,19 @@ class CField(messages.Field):
 
 class Periodic:
 
-    STRUCT =                                                                   \
-    "/**\n"                                                                    \
-    " * Description of a periodic message.\n"                                  \
-    " */\n"                                                                    \
-    "typedef struct __PeriodicMessage {\n"                                     \
-    "    uint16_t    target;\n"                                                \
-    "    uint16_t    cnt;\n"                                                   \
-    "    uint8_t     msgid;\n"                                                 \
-    "} PeriodicMessage_t;"
+    # The definition this struct is in messages.h
+
     #use a uint8_t for counting how many main iterations
     #to wait until releasing this message for transmission
     CNT_MAX = (2 ** 16) - 1
 
-    def __init__(self, m, periodicfreq=60.0):
+    AVAILABLE_CHANNELS = ("COMM_0", "COMM_1", "COMM_USB")
+
+    def __init__(self, m, chan, periodicfreq=60.0):
         self._periodicfreq = periodicfreq
         self._message = m.name
         self._frequency = float(m.frequency)
+        self._chan = chan
 
         #the main loop runs at periodicfreq. We want to run at frequency
         #calculate how many iterations we must wait before we run
@@ -53,24 +49,15 @@ class Periodic:
         else:
             raise Exception("periodic freq, f=%s, must be %s < f < %s" % (self._frequency, minfreq, maxfreq))
 
+        if self._chan not in self.AVAILABLE_CHANNELS:
+            raise Exception("invalid channel: %s, must be one of %s" % (self._chan, ",".join(self.AVAILABLE_CHANNELS)))
+
     def get_initializer(self):
-        return "{ %d, %d, MESSAGE_ID_%s }" % (self._target, 0, self._message)
+        return "{ %d, %d, MESSAGE_ID_%s, %s }" % (self._target, 0, self._message, self._chan)
 
 class CMessage(messages.Message):
 
-    STRUCT =                                                                     \
-    "/**\n"                                                                      \
-    " * A message to be sent.\n"                                                 \
-    " */\n"                                                                      \
-    "typedef struct __CommMessage {\n"                                           \
-    "    uint8_t acid;   /**< Aircraft ID, id of message sender */\n"            \
-    "    uint8_t msgid;  /**< ID of message in payload */\n"                     \
-    "    uint8_t len;    /**< Length of payload */\n"                            \
-    "    uint8_t payload[COMM_MAX_PAYLOAD_LEN] __attribute__ ((aligned));\n"     \
-    "    uint8_t ck_a;   /**< Checksum high byte */\n"                           \
-    "    uint8_t ck_b;   /**< Checksum low byte */\n"                            \
-    "    uint8_t idx;    /**< State vaiable when filling payload. Not sent */\n" \
-    "} CommMessage_t;" 
+    # The definition this struct is in messages.h
 
     def __init__(self, m):
         messages.Message.__init__(self, m, CField)
@@ -103,19 +90,14 @@ class _CWriter(_Writer):
 
     def preamble(self):
         gentools.print_header(
-            "%s_H" % self.note.upper(),
+            "%s_GENERATED_H" % self.note.upper(),
             generatedfrom=self.messages_path)
 
         print "#include \"std.h\""
         print
         print "#define COMM_STX 0x99"
-        print "#define COMM_MAX_PAYLOAD_LEN 256"
         print "#define COMM_DEFAULT_ACID 120"
         print "#define COMM_NUM_NON_PAYLOAD_BYTES 6"
-        print
-        print Periodic.STRUCT
-        print
-        print CMessage.STRUCT
         print
         for m in self.messages:
             m.print_id()
@@ -128,7 +110,7 @@ class _CWriter(_Writer):
         print
 
     def postamble(self):
-        gentools.print_footer("%s_H" % self.note.upper())
+        gentools.print_footer("%s_GENERATED_H" % self.note.upper())
 
 class MacroWriter(_CWriter):
 
@@ -344,14 +326,18 @@ if __name__ == "__main__":
             except KeyError:
                 names[m.name] = m
 
-        #must have a periodic element
-        p = x.root.periodic
-        #but periodic messages are optional
-        try: 
-            pm = xmlobject.ensure_list(p.message)
-        except AttributeError:
-            pm = []
-        periodic = [Periodic(m) for m in pm]
+        #must have one or more periodic element(s)
+        periodic = []
+        for p in xmlobject.ensure_list(x.root.periodic):
+            #and it must specify a channel
+            chan = p.channel
+
+            #but periodic messages are optional
+            try: 
+                pm = xmlobject.ensure_list(p.message)
+            except AttributeError:
+                pm = []
+            periodic += [Periodic(m, chan) for m in pm]
     except:
         import traceback
         parser.error("invalid xml\n%s" % traceback.format_exc())

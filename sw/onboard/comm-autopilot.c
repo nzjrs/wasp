@@ -13,6 +13,8 @@
 #include "booz2_guidance_h.h"
 #include "booz2_guidance_v.h"
 
+#include "generated/messages.h"
+
 bool_t
 comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
 {
@@ -21,7 +23,8 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
     switch (msgid)
     {
         case MESSAGE_ID_GPS_LLH:
-            MESSAGE_SEND_GPS_LLH( COMM_1, 
+            MESSAGE_SEND_GPS_LLH(
+                    chan, 
                     &booz_gps_state.fix,
                     &booz_gps_state.num_sv,
                     &booz_gps_state.booz2_gps_lat,
@@ -39,7 +42,7 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
             break;
         case MESSAGE_ID_IMU_ACCEL_RAW:
             MESSAGE_SEND_IMU_ACCEL_RAW(
-                    COMM_1,
+                    chan,
                     &booz_imu.accel_unscaled.x,
 			        &booz_imu.accel_unscaled.y,
 			        &booz_imu.accel_unscaled.z);
@@ -94,7 +97,8 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
         case MESSAGE_ID_ALTIMETER:
             {
             int32_t alt = altimeter_get_altitude();
-            MESSAGE_SEND_ALTIMETER(COMM_1,
+            MESSAGE_SEND_ALTIMETER(
+                    chan,
                     &alt,
                     &altimeter_status,
                     &booz2_analog_baro_offset,
@@ -102,7 +106,8 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
             }
             break;
         case MESSAGE_ID_AUTOPILOT:
-            MESSAGE_SEND_AUTOPILOT(COMM_1,
+            MESSAGE_SEND_AUTOPILOT(
+                    chan,
                     &booz2_autopilot_mode,
                     &booz2_guidance_h_mode,
                     &booz2_guidance_v_mode);
