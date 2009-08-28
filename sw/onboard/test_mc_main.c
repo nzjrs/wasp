@@ -12,6 +12,8 @@
 
 #include "actuators.h"
 
+#define MOTOR_SPEED 30
+
 static inline void main_init( void );
 static inline void main_periodic_task( void );
 static inline void main_event_task( void );
@@ -52,16 +54,16 @@ static inline void main_periodic_task( void ) {
             actuators_set(SERVO_LEFT, 0);
             break;
         case 2001:
-            actuators_set(SERVO_FRONT, 15);
+            actuators_set(SERVO_FRONT, MOTOR_SPEED);
             break;
         case 4001:
-            actuators_set(SERVO_BACK, 15);
+            actuators_set(SERVO_BACK, MOTOR_SPEED);
             break;
         case 6001:
-            actuators_set(SERVO_RIGHT, 15);
+            actuators_set(SERVO_RIGHT, MOTOR_SPEED);
             break;
         case 8001:
-            actuators_set(SERVO_LEFT, 15);
+            actuators_set(SERVO_LEFT, MOTOR_SPEED);
             break;
         case 10001:
             i = 0;
