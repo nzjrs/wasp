@@ -11,37 +11,29 @@ class Camera(gtk.DrawingArea):
         #configure the camera
         for cmd in v4lcmds:
             cmd = ['v4lctl', '-c', device] + cmd
+            print cmd
             try:
                 if subprocess.call(cmd, executable='v4lctl') != 0:
                     print "Error calling %s" % ' '.join(cmd)
             except OSError: pass
 
+
         #configure the pipeline
-        #gst-launch-0.10 v4l2src ! ffmpegcolorspace ! autovideosink"
-        self.pipeline = gst.Pipeline("photobooth")
+        #gst-launch-0.10 v4l2src ! autovideosink"
+        # Set up the gstreamer pipeline
+        self.pipeline = gst.Pipeline("wasp-video")
         self.source = gst.element_factory_make("v4l2src", "src")
         self.source.set_property("device", device)
-
-        self.csp = gst.element_factory_make("ffmpegcolorspace", "csp")
-
         self.sink = gst.element_factory_make("autovideosink", "sink")
 
-        self.pipeline.add(self.source, self.csp, self.sink)
-        gst.element_link_many(self.source, self.csp, self.sink)
+        self.pipeline.add(self.source, self.sink)
+        gst.element_link_many(self.source, self.sink)
 
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self._on_message)
         bus.enable_sync_message_emission()
         bus.connect("sync-message::element", self._on_sync_message)
-
-        self.connect("expose-event", self._on_expose)
-
-    def _on_expose(self, widget, event):
-        pass
-
-    def _set_image(self, stockid):
-        pass
 
     def _on_message(self, bus, message):
         t = message.type
@@ -58,6 +50,7 @@ class Camera(gtk.DrawingArea):
                 # Assign the viewport so the video does not
                 # show in a new window
                 #imagesink = message.src
+                message.src.set_property("force-aspect-ratio", True)
                 message.src.set_xwindow_id(self.window.xid)
 
     def start(self, *args):
