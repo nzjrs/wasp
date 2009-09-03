@@ -35,6 +35,9 @@ test: clean
 	@make -C sw/groundstation/ test
 	@cd sw/onboard ; ./build-tests.sh
 
+showdoc: doc
+	@firefox doc/built/html/index.html
+
 ################################################################################
 # Dependencies
 ################################################################################
@@ -44,10 +47,10 @@ mkdir:
 $(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg
 	@DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen $<
 
-sw/doc/messages.txt: sw/messages.xml
+sw/doc/messages.txt: sw/onboard/config/messages.xml
 	@PYTHONPATH=./sw/groundstation/ ./sw/tools/gen-messages.py -m $< -f rst > $@
 
-sw/onboard/generated/messages.h: sw/messages.xml
+sw/onboard/generated/messages.h: sw/onboard/config/messages.xml
 	@make -C sw/onboard/ generated/messages.h
 
 html:
