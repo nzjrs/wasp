@@ -76,7 +76,7 @@
 //#define POWER_SWITCH_LED 3
 
 /* Servos: 4017 servo driver on CAM connector */
-#define USE_SERVOS_4017         0
+#define USE_SERVOS_4017         1
 #define SERVO_CLOCK_PIN         28          /* P0.28 aka MAT0.2  */
 #define SERVO_CLOCK_PINSEL      PINSEL0
 #define SERVO_CLOCK_PINSEL_VAL  0x02

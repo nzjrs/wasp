@@ -90,21 +90,19 @@ void booz2_autopilot_periodic(void) {
 
 }
 
-//#define KILL_MOTORS 1
-
 void booz2_autopilot_set_actuators(void)
 {
 #ifdef KILL_MOTORS
-    pprz_t mixed_commands[SERVOS_NB] = {0,0,0,0};
+    pprz_t motor_commands[MOTORS_NB] = {0,0,0,0};
 #else
-    pprz_t mixed_commands[SERVOS_NB];
-    BOOZ2_SUPERVISION_RUN(mixed_commands, booz2_commands, booz2_autopilot_motors_on);
+    pprz_t motor_commands[MOTORS_NB];
+    BOOZ2_SUPERVISION_RUN(motor_commands, booz2_commands, booz2_autopilot_motors_on);
 #endif
-    actuators_set(SERVO_FRONT, mixed_commands[SERVO_FRONT]);
-    actuators_set(SERVO_BACK, mixed_commands[SERVO_BACK]);
-    actuators_set(SERVO_RIGHT, mixed_commands[SERVO_RIGHT]);
-    actuators_set(SERVO_LEFT, mixed_commands[SERVO_LEFT]);
-    actuators_commit();
+    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_FRONT, motor_commands[MOTOR_FRONT]);
+    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_BACK, motor_commands[MOTOR_BACK]);
+    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_RIGHT, motor_commands[MOTOR_RIGHT]);
+    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_LEFT, motor_commands[MOTOR_LEFT]);
+    actuators_commit(ACTUATOR_BANK_MOTORS);
 }
 
 void booz2_autopilot_set_mode(uint8_t new_autopilot_mode) {

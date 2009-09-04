@@ -37,7 +37,7 @@ static inline void main_init( void ) {
 
     comm_init(COMM_1);
 
-    actuators_init();
+    actuators_init(ACTUATOR_BANK_MOTORS);
 
     int_enable();
 }
@@ -48,28 +48,28 @@ static inline void main_periodic_task( void ) {
     switch(i++) 
     {
         case 1:
-            actuators_set(SERVO_FRONT, 0);
-            actuators_set(SERVO_BACK, 0);
-            actuators_set(SERVO_RIGHT, 0);
-            actuators_set(SERVO_LEFT, 0);
+            actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_FRONT, 0);
+            actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_BACK, 0);
+            actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_RIGHT, 0);
+            actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_LEFT, 0);
             break;
         case 2001:
-            actuators_set(SERVO_FRONT, MOTOR_SPEED);
+            actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_FRONT, MOTOR_SPEED);
             break;
         case 4001:
-            actuators_set(SERVO_BACK, MOTOR_SPEED);
+            actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_BACK, MOTOR_SPEED);
             break;
         case 6001:
-            actuators_set(SERVO_RIGHT, MOTOR_SPEED);
+            actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_RIGHT, MOTOR_SPEED);
             break;
         case 8001:
-            actuators_set(SERVO_LEFT, MOTOR_SPEED);
+            actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_LEFT, MOTOR_SPEED);
             break;
         case 10001:
             i = 0;
             break;
     }
-    actuators_commit();
+    actuators_commit(ACTUATOR_BANK_MOTORS);
 }
 
 static inline void main_event_task( void ) {

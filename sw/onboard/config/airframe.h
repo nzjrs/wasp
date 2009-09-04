@@ -4,11 +4,11 @@
 #ifndef AIRFRAME_H
 #define AIRFRAME_H 
 
-#define SERVOS_NB 4
-#define SERVO_FRONT 0
-#define SERVO_BACK 1
-#define SERVO_RIGHT 2
-#define SERVO_LEFT 3
+#define MOTORS_NB 4
+#define MOTOR_FRONT 0
+#define MOTOR_BACK 1
+#define MOTOR_RIGHT 2
+#define MOTOR_LEFT 3
 
 #define COMMAND_PITCH 0
 #define COMMAND_ROLL 1

@@ -3,16 +3,21 @@
 
 #include "config/airframe.h"
 
+#define FRONT   0
+#define BACK    1
+#define RIGHT   2
+#define LEFT    3
+
 #if defined SUPERVISION_FRONT_ROTOR_CW
 #define TRIM_FRONT ( SUPERVISION_TRIM_E-SUPERVISION_TRIM_R)
 #define TRIM_RIGHT (-SUPERVISION_TRIM_A+SUPERVISION_TRIM_R)
 #define TRIM_BACK  (-SUPERVISION_TRIM_E-SUPERVISION_TRIM_R)
 #define TRIM_LEFT  ( SUPERVISION_TRIM_A+SUPERVISION_TRIM_R)
 #define SUPERVISION_MIX(_mot_cmd, _da, _de, _dr, _dt) {		\
-    _mot_cmd[SERVO_FRONT] = _dt + _de - _dr + TRIM_FRONT;	\
-    _mot_cmd[SERVO_RIGHT] = _dt - _da + _dr + TRIM_RIGHT;	\
-    _mot_cmd[SERVO_BACK]  = _dt - _de - _dr + TRIM_BACK;	\
-    _mot_cmd[SERVO_LEFT]  = _dt + _da + _dr + TRIM_LEFT;	\
+    _mot_cmd[FRONT] = _dt + _de - _dr + TRIM_FRONT;	\
+    _mot_cmd[RIGHT] = _dt - _da + _dr + TRIM_RIGHT;	\
+    _mot_cmd[BACK]  = _dt - _de - _dr + TRIM_BACK;	\
+    _mot_cmd[LEFT]  = _dt + _da + _dr + TRIM_LEFT;	\
   }
 #else
 #define TRIM_FRONT ( SUPERVISION_TRIM_E+SUPERVISION_TRIM_R)
@@ -20,49 +25,49 @@
 #define TRIM_BACK  (-SUPERVISION_TRIM_E+SUPERVISION_TRIM_R)
 #define TRIM_LEFT  ( SUPERVISION_TRIM_A-SUPERVISION_TRIM_R)
 #define SUPERVISION_MIX(_mot_cmd, _da, _de, _dr, _dt) {		\
-    _mot_cmd[SERVO_FRONT] = _dt + _de + _dr + TRIM_FRONT;	\
-    _mot_cmd[SERVO_RIGHT] = _dt - _da - _dr + TRIM_RIGHT;	\
-    _mot_cmd[SERVO_BACK]  = _dt - _de + _dr + TRIM_BACK;	\
-    _mot_cmd[SERVO_LEFT]  = _dt + _da - _dr + TRIM_LEFT;	\
+    _mot_cmd[FRONT] = _dt + _de + _dr + TRIM_FRONT;	\
+    _mot_cmd[RIGHT] = _dt - _da - _dr + TRIM_RIGHT;	\
+    _mot_cmd[BACK]  = _dt - _de + _dr + TRIM_BACK;	\
+    _mot_cmd[LEFT]  = _dt + _da - _dr + TRIM_LEFT;	\
   }
 #endif
 
 #define SUPERVISION_FIND_MAX_MOTOR(_mot_cmd, _max_mot) {	\
     _max_mot = (-32767-1); /* INT16_MIN;*/			\
-    if (_mot_cmd[SERVO_FRONT] > _max_mot)			\
-      max_mot = _mot_cmd[SERVO_FRONT];				\
-    if (_mot_cmd[SERVO_RIGHT] > _max_mot)			\
-      max_mot = _mot_cmd[SERVO_RIGHT];				\
-    if (_mot_cmd[SERVO_BACK] > _max_mot)			\
-      max_mot = _mot_cmd[SERVO_BACK];				\
-    if (_mot_cmd[SERVO_LEFT] > _max_mot)			\
-      max_mot = _mot_cmd[SERVO_LEFT];				\
+    if (_mot_cmd[FRONT] > _max_mot)			\
+      max_mot = _mot_cmd[FRONT];				\
+    if (_mot_cmd[RIGHT] > _max_mot)			\
+      max_mot = _mot_cmd[RIGHT];				\
+    if (_mot_cmd[BACK] > _max_mot)			\
+      max_mot = _mot_cmd[BACK];				\
+    if (_mot_cmd[LEFT] > _max_mot)			\
+      max_mot = _mot_cmd[LEFT];				\
   }
 
 #define SUPERVISION_FIND_MIN_MOTOR(_mot_cmd, _min_mot) {	\
     _min_mot = (32767); /*INT16_MAX;*/				\
-    if (_mot_cmd[SERVO_FRONT] < _min_mot)			\
-      min_mot = _mot_cmd[SERVO_FRONT];				\
-    if (_mot_cmd[SERVO_RIGHT] < _min_mot)			\
-      min_mot = _mot_cmd[SERVO_RIGHT];				\
-    if (_mot_cmd[SERVO_BACK] < _min_mot)			\
-      min_mot = _mot_cmd[SERVO_BACK];				\
-    if (_mot_cmd[SERVO_LEFT] < _min_mot)			\
-      min_mot = _mot_cmd[SERVO_LEFT];				\
+    if (_mot_cmd[FRONT] < _min_mot)			\
+      min_mot = _mot_cmd[FRONT];				\
+    if (_mot_cmd[RIGHT] < _min_mot)			\
+      min_mot = _mot_cmd[RIGHT];				\
+    if (_mot_cmd[BACK] < _min_mot)			\
+      min_mot = _mot_cmd[BACK];				\
+    if (_mot_cmd[LEFT] < _min_mot)			\
+      min_mot = _mot_cmd[LEFT];				\
   }
 
 #define SUPERVISION_OFFSET_MOTORS(_mot_cmd, _offset) {	\
-    _mot_cmd[SERVO_FRONT] += _offset;			\
-    _mot_cmd[SERVO_RIGHT] += _offset;			\
-    _mot_cmd[SERVO_BACK]  += _offset;			\
-    _mot_cmd[SERVO_LEFT]  += _offset;			\
+    _mot_cmd[FRONT] += _offset;			\
+    _mot_cmd[RIGHT] += _offset;			\
+    _mot_cmd[BACK]  += _offset;			\
+    _mot_cmd[LEFT]  += _offset;			\
   }
 
 #define SUPERVISION_BOUND_MOTORS(_mot_cmd) {				\
-    Bound(_mot_cmd[SERVO_FRONT], SUPERVISION_MIN_MOTOR, SUPERVISION_MAX_MOTOR); \
-    Bound(_mot_cmd[SERVO_RIGHT], SUPERVISION_MIN_MOTOR, SUPERVISION_MAX_MOTOR); \
-    Bound(_mot_cmd[SERVO_BACK] , SUPERVISION_MIN_MOTOR, SUPERVISION_MAX_MOTOR); \
-    Bound(_mot_cmd[SERVO_LEFT] , SUPERVISION_MIN_MOTOR, SUPERVISION_MAX_MOTOR); \
+    Bound(_mot_cmd[FRONT], SUPERVISION_MIN_MOTOR, SUPERVISION_MAX_MOTOR); \
+    Bound(_mot_cmd[RIGHT], SUPERVISION_MIN_MOTOR, SUPERVISION_MAX_MOTOR); \
+    Bound(_mot_cmd[BACK] , SUPERVISION_MIN_MOTOR, SUPERVISION_MAX_MOTOR); \
+    Bound(_mot_cmd[LEFT] , SUPERVISION_MIN_MOTOR, SUPERVISION_MAX_MOTOR); \
   }
 
 
@@ -84,10 +89,10 @@
       SUPERVISION_BOUND_MOTORS(_out);					\
     }									\
     else {								\
-      _out[SERVO_FRONT] = 0;						\
-      _out[SERVO_RIGHT] = 0;						\
-      _out[SERVO_BACK]  = 0;						\
-      _out[SERVO_LEFT]  = 0;						\
+      _out[FRONT] = 0;						\
+      _out[RIGHT] = 0;						\
+      _out[BACK]  = 0;						\
+      _out[LEFT]  = 0;						\
     }									\
   }
 

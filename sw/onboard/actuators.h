@@ -24,6 +24,9 @@
 /** \file actuators.h
  *  \brief Hardware independent API for actuators (servos, motor controllers)
  *
+ *  The implementation splits the actuators into 4 banks of 16 actuators.
+ *  nominally, the first bank is for motor controllers, the second bank is
+ *  for servos
  */
 #ifndef ACTUATORS_H
 #define ACTUATORS_H
@@ -32,10 +35,15 @@
 
 typedef uint8_t ActuatorID_t;
 
-void actuators_init( void );
+#define ACTUATOR_BANK_MOTORS            0x10
+#define ACTUATOR_BANK_SERVOS            0x20
+#define ACTUATOR_BANK_3                 0x40
+#define ACTUATOR_BANK_4                 0x80
+
+void actuators_init( uint8_t bank );
 
 void actuators_set( ActuatorID_t id, uint8_t value );
 
-void actuators_commit( void );
+void actuators_commit( uint8_t bank );
 
 #endif /* ACTUATORS_H */
