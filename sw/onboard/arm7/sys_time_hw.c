@@ -18,7 +18,7 @@ uint32_t last_periodic_event;
 
 uint32_t chrono_start; /* T0TC ticks */
 
-#define TIMER0_IT_MASK (TIR_CR2I | TIR_MR1I)
+#define TIMER0_IT_MASK (TIR_CR2I | TIR_MR0I)
 
 void TIMER0_ISR ( void ) __attribute__((naked));
 void TIMER0_ISR ( void ) {
@@ -33,12 +33,11 @@ void TIMER0_ISR ( void ) {
     }
 #endif
 #if USE_SERVOS_4017
-    if (T0IR&TIR_MR1I) {
+    if (T0IR&TIR_MR0I) {
         servos_4017_isr();
-      /* clear interrupt */
-      T0IR = TIR_MR1I;
+        /* clear interrupt */
+        T0IR = TIR_MR0I;
     }
-
 #endif
   }
   VICVectAddr = 0x00000000;

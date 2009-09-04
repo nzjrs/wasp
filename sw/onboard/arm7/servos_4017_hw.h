@@ -21,15 +21,15 @@ static inline void servos_4017_isr(void)
 {
     if (servos_4017_idx >= _4017_NB_CHANNELS) 
     {
-        SetBit(IO1SET, SERVO_RESET_PIN);
+        SetBit(SERVO_RESET_IOSET, SERVO_RESET_PIN);
         servos_4017_idx = 0;
-        SetBit(IO1CLR, SERVO_RESET_PIN);
+        SetBit(SERVO_RESET_IOCLR, SERVO_RESET_PIN);
     }
     
     /* request clock high on next match */
-    T0MR1 += servos_values[servos_4017_idx];
+    T0MR0 += servos_values[servos_4017_idx];
     /* lower clock pin */
-    T0EMR &= ~TEMR_EM1;
+    T0EMR &= ~TEMR_EM0;
     servos_4017_idx++;
 }
 #else /* SERVOS_4017_CLOCK_FALLING */
@@ -41,31 +41,31 @@ static inline void servos_4017_isr(void)
 {
     if (servos_4017_idx == _4017_NB_CHANNELS) 
     {
-        SetBit(IO1SET, SERVO_RESET_PIN);
+        SetBit(SERVO_RESET_IOSET, SERVO_RESET_PIN);
         /* Start a long 1ms reset, keep clock low */
-        T0MR1 += SERVOS_4017_RESET_WIDTH;
+        T0MR0 += SERVOS_4017_RESET_WIDTH;
         servos_4017_idx++;
-        T0EMR &= ~TEMR_EM1;
+        T0EMR &= ~TEMR_EM0;
     }
     else if (servos_4017_idx > _4017_NB_CHANNELS) 
     {
         /* Clear the reset*/
-        SetBit(IO1CLR,SERVO_RESET_PIN);
+        SetBit(SERVO_RESET_IOCLR, SERVO_RESET_PIN);
         /* assert clock       */
-        T0EMR |= TEMR_EM1;
+        T0EMR |= TEMR_EM0;
         /* Starts a short pulse-like period */
-        T0MR1 += SERVOS_4017_FIRST_PULSE_WIDTH;
+        T0MR0 += SERVOS_4017_FIRST_PULSE_WIDTH;
         servos_4017_idx=0; /** Starts a new sequence next time */
     }
     else 
     {
         /* request next match */
-        T0MR1 += servos_values[servos_4017_idx];
+        T0MR0 += servos_values[servos_4017_idx];
         /* clock low if not last one, last is done with reset */
         if (servos_4017_idx != _4017_NB_CHANNELS-1) 
         {
             /* raise clock pin */
-            T0EMR |= TEMR_EM1;
+            T0EMR |= TEMR_EM0;
         }
         servos_4017_idx++;
     }

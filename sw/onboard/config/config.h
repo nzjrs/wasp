@@ -41,11 +41,6 @@
 #define BOOZ2_ANALOG_BARO_LED   2
 #define AHRS_ALIGNER_LED        3
 
-/* PPM : rc rx on P0.28 ( CAP0.2 ) */
-#define PPM_PINSEL      PINSEL1
-#define PPM_PINSEL_VAL  0x02
-#define PPM_PINSEL_BIT  24
-
 /* ADC */
 
 /* pressure : P0.10 AD1.2 */
@@ -72,17 +67,19 @@
 #define MM_DRDY_EINT        3
 #define MM_DRDY_VIC_IT      VIC_EINT3
 
-// damit, we have two of them now
-//#define POWER_SWITCH_LED 3
-
 /* Servos: 4017 servo driver on CAM connector */
 #define USE_SERVOS_4017         1
-#define SERVO_CLOCK_PIN         28          /* P0.28 aka MAT0.2  */
-#define SERVO_CLOCK_PINSEL      PINSEL0
-#define SERVO_CLOCK_PINSEL_VAL  0x02
-#define SERVO_CLOCK_PINSEL_BIT  10
-#define SERVO_DATA_PIN          23          /* p1.23 */
-#define SERVO_RESET_PIN         24          /* p1.24 */
+#define SERVO_CLOCK_IODIR       IO0DIR
+#define SERVO_CLOCK_PIN         22          /* P0.22 aka MAT0.0  */
+#define SERVO_CLOCK_PINSEL      PINSEL1
+#define SERVO_CLOCK_PINSEL_VAL  0x03
+#define SERVO_CLOCK_PINSEL_BIT  12
+
+#define SERVO_RESET_PIN         21          /* P0.21 aka PWM5 */
+//#define SERVO_RESET_PIN         13          /* P0.13 aka PWM5 aka ADC_SPARE */
+#define SERVO_RESET_IODIR       IO0DIR
+#define SERVO_RESET_IOSET       IO0SET
+#define SERVO_RESET_IOCLR       IO0CLR
 
 /* Time */
 #define PERIODIC_TASK_PERIOD SYS_TICS_OF_SEC((1./512.))
@@ -92,6 +89,12 @@
 #define RC_FUTABA           0
 #define RC_JR               1
 #define RADIO_CONTROL_TYPE  RC_FUTABA
+
+/* PPM : rc rx on P0.28 ( CAP0.2 ) */
+#define PPM_PINSEL      PINSEL1
+#define PPM_PINSEL_VAL  0x02
+#define PPM_PINSEL_BIT  24
+
 
 /* UARTS */
 #define USE_UART0 1
