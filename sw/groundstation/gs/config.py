@@ -10,6 +10,7 @@ class ConfigurableIface:
 
     def __init__(self, config):
         self._config = config
+        self._autobind_keys = []
 
     def config_get(self, key, default):
         return self._config.get(key, default, section=self.CONFIG_SECTION)
@@ -20,11 +21,36 @@ class ConfigurableIface:
     def config_delete_keys_in_section(self):
         self._config.delete_keys_in_section(section=self.CONFIG_SECTION)
 
+    def autobind_config(self, *keys):
+        """
+        Autobinds configuration variables of the supplied names to
+        instance properties. It saves you having to implement
+        update_{state,config}_from_{config,state} functions.
+        A default value for the configutaion variable
+        must be present as a class property. For example
+
+        autobind_config(foo)
+            self._foo
+                Contains the value of the config called foo
+            self.DEFAULT_FOO
+                Must contain the default value of foo
+        """
+        self._autobind_keys = keys
+        for key in self._autobind_keys:
+            default = getattr(self, "DEFAULT_%s" % key.upper())
+            val = self.config_get(key, default)
+            setattr(self, "_%s" % key, val)
+            print "set", key, val
+
     def update_state_from_config(self):
-        pass
+        for key in self._autobind_keys:
+            default = getattr(self, "DEFAULT_%s" % key.upper())
+            setattr(self, "_%s" % key, self.config_get(key, default))
 
     def update_config_from_state(self):
-        pass
+        for key in self._autobind_keys:
+            val = getattr(self, "_%s" % key)
+            self.config_set(key, val)
 
     def get_preference_widgets(self):
         """
