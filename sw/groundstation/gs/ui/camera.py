@@ -1,17 +1,28 @@
+import logging
 import subprocess
 import gtk
 import gst
 
+import gs.config as config
+
+LOG = logging.getLogger('camera')
+
 class Camera(gtk.DrawingArea):
-    def __init__(self, device="/dev/video0", v4lcmds=[]):
+    def __init__(self, source="v4l2src", device="/dev/video0", norm="PAL-N", input_channel="Composite1"):
         gtk.DrawingArea.__init__(self)
         self._playing = False
         self._pb = None
 
+        v4lcmds = []
+        if norm:
+            v4lcmds.append(["setnorm", norm])
+        if input_channel:
+            v4lcmds.append(["setinput", input_channel])
+
         #configure the camera
         for cmd in v4lcmds:
             cmd = ['v4lctl', '-c', device] + cmd
-            print cmd
+            LOG.debug("Setting video parameter: %s" % " ".join(cmd))
             try:
                 if subprocess.call(cmd, executable='v4lctl') != 0:
                     print "Error calling %s" % ' '.join(cmd)
@@ -21,19 +32,20 @@ class Camera(gtk.DrawingArea):
         #configure the pipeline
         #gst-launch-0.10 v4l2src ! autovideosink"
         # Set up the gstreamer pipeline
-        self.pipeline = gst.Pipeline("wasp-video")
-        self.source = gst.element_factory_make("v4l2src", "src")
-        self.source.set_property("device", device)
-        self.sink = gst.element_factory_make("autovideosink", "sink")
+        try:
+            pipeline = "%s device=%s ! autovideosink" % (source, device)
 
-        self.pipeline.add(self.source, self.sink)
-        gst.element_link_many(self.source, self.sink)
+            LOG.debug("Video pipeline: %s" % pipeline)
+            self.pipeline = gst.parse_launch (pipeline)
 
-        bus = self.pipeline.get_bus()
-        bus.add_signal_watch()
-        bus.connect("message", self._on_message)
-        bus.enable_sync_message_emission()
-        bus.connect("sync-message::element", self._on_sync_message)
+            bus = self.pipeline.get_bus()
+            bus.add_signal_watch()
+            bus.connect("message", self._on_message)
+            bus.enable_sync_message_emission()
+            bus.connect("sync-message::element", self._on_sync_message)
+        except:
+            LOG.warning("Error configuring camera window", exc_info=True)
+            self._pipeline = None
 
     def _on_message(self, bus, message):
         t = message.type
@@ -54,21 +66,37 @@ class Camera(gtk.DrawingArea):
                 message.src.set_xwindow_id(self.window.xid)
 
     def start(self, *args):
-        self._playing = True
-        self.pipeline.set_state(gst.STATE_PLAYING)
+        if self.pipeline:
+            self._playing = True
+            self.pipeline.set_state(gst.STATE_PLAYING)
 
     def stop(self, *args):
-        self._playing = False
-        self.pipeline.set_state(gst.STATE_NULL)
+        if self.pipeline:
+            self._playing = False
+            self.pipeline.set_state(gst.STATE_NULL)
 
     def pause(self, *args):
-        self._playing = False
-        self.pipeline.set_state(gst.STATE_PAUSED)
+        if self.pipeline:
+            self._playing = False
+            self.pipeline.set_state(gst.STATE_PAUSED)
 
-class CameraWindow(gtk.Window):
-    def __init__(self, **kwargs):
+class CameraWindow(gtk.Window, config.ConfigurableIface):
+
+    CONFIG_SECTION = "CAMERA"
+
+    DEFAULT_SOURCE = "v4l2src"
+    DEFAULT_DEVICE = "/dev/video0"
+    DEFAULT_NORM = "PAL-N"
+    DEFAULT_INPUT_CHANNEL = "Composite1"
+
+    def __init__(self, conf):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        self._cam = Camera(**kwargs)
+        config.ConfigurableIface.__init__(self, conf)
+
+        #initialize self._source, etc with the default ^^^ values
+        self.autobind_config("source", "device", "norm", "input_channel")
+
+        self._cam = Camera(self._source, self._device, self._norm, self._input_channel)
         self._cam.show()
         self.add(self._cam)
         self.connect("destroy", self.stop)
@@ -80,18 +108,43 @@ class CameraWindow(gtk.Window):
         self._cam.stop()
 
     def pause(self, *args):
-        self._cam.pause()    
+        self._cam.pause()
+
+    def get_preference_widgets(self):
+        #all following items configuration is saved
+        items = [
+            self.build_entry("source"),
+            self.build_entry("device"),
+            self.build_entry("norm"),
+            self.build_entry("input_channel")
+        ]
+
+        #the gui looks like
+        sg = self.make_sizegroup()
+        frame = self.build_frame(None, [
+            self.build_label("Source", items[0], sg),
+            self.build_label("Device", items[1], sg),
+            self.build_label("Norm", items[2], sg),
+            self.build_label("Input Channel", items[3], sg),
+        ])
+
+        return "Camera", frame, items
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+
     gtk.gdk.threads_init()
 
-    win = CameraWindow(
+    win = gtk.Window()
+    cam = Camera(
             device='/dev/video0',
-            v4lcmds=[['setnorm', 'PAL-N'], ['setinput', 'Composite1']]
-            )
+            norm='PAL-N',
+            input_channel='Composite1')
+    win.add(cam)
+    win.connect("destroy", lambda w,c: c.stop(), cam)
     win.connect("destroy", gtk.main_quit)
     win.show_all()
-    win.start()
+    cam.start()
     gtk.main()
 
 

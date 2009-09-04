@@ -422,11 +422,12 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         if self._camera_window == None:
             try:
                 from gs.ui.camera import CameraWindow
-                self._camera_window = CameraWindow()
+                self._camera_window = CameraWindow(self._config)
             except:
                 LOG.warning("Could not initialize camera window", exc_info=True)
                 return
 
+        self._configurable.append(self._camera_window)
         self._camera_window.start()
         self._camera_window.show()
 
