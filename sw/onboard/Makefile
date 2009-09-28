@@ -135,9 +135,9 @@ size:
 
 # Program the device.  
 LPC21IAP    = ../lpc21iap/lpc21iap
-bootloader:
+programmer:
 	@cd ../lpc21iap && make --quiet --no-print-directory Q=$(Q)
-upload: $(OBJDIR)/$(TARGET).elf bootloader
+upload: $(OBJDIR)/$(TARGET).elf programmer
 	@echo UPLOAD $(OBJDIR)/$(TARGET).elf
 	$(Q)$(LPC21IAP)  $(OBJDIR)/$(TARGET).elf
 

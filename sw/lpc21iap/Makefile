@@ -1,6 +1,5 @@
 #MS VC: cl lpc21iap.c elf.c lpcusb.c libusb.lib
 
-LIBNAME	= usb
 APPNAME = lpc21iap
 
 # Package definitions
@@ -18,7 +17,8 @@ OD		= objdump
 RM		= rm
 TAR		= tar
 
-CFLAGS  = -Wall -g
+CFLAGS  = -Wall -g `pkg-config --cflags libusb`
+LDFLAGS = `pkg-config --libs libusb`
 
 SOURCES =	lpc21iap.c elf.c lpcusb.c
 
@@ -31,7 +31,7 @@ app: $(APPNAME)
 
 $(APPNAME):	$(SOURCES) Makefile
 	@echo CC $@
-	$(Q)$(CC) $(CFLAGS) $(SOURCES) -o $(APPNAME) -l$(LIBNAME)
+	$(Q)$(CC) $(CFLAGS) $(SOURCES) -o $(APPNAME) $(LDFLAGS)
 
 # Builds archive tar file
 arch: clean
