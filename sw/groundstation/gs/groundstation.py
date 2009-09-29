@@ -72,8 +72,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._home_lon = self.CONFIG_LON_DEFAULT
         self._home_zoom = self.CONFIG_ZOOM_DEFAULT
 
-        self._window = self._builder.get_object("main_window")
-        self._gps_coords = self._builder.get_object("gps_coords")
+        self._window = self.get_resource("main_window")
 
         self._config = Config(filename=prefsfile)
         ConfigurableIface.__init__(self, self._config)
@@ -90,17 +89,17 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map = Map(self._config, self._source)
         self._tm = TurretManager(self._config)
         self._test = TestManager(self._config)
-        self._gm = GraphManager(self._config, self._source, self._messagesfile, self._builder.get_object("graphs_box"), self._window)
+        self._gm = GraphManager(self._config, self._source, self._messagesfile, self.get_resource("graphs_box"), self._window)
         self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
         self._fp = FlightPlanEditor(self._map)
 
-        self._builder.get_object("main_left_vbox").pack_start(self._info.widget, False, False)
-        self._builder.get_object("main_map_vbox").pack_start(self._msgarea, False, False)
-        self._builder.get_object("window_vbox").pack_start(self._sb, False, False)
-        self._builder.get_object("autopilot_hbox").pack_start(self._fp.widget, True, True)
-        self._builder.get_object("settings_hbox").pack_start(self._settings.widget, True, True)
+        self.get_resource("main_left_vbox").pack_start(self._info.widget, False, False)
+        self.get_resource("main_map_vbox").pack_start(self._msgarea, False, False)
+        self.get_resource("window_vbox").pack_start(self._sb, False, False)
+        self.get_resource("autopilot_hbox").pack_start(self._fp.widget, True, True)
+        self.get_resource("settings_hbox").pack_start(self._settings.widget, True, True)
 
         #Lazy initialize the following when first needed
         self._plane_view = None
@@ -109,7 +108,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._prefs_window = None
 
         #create the map
-        self._builder.get_object("map_holder").add(self._map.get_widget())
+        self.get_resource("map_holder").add(self._map.get_widget())
         self._map.connect("notify::auto-center", self.on_map_autocenter_property_change)
         self._map.connect("notify::show-trip-history", self.on_map_show_trip_history_property_change)
     
@@ -130,9 +129,9 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             if c:
                 c.update_state_from_config()
 
-        self._builder.get_object("menu_item_disconnect").set_sensitive(False)
-        self._builder.get_object("menu_item_autopilot_disable").set_sensitive(False)
-        self._builder.connect_signals(self)
+        self.get_resource("menu_item_disconnect").set_sensitive(False)
+        self.get_resource("menu_item_autopilot_disable").set_sensitive(False)
+        self.builder_connect_signals()
 
         self._window.show_all()
 
@@ -144,16 +143,16 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         rxts = self._source.get_rx_message_treestore()
         if rxts:
-            sw = self._builder.get_object("telemetry_sw")
+            sw = self.get_resource("telemetry_sw")
             rxtv = MessageTreeView(rxts, editable=False, show_dt=True)
             sw.add(rxtv)
 
-            vb = self._builder.get_object("telemetry_left_vbox")
+            vb = self.get_resource("telemetry_left_vbox")
             rm = RequestMessageSender(self._messagesfile)
             rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
             vb.pack_start(rm, False, False)
 
-            gb = self._builder.get_object("graph_button")
+            gb = self.get_resource("graph_button")
             gb.connect("clicked", on_gb_clicked, rxtv, self._gm)
 
     def _error_message(self, message, secondary=None):
@@ -276,12 +275,12 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._disconnect()
         
     def on_autopilot_enable_activate(self, widget):
-        self._builder.get_object("menu_item_autopilot_disable").set_sensitive(True)
-        self._builder.get_object("menu_item_autopilot_enable").set_sensitive(False)
+        self.get_resource("menu_item_autopilot_disable").set_sensitive(True)
+        self.get_resource("menu_item_autopilot_enable").set_sensitive(False)
     
     def on_autopilot_disable_activate(self, widget):
-        self._builder.get_object("menu_item_autopilot_disable").set_sensitive(False)
-        self._builder.get_object("menu_item_autopilot_enable").set_sensitive(True)
+        self.get_resource("menu_item_autopilot_disable").set_sensitive(False)
+        self.get_resource("menu_item_autopilot_enable").set_sensitive(True)
         
 
     def on_menu_item_about_activate(self, widget):
@@ -303,14 +302,14 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             #tell the database to load from a new file
             db = Database(filename)
             
-            db_notes = self._builder.get_object("db_notes")
+            db_notes = self.get_resource("db_notes")
             buff = db_notes.get_buffer()
             
             notes = db.fetchall("select notes from flight where rowid=1")[0][0]
             if (notes):
                 buff.set_text(notes)
 
-            sw = self._builder.get_object("dbscrolledwindow")
+            sw = self.get_resource("dbscrolledwindow")
             for c in sw.get_children():
                 sw.remove(c)
             dbw = DBWidget(db)
@@ -320,11 +319,11 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def on_flight_props_activate(self, widget):
         self._error_message("Not Implemented")
-        #dlg = self._builder.get_object("db_dialog")
-        #sw = self._builder.get_object("dbscrolledwindow")
-        #db_notes = self._builder.get_object("db_notes")
+        #dlg = self.get_resource("db_dialog")
+        #sw = self.get_resource("dbscrolledwindow")
+        #db_notes = self.get_resource("db_notes")
         #buff = gtk.TextBuffer()
-        #file_chooser = self._builder.get_object("db_file_chooser")
+        #file_chooser = self.get_resource("db_file_chooser")
         
         #db_notes.set_buffer(buff)
                 
@@ -366,11 +365,11 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         #db.close()
 
     def on_menu_item_show_previous_activate(self, widget):
-        dlg = self._builder.get_object("db_dialog")
-        sw = self._builder.get_object("dbscrolledwindow")
-        db_notes = self._builder.get_object("db_notes")
+        dlg = self.get_resource("db_dialog")
+        sw = self.get_resource("dbscrolledwindow")
+        db_notes = self.get_resource("db_notes")
         buff = gtk.TextBuffer()
-        file_chooser = self._builder.get_object("db_file_chooser")
+        file_chooser = self.get_resource("db_file_chooser")
         
         db_notes.set_buffer(buff)
                 
@@ -438,13 +437,13 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map.clear_tracks()
 
     def on_map_autocenter_property_change(self, osm, param):
-        self._builder.get_object("menu_item_auto_centre").set_active(osm.get_property("auto-center"))
+        self.get_resource("menu_item_auto_centre").set_active(osm.get_property("auto-center"))
         
     def on_menu_item_auto_centre_toggled(self, widget):
         self._map.props.auto_center = widget.get_active()
 
     def on_map_show_trip_history_property_change(self, osm, param):
-        self._builder.get_object("menu_item_show_path").set_active(osm.get_property("show-trip-history"))
+        self.get_resource("menu_item_show_path").set_active(osm.get_property("show-trip-history"))
 
     def on_menu_item_show_path_toggled(self, widget):
         self._map.props.show_trip_history = widget.get_active()

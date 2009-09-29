@@ -58,3 +58,6 @@ class GtkBuilderWidget:
 
         return self._resources[name]
 
+    def builder_connect_signals(self):
+        self._builder.connect_signals(self)
+
