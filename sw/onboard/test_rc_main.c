@@ -6,6 +6,7 @@
 #include "led.h"
 #include "comm.h"
 #include "rc.h"
+#include "generated/messages.h"
 
 static inline void main_init( void );
 static inline void main_periodic_task( void );

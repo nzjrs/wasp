@@ -4,6 +4,7 @@
 #include "led.h"
 #include "comm.h"
 #include "gps.h"
+#include "generated/messages.h"
 
 static inline void main_init( void );
 static inline void main_periodic_task( void );
@@ -39,7 +40,9 @@ static inline void main_periodic_task( void ) {
         &booz_gps_state.num_sv,
         &booz_gps_state.booz2_gps_lat,
         &booz_gps_state.booz2_gps_lon,
-        &booz_gps_state.booz2_gps_hmsl);
+        &booz_gps_state.booz2_gps_hmsl,
+        &booz_gps_state.booz2_gps_hacc,
+        &booz_gps_state.booz2_gps_vacc);
   });
 
 

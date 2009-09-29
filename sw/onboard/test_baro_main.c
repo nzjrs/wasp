@@ -7,6 +7,7 @@
 #include "comm.h"
 #include "analog.h"
 #include "altimeter.h"
+#include "generated/messages.h"
 
 static inline void main_init( void );
 static inline void main_periodic_task( void );
