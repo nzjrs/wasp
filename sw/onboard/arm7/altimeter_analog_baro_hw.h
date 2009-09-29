@@ -49,12 +49,12 @@ booz2_analog_baro_calibrate(void)
 
         Booz2AnalogSetDAC(booz2_analog_baro_offset);
 
-        altimeter_status = STATUS_INITIALIZING;
+        altimeter_system_status = STATUS_INITIALIZING;
 	    LED_TOGGLE(BOOZ2_ANALOG_BARO_LED);
     }
 	else
     {
-        altimeter_status = STATUS_INITIALIZED;
+        altimeter_system_status = STATUS_INITIALIZED;
         LED_ON(BOOZ2_ANALOG_BARO_LED);
     }
     });
@@ -65,7 +65,7 @@ booz2_analog_baro_isr(uint16_t val)
 {
     booz2_analog_baro_value = val;
     booz2_analog_baro_value_filtered = (3*booz2_analog_baro_value_filtered + booz2_analog_baro_value)/4;
-    if (altimeter_status != STATUS_INITIALIZED)
+    if (altimeter_system_status != STATUS_INITIALIZED)
         booz2_analog_baro_calibrate();
     booz2_analog_baro_data_available = TRUE;
 }

@@ -3,7 +3,7 @@
 
 #include "std.h"
 
-extern SystemStatus_t altimeter_status;
+extern SystemStatus_t altimeter_system_status;
 
 extern uint16_t booz2_analog_baro_offset;
 extern uint16_t booz2_analog_baro_value;

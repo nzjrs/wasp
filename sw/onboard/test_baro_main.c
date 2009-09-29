@@ -41,7 +41,7 @@ static inline void main_periodic_task( void ) {
         int32_t alt = altimeter_get_altitude();
         MESSAGE_SEND_ALTIMETER(COMM_1,
             &alt,
-            &altimeter_status,
+            &altimeter_system_status,
             &booz2_analog_baro_offset,
             &booz2_analog_baro_value);
     });

@@ -33,6 +33,9 @@ struct Booz_gps_state {
 extern 
 struct Booz_gps_state booz_gps_state;
 
+extern
+SystemStatus_t gps_system_status;
+
 void 
 gps_init(void);
 

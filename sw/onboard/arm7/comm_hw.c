@@ -7,6 +7,8 @@
 #include "arm7/usb_ser_hw.h"
 #include "arm7/led_hw.h"
 
+SystemStatus_t comm_system_status = STATUS_UNINITIAIZED;
+
 void
 comm_init ( CommChannel_t chan )
 {
@@ -39,6 +41,7 @@ comm_init ( CommChannel_t chan )
         comm_status[i].parse_error = 0;
     }
 
+    comm_system_status = STATUS_INITIALIZED;
 }
 
 bool_t
@@ -64,6 +67,8 @@ comm_ch_available ( CommChannel_t chan )
 uint8_t
 comm_get_ch( CommChannel_t chan )
 {
+    comm_system_status = STATUS_ALIVE;
+
 #if USE_UART0
     if (chan == COMM_0) {
         return Uart0Getch();
@@ -84,6 +89,8 @@ comm_get_ch( CommChannel_t chan )
 void
 comm_send_ch( CommChannel_t chan, uint8_t ch )
 {
+    comm_system_status = STATUS_ALIVE;
+
 #if USE_UART0
     if (chan == COMM_0)
         uart0_transmit(ch);

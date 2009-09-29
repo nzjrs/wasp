@@ -22,6 +22,8 @@ static inline void ppm_isr ( void )
     uint32_t length = now - last;
     last = now;
 
+    rc_system_status = STATUS_ALIVE;
+
     if (state == RADIO_CTL_NB)
     {
         if (length > SYS_TICS_OF_USEC(PPM_SYNC_MIN_LEN) &&

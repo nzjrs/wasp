@@ -6,6 +6,7 @@
 #include "arm7/led_hw.h"
 
 struct Booz_gps_state booz_gps_state;
+SystemStatus_t gps_system_status = STATUS_UNINITIAIZED;
 
 /* misc */
 volatile bool_t  booz2_gps_msg_received;
@@ -46,6 +47,7 @@ void gps_init(void)
   booz_gps_state.fix = GPS_FIX_NONE;
   uart0_init_tx();
   ubx_init();
+  gps_system_status = STATUS_INITIALIZED;
 }
 
 bool_t
@@ -59,6 +61,9 @@ gps_event_task(void)
     }
     if (ubx_msg_available) {
         if (ubx_class == UBX_NAV_ID) {
+
+            gps_system_status = STATUS_ALIVE;
+
             if (ubx_id == UBX_NAV_POSLLH_ID) {
                 booz_gps_state.booz2_gps_lon = UBX_NAV_POSLLH_LON(ubx_msg_buf);
                 booz_gps_state.booz2_gps_lat = UBX_NAV_POSLLH_LAT(ubx_msg_buf);

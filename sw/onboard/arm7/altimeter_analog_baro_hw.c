@@ -28,7 +28,7 @@
 #include "altimeter.h"
 #include "arm7/altimeter_analog_baro_hw.h"
 
-SystemStatus_t altimeter_status;
+SystemStatus_t altimeter_system_status;
 
 uint16_t booz2_analog_baro_offset;
 uint16_t booz2_analog_baro_value;
@@ -38,7 +38,7 @@ bool_t   booz2_analog_baro_data_available;
 
 void altimeter_init( void ) {
 
-  altimeter_status = STATUS_UNINITIAIZED;
+  altimeter_system_status = STATUS_UNINITIAIZED;
 
   booz2_analog_baro_offset = 1023;
   Booz2AnalogSetDAC(booz2_analog_baro_offset);

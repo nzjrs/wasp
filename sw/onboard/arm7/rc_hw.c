@@ -6,6 +6,8 @@
 #include "rc.h"
 #include "arm7/rc_hw.h"
 
+SystemStatus_t rc_system_status = STATUS_UNINITIAIZED;
+
 void rc_init ( void )
 {
     /* select pin for capture */
@@ -22,6 +24,7 @@ void rc_init ( void )
     ppm_valid = FALSE;
     rc_status = RC_REALLY_LOST;
     time_since_last_ppm = RC_REALLY_LOST_TIME;
+    rc_system_status = STATUS_INITIALIZED;
 }
 
 void rc_periodic_task ( void )

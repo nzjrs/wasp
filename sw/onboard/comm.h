@@ -31,6 +31,7 @@ extern CommTXMessageCallback_t  comm_callback_tx[COMM_NB];
 extern CommMessage_t            comm_message[COMM_NB];
 extern CommStatus_t             comm_status[COMM_NB];
 extern bool_t                   comm_channel_used[COMM_NB];
+extern SystemStatus_t           comm_system_status;
 
 void
 comm_init ( CommChannel_t chan );

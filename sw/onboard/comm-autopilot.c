@@ -100,7 +100,7 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
             MESSAGE_SEND_ALTIMETER(
                     chan,
                     &alt,
-                    &altimeter_status,
+                    &altimeter_system_status,
                     &booz2_analog_baro_offset,
                     &booz2_analog_baro_value);
             }
@@ -111,6 +111,14 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
                     &booz2_autopilot_mode,
                     &booz2_guidance_h_mode,
                     &booz2_guidance_v_mode);
+            break;
+        case MESSAGE_ID_STATUS_LOWLEVEL:
+            MESSAGE_SEND_STATUS_LOWLEVEL(
+                    chan,
+                    &rc_system_status,
+                    &gps_system_status,
+                    &altimeter_system_status,
+                    &comm_system_status);
             break;
         default:
             ret = FALSE;

@@ -62,7 +62,9 @@ typedef enum {
 typedef enum {
     STATUS_UNINITIAIZED,
     STATUS_INITIALIZING,
-    STATUS_INITIALIZED
+    STATUS_INITIALIZED,
+    STATUS_ALIVE,
+    STATUS_FAIL
 } SystemStatus_t;
 
 #define MAX_PPRZ 9600

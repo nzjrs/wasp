@@ -55,7 +55,7 @@ void booz_ins_init() {
 void booz_ins_propagate() {
 
 #if USE_VFF
-  if (altimeter_status == STATUS_INITIALIZED && booz_ins_baro_initialised) {
+  if (altimeter_system_status == STATUS_INITIALIZED && booz_ins_baro_initialised) {
     float accel_float = BOOZ_ACCEL_F_OF_I(booz_imu.accel.z);
     b2_vff_propagate(accel_float);
     booz_ins_ltp_accel.z = BOOZ_ACCEL_I_OF_F(b2_vff_zdotdot);
@@ -76,7 +76,7 @@ void booz_ins_propagate() {
 void booz_ins_update_baro() {
 
 #if USE_VFF
-  if (altimeter_status == STATUS_INITIALIZED) {
+  if (altimeter_system_status == STATUS_INITIALIZED) {
     uint32_t alt = altimeter_get_altitude();
     if (!booz_ins_baro_initialised) {
       booz_ins_qfe = alt;

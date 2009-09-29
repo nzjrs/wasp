@@ -15,6 +15,8 @@ typedef enum {
 extern pprz_t       rc_values[RADIO_CTL_NB];
 extern RCStatus_t   rc_status;
 
+extern SystemStatus_t rc_system_status;
+
 extern uint8_t  rc_values_contains_avg_channels;
 extern uint8_t  time_since_last_ppm;
 extern uint8_t  ppm_cpt, last_ppm_cpt;

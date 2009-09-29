@@ -47,8 +47,8 @@ extern int32_t  booz2_gps_vel_e;
     }									\
   }
 
-extern void booz2_gps_init(void);
-extern void booz2_gps_read_ubx_message(void);
+void booz2_gps_init(void);
+void booz2_gps_read_ubx_message(void);
 
 
 #define __GpsLink(dev, _x) dev##_x
@@ -68,11 +68,8 @@ extern uint8_t ubx_msg_buf[];
 extern uint8_t ubx_id;
 extern uint8_t ubx_class;
 
-extern void ubx_parse( uint8_t c );
-extern void ubx_init(void);
-
-
-
+void ubx_parse( uint8_t c );
+void ubx_init(void);
 
 #endif /* BOOZ2_GPS_H */
 
