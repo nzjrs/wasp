@@ -1,0 +1,6 @@
+EARTH_MEAN_RADIUS_KM = 6371.0
+
+#name : (a,b)
+ELLIPSOID   =   {
+    "WGS84" :   (6378137.0, 6356752.314245),
+}

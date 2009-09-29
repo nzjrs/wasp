@@ -2,8 +2,8 @@ ME = $(shell pwd | sed -e 's/\//\\\//g')
 DFILE = "groundstation.desktop"
 
 test:
-	@PYTHONPATH=. python wasp/test/test.py
-	@PYTHONPATH=. python wasp/test/test_ui.py
+	@PYTHONPATH=. find wasp/test/ -name 'test*.py' -exec python {} \;
+	@PYTHONPATH=. find gs/test/ -name 'test*.py' -exec python {} \;
 
 clean:
 	@rm -rf wasp/test/html/
