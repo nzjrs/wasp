@@ -136,7 +136,7 @@ size:
 # Program the device.  
 LPC21IAP    = ../lpc21iap/lpc21iap
 programmer:
-	@cd ../lpc21iap && make --quiet --no-print-directory Q=$(Q)
+	$(Q)cd `dirname $(LPC21IAP)` && make --quiet --no-print-directory Q=$(Q)
 upload: $(OBJDIR)/$(TARGET).elf programmer
 	@echo UPLOAD $(OBJDIR)/$(TARGET).elf
 	$(Q)$(LPC21IAP)  $(OBJDIR)/$(TARGET).elf
