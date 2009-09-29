@@ -21,6 +21,10 @@ onboard:
 bootloader:
 	@make -C sw/bootloader/ all
 
+BOOTLOADER_DEV=/dev/ttyUSB0
+install_bootloader: bootloader
+	lpc21isp -control sw/bootloader/bl.hex $(BOOTLOADER_DEV) 38400 12000
+
 doc: mkdir $(GENERATED_FILES) html
 
 all: onboard bootloader doc
