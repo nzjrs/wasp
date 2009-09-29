@@ -1,6 +1,19 @@
 Groundstation tools for monitoring UAV telemetry
 
+Dependencies:
+ * libserial
+     This is configured as a submodule of this repository,
+     so if it is not available on your system then you need
+     only do 
+     $git submodule init && git submodule update 
+     from the top of tree
+ * python-osm-gps-map
+     http://github.com/nzjrs/osm-gps-map
+     This does not need to be installed system wide, you can just
+     build it and update your PYTHONPATH accordingly
+     $export PYTHONPATH=/path/to/osm/python/.libs
+     
 Run these like follows
-./run.sh ./groundstation.py
-./run.sh ./tools/console-serial-monitor.py
-./run.sh ./tools/gui-serial-monitor.py
+./groundstation.py
+./tools/console-serial-monitor.py
+./tools/gui-serial-monitor.py
