@@ -69,7 +69,6 @@
 
 /* Servos: 4017 servo driver on CAM connector */
 #define USE_SERVOS_4017             1
-#define SERVOS_4017_CLOCK_FALLING   0
 
 #define SERVO_CLOCK_IODIR       IO0DIR
 #define SERVO_CLOCK_PIN         22          /* P0.22 aka MAT0.0  */

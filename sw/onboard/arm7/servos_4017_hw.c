@@ -6,7 +6,7 @@
 #define START_TIMEOUT 0xFFFF;
 
 uint8_t servos_4017_idx;
-uint16_t servos_values[_4017_NB_CHANNELS];
+uint16_t servos_values[SERVOS_4017_NB_CHANNELS];
 
 void servos_4017_init ( void ) 
 {
@@ -25,25 +25,25 @@ void servos_4017_init ( void )
     /* enable match 0 interrupt */
     T0MCR |= TMCR_MR0_I;
 
-#ifndef SERVOS_4017_CLOCK_FALLING
-    /* lower clock         */
-    T0EMR &= ~TEMR_EM0;	
-    /* set high on match 0 */
-    T0EMR |= TEMR_EMC0_2;
-#else
     /* assert clock       */
     T0EMR |= TEMR_EM0;	
     /* set low on match 0 */
     T0EMR |= TEMR_EMC0_1;
-#endif
+
     /* set first pulse in a while */
     T0MR0 = START_TIMEOUT;
-    servos_4017_idx = _4017_NB_CHANNELS;
+    servos_4017_idx = SERVOS_4017_NB_CHANNELS;
 
     /* Set all servos at their midpoints */
     /* compulsory for unaffected servos  */
-    for( i=0 ; i < _4017_NB_CHANNELS ; i++ )
+    for( i=0 ; i < SERVOS_4017_NB_CHANNELS ; i++ )
         servos_values[i] = SERVOS_TICS_OF_USEC(1500);
+
+    servos_values[0] = SERVOS_TICS_OF_USEC(1000);
+    servos_values[1] = SERVOS_TICS_OF_USEC(1100);
+    servos_values[2] = SERVOS_TICS_OF_USEC(1200);
+    servos_values[3] = SERVOS_TICS_OF_USEC(1300);
+    servos_values[4] = SERVOS_TICS_OF_USEC(1400);
 
 }
 

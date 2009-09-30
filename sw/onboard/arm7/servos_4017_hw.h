@@ -7,45 +7,21 @@
 #include "arm7/led_hw.h"
 #include "arm7/sys_time_hw.h"
 
-#if defined NB_CHANNELS
-    #define _4017_NB_CHANNELS Chop(NB_CHANNELS,0,10)
-#else
-    #define _4017_NB_CHANNELS 10
-#endif
-
+#define SERVOS_4017_NB_CHANNELS         10
 #define SERVOS_TICS_OF_USEC(s)          SYS_TICS_OF_USEC(s)
+#define SERVOS_4017_RESET_WIDTH         SERVOS_TICS_OF_USEC(1000)
+#define SERVOS_4017_FIRST_PULSE_WIDTH   SERVOS_TICS_OF_USEC(100)
 
-extern uint16_t servos_values[_4017_NB_CHANNELS];
+extern uint16_t servos_values[SERVOS_4017_NB_CHANNELS];
 extern uint8_t servos_4017_idx;
 
 void servos_4017_init(void);
-
-#ifndef SERVOS_4017_CLOCK_FALLING    
-static inline void servos_4017_isr(void)
-{
-    if (servos_4017_idx >= _4017_NB_CHANNELS) 
-    {
-        SetBit(SERVO_RESET_IOSET, SERVO_RESET_PIN);
-        servos_4017_idx = 0;
-        SetBit(SERVO_RESET_IOCLR, SERVO_RESET_PIN);
-    }
-    
-    /* request clock high on next match */
-    T0MR0 += servos_values[servos_4017_idx];
-    /* lower clock pin */
-    T0EMR &= ~TEMR_EM0;
-    servos_4017_idx++;
-}
-#else /* SERVOS_4017_CLOCK_FALLING */
-
-#define SERVOS_4017_RESET_WIDTH         SERVOS_TICS_OF_USEC(1000)
-#define SERVOS_4017_FIRST_PULSE_WIDTH   SERVOS_TICS_OF_USEC(100)
 
 static inline void servos_4017_isr(void)
 {
     LED_ON(2);
 
-    if (servos_4017_idx == _4017_NB_CHANNELS) 
+    if (servos_4017_idx == SERVOS_4017_NB_CHANNELS) 
     {
         SetBit(SERVO_RESET_IOSET, SERVO_RESET_PIN);
         /* Start a long 1ms reset, keep clock low */
@@ -53,7 +29,7 @@ static inline void servos_4017_isr(void)
         servos_4017_idx++;
         T0EMR &= ~TEMR_EM0;
     }
-    else if (servos_4017_idx > _4017_NB_CHANNELS) 
+    else if (servos_4017_idx > SERVOS_4017_NB_CHANNELS) 
     {
         /* Clear the reset*/
         SetBit(SERVO_RESET_IOCLR, SERVO_RESET_PIN);
@@ -68,7 +44,7 @@ static inline void servos_4017_isr(void)
         /* request next match */
         T0MR0 += servos_values[servos_4017_idx];
         /* clock low if not last one, last is done with reset */
-        if (servos_4017_idx != _4017_NB_CHANNELS-1) 
+        if (servos_4017_idx != SERVOS_4017_NB_CHANNELS-1) 
         {
             /* raise clock pin */
             T0EMR |= TEMR_EM0;
@@ -76,6 +52,5 @@ static inline void servos_4017_isr(void)
         servos_4017_idx++;
     }
 }
-#endif
 
 #endif /* SERVOS_4017_HW_H */
