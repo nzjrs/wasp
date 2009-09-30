@@ -120,7 +120,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
     CONFIG_SECTION = "MAP"
 
     DEFAULT_PROXY = os.environ.get("http_proxy", "")
-    DEFAULT_CACHE = tempfile.gettempdir()
+    DEFAULT_CACHE = os.environ.get("XDG_CACHE_HOME", os.path.join(os.environ['HOME'], ".cache", "wasp"))
     if os.name == "nt":
         DEFAULT_SOURCE = "0"
     else:
@@ -197,6 +197,9 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
             self._proxy = None
         if self._cache == "":
             self._cache = None
+        else:
+            if not os.path.isdir(self._cache):
+                os.makedirs(self._cache)
 
         if not self._map:
             if MAP_AVAILABLE:
