@@ -33,11 +33,11 @@ static inline void servos_4017_isr(void)
     {
         /* Clear the reset*/
         SetBit(SERVO_RESET_IOCLR, SERVO_RESET_PIN);
-        /* assert clock       */
+        /* assert clock */
         T0EMR |= TEMR_EM0;
         /* Starts a short pulse-like period */
         T0MR0 += SERVOS_4017_FIRST_PULSE_WIDTH;
-        servos_4017_idx=0; /** Starts a new sequence next time */
+        servos_4017_idx=0; /* Starts a new sequence next time */
     }
     else 
     {

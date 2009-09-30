@@ -25,7 +25,7 @@ void servos_4017_init ( void )
     /* enable match 0 interrupt */
     T0MCR |= TMCR_MR0_I;
 
-    /* assert clock       */
+    /* assert clock */
     T0EMR |= TEMR_EM0;	
     /* set low on match 0 */
     T0EMR |= TEMR_EMC0_1;
@@ -35,7 +35,7 @@ void servos_4017_init ( void )
     servos_4017_idx = SERVOS_4017_NB_CHANNELS;
 
     /* Set all servos at their midpoints */
-    /* compulsory for unaffected servos  */
+    /* compulsory for unaffected servos */
     for( i=0 ; i < SERVOS_4017_NB_CHANNELS ; i++ )
         servos_values[i] = SERVOS_TICS_OF_USEC(1500);
 
