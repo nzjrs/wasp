@@ -55,19 +55,19 @@
 
 #include "autopilot_main.h"
 
-uint32_t t0, t1, diff;
-
 int main( void ) {
-  booz2_main_init();
-  while(1) {
-    if (sys_time_periodic())
-      booz2_main_periodic();
-    booz2_main_event();
-  }
-  return 0;
+    autopilot_main_init();
+    while(1) {
+        if (sys_time_periodic()) {
+            autopilot_main_periodic();
+            sys_time_calculate_cpu_usage();
+        }
+        autopilot_main_event();
+    }
+    return 0;
 }
 
-STATIC_INLINE void booz2_main_init( void ) {
+static inline void autopilot_main_init( void ) {
   hw_init();
   sys_time_init();
   led_init();
@@ -103,10 +103,10 @@ STATIC_INLINE void booz2_main_init( void ) {
   int_enable();
 }
 
-STATIC_INLINE void booz2_main_periodic( void ) {
+static inline void autopilot_main_periodic( void ) {
   static uint8_t _cnt = 0;
-  //  t0 = T0TC;
 
+  /* read imu */
   imu_periodic_task();
 
   /* run control loops */
@@ -139,14 +139,9 @@ STATIC_INLINE void booz2_main_periodic( void ) {
         break;
     }
 
-  //  t1 = T0TC;
-  //  diff = t1 - t0;
-  //  RunOnceEvery(100, {DOWNLINK_SEND_TIME(&diff);});
-  //  t0 = t1;
-
 }
 
-STATIC_INLINE void booz2_main_event( void ) {
+static inline void autopilot_main_event( void ) {
   uint8_t valid = 0;
 
   if (rc_event_task())

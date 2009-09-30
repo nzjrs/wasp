@@ -11,6 +11,7 @@
 #include "arm7/rc_hw.h"             /* ppm_isr */
 #include "arm7/servos_4017_hw.h"    /* servos_4017_isr */
 
+uint8_t  cpu_usage;
 uint16_t cpu_time_sec;
 uint32_t cpu_time_ticks;
 uint32_t last_periodic_event;
@@ -62,6 +63,7 @@ void sys_time_init( void ) {
 
   cpu_time_sec = 0;
   cpu_time_ticks = 0;
+  last_periodic_event = 0;
 
   /* select TIMER0 as IRQ    */
   VICIntSelect &= ~VIC_BIT(VIC_TIMER0);
@@ -104,4 +106,10 @@ void sys_time_usleep(uint32_t us) {
   uint32_t start = T0TC;
   uint32_t ticks = SYS_TICS_OF_USEC(us);
   while ((uint32_t)(T0TC-start) < ticks);
+}
+
+void sys_time_calculate_cpu_usage ( void ) {
+  uint32_t now = T0TC;
+  uint32_t dif = now - last_periodic_event;
+  cpu_usage = (dif*100)/PERIODIC_TASK_PERIOD;
 }

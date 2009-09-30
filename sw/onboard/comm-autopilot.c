@@ -7,6 +7,7 @@
 #include "analog.h"
 #include "altimeter.h"
 #include "settings.h"
+#include "sys_time.h"
 
 #include "booz2_autopilot.h"
 #include "booz2_ins.h"
@@ -91,7 +92,8 @@ comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
                     &bat,
                     &booz2_autopilot_in_flight,
                     &booz2_autopilot_motors_on,
-                    &booz2_autopilot_mode);
+                    &booz2_autopilot_mode,
+                    &cpu_usage);
             }
             break;
         case MESSAGE_ID_ALTIMETER:

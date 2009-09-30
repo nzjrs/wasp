@@ -33,6 +33,7 @@
      <field name="in_flight" type="uint8" values="ON_GROUND|IN_FLIGHT"/>
      <field name="motors_on" type="uint8" values="MOTORS_OFF|MOTORS_ON"/>
      <field name="autopilot_mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|HOVER_DIRECT|HOVER_Z_HOLD|NAV"/>
+     <field name="cpu_usage" type="uint8" unit="pct"/>
    </message>
 
    <message name="BUILD_INFO" id="9">
@@ -165,7 +166,7 @@
 
    <periodic channel="COMM_1">
       <message name="COMM_STATUS" frequency="0.25"/>
-      <message name="STATUS" frequency="0.5"/>
+      <message name="STATUS" frequency="1"/>
       <message name="TIME" frequency="0.1"/>
       <message name="GPS_LLH" frequency="0.1"/>
    </periodic>
