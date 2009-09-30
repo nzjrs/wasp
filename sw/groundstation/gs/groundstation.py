@@ -174,6 +174,9 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         if connected:
             conn_menu.set_sensitive(False)
             disconn_menu.set_sensitive(True)
+
+            #request UAV info once connected
+            gobject.timeout_add(500, self.on_menu_item_refresh_uav_activate)
         else:
             disconn_menu.set_sensitive(False)
             conn_menu.set_sensitive(True)
@@ -229,14 +232,15 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._source.quit()
         gtk.main_quit()
 
-    def on_menu_item_refresh_uav_activate(self, widget):
-        rm = self._messagesfile.get_message_by_name("REQUEST_MESSAGE")
-
+    def on_menu_item_refresh_uav_activate(self, *args):
         #request a number of messages from the UAV
         for n in ("BUILD_INFO", ):
             m = self._messagesfile.get_message_by_name(n)
             if m:
-                self._source.send_message(rm, (m.id,))
+                self._source.request_message(m.id)
+
+        #so we can be called on timeout_add
+        return False
 
     def on_menu_item_log_activate(self, widget):
         w = LogWindow(self._logbuffer)

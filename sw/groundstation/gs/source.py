@@ -92,6 +92,11 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
         #dictionary of msgid : [list, of, _MessageCb objects]
         self._callbacks = {}
 
+        self._messages_file = messages
+        self._rm = self._messages_file.get_message_by_name("REQUEST_MESSAGE")
+        self._transport = transport.Transport(check_crc=True, debug=DEBUG)
+        self._transport_header = transport.TransportHeaderFooter(acid=0x78)
+
         if use_test_source:
             self.serial = communication.DummySerialCommunication(messages, self._transport, self._transport_header)
             LOG.info("Test source enabled")
@@ -99,10 +104,6 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
             self.serial = communication.SerialCommunication(port=self._port, speed=int(self._speed), timeout=1)
 
         monitor.GObjectSerialMonitor.__init__(self, self.serial)
-
-        self._messages_file = messages
-        self._transport = transport.Transport(check_crc=True, debug=DEBUG)
-        self._transport_header = transport.TransportHeaderFooter(acid=0x78)
 
         #track how many messages per second
         self._lastt = datetime.datetime.now()
@@ -180,6 +181,9 @@ class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface)
                         msg,
                         *values)
             self.serial.write(data.tostring())
+
+    def request_message(self, message_id):
+        self.send_message(self._rm, (message_id,))
 
     def quit(self):
         self.disconnect_from_uav()

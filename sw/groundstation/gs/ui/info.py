@@ -92,14 +92,3 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         t = datetime.datetime.fromtimestamp(int(time))
         self.get_resource("time_value").set_text(t.strftime("%d/%m/%Y %H:%M:%S"))
 
-if __name__ == "__main__":
-    i = InfoBox()
-
-    w = gtk.Window()
-    w.add(i.widget)
-    w.show_all()
-    w.connect("delete-event", lambda *a: gtk.main_quit())
-
-    i.set_build_info("123", 0, 0, 0, 0)
-
-    gtk.main()
