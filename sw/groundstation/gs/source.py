@@ -17,37 +17,6 @@ import wasp.ui.treeview as treeview
 DEBUG=False
 LOG = logging.getLogger('uavsource')
 
-class _Source:
-    def register_interest(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def unregister_interest(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def quit(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def get_rx_message_treestore(self, *args, **kwargs):
-        raise NotImplementedError    
-
-    def send_message(self, msg, values):
-        raise NotImplementedError
-
-    def connect_to_uav(self):
-        raise NotImplementedError
-
-    def disconnect_from_uav(self):
-        raise NotImplementedError
-
-    def get_connection_parameters(self):
-        raise NotImplementedError
-
-    def get_messages_per_second(self):
-        raise NotImplementedError
-
-    def get_ping_time(self):
-        raise NotImplementedError
-
 class _MessageCb:
     def __init__(self, cb, max_freq, **kwargs):
         self.cb = cb
@@ -72,7 +41,7 @@ class _MessageCb:
                 except Exception:
                     LOG.warn("Error calling callback for %s" % msg, exc_info=True)
 
-class UAVSource(monitor.GObjectSerialMonitor, _Source, config.ConfigurableIface):
+class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
     CONFIG_SECTION = "UAVSOURCE"
 
