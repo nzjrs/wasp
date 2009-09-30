@@ -2,9 +2,7 @@
 
 #include "arm7/sys_time_hw.h"
 #include "arm7/servos_4017_hw.h"
-#include "arm7/led_hw.h"
 
-#define SERVOS_TICS_OF_USEC(s) SYS_TICS_OF_USEC(s)
 #define START_TIMEOUT 0xFFFF;
 
 uint8_t servos_4017_idx;

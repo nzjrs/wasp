@@ -4,12 +4,16 @@
 #include "std.h"
 #include "LPC21xx.h"
 #include "config/config.h"
+#include "arm7/led_hw.h"
+#include "arm7/sys_time_hw.h"
 
 #if defined NB_CHANNELS
     #define _4017_NB_CHANNELS Chop(NB_CHANNELS,0,10)
 #else
     #define _4017_NB_CHANNELS 10
 #endif
+
+#define SERVOS_TICS_OF_USEC(s)          SYS_TICS_OF_USEC(s)
 
 extern uint16_t servos_values[_4017_NB_CHANNELS];
 extern uint8_t servos_4017_idx;
@@ -34,11 +38,13 @@ static inline void servos_4017_isr(void)
 }
 #else /* SERVOS_4017_CLOCK_FALLING */
 
-#define SERVOS_4017_RESET_WIDTH SERVOS_TICS_OF_USEC(1000)
-#define SERVOS_4017_FIRST_PULSE_WIDTH SERVOS_TICS_OF_USEC(100)
+#define SERVOS_4017_RESET_WIDTH         SERVOS_TICS_OF_USEC(1000)
+#define SERVOS_4017_FIRST_PULSE_WIDTH   SERVOS_TICS_OF_USEC(100)
 
 static inline void servos_4017_isr(void)
 {
+    LED_ON(2);
+
     if (servos_4017_idx == _4017_NB_CHANNELS) 
     {
         SetBit(SERVO_RESET_IOSET, SERVO_RESET_PIN);
@@ -70,6 +76,6 @@ static inline void servos_4017_isr(void)
         servos_4017_idx++;
     }
 }
-#endif /* SERVOS_4017_CLOCK_ON_RESET */	
+#endif
 
 #endif /* SERVOS_4017_HW_H */

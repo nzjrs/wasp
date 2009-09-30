@@ -6,6 +6,7 @@
 #include "init.h"
 #include "sys_time.h"
 #include "led.h"
+#include "rc.h"
 
 #include "generated/messages.h"
 #include "comm.h"
@@ -23,8 +24,10 @@ uint32_t t0, t1, diff;
 int main( void ) {
     main_init();
     while(1) {
-        if (sys_time_periodic())
+        if (sys_time_periodic()) {
             main_periodic_task();
+            led_toggle(4);
+        }
         main_event_task();
     }
     return 0;
@@ -37,6 +40,7 @@ static inline void main_init( void ) {
 
     comm_init(COMM_1);
 
+//    rc_init();
     actuators_init(ACTUATOR_BANK_SERVOS);
 
     int_enable();
@@ -71,11 +75,11 @@ static inline void main_periodic_task( void ) {
             break;
     }
 #endif
-    actuators_set(ACTUATOR_BANK_SERVOS | 0, 20);
-    actuators_set(ACTUATOR_BANK_SERVOS | 1, 40);
-    actuators_set(ACTUATOR_BANK_SERVOS | 2, 60);
-    actuators_set(ACTUATOR_BANK_SERVOS | 3, 80);
-    actuators_commit(ACTUATOR_BANK_SERVOS);
+//    actuators_set(ACTUATOR_BANK_SERVOS | 0, 20);
+//    actuators_set(ACTUATOR_BANK_SERVOS | 1, 40);
+//    actuators_set(ACTUATOR_BANK_SERVOS | 2, 60);
+//    actuators_set(ACTUATOR_BANK_SERVOS | 3, 80);
+//    actuators_commit(ACTUATOR_BANK_SERVOS);
 }
 
 static inline void main_event_task( void ) {
