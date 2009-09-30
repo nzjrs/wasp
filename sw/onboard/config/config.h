@@ -68,7 +68,8 @@
 #define MM_DRDY_VIC_IT      VIC_EINT3
 
 /* Servos: 4017 servo driver on CAM connector */
-#define USE_SERVOS_4017             1
+#define USE_SERVOS_4017         1
+#define SERVOS_4017_NB_CHANNELS 10
 
 #define SERVO_CLOCK_IODIR       IO0DIR
 #define SERVO_CLOCK_PIN         22          /* P0.22 aka MAT0.0  */

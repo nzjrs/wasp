@@ -39,12 +39,6 @@ void servos_4017_init ( void )
     for( i=0 ; i < SERVOS_4017_NB_CHANNELS ; i++ )
         servos_values[i] = SERVOS_TICS_OF_USEC(1500);
 
-    servos_values[0] = SERVOS_TICS_OF_USEC(1000);
-    servos_values[1] = SERVOS_TICS_OF_USEC(1100);
-    servos_values[2] = SERVOS_TICS_OF_USEC(1200);
-    servos_values[3] = SERVOS_TICS_OF_USEC(1300);
-    servos_values[4] = SERVOS_TICS_OF_USEC(1400);
-
 }
 
 

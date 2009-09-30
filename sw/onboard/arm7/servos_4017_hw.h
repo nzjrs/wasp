@@ -7,7 +7,6 @@
 #include "arm7/led_hw.h"
 #include "arm7/sys_time_hw.h"
 
-#define SERVOS_4017_NB_CHANNELS         10
 #define SERVOS_TICS_OF_USEC(s)          SYS_TICS_OF_USEC(s)
 #define SERVOS_4017_RESET_WIDTH         SERVOS_TICS_OF_USEC(1000)
 #define SERVOS_4017_FIRST_PULSE_WIDTH   SERVOS_TICS_OF_USEC(100)
@@ -19,10 +18,9 @@ void servos_4017_init(void);
 
 static inline void servos_4017_isr(void)
 {
-    LED_ON(2);
-
     if (servos_4017_idx == SERVOS_4017_NB_CHANNELS) 
     {
+        /* Set reset high */
         SetBit(SERVO_RESET_IOSET, SERVO_RESET_PIN);
         /* Start a long 1ms reset, keep clock low */
         T0MR0 += SERVOS_4017_RESET_WIDTH;
