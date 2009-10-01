@@ -1,12 +1,13 @@
 import logging
 
+import gs.plugin as plugin
 import gs.config as config
 
 LOG = logging.getLogger('testmanager')
 
-class TestManager(config.ConfigurableIface):
+class TestConfigurable(plugin.Plugin, config.ConfigurableIface):
     CONFIG_SECTION = "TEST"
-    def __init__(self, conf):
+    def __init__(self, conf, source, messages_file):
         config.ConfigurableIface.__init__(self, conf)
         self.ck = "0"
 

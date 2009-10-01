@@ -1,14 +1,15 @@
 import logging
 
+import gs.plugin as plugin
 import gs.config as config
 
 import libserial.SerialSender
 
 LOG = logging.getLogger('turret')
 
-class TurretManager(libserial.SerialSender.SerialSender, config.ConfigurableIface):
+class Turret(plugin.Plugin, libserial.SerialSender.SerialSender, config.ConfigurableIface):
     CONFIG_SECTION = "TURRET"
-    def __init__(self, conf):
+    def __init__(self, conf, source, messages_file):
         libserial.SerialSender.SerialSender.__init__(self, speed=9600)
         config.ConfigurableIface.__init__(self, conf)
 
@@ -17,13 +18,11 @@ class TurretManager(libserial.SerialSender.SerialSender, config.ConfigurableIfac
         self._gpggaString += "%(lon)s,%(lon_hem)s,1,,,"
         self._gpggaString += "%(alt)s,M,,M,,,*75 \r\n"
 
-        LOG.debug("GGA String: %s" % self._gpggaString)
-
     def update_state_from_config(self):
         p = self.config_get("serial_port", "")
         LOG.debug("Serial port: %s" % p)
         if p:
-            self.connect(port=p)
+            self.connect_to_port(port=p)
 
     def get_preference_widgets(self):
         items = [

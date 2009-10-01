@@ -9,9 +9,8 @@ import logging
 from gs.database import Database
 from gs.config import Config, ConfigurableIface, ConfigWindow
 from gs.source import UAVSource
+from gs.plugin import PluginManager
 
-from gs.managers.turretmanager import TurretManager
-from gs.managers.testmanager import TestManager
 from gs.managers.graphmanager import GraphManager
 from gs.ui import GtkBuilderWidget, get_icon_pixbuf
 from gs.ui.graph import Graph
@@ -86,9 +85,12 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._settingsfile = SettingsFile(path=settingsfile)
         self._settings = SettingsController(self._source, self._settingsfile, self._messagesfile)
 
+        self._plugin_manager = PluginManager()
+        self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile)
+
+        print self._plugin_manager.get_plugins_implementing_interface(ConfigurableIface)
+
         self._map = Map(self._config, self._source)
-        self._tm = TurretManager(self._config)
-        self._test = TestManager(self._config)
         self._gm = GraphManager(self._config, self._source, self._messagesfile, self.get_resource("graphs_box"), self._window)
         self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
@@ -122,9 +124,10 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             self._source,
             self._map,
             self._gm,
-            self._tm,
-            self._test,
         ]
+        #Add those plugins that can also be configured
+        self._configurable += self._plugin_manager.get_plugins_implementing_interface(ConfigurableIface)
+
         for c in self._configurable:
             if c:
                 c.update_state_from_config()
