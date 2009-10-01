@@ -11,9 +11,8 @@ from gs.config import Config, ConfigurableIface, ConfigWindow
 from gs.source import UAVSource
 from gs.plugin import PluginManager
 
-from gs.managers.graphmanager import GraphManager
 from gs.ui import GtkBuilderWidget, get_icon_pixbuf
-from gs.ui.graph import Graph
+from gs.ui.graph import Graph, GraphManager
 from gs.ui.tree import DBWidget
 from gs.ui.msgarea import MsgAreaController
 from gs.ui.statusbar import StatusBar
