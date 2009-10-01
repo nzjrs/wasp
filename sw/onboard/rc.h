@@ -29,6 +29,9 @@ rc_init ( void );
 void
 rc_periodic_task ( void );
 
+/**
+ * @return: TRUE if there is a valid RC signal
+ */
 bool_t
 rc_event_task ( void );
 
