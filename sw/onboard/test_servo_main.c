@@ -13,11 +13,17 @@
 
 #include "actuators.h"
 
+typedef struct {
+    uint8_t val;
+    uint8_t dval;
+} Servo_t;
+
 static inline void main_init( void );
 static inline void main_periodic_task( void );
 static inline void main_event_task( void );
 
 uint32_t t0, t1, diff;
+Servo_t servos[SERVOS_4017_NB_CHANNELS];
 
 int main( void ) {
     main_init();
@@ -29,36 +35,63 @@ int main( void ) {
     return 0;
 }
 
+#define SERVO_SEPERATION    (0xFF/SERVOS_4017_NB_CHANNELS)
+
 static inline void main_init( void ) {
+    uint8_t i,j;
+
     hw_init();
     sys_time_init();
     led_init();
     actuators_init(ACTUATOR_BANK_SERVOS);
     int_enable();
+
+    /* Initialise all servos to values which are
+       evenly spaced through the full range */
+    for (i = 0, j = 0; i < SERVOS_4017_NB_CHANNELS; i++, j += SERVO_SEPERATION) {
+        servos[i].val = j;
+        /* starting moving in the forward direction */
+        servos[i].dval = 1;
+    }
+        
+
 }
 
-#define SERVO_SEPERATION    (0xFF/SERVOS_4017_NB_CHANNELS)
+
 #define SERVO_MIN           0x00
 #define SERVO_MAX           0xFF
-#define SERVO_SPEED         0
+#define SERVO_SPEED         5
+
+/* define as non zero to set all servos to this value */
+//#define SERVO_FIXED_VALUE   (0xFF/2)
 
 static inline void main_periodic_task( void ) {
-    static uint8_t  val = 0;
+    uint8_t i;
     static uint16_t cnt = 0;
 
-    if (++cnt == 200) 
+    if (++cnt == SERVO_SPEED) 
     {
-        uint8_t i,j;
+        /* Move all servos forward or backward by dval */
+        for (i = 0; i < SERVOS_4017_NB_CHANNELS; i++) 
+        {
+            Servo_t *servo = &servos[i];
 
-        /* Evenly space all servo values through the full range */
-        for (i = 0, j = 0; i < SERVOS_4017_NB_CHANNELS; i++, j += SERVO_SEPERATION)
-            actuators_set(
-                ACTUATOR_BANK_SERVOS | i,
-                Chop(val + j, SERVO_MIN, SERVO_MAX)
-            );
+            /* reverse servos when they get to the end */
+            if (servo->val == SERVO_MAX && servo->dval == 1)
+                servo->dval = -1;
+            else if (servo->val == SERVO_MIN)
+                servo->dval = 1;
+
+            /* move and set servo */
+            servo->val += servo->dval;
+#if SERVO_FIXED_VALUE > 0
+            actuators_set(ACTUATOR_BANK_SERVOS | i, SERVO_FIXED_VALUE);
+#else
+            actuators_set(ACTUATOR_BANK_SERVOS | i, servo->val);
+#endif
+        }
 
         actuators_commit(ACTUATOR_BANK_SERVOS);
-        val += SERVO_SPEED;
         cnt = 0;
     }
 }
