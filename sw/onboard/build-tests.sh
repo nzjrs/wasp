@@ -1,7 +1,7 @@
 #!/bin/bash
 
 OK=0
-FILES=`ls test_*_main.c`
+FILES=`ls test/test_*_main.c`
 
 for f in $FILES
 do
