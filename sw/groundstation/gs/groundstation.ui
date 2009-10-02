@@ -379,6 +379,20 @@
                         <signal name="activate" handler="on_autopilot_disable_activate"/>
                       </object>
                     </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separatormenuitem3">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="imagemenuitem1">
+                        <property name="label" translatable="yes">Mark Home</property>
+                        <property name="visible">True</property>
+                        <property name="image">image16</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_uav_mark_home"/>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>
@@ -1714,5 +1728,9 @@
     <property name="visible">True</property>
     <property name="stock">gtk-justify-center</property>
     <property name="icon-size">1</property>
+  </object>
+  <object class="GtkImage" id="image16">
+    <property name="visible">True</property>
+    <property name="stock">gtk-home</property>
   </object>
 </interface>

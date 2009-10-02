@@ -81,13 +81,15 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._source = UAVSource(self._config, self._messagesfile, use_test_source)
         self._source.serial.connect("serial-connected", self._on_serial_connected)
 
+        #track the state of a few key variables received from the plane
+        self._state = {}
+        self._source.register_interest(self._on_gps, 2, "GPS_LLH")
+
         self._settingsfile = SettingsFile(path=settingsfile)
         self._settings = SettingsController(self._source, self._settingsfile, self._messagesfile)
 
         self._plugin_manager = PluginManager()
         self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile)
-
-        print self._plugin_manager.get_plugins_implementing_interface(ConfigurableIface)
 
         self._map = Map(self._config, self._source)
         self._gm = GraphManager(self._config, self._source, self._messagesfile, self.get_resource("graphs_box"), self._window)
@@ -169,6 +171,15 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         m.run()
         m.destroy()
 
+    def _on_gps(self, msg, payload):
+        fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_values(payload)
+        if fix:
+            #scale 1e7 from UBlox protocol datasheet
+            self._state["lat"] = lat/1e7
+            self._state["lon"] = lon/1e7
+            #convert from mm to m
+            self._state["hsl"] = hsl/1000.0
+
     def _on_serial_connected(self, serial, connected):
         conn_menu = self.get_resource("menu_item_connect")
         disconn_menu = self.get_resource("menu_item_disconnect")
@@ -233,6 +244,16 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._config.save()
         self._source.quit()
         gtk.main_quit()
+
+    def on_uav_mark_home(self, *args):
+        #get lla from state
+        try:
+            lat = self._state["lat"]
+            lon = self._state["lon"]
+            pb = get_icon_pixbuf(stock=gtk.STOCK_HOME, size=gtk.ICON_SIZE_MENU)
+            self._map.add_image(lat,lon,pb)
+        except KeyError, e:
+            pass
 
     def on_menu_item_refresh_uav_activate(self, *args):
         #request a number of messages from the UAV

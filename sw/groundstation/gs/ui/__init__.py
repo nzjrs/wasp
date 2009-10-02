@@ -15,16 +15,32 @@ def make_label(text, width=None):
     l.set_padding(5, 0)
     return l
 
-def get_icon_pixbuf(name, size=gtk.ICON_SIZE_DIALOG):
-    mydir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(mydir, "..", "..", "data", "icons", name)
-    try:
-        pb = gtk.gdk.pixbuf_new_from_file_at_size(
-                        os.path.abspath(filename),
-                        *gtk.icon_size_lookup(size)
-        )
-    except Exception:
-        LOG.warn("Error loading icon: %s" % filename, exc_info=True)
+def get_icon_pixbuf(name=None, stock=None, size=gtk.ICON_SIZE_DIALOG):
+    ok = True
+    if name:
+        mydir = os.path.dirname(os.path.abspath(__file__))
+        filename = os.path.join(mydir, "..", "..", "data", "icons", name)
+        try:
+            pb = gtk.gdk.pixbuf_new_from_file_at_size(
+                            os.path.abspath(filename),
+                            *gtk.icon_size_lookup(size)
+            )
+        except Exception:
+            LOG.warn("Error loading icon: %s" % filename, exc_info=True)
+            ok = False
+    elif stock:
+        try:
+            pb = gtk.icon_theme_get_default().load_icon(
+                        stock,
+                        gtk.icon_size_lookup(size)[0],
+                        0)
+        except Exception:
+            ok = False
+            LOG.warn("Error loading stock icon: %s" % stock, exc_info=True)
+    else:
+        raise ValueError("Must pass and icon name or a stock name")
+
+    if not ok:
         pb = gtk.icon_theme_get_default().load_icon(
                     gtk.STOCK_MISSING_IMAGE, 
                     gtk.icon_size_lookup(size)[0],
