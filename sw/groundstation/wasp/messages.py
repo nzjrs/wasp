@@ -82,6 +82,13 @@ class PyField(Field):
             "int32" :   "i",
             "float" :   "f"
     }
+    #maps type to correct format string
+    TYPE_TO_PRINT_MAP = {
+            float   :   "%f",
+            str     :   "%s",
+            chr     :   "%c",
+            int     :   "%d"
+    }
 
     def __init__(self, node):
         Field.__init__(self, node)
@@ -91,6 +98,17 @@ class PyField(Field):
                 self._enum_values = node.values.split("|")
             except AttributeError:
                 self._enum_values = []
+
+        #cache the python type for speed
+        if self.type == "float":
+            self._klass = float
+        elif self.type == "char":
+            if self.is_array:
+                self._klass = str
+            else:
+                self._klass = chr
+        else:
+            self._klass = int
 
         if self.is_array:
             self.format = "%d%s" % (self.num_elements, self.TYPE_TO_STRUCT_MAP[self.type])
@@ -102,6 +120,10 @@ class PyField(Field):
             self._fstr = node.format
         except AttributeError:
             self._fstr = "%s"
+            #if self.is_array:
+            #    self._fstr = "%s"
+            #else:
+            #    self._fstr = self.TYPE_TO_PRINT_MAP[self._klass]
 
         try:
             self._fstr += " %s" % node.unit
@@ -115,34 +137,21 @@ class PyField(Field):
 
         self._isenum = self.type == "uint8" and self._enum_values
 
-    def _get_python_type(self):
-        if self.type == "float":
-            return float
-        elif self.type == "char":
-            if self.is_array:
-                return str
-            else:
-                return chr
-        else:
-            return int    
-
     def get_default_value(self):
-        klass = self._get_python_type()
         if self.is_array and self.type != "char":
-            return list( [klass() for i in range(self.num_elements)] )
+            return list( [self._klass() for i in range(self.num_elements)] )
         else:
-            return klass()
+            return self._klass()
 
     def interpret_value_from_user_string(self, string, default=None, sep=","):
-        klass = self._get_python_type()
         try:
             if self.is_array and self.type != "char":
                 vals = string.split(sep)
                 if len(vals) != self.num_elements:
                     raise ValueError
-                return list( [klass(v) for v in vals] )
+                return list( [self._klass(v) for v in vals] )
             else:
-                return klass(string)
+                return self._klass(string)
         except ValueError:
             #invalid user input for type
             if default:
@@ -168,6 +177,23 @@ class PyField(Field):
                     return "?%s?" % value
             else:
                 return self._fstr % (self._coef * value)
+
+    def get_scaled_value(self, value):
+        """
+        Returns the scaled (according to alt_unit_coef). Note, that unlike
+        the other get_ functions, this does not respect the original type of
+        the field. A float is always returned
+        """
+        if self.is_array:
+            if self.type == "char":
+                return value
+            else:
+                return [float(val * self._coef) for val in value]
+        else:
+            if self._isenum:
+                return value
+            else:
+                return float(value * self._coef)
 
 class PyMessage(Message):
 
@@ -237,6 +263,18 @@ class PyMessage(Message):
                 return pvals
         else:
             return ""
+
+    def unpack_scaled_values(self, string):
+        if self.fields:
+
+            vals = self.unpack_values(string)
+            assert len(vals) == self.num_values
+            fvals = self.get_field_values(vals)
+            assert len(fvals) == self.num_fields
+
+            return [self.fields[i].get_scaled_value(fvals[i]) for i in range(self.num_fields)]
+
+        return ()
 
     def get_default_values(self):
         return [ f.get_default_value() for f in self.fields ]
