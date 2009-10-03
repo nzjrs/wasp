@@ -145,8 +145,9 @@
    <message name="GPS_LLH" id="36">
       <field name="fix" type="uint8" values="NONE|2D|3D"/>
       <field name="sv" type="uint8"/>
-      <field name="lat"  type="int32"/>
-      <field name="lon"  type="int32"/>
+      <!-- scale value of 1e7 taken from ublox datasheet -->
+      <field name="lat"  type="int32" alt_unit_coef="1e-7"/> 
+      <field name="lon"  type="int32" alt_unit_coef="1e-7"/>
       <field name="hsl"  type="int32" unit="mm"/>
       <field name="hacc"  type="int32" unit="mm"/>
       <field name="vacc"  type="int32" unit="mm"/>

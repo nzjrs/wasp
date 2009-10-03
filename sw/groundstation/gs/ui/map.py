@@ -158,20 +158,14 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         self._alt.update_pixel_x(allocation.width/2)
 
     def _on_gps(self, msg, payload):
-        fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_values(payload)
+        fix,sv,self.lat,self.lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
 
-        #scale 1e7 from UBlox protocol datasheet
-        lat = lat/1e7
-        lon = lon/1e7
         #convert from mm to m
         hsl = hsl/1000.0
 
-        self.lat = lat
-        self.lon = lon
-
         if fix:
             if MAP_AVAILABLE:
-                self._map.draw_gps(lat, lon, 0)
+                self._map.draw_gps(self.lat, self.lon, 0)
 
                 px, py = self._map.geographic_to_screen(self.lat, self.lon)
                 self._alt.update_pixel_x_and_altitude(px, hsl)

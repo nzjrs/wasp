@@ -172,11 +172,10 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         m.destroy()
 
     def _on_gps(self, msg, payload):
-        fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_values(payload)
+        fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
         if fix:
-            #scale 1e7 from UBlox protocol datasheet
-            self._state["lat"] = lat/1e7
-            self._state["lon"] = lon/1e7
+            self._state["lat"] = lat
+            self._state["lon"] = lon
             #convert from mm to m
             self._state["hsl"] = hsl/1000.0
 
