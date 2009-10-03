@@ -245,12 +245,12 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         gtk.main_quit()
 
     def on_uav_mark_home(self, *args):
-        #get lla from state
+        #get lat, lon from state
         try:
             lat = self._state["lat"]
             lon = self._state["lon"]
-            pb = get_icon_pixbuf(stock=gtk.STOCK_HOME, size=gtk.ICON_SIZE_MENU)
-            self._map.add_image(lat,lon,pb)
+            self._map.mark_home(lat,lon)
+            self._sb.mark_home(lat, lon)
         except KeyError, e:
             pass
 

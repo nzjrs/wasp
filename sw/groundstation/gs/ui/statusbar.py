@@ -3,6 +3,7 @@ import gtk
 
 import gs.ui
 import gs.ui.indicators as indicators
+import gs.geo as geo
 
 class StatusBar(gtk.Statusbar):
     def __init__(self, source):
@@ -38,9 +39,17 @@ class StatusBar(gtk.Statusbar):
         #ping time
         self._pt = gs.ui.make_label("PING: ?", 12)
         hb.pack_start(self._pt, False, False)
-        #GPS LLA
-        self._gps_coords = gs.ui.make_label("GPS: +180.0000 N, +180.0000 E")
+        #GPS LL
+        self._gps_coords = gs.ui.make_label("GPS: +???.???? N, +???.???? E")
         hb.pack_start(self._gps_coords, False, False)
+        #Altitude
+        self._alt = gs.ui.make_label("ALT: ?????.? m")
+        hb.pack_start(self._alt, False, False)
+        #Distance from home
+        self._dist = gs.ui.make_label("DIST: ?????.? m")
+        hb.pack_start(self._dist, False, False)
+        self._home_lat = None
+        self._home_lon = None
         #debug
         self._debug = indicators.ColorLabelBox(text="", fade=True)
         self._debug.set_blank()
@@ -77,7 +86,25 @@ class StatusBar(gtk.Statusbar):
 
     def _on_gps(self, msg, payload):
         fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
-        self._gps_coords.set_text("GPS: %.4f %s, %.4f %s" % (lat,"N",lon,"E"))
+
+        if fix:
+            self._gps_coords.set_text("GPS: %.4f %s, %.4f %s" % (lat,"N",lon,"E"))
+
+            #convert from mm to m
+            hsl = hsl/1000.0
+            self._alt.set_text("ALT: %.1f m" % hsl)
+
+            #update distance from home
+            if self._home_lat != None and self._home_lon != None:
+                dist = geo.crow_flies_distance_two_point(
+                            (self._home_lat, self._home_lon),
+                            (lat, lon))
+                self._dist.set_text("DIST: %.1f m" % dist)
+
+
+    def mark_home(self, lat, lon):
+        self._home_lat = lat
+        self._home_lon = lon
 
 
 

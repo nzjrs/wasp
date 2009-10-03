@@ -254,6 +254,11 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
     def centre(self):
         self._map.set_zoom(self._map.props.max_zoom)
 
+    def mark_home(self, lat, lon):
+        self._map.add_image(
+                    lat,lon,
+                    gs.ui.get_icon_pixbuf(stock=gtk.STOCK_HOME, size=gtk.ICON_SIZE_MENU))
+
     def show_cache_dialog(self, msgarea):
 
         def update_download_count(msg, msgarea, gpsmap):
