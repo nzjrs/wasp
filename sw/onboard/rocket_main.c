@@ -1,3 +1,5 @@
+//based on LED test main
+
 #include <inttypes.h>
 
 #include "std.h"
@@ -27,11 +29,12 @@ static inline void main_init( void ) {
 }
 
 static inline void main_periodic_task( void ) {
+  //turn Leds 2-4 on and off periodically
+  static int tick=2, increment=1;
   RunOnceEvery(100, {
-    led_toggle(1);
-    led_toggle(2);
-    led_toggle(3);
-    led_toggle(4);
+    led_toggle(tick);
+    tick += increment;
+    if (tick > 4 || tick < 2) increment*=-1;
   });
 }
 

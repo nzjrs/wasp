@@ -1,4 +1,4 @@
-TARGET          ?= autopilot_main
+TARGET          ?= rocket_main
 OBJDIR          = bin
 ARCH            = arm7
 Q               = @
