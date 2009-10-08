@@ -10,6 +10,7 @@ Documentation
 .. toctree::
    :maxdepth: 2
 
+   sw/doc/index
    sw/doc/autopilot
    sw/doc/onboard
    sw/doc/comm-protocol

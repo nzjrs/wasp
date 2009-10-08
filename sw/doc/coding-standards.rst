@@ -1,5 +1,3 @@
-
-
 Bug-killing standards for firmware coding
 *****************************************
 
