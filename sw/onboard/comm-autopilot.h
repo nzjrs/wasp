@@ -4,7 +4,7 @@
 #include "comm.h"
 
 bool_t
-comm_autopilot_send ( CommChannel_t chan, uint8_t msgid );
+comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid );
 
 bool_t 
 comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message);

@@ -17,7 +17,7 @@
 #include "generated/messages.h"
 
 bool_t
-comm_autopilot_send ( CommChannel_t chan, uint8_t msgid )
+comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
 {
     uint8_t ret = TRUE;
 

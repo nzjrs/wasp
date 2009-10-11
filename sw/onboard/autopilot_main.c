@@ -77,7 +77,7 @@ static inline void autopilot_main_init( void ) {
   rc_init();
 
   comm_init(COMM_1);
-  comm_add_tx_callback(COMM_1, comm_autopilot_send);
+  comm_add_tx_callback(COMM_1, comm_autopilot_message_send);
   comm_add_rx_callback(COMM_1, comm_autopilot_message_received);
 
   gps_init();
