@@ -199,8 +199,12 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
                 if self.serial.is_open():
                     self.disconnect_from_uav()
 
-                LOG.info("Connecting to UAV")
+                #instatiate the new source, and call change_serialsender
+                #to reconnect to the underlying object signals telling us
+                #when data has arrived
+                LOG.info("Connecting to UAV on new port: %s %s" % (port, speed))
                 self.serial = communication.SerialCommunication(port=port, speed=int(speed), timeout=1)
+                self.change_serialsender(self.serial)
 
         self._port = port
         self._speed = speed

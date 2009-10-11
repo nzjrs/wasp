@@ -21,7 +21,6 @@ class GObjectSerialMonitor(gobject.GObject):
         serialsender.connect("serial-connected", self._on_serial_connected)
 
     def _on_serial_connected(self, serial, connected):
-        print "--------------------------", serial, connected
         #remove the old watch
         if self._watch:
             gobject.source_remove(self._watch)
