@@ -75,6 +75,14 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
         monitor.GObjectSerialMonitor.__init__(self, self.serial)
 
+        #because we already initialized the base gobject type uising the
+        #__signals__ defined in monitor.GObjectSerialMonitor, we must
+        #programatically add the source-connected signal
+        gobject.signal_new(
+                'source-connected', UAVSource,
+                gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                (bool,))
+
         #track how many messages per second
         self._lastt = datetime.datetime.now()
         self._times = utils.MovingAverage(5, float)
@@ -163,12 +171,12 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
     def connect_to_uav(self):
         if self._port and self._speed:
-            if self.serial.connect_to_port():
-                return True
-        return False
+            self.serial.connect_to_port()
+        self.emit("source-connected", self.serial.is_open())
 
     def disconnect_from_uav(self):
         self.serial.disconnect_from_port()
+        self.emit("source-connected", self.serial.is_open())
 
     def get_messages_per_second(self):
         try:

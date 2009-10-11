@@ -42,6 +42,7 @@ class DummySerialCommunication(gobject.GObject):
         self._header = header
 
         self._sendcache = {}
+        self._is_open = False
 
         #Write messages to the pipe, so that it is read and processed by
         #the groundstation
@@ -110,10 +111,15 @@ class DummySerialCommunication(gobject.GObject):
 
     def connect_to_port(self):
         self.emit("serial-connected", True)
+        self._is_open = True
         return True
 
     def disconnect_from_port(self):
         self.emit("serial-connected", False)
+        self._is_open = False
+
+    def is_open(self):
+        return self._is_open
 
     def write(self, data):
         os.write(self._writefd, data)

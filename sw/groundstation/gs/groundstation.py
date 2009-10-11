@@ -79,7 +79,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._messagesfile.parse()
 
         self._source = UAVSource(self._config, self._messagesfile, use_test_source)
-        self._source.serial.connect("serial-connected", self._on_serial_connected)
+        self._source.connect("source-connected", self._on_source_connected)
 
         #track the state of a few key variables received from the plane
         self._state = {}
@@ -179,7 +179,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             #convert from mm to m
             self._state["hsl"] = hsl/1000.0
 
-    def _on_serial_connected(self, serial, connected):
+    def _on_source_connected(self, source, connected):
         conn_menu = self.get_resource("menu_item_connect")
         disconn_menu = self.get_resource("menu_item_disconnect")
 

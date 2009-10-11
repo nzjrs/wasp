@@ -59,14 +59,14 @@ class StatusBar(gtk.Statusbar):
         self.pack_start(hb, False, False)
         self.reorder_child(hb, 0)
 
-        source.serial.connect("serial-connected", self._on_serial_connected)
+        source.connect("source-connected", self._on_source_connected)
 
         source.register_interest(self._on_gps, 0, "GPS_LLH")
         source.register_interest(self._on_debug, 0, "DEBUG")
 
         gobject.timeout_add_seconds(1, self._check_messages_per_second, source)
 
-    def _on_serial_connected(self, serial, connected):
+    def _on_source_connected(self, source, connected):
         if connected:
             self._c.set_green()
             self._c.set_tooltip_text("")

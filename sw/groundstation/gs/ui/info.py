@@ -29,7 +29,7 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         self._cpu_pb = progressbar.ProgressBar(range=(0,100))
         self.get_resource("cpu_hbox").pack_start(self._cpu_pb, False)
 
-        source.serial.connect("serial-connected", self._on_serial_connected, source)
+        source.connect("source-connected", self._on_source_connected)
 
         source.register_interest(self._on_status, 5, "STATUS")
         source.register_interest(self._on_comm_status, 5, "COMM_STATUS")
@@ -42,15 +42,14 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         self.get_resource("rate_value").set_text("%.1f msgs/s" % source.get_messages_per_second())
         return True
 
-    def _on_serial_connected(self, serial, connected, source):
+    def _on_source_connected(self, source, connected):
         if connected:
             self.get_resource("connected_value").set_text("YES")
-
-            port, speed = source.get_connection_parameters()
-            self.get_resource("port_value").set_text(port)
-            self.get_resource("speed_value").set_text("%s baud" % speed)
         else:
             self.get_resource("connected_value").set_text("NO")
+        port, speed = source.get_connection_parameters()
+        self.get_resource("port_value").set_text(port)
+        self.get_resource("speed_value").set_text("%s baud" % speed)
 
     def _on_status(self, msg, payload):
         rc, gps, bv, in_flight, motors_on, autopilot_mode, cpu_usage = msg.unpack_values(payload)
