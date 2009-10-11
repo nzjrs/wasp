@@ -1,5 +1,6 @@
+#include "std.h"
 #include "config/config.h"
-#include "config/airframe.h"
+#include "generated/settings.h"
 
 #include "analog.h"
 #include "arm7/analog_hw.h"
