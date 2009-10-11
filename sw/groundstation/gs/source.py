@@ -66,6 +66,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         self._transport = transport.Transport(check_crc=True, debug=DEBUG)
         self._transport_header = transport.TransportHeaderFooter(acid=0x78)
 
+        self._use_test_source = use_test_source
         if use_test_source:
             self.serial = communication.DummySerialCommunication(messages, self._transport, self._transport_header)
             LOG.info("Test source enabled")
@@ -182,11 +183,20 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
             return 0.0
 
     def update_state_from_config(self):
-        self._port = self.config_get("serial_port", self.DEFAULT_PORT)
-        self._speed = self.config_get("serial_speed", self.DEFAULT_SPEED)
+        port = self.config_get("serial_port", self.DEFAULT_PORT)
+        speed = self.config_get("serial_speed", self.DEFAULT_SPEED)
+
+        if port != self._port or speed != self._speed:
+            if not self._use_test_source:
+                if self.serial.is_open():
+                    self.disconnect_from_uav()
+
+                LOG.info("Connecting to UAV")
+                self.serial = communication.SerialCommunication(port=port, speed=int(speed), timeout=1)
+
+        self._port = port
+        self._speed = speed
         LOG.info("Updating state from config: %s %s" % (self._port, self._speed))
-        #if p:
-        #    self.connect(port=p)
 
     def update_config_from_state(self):
         LOG.info("Updating config from state")
