@@ -44,4 +44,4 @@ LDSCRIPT    = LPC2148-ROM-bl.ld
 # Arch specific flags
 ARCHCFLAGS  = -mcpu=$(MCU) $(THUMB_IW)
 ARCHASFLAGS = -mcpu=$(MCU) $(THUMB_IW) -x assembler-with-cpp
-ARCHLDFLAGS = -lgcc -T$(LDSCRIPT)
+ARCHLDFLAGS = -n -nostartfiles -lgcc -T$(LDSCRIPT)

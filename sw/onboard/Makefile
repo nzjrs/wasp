@@ -39,7 +39,7 @@ ASMSRC = $(ARCHASMSRC)
 REMOVE      = rm -f
 
 # Compiler flags.
-CFLAGS = -I. -I math -I arch
+CFLAGS = -I. -I math -I arch -I arch/$(ARCH)/include
 CFLAGS += -Os
 CFLAGS += -Winline
 CFLAGS += -Wall -Wcast-qual -Wimplicit -Wcast-align
@@ -57,7 +57,7 @@ INCLUDE_BUILD_INFO ?= 1
 CFLAGS += -DINCLUDE_BUILD_INFO=$(INCLUDE_BUILD_INFO)
 
 # Linker flags.
-LDFLAGS = -n -nostartfiles -Wl,-Map=$(OBJDIR)/$(TARGET).map,--cref,-gc-sections
+LDFLAGS = -Wl,-Map=$(OBJDIR)/$(TARGET).map,--cref,-gc-sections
 LDFLAGS += -lc
 LDFLAGS += -lm
 
@@ -129,7 +129,6 @@ $(OBJDIR)/%.hex: $(OBJDIR)/%.elf
 	$(Q)$(OBJCOPY) -O $(FORMAT) $< $@
 
 # Create extended listing file from ELF output file.
-# testing: option -C
 $(OBJDIR)/%.lss: $(OBJDIR)/%.elf
 	@echo OBJD $@
 	$(Q)$(OBJDUMP) -h -S -C $< > $@
