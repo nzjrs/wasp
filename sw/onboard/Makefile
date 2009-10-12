@@ -4,7 +4,9 @@ OBJDIR          = bin
 Q               = @
 TOOLS           = ../tools
 
-SRC =                            \
+include Makefile.$(ARCH)
+
+SRC =                               \
     $(TARGET).c                     \
     math/booz_trig_int.c            \
     math/pprz_geodetic_int.c        \
@@ -30,14 +32,8 @@ SRC =                            \
     settings.c
 
 # Include arch specific sources
-include Makefile.$(ARCH)
 SRC +=  $(ARCHSRC)
 ASMSRC = $(ARCHASMSRC)
-
-MCU         = arm7tdmi
-THUMB       = -mthumb
-THUMB_IW    = -mthumb-interwork
-FORMAT      = ihex
 
 # Define programs and commands.
 REMOVE      = rm -f
@@ -55,6 +51,7 @@ CFLAGS += -Wmissing-prototypes -Wnested-externs
 CFLAGS += -std=gnu99
 CFLAGS += -fshort-enums
 CFLAGS += -ffunction-sections
+CFLAGS += -DARCH=$(ARCH)
 
 INCLUDE_BUILD_INFO ?= 1
 CFLAGS += -DINCLUDE_BUILD_INFO=$(INCLUDE_BUILD_INFO)
@@ -63,9 +60,11 @@ CFLAGS += -DINCLUDE_BUILD_INFO=$(INCLUDE_BUILD_INFO)
 LDFLAGS = -n -nostartfiles -Wl,-Map=$(OBJDIR)/$(TARGET).map,--cref,-gc-sections
 LDFLAGS += -lc
 LDFLAGS += -lm
-LDFLAGS += -lgcc 
-LDSCRIPT = LPC2148-ROM-bl.ld
-LDFLAGS +=-T$(LDSCRIPT)
+
+# Include arch specific flags
+CFLAGS  += $(ARCHCFLAGS)
+LDFLAGS += $(ARCHLDFLAGS)
+ASFLAGS = $(ARCHASFLAGS)
 
 # Define all object files.
 COBJARM   = $(SRC:%.c=$(OBJDIR)/%.o)
@@ -74,11 +73,6 @@ AOBJARM   = $(ASMSRC:%.S=$(OBJDIR)/%.o)
 # Define all list files
 LST       = $(SRC:%.c=$(OBJDIR)/%.lst)
 LST       += $(ASMSRC:%.S=$(OBJDIR)/%.lst)
-
-# Combine all necessary flags and optional flags.
-# Add target processor to flags.
-ALL_CFLAGS = -mcpu=$(MCU) $(THUMB_IW) -I. $(CFLAGS) $(GENDEPFLAGS)
-ALL_ASFLAGS = -mcpu=$(MCU) $(THUMB_IW) -I. -x assembler-with-cpp $(ASFLAGS)
 
 # Default target.
 all: build size
@@ -150,19 +144,19 @@ $(OBJDIR)/%.sym: $(OBJDIR)/%.elf
 .PRECIOUS : $(AOBJARM) $(COBJARM)
 $(OBJDIR)/%.elf:  $(AOBJARM) $(COBJARM)
 	@echo LD $@
-	$(Q)$(CC) $(THUMB) $(ALL_CFLAGS) $(AOBJARM) $(COBJARM)  --output $@ $(LDFLAGS)
+	$(Q)$(CC) $(THUMB) $(CFLAGS) $(AOBJARM) $(COBJARM)  --output $@ $(LDFLAGS)
 
 # Compile: create object files from C source files. ARM-only
 $(OBJDIR)/%.o : %.c
 	@echo CC $@
 	$(Q)test -d $(dir $@) || mkdir -p $(dir $@)
-	$(Q)$(CC) -c $(ALL_CFLAGS) $< -o $@ 
+	$(Q)$(CC) -c $(CFLAGS) $< -o $@ 
 
 # Assemble: create object files from assembler source files. ARM-only
 $(AOBJARM) : $(OBJDIR)/%.o : %.S
 	@echo AS $@
 	$(Q)test -d $(dir $@) || mkdir -p $(dir $@)
-	$(Q)$(CC) -c $(ALL_ASFLAGS) $< -o $@
+	$(Q)$(CC) -c $(ASFLAGS) $< -o $@
 
 clean:
 	$(REMOVE) $(OBJDIR)/$(TARGET).hex
@@ -194,4 +188,3 @@ ifneq ($(MAKECMDGOALS),erase)
 -include $(OBJDIR)/.depend
 endif
 endif
-
