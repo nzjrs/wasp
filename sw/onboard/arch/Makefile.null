@@ -1,0 +1,18 @@
+ARCHSRC =                                \
+    arch/null/null.c
+
+ARCHASMSRC =                             \
+    $(NULL)
+
+# Define programs and commands.
+CC		    = gcc
+LD		    = gcc
+OBJCOPY     = objcopy
+OBJDUMP     = objdump
+SIZE        = size
+NM          = nm
+
+# Arch specific flags
+ARCHCFLAGS  = -g
+ARCHASFLAGS = 
+ARCHLDFLAGS = 
