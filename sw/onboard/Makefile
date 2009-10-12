@@ -1,10 +1,10 @@
 TARGET          ?= autopilot_main
 ARCH            ?= arm7
-OBJDIR          = bin
+OBJDIR          = bin/$(ARCH)
 Q               = @
 TOOLS           = ../tools
 
-include Makefile.$(ARCH)
+include arch/Makefile.$(ARCH)
 
 SRC =                               \
     $(TARGET).c                     \
@@ -32,14 +32,14 @@ SRC =                               \
     settings.c
 
 # Include arch specific sources
-SRC +=  $(ARCHSRC)
+SRC += $(ARCHSRC)
 ASMSRC = $(ARCHASMSRC)
 
 # Define programs and commands.
 REMOVE      = rm -f
 
 # Compiler flags.
-CFLAGS = -I. -I math -I $(ARCH)/include
+CFLAGS = -I. -I math -I arch -I arch/$(ARCH)/include
 CFLAGS += -Os
 CFLAGS += -Winline
 CFLAGS += -Wall -Wcast-qual -Wimplicit -Wcast-align
