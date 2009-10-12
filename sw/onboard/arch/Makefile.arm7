@@ -1,4 +1,4 @@
-ARCHSRC =                           \
+ARCHSRC =                                \
     arch/arm7/init_hw.c                  \
     arch/arm7/armVIC.c                   \
     arch/arm7/sys_time_hw.c              \
@@ -23,7 +23,7 @@ ARCHSRC =                           \
     arch/arm7/altimeter_analog_baro_hw.c \
     arch/arm7/settings_mem_hw.c
 
-ARCHASMSRC =                        \
+ARCHASMSRC =                             \
     arch/arm7/crt0.S
 
 # Define programs and commands.
@@ -42,6 +42,6 @@ FORMAT      = ihex
 LDSCRIPT    = LPC2148-ROM-bl.ld
 
 # Arch specific flags
-ARCHCFLAGS = -mcpu=$(MCU) $(THUMB_IW)
+ARCHCFLAGS  = -mcpu=$(MCU) $(THUMB_IW)
 ARCHASFLAGS = -mcpu=$(MCU) $(THUMB_IW) -x assembler-with-cpp
 ARCHLDFLAGS = -lgcc -T$(LDSCRIPT)
