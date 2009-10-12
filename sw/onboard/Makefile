@@ -39,7 +39,7 @@ ASMSRC = $(ARCHASMSRC)
 REMOVE      = rm -f
 
 # Compiler flags.
-CFLAGS = -I. -I math -I arch -I arch/$(ARCH)/include
+CFLAGS = -I. -I math -I arch
 CFLAGS += -Os
 CFLAGS += -Winline
 CFLAGS += -Wall -Wcast-qual -Wimplicit -Wcast-align

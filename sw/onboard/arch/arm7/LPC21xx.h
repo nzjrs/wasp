@@ -19,18 +19,18 @@
 #define REG16           volatile unsigned short
 #define REG32           volatile unsigned long
 
-#include "lpcWD.h"
-#include "lpcTMR.h"
-#include "lpcUART.h"
-#include "lpcI2C.h"
-#include "lpcSPI.h"
-#include "lpcRTC.h"
-#include "lpcGPIO.h"
-#include "lpcPIN.h"
-#include "lpcADC.h"
-#include "lpcSCB.h"
-#include "lpcVIC.h"
-#include "lpcCAN.h"
+#include "include/lpcWD.h"
+#include "include/lpcTMR.h"
+#include "include/lpcUART.h"
+#include "include/lpcI2C.h"
+#include "include/lpcSPI.h"
+#include "include/lpcRTC.h"
+#include "include/lpcGPIO.h"
+#include "include/lpcPIN.h"
+#include "include/lpcADC.h"
+#include "include/lpcSCB.h"
+#include "include/lpcVIC.h"
+#include "include/lpcCAN.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Watchdog

@@ -26,7 +26,6 @@
 #define UART_HW_H
 
 #include "std.h"
-#include "types.h"
 #include "LPC21xx.h"
 #include "config/config.h"
 
