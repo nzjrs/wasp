@@ -77,10 +77,9 @@ LST       += $(ASMSRC:%.S=$(OBJDIR)/%.lst)
 # Default target.
 all: build size
 
-build: generated elf hex lss sym
+build: generated elf lss sym
 
 elf: $(OBJDIR)/$(TARGET).elf
-hex: $(OBJDIR)/$(TARGET).hex
 lss: $(OBJDIR)/$(TARGET).lss 
 sym: $(OBJDIR)/$(TARGET).sym
 
@@ -122,12 +121,6 @@ generated/build.h: $(SRC) $(TOOLS)/gen-build-info.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-build-info.py --target=$(TARGET) > $@
 
-# Create final output files (.hex, .eep) from ELF output file.
-# TODO: handling the .eeprom-section should be redundant
-$(OBJDIR)/%.hex: $(OBJDIR)/%.elf
-	@echo OBJC $@
-	$(Q)$(OBJCOPY) -O $(FORMAT) $< $@
-
 # Create extended listing file from ELF output file.
 $(OBJDIR)/%.lss: $(OBJDIR)/%.elf
 	@echo OBJD $@
@@ -158,7 +151,6 @@ $(AOBJARM) : $(OBJDIR)/%.o : %.S
 	$(Q)$(CC) -c $(ASFLAGS) $< -o $@
 
 clean:
-	$(REMOVE) $(OBJDIR)/$(TARGET).hex
 	$(REMOVE) $(OBJDIR)/$(TARGET).obj
 	$(REMOVE) $(OBJDIR)/$(TARGET).elf
 	$(REMOVE) $(OBJDIR)/$(TARGET).map
@@ -174,7 +166,7 @@ clean:
 	$(REMOVE) generated/*.h
 
 # Listing of phony targets.
-.PHONY : all size build elf hex lss sym clean upload
+.PHONY : all size build elf lss sym clean upload
 
 # Dependencies
 $(OBJDIR)/.depend:
