@@ -1,10 +1,10 @@
 TARGET          ?= autopilot_main
+ARCH            ?= arm7
 OBJDIR          = bin
-ARCH            = arm7
 Q               = @
 TOOLS           = ../tools
 
-SRCARM =                            \
+SRC =                            \
     $(TARGET).c                     \
     math/booz_trig_int.c            \
     math/pprz_geodetic_int.c        \
@@ -29,34 +29,10 @@ SRCARM =                            \
     comm-autopilot.c                \
     settings.c
 
-# Arch sources
-SRCARM +=                           \
-    arm7/init_hw.c                  \
-    arm7/armVIC.c                   \
-    arm7/sys_time_hw.c              \
-    arm7/led_hw.c                   \
-    arm7/rc_hw.c                    \
-    arm7/uart_hw.c                  \
-    arm7/usb_ser_hw.c               \
-    arm7/lpcusb/usbhw_lpc.c         \
-    arm7/lpcusb/usbcontrol.c        \
-    arm7/lpcusb/usbstdreq.c         \
-    arm7/lpcusb/usbinit.c           \
-    arm7/comm_hw.c                  \
-    arm7/ublox_gps_hw.c             \
-    arm7/micromag.c                 \
-    arm7/max1168.c                  \
-    arm7/imu_booz_hw.c              \
-    arm7/i2c_hw.c                   \
-    arm7/actuators_hw.c             \
-    arm7/buss_twi_blmc_hw.c         \
-    arm7/servos_4017_hw.c           \
-    arm7/analog_hw.c                \
-    arm7/altimeter_analog_baro_hw.c \
-    arm7/settings_mem_hw.c
-
-ASRCARM =                           \
-    arm7/crt0.S
+# Include arch specific sources
+include Makefile.$(ARCH)
+SRC +=  $(ARCHSRC)
+ASMSRC = $(ARCHASMSRC)
 
 MCU         = arm7tdmi
 THUMB       = -mthumb
@@ -64,20 +40,11 @@ THUMB_IW    = -mthumb-interwork
 FORMAT      = ihex
 
 # Define programs and commands.
-CC		    = arm-elf-gcc
-LD		    = arm-elf-gcc
-SHELL       = sh
-OBJCOPY     = arm-elf-objcopy
-OBJDUMP     = arm-elf-objdump
-SIZE        = arm-elf-size
-NM          = arm-elf-nm
 REMOVE      = rm -f
-COPY        = cp
 
 # Compiler flags.
 CFLAGS = -I. -I math -I $(ARCH)/include
 CFLAGS += -Os
-# CFLAGS += -malignment-traps
 CFLAGS += -Winline
 CFLAGS += -Wall -Wcast-qual -Wimplicit -Wcast-align
 CFLAGS += -Wpointer-arith -Wswitch
@@ -96,17 +63,17 @@ CFLAGS += -DINCLUDE_BUILD_INFO=$(INCLUDE_BUILD_INFO)
 LDFLAGS = -n -nostartfiles -Wl,-Map=$(OBJDIR)/$(TARGET).map,--cref,-gc-sections
 LDFLAGS += -lc
 LDFLAGS += -lm
-LDFLAGS += -lc -lgcc 
+LDFLAGS += -lgcc 
 LDSCRIPT = LPC2148-ROM-bl.ld
 LDFLAGS +=-T$(LDSCRIPT)
 
 # Define all object files.
-COBJARM   = $(SRCARM:%.c=$(OBJDIR)/%.o)
-AOBJARM   = $(ASRCARM:%.S=$(OBJDIR)/%.o)
+COBJARM   = $(SRC:%.c=$(OBJDIR)/%.o)
+AOBJARM   = $(ASMSRC:%.S=$(OBJDIR)/%.o)
 
 # Define all list files
-LST       = $(SRCARM:%.c=$(OBJDIR)/%.lst)
-LST       += $(ASRCARM:%.S=$(OBJDIR)/%.lst)
+LST       = $(SRC:%.c=$(OBJDIR)/%.lst)
+LST       += $(ASMSRC:%.S=$(OBJDIR)/%.lst)
 
 # Combine all necessary flags and optional flags.
 # Add target processor to flags.
@@ -157,7 +124,7 @@ generated/settings.h: config/settings.xml $(TOOLS)/gen-settings.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-settings.py --settings=$< > $@
 
-generated/build.h: $(SRCARM) $(TOOLS)/gen-build-info.py
+generated/build.h: $(SRC) $(TOOLS)/gen-build-info.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-build-info.py --target=$(TARGET) > $@
 
@@ -189,7 +156,7 @@ $(OBJDIR)/%.elf:  $(AOBJARM) $(COBJARM)
 $(OBJDIR)/%.o : %.c
 	@echo CC $@
 	$(Q)test -d $(dir $@) || mkdir -p $(dir $@)
-	$(Q)$(CC) -c $(ALL_CFLAGS) $(CONLYFLAGS) $< -o $@ 
+	$(Q)$(CC) -c $(ALL_CFLAGS) $< -o $@ 
 
 # Assemble: create object files from assembler source files. ARM-only
 $(AOBJARM) : $(OBJDIR)/%.o : %.S
@@ -220,7 +187,7 @@ clean:
 $(OBJDIR)/.depend:
 	@echo DEPEND $@
 	@test -d $(OBJDIR) || mkdir -p $(OBJDIR)
-	$(Q)$(CC) -MM -MG $(CFLAGS) $(SRCARM) | sed 's|\([^\.]*\.o\)|$(OBJDIR)/\1|' > $@
+	$(Q)$(CC) -MM -MG $(CFLAGS) $(SRC) | sed 's|\([^\.]*\.o\)|$(OBJDIR)/\1|' > $@
 
 ifneq ($(MAKECMDGOALS),clean) 
 ifneq ($(MAKECMDGOALS),erase) 

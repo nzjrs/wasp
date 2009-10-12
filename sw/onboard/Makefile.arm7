@@ -1,0 +1,35 @@
+ARCHSRC =                           \
+    arm7/init_hw.c                  \
+    arm7/armVIC.c                   \
+    arm7/sys_time_hw.c              \
+    arm7/led_hw.c                   \
+    arm7/rc_hw.c                    \
+    arm7/uart_hw.c                  \
+    arm7/usb_ser_hw.c               \
+    arm7/lpcusb/usbhw_lpc.c         \
+    arm7/lpcusb/usbcontrol.c        \
+    arm7/lpcusb/usbstdreq.c         \
+    arm7/lpcusb/usbinit.c           \
+    arm7/comm_hw.c                  \
+    arm7/ublox_gps_hw.c             \
+    arm7/micromag.c                 \
+    arm7/max1168.c                  \
+    arm7/imu_booz_hw.c              \
+    arm7/i2c_hw.c                   \
+    arm7/actuators_hw.c             \
+    arm7/buss_twi_blmc_hw.c         \
+    arm7/servos_4017_hw.c           \
+    arm7/analog_hw.c                \
+    arm7/altimeter_analog_baro_hw.c \
+    arm7/settings_mem_hw.c
+
+ARCHASMSRC =                        \
+    arm7/crt0.S
+
+# Define programs and commands.
+CC		    = arm-elf-gcc
+LD		    = arm-elf-gcc
+OBJCOPY     = arm-elf-objcopy
+OBJDUMP     = arm-elf-objdump
+SIZE        = arm-elf-size
+NM          = arm-elf-nm
