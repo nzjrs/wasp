@@ -18,7 +18,10 @@ typedef enum {
 uint8_t         do_max1168_read;
 uint8_t         imu_spi_selected;
 
-static void     SSP_ISR(void) __attribute__((naked));
+static void         SSP_ISR(void) __attribute__((naked));
+static inline void  imu_scale_gyro(void);
+static inline void  imu_scale_accel(void);
+static inline void  imu_scale_mag(void);
 
 void 
 imu_init(void)
@@ -28,14 +31,8 @@ imu_init(void)
     VECT3_ASSIGN(booz_imu.accel_neutral, IMU_ACCEL_X_NEUTRAL, IMU_ACCEL_Y_NEUTRAL, IMU_ACCEL_Z_NEUTRAL);
     VECT3_ASSIGN(booz_imu.mag_neutral,   IMU_MAG_X_NEUTRAL,   IMU_MAG_Y_NEUTRAL,   IMU_MAG_Z_NEUTRAL);
 
-    /*
-    Compute quaternion and rotation matrix
-    for conversions between body and imu frame
-    */
-    struct booz_ieuler body_to_imu_eulers = {IMU_BODY_TO_IMU_PHI, IMU_BODY_TO_IMU_THETA, IMU_BODY_TO_IMU_PSI};
-    INT32_QUAT_OF_EULERS(booz_imu.body_to_imu_quat, body_to_imu_eulers);
-    INT32_QUAT_NORMALISE(booz_imu.body_to_imu_quat);
-    INT32_RMAT_OF_EULERS(booz_imu.body_to_imu_rmat, body_to_imu_eulers);
+    /* initialise IMU alignment */
+    imu_adjust_alignment(IMU_BODY_TO_IMU_PHI, IMU_BODY_TO_IMU_THETA, IMU_BODY_TO_IMU_PSI);
 
     imu_spi_selected = SPI_NONE;
     do_max1168_read = FALSE;
@@ -94,8 +91,8 @@ imu_event_task(void)
         booz_imu.accel_unscaled.y = max1168_values[IMU_ACCEL_Y_CHAN];
         booz_imu.accel_unscaled.z = max1168_values[IMU_ACCEL_Z_CHAN];
 
-        Booz2ImuScaleGyro();
-        Booz2ImuScaleAccel();
+        imu_scale_gyro();
+        imu_scale_accel();
 
         max1168_reset();
     }
@@ -126,7 +123,7 @@ imu_event_task(void)
         booz_imu.mag_unscaled.y = micromag_values[IMU_MAG_Y_CHAN];
         booz_imu.mag_unscaled.z = micromag_values[IMU_MAG_Z_CHAN];
 
-        Booz2ImuScaleMag();
+        imu_scale_mag();
 
         micromag_reset();
     }
@@ -147,4 +144,42 @@ imu_periodic_task(void)
 
 }
 
+void
+imu_adjust_alignment( int32_t phi, int32_t theta, int32_t psi )
+{
+    /*
+    Compute quaternion and rotation matrix
+    for conversions between body and imu frame
+    */
+    struct booz_ieuler body_to_imu_eulers = {phi, theta, psi};
 
+    INT32_QUAT_OF_EULERS(booz_imu.body_to_imu_quat, body_to_imu_eulers);
+    INT32_QUAT_NORMALISE(booz_imu.body_to_imu_quat);
+    INT32_RMAT_OF_EULERS(booz_imu.body_to_imu_rmat, body_to_imu_eulers);
+}
+
+static inline void
+imu_scale_gyro(void)
+{
+    RATES_COPY(booz_imu.gyro_prev, booz_imu.gyro);
+    booz_imu.gyro.p = ((booz_imu.gyro_unscaled.p - booz_imu.gyro_neutral.p)*IMU_GYRO_P_SENS_NUM)/IMU_GYRO_P_SENS_DEN;
+    booz_imu.gyro.q = ((booz_imu.gyro_unscaled.q - booz_imu.gyro_neutral.q)*IMU_GYRO_Q_SENS_NUM)/IMU_GYRO_Q_SENS_DEN;
+    booz_imu.gyro.r = ((booz_imu.gyro_unscaled.r - booz_imu.gyro_neutral.r)*IMU_GYRO_R_SENS_NUM)/IMU_GYRO_R_SENS_DEN;
+}
+
+static inline void
+imu_scale_accel(void)
+{
+    VECT3_COPY(booz_imu.accel_prev, booz_imu.accel);
+    booz_imu.accel.x = ((booz_imu.accel_unscaled.x - booz_imu.accel_neutral.x)*IMU_ACCEL_X_SENS_NUM)/IMU_ACCEL_X_SENS_DEN;
+    booz_imu.accel.y = ((booz_imu.accel_unscaled.y - booz_imu.accel_neutral.y)*IMU_ACCEL_Y_SENS_NUM)/IMU_ACCEL_Y_SENS_DEN;
+    booz_imu.accel.z = ((booz_imu.accel_unscaled.z - booz_imu.accel_neutral.z)*IMU_ACCEL_Z_SENS_NUM)/IMU_ACCEL_Z_SENS_DEN;
+}
+
+static inline void
+imu_scale_mag(void)
+{
+    booz_imu.mag.x = ((booz_imu.mag_unscaled.x - booz_imu.mag_neutral.x) * IMU_MAG_X_SENS_NUM) / IMU_MAG_X_SENS_DEN;
+    booz_imu.mag.y = ((booz_imu.mag_unscaled.y - booz_imu.mag_neutral.y) * IMU_MAG_Y_SENS_NUM) / IMU_MAG_Y_SENS_DEN;
+    booz_imu.mag.z = ((booz_imu.mag_unscaled.z - booz_imu.mag_neutral.z) * IMU_MAG_Z_SENS_NUM) / IMU_MAG_Z_SENS_DEN;
+}
