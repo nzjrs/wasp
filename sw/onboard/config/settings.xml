@@ -12,6 +12,11 @@
   <section name="BATTERY">
     <setting name="SENS" value="0.48" integer="8"/>
   </section>
+  <section name="IMU_ALIGNMENT">
+    <setting name="BODY_TO_IMU_PHI" type="float" value="0.0" min="-3.0" max="3.0" set="1" get="1"/>
+    <setting name="BODY_TO_IMU_THETA" type="float" value="0.0" min="-3.0" max="3.0" set="1" get="1"/>
+    <setting name="BODY_TO_IMU_PSI" type="float" value="0.0" min="-3.0" max="3.0" set="1" get="1"/>
+  </section>
   <section name="TESTSECTION2">
     <setting name="TEST1" type="uint8" value="123"/>
     <setting name="TEST2" type="uint8"/>

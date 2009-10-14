@@ -1,6 +1,7 @@
 #include "settings.h"
 #include "comm.h"
 #include "generated/messages.h"
+#include "generated/settings.h"
 
 static inline bool_t
 set_setting_u8(uint8_t id, uint8_t val)
@@ -17,7 +18,20 @@ set_setting_float(uint8_t id, float val)
 static inline bool_t
 get_setting(CommChannel_t chan, uint8_t id)
 {
-    return TRUE;
+    bool_t ret = TRUE;
+
+    switch (id)
+    {
+        case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_PHI:
+        case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_THETA:
+        case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_PSI:
+            break;
+        default:
+            ret = FALSE;
+            break;
+    }
+        
+    return ret;
 }
 
 bool_t
