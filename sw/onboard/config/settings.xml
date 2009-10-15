@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <settings>
-  <section name="AUTOPILOT2">
+  <section name="AUTOPILOT">
     <setting name="MODE_MANUAL" value="BOOZ2_AP_MODE_RATE_DIRECT" doc="Autopilot mode in manual flight"/>
     <setting name="MODE_AUTO1" value="BOOZ2_AP_MODE_HOVER_DIRECT" doc="Autopilot mode 1"/>
     <setting name="MODE_AUTO2" value="BOOZ2_AP_MODE_ATTITUDE_DIRECT" doc="Autopilot mode 2"/>
@@ -34,6 +34,29 @@
     <setting name="MAG_X" value="-12"/>
     <setting name="MAG_Y" value="-10"/>
     <setting name="MAG_Z" value="-11"/>
+  </section>
+  <section name="MOTOR">
+    <setting name="NB" value="4"/>
+    <setting name="FRONT" value="0"/>
+    <setting name="BACK" value="1"/>
+    <setting name="RIGHT" value="2"/>
+    <setting name="LEFT" value="3"/>
+  </section>
+  <section name="COMMAND">
+    <setting name="NB" value="4"/>
+    <setting name="PITCH" value="0"/>
+    <setting name="ROLL" value="1"/>
+    <setting name="YAW" value="2"/>
+    <setting name="THRUST" value="3"/>
+    <setting name="FAILSAFE" value="{0,0,0,0}"/>
+  </section>
+  <section name="SUPERVISION">
+    <setting name="FRONT_ROTOR_CW" value="1"/>
+    <setting name="MIN_MOTOR" value="2"/>
+    <setting name="MAX_MOTOR" value="210"/>
+    <setting name="TRIM_A" value="0"/>
+    <setting name="TRIM_E" value="0"/>
+    <setting name="TRIM_R" value="1"/>
   </section>
 </settings>
 

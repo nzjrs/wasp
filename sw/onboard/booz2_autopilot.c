@@ -54,7 +54,7 @@ void booz2_autopilot_init(void) {
   booz2_autopilot_in_flight = FALSE;
   booz2_autopilot_motors_on_counter = 0;
   booz2_autopilot_in_flight_counter = 0;
-  booz2_autopilot_mode_auto2 = BOOZ2_MODE_AUTO2;
+  booz2_autopilot_mode_auto2 = AUTOPILOT_MODE_AUTO2;
   booz2_autopilot_tol = 0;
 }
 

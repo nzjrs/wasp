@@ -28,8 +28,9 @@
 #include "std.h"
 
 #include "booz_geometry_int.h"
-#include "config/airframe.h"
 #include "booz2_ins.h"
+
+#include "generated/settings.h"
 
 #define BOOZ2_AP_MODE_FAILSAFE          0
 #define BOOZ2_AP_MODE_KILL              1
@@ -57,24 +58,13 @@ void booz2_autopilot_on_rc_event(void);
 void booz2_autopilot_set_mode(uint8_t new_autopilot_mode);
 void booz2_autopilot_set_actuators(void);
 
-#ifndef BOOZ2_MODE_MANUAL
-#define BOOZ2_MODE_MANUAL BOOZ2_AP_MODE_RATE_DIRECT
-#endif
-#ifndef BOOZ2_MODE_AUTO1
-#define BOOZ2_MODE_AUTO1 BOOZ2_AP_MODE_ATTITUDE_DIRECT
-#endif
-#ifndef BOOZ2_MODE_AUTO2
-#define BOOZ2_MODE_AUTO2 BOOZ2_AP_MODE_ATTITUDE_Z_HOLD
-#endif
-
-
 #define TRESHOLD_1_PPRZ (MIN_PPRZ / 2)
-#define TRESHOLD_2_PPRZ (MAX_PPRZ/2)
+#define TRESHOLD_2_PPRZ (MAX_PPRZ / 2)
 
 #define BOOZ_AP_MODE_OF_PPRZ(_rc, _booz_mode) {				\
     if      (_rc > TRESHOLD_2_PPRZ) _booz_mode = booz2_autopilot_mode_auto2; \
-    else if (_rc > TRESHOLD_1_PPRZ) _booz_mode = BOOZ2_MODE_AUTO1;	\
-    else                            _booz_mode = BOOZ2_MODE_MANUAL;	\
+    else if (_rc > TRESHOLD_1_PPRZ) _booz_mode = AUTOPILOT_MODE_AUTO1;	\
+    else                            _booz_mode = AUTOPILOT_MODE_MANUAL;	\
   }
 
 #define booz2_autopilot_SetTol(_v) { \
