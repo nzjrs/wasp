@@ -105,6 +105,14 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         return True
 
     def register_interest(self, cb, max_frequency, *message_names, **user_data):
+        """
+        Register interest in receiving a callback when a message with the specified 
+        name arrives.
+
+        @cb: Callback to be called. The signature is (msg, payload, **user_data)
+        @max_frequency: Max frequency to receive callbacks
+        @message_names: List of message names to watch for
+        """
         for m in message_names:
             msg = self._messages_file.get_message_by_name(m)
             if not msg:
