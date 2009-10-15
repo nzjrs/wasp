@@ -1,7 +1,7 @@
 #ifndef BOOZ2_SUPERVISION_H
 #define BOOZ2_SUPERVISION_H
 
-#include "config/airframe.h"
+#include "generated/settings.h"
 
 #define FRONT   0
 #define BACK    1

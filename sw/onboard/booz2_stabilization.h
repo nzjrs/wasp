@@ -3,8 +3,8 @@
 
 #include "std.h"
 
-#include "config/airframe.h"
+#include "generated/settings.h"
 
-extern int32_t booz2_stabilization_cmd[COMMANDS_NB];
+extern int32_t booz2_stabilization_cmd[COMMAND_NB];
 
 #endif /* BOOZ2_STABILIZATION_H */

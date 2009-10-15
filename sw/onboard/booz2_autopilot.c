@@ -40,8 +40,8 @@ uint8_t booz2_autopilot_tol;
 uint32_t booz2_autopilot_motors_on_counter;
 uint32_t booz2_autopilot_in_flight_counter;
 
-int32_t booz2_commands[COMMANDS_NB];
-int32_t booz2_commands_failsafe[COMMANDS_NB] = COMMANDS_FAILSAFE;
+int32_t booz2_commands[COMMAND_NB];
+int32_t booz2_commands_failsafe[COMMAND_NB] = COMMAND_FAILSAFE;
 
 #define BOOZ2_AUTOPILOT_MOTOR_ON_TIME     40
 #define BOOZ2_AUTOPILOT_IN_FLIGHT_TIME    40
@@ -93,9 +93,9 @@ void booz2_autopilot_periodic(void) {
 void booz2_autopilot_set_actuators(void)
 {
 #ifdef KILL_MOTORS
-    pprz_t motor_commands[MOTORS_NB] = {0,0,0,0};
+    pprz_t motor_commands[MOTOR_NB] = {0,0,0,0};
 #else
-    pprz_t motor_commands[MOTORS_NB];
+    pprz_t motor_commands[MOTOR_NB];
     BOOZ2_SUPERVISION_RUN(motor_commands, booz2_commands, booz2_autopilot_motors_on);
 #endif
     actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_FRONT, motor_commands[MOTOR_FRONT]);
