@@ -13,24 +13,27 @@
     <setting name="BODY_TO_IMU_THETA" type="float" value="1.50" min="-3.0" max="3.0" step="0.05" set="1" get="1"/>
     <setting name="BODY_TO_IMU_PSI" type="float" value="0.0" min="-3.0" max="3.0" step="0.05" set="1" get="1"/>
   </section>
-<!--
-  <section name="TESTSECTION">
-    <setting name="TEST1" type="uint8" value="123"/>
-    <setting name="TEST2" type="uint8"/>
+  <section name="IMU_SENS">
+    <setting name="GYRO_P" value="1.01" integer="16"/>
+    <setting name="GYRO_Q" value="-1.01" integer="16"/>
+    <setting name="GYRO_R" value="-1.01" integer="16"/>
+    <setting name="ACCEL_X" value="-2.44665442" integer="16"/>
+    <setting name="ACCEL_Y" value="-2.44994081" integer="16"/>
+    <setting name="ACCEL_Z" value="-2.50555481" integer="16"/>
+    <setting name="MAG_X" value="22.008352" integer="16"/>
+    <setting name="MAG_Y" value="-21.79885" integer="16"/>
+    <setting name="MAG_Z" value="-14.675745" integer="16"/>
   </section>
-  <section name="TESTSECTION2">
-    <setting name="TEST1" type="uint8" value="123"/>
-    <setting name="TEST2" type="uint8"/>
-    <setting name="IMU_MAG_X_SENS" value="22.008352" integer="16"/>
-    <setting name="IMU_MAG_Y_SENS" value="-21.79885" integer="16"/>
-    <setting name="IMU_MAG_Z_SENS" value="-14.675745" integer="16"/>
+  <section name="IMU_NEUTRAL">
+    <setting name="GYRO_P" value="33026"/>
+    <setting name="GYRO_Q" value="32348"/>
+    <setting name="GYRO_R" value="32524"/>
+    <setting name="ACCEL_X" value="32311"/>
+    <setting name="ACCEL_Y" value="32536"/>
+    <setting name="ACCEL_Z" value="32779"/>
+    <setting name="MAG_X" value="-12"/>
+    <setting name="MAG_Y" value="-10"/>
+    <setting name="MAG_Z" value="-11"/>
   </section>
-  <section name="TESTSECTION3">
-    <setting name="TESTSETGET" type="uint8" value="104" set="1" get="1"/>
-    <setting name="TESTSETGETONLY" type="uint8" value="14" get="1"/>
-    <setting name="TESTSETONOFF" type="uint8" value="0" min="0" max="1" set="1"/>
-    <setting name="TESTSETGETFLOAT" type="float" value="3.5" set="1" get="1"/>
-  </section>
--->
 </settings>
 

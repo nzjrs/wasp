@@ -28,9 +28,9 @@ void
 imu_init(void)
 {
     /* initialises neutrals */
-    RATES_ASSIGN(booz_imu.gyro_neutral,  IMU_GYRO_P_NEUTRAL,  IMU_GYRO_Q_NEUTRAL,  IMU_GYRO_R_NEUTRAL);
-    VECT3_ASSIGN(booz_imu.accel_neutral, IMU_ACCEL_X_NEUTRAL, IMU_ACCEL_Y_NEUTRAL, IMU_ACCEL_Z_NEUTRAL);
-    VECT3_ASSIGN(booz_imu.mag_neutral,   IMU_MAG_X_NEUTRAL,   IMU_MAG_Y_NEUTRAL,   IMU_MAG_Z_NEUTRAL);
+    RATES_ASSIGN(booz_imu.gyro_neutral,  IMU_NEUTRAL_GYRO_P,  IMU_NEUTRAL_GYRO_Q,  IMU_NEUTRAL_GYRO_R);
+    VECT3_ASSIGN(booz_imu.accel_neutral, IMU_NEUTRAL_ACCEL_X, IMU_NEUTRAL_ACCEL_Y, IMU_NEUTRAL_ACCEL_Z);
+    VECT3_ASSIGN(booz_imu.mag_neutral,   IMU_NEUTRAL_MAG_X,   IMU_NEUTRAL_MAG_Y,   IMU_NEUTRAL_MAG_Z);
 
     /* initialise IMU alignment */
     imu_adjust_alignment(IMU_ALIGNMENT_BODY_TO_IMU_PHI, IMU_ALIGNMENT_BODY_TO_IMU_THETA, IMU_ALIGNMENT_BODY_TO_IMU_PSI);
@@ -171,24 +171,24 @@ static inline void
 imu_scale_gyro(void)
 {
     RATES_COPY(booz_imu.gyro_prev, booz_imu.gyro);
-    booz_imu.gyro.p = ((booz_imu.gyro_unscaled.p - booz_imu.gyro_neutral.p)*IMU_GYRO_P_SENS_NUM)/IMU_GYRO_P_SENS_DEN;
-    booz_imu.gyro.q = ((booz_imu.gyro_unscaled.q - booz_imu.gyro_neutral.q)*IMU_GYRO_Q_SENS_NUM)/IMU_GYRO_Q_SENS_DEN;
-    booz_imu.gyro.r = ((booz_imu.gyro_unscaled.r - booz_imu.gyro_neutral.r)*IMU_GYRO_R_SENS_NUM)/IMU_GYRO_R_SENS_DEN;
+    booz_imu.gyro.p = ((booz_imu.gyro_unscaled.p - booz_imu.gyro_neutral.p)*IMU_SENS_GYRO_P_NUM)/IMU_SENS_GYRO_P_DEN;
+    booz_imu.gyro.q = ((booz_imu.gyro_unscaled.q - booz_imu.gyro_neutral.q)*IMU_SENS_GYRO_Q_NUM)/IMU_SENS_GYRO_Q_DEN;
+    booz_imu.gyro.r = ((booz_imu.gyro_unscaled.r - booz_imu.gyro_neutral.r)*IMU_SENS_GYRO_R_NUM)/IMU_SENS_GYRO_R_DEN;
 }
 
 static inline void
 imu_scale_accel(void)
 {
     VECT3_COPY(booz_imu.accel_prev, booz_imu.accel);
-    booz_imu.accel.x = ((booz_imu.accel_unscaled.x - booz_imu.accel_neutral.x)*IMU_ACCEL_X_SENS_NUM)/IMU_ACCEL_X_SENS_DEN;
-    booz_imu.accel.y = ((booz_imu.accel_unscaled.y - booz_imu.accel_neutral.y)*IMU_ACCEL_Y_SENS_NUM)/IMU_ACCEL_Y_SENS_DEN;
-    booz_imu.accel.z = ((booz_imu.accel_unscaled.z - booz_imu.accel_neutral.z)*IMU_ACCEL_Z_SENS_NUM)/IMU_ACCEL_Z_SENS_DEN;
+    booz_imu.accel.x = ((booz_imu.accel_unscaled.x - booz_imu.accel_neutral.x)*IMU_SENS_ACCEL_X_NUM)/IMU_SENS_ACCEL_X_DEN;
+    booz_imu.accel.y = ((booz_imu.accel_unscaled.y - booz_imu.accel_neutral.y)*IMU_SENS_ACCEL_Y_NUM)/IMU_SENS_ACCEL_Y_DEN;
+    booz_imu.accel.z = ((booz_imu.accel_unscaled.z - booz_imu.accel_neutral.z)*IMU_SENS_ACCEL_Z_NUM)/IMU_SENS_ACCEL_Z_DEN;
 }
 
 static inline void
 imu_scale_mag(void)
 {
-    booz_imu.mag.x = ((booz_imu.mag_unscaled.x - booz_imu.mag_neutral.x) * IMU_MAG_X_SENS_NUM) / IMU_MAG_X_SENS_DEN;
-    booz_imu.mag.y = ((booz_imu.mag_unscaled.y - booz_imu.mag_neutral.y) * IMU_MAG_Y_SENS_NUM) / IMU_MAG_Y_SENS_DEN;
-    booz_imu.mag.z = ((booz_imu.mag_unscaled.z - booz_imu.mag_neutral.z) * IMU_MAG_Z_SENS_NUM) / IMU_MAG_Z_SENS_DEN;
+    booz_imu.mag.x = ((booz_imu.mag_unscaled.x - booz_imu.mag_neutral.x) * IMU_SENS_MAG_X_NUM) / IMU_SENS_MAG_X_DEN;
+    booz_imu.mag.y = ((booz_imu.mag_unscaled.y - booz_imu.mag_neutral.y) * IMU_SENS_MAG_Y_NUM) / IMU_SENS_MAG_Y_DEN;
+    booz_imu.mag.z = ((booz_imu.mag_unscaled.z - booz_imu.mag_neutral.z) * IMU_SENS_MAG_Z_NUM) / IMU_SENS_MAG_Z_DEN;
 }

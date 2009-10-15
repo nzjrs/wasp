@@ -1,8 +1,18 @@
 #ifndef _BOOZ_IMU_BABY_H_
 #define _BOOZ_IMU_BABY_H_
 
+/* Pin allocations for channels */
+#define IMU_GYRO_P_CHAN     1
+#define IMU_GYRO_Q_CHAN     0
+#define IMU_GYRO_R_CHAN     2
+#define IMU_ACCEL_X_CHAN    3
+#define IMU_ACCEL_Y_CHAN    5
+#define IMU_ACCEL_Z_CHAN    6
+#define IMU_MAG_X_CHAN      0
+#define IMU_MAG_Y_CHAN      1
+#define IMU_MAG_Z_CHAN      2
+
 /* SSPCR0 settings */
-//#define SSP_DDS  0x07 << 0  /* data size         : 8 bits        */
 #define SSP_DDS  0x0F << 0  /* data size         : 16 bits        */
 #define SSP_FRF  0x00 << 4  /* frame format      : SPI           */
 #define SSP_CPOL 0x00 << 6  /* clock polarity    : data captured on first clock transition */  
