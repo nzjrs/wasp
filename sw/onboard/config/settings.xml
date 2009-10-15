@@ -8,6 +8,9 @@
   <section name="BATTERY">
     <setting name="SENS" value="0.48" integer="8"/>
   </section>
+  <section name="INS">
+    <setting name="BARO_SENS" value="15.0" integer="8"/>
+  </section>
   <section name="IMU_ALIGNMENT">
     <setting name="BODY_TO_IMU_PHI" type="float" value="0.75" min="-3.0" max="3.0" step="0.05" set="1" get="1"/>
     <setting name="BODY_TO_IMU_THETA" type="float" value="1.50" min="-3.0" max="3.0" step="0.05" set="1" get="1"/>

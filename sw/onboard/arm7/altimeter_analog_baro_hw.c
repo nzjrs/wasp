@@ -23,10 +23,10 @@
  */
 
 #include "std.h"
-#include "config/airframe.h"
-
 #include "altimeter.h"
 #include "arm7/altimeter_analog_baro_hw.h"
+
+#include "generated/settings.h"
 
 SystemStatus_t altimeter_system_status;
 
@@ -66,6 +66,6 @@ altimeter_event_task(void)
 int32_t
 altimeter_get_altitude(void)
 { 
-    return (booz2_analog_baro_value * BOOZ_INS_BARO_SENS_NUM)/BOOZ_INS_BARO_SENS_DEN;
+    return (booz2_analog_baro_value * INS_BARO_SENS_NUM)/INS_BARO_SENS_DEN;
 }
 
