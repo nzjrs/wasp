@@ -38,6 +38,9 @@
 #ifndef TRUE
 #define TRUE (!FALSE)
 #endif
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
 
 /* Boolean values */
 typedef uint8_t bool_t;

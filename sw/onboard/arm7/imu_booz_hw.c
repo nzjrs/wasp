@@ -2,6 +2,7 @@
 
 #include "config/config.h"
 #include "config/airframe.h"
+#include "generated/settings.h"
 
 #include "imu.h"
 #include "arm7/armVIC.h"
@@ -32,7 +33,7 @@ imu_init(void)
     VECT3_ASSIGN(booz_imu.mag_neutral,   IMU_MAG_X_NEUTRAL,   IMU_MAG_Y_NEUTRAL,   IMU_MAG_Z_NEUTRAL);
 
     /* initialise IMU alignment */
-    imu_adjust_alignment(IMU_BODY_TO_IMU_PHI, IMU_BODY_TO_IMU_THETA, IMU_BODY_TO_IMU_PSI);
+    imu_adjust_alignment(IMU_ALIGNMENT_BODY_TO_IMU_PHI, IMU_ALIGNMENT_BODY_TO_IMU_THETA, IMU_ALIGNMENT_BODY_TO_IMU_PSI);
 
     imu_spi_selected = SPI_NONE;
     do_max1168_read = FALSE;
@@ -145,13 +146,21 @@ imu_periodic_task(void)
 }
 
 void
-imu_adjust_alignment( int32_t phi, int32_t theta, int32_t psi )
+imu_adjust_alignment( float phi, float theta, float psi )
 {
+    booz_imu.body_to_imu_phi = phi;
+    booz_imu.body_to_imu_theta = theta;
+    booz_imu.body_to_imu_psi = psi;
+
     /*
     Compute quaternion and rotation matrix
     for conversions between body and imu frame
     */
-    struct booz_ieuler body_to_imu_eulers = {phi, theta, psi};
+    struct booz_ieuler body_to_imu_eulers = {
+            ANGLE_BFP_OF_REAL(RadOfDeg(phi)),
+            ANGLE_BFP_OF_REAL(RadOfDeg(theta)),
+            ANGLE_BFP_OF_REAL(RadOfDeg(psi))
+    };
 
     INT32_QUAT_OF_EULERS(booz_imu.body_to_imu_quat, body_to_imu_eulers);
     INT32_QUAT_NORMALISE(booz_imu.body_to_imu_quat);

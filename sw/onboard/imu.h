@@ -10,6 +10,9 @@
 #include "config/airframe.h"
 
 typedef struct __IMU {
+    float body_to_imu_phi;
+    float body_to_imu_theta;
+    float body_to_imu_psi;
     struct Int32Rates gyro;
     struct Int32Vect3 accel;
     struct Int32Vect3 mag;
@@ -43,6 +46,6 @@ uint8_t
 imu_event_task ( void );
 
 void
-imu_adjust_alignment( int32_t phi, int32_t theta, int32_t psi );
+imu_adjust_alignment( float phi, float theta, float psi );
 
 #endif /* _IMU_BABY_H */

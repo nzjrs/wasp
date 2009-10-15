@@ -1,5 +1,8 @@
 #include "settings.h"
+
 #include "comm.h"
+#include "imu.h"
+
 #include "generated/messages.h"
 #include "generated/settings.h"
 
@@ -12,24 +15,51 @@ set_setting_u8(uint8_t id, uint8_t val)
 static inline bool_t
 set_setting_float(uint8_t id, float val)
 {
-    return TRUE;
-}
-
-static inline bool_t
-get_setting(CommChannel_t chan, uint8_t id)
-{
     bool_t ret = TRUE;
 
     switch (id)
     {
         case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_PHI:
+            imu_adjust_alignment(val, booz_imu.body_to_imu_theta, booz_imu.body_to_imu_psi);
+            break;
         case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_THETA:
+            imu_adjust_alignment(booz_imu.body_to_imu_phi, val, booz_imu.body_to_imu_psi);
+            break;
         case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_PSI:
+            imu_adjust_alignment(booz_imu.body_to_imu_phi, booz_imu.body_to_imu_theta, val);
+            break;
+        default:
+            ret = FALSE;
+    }
+
+    return ret;
+}
+
+static inline bool_t
+get_setting(CommChannel_t chan, uint8_t id)
+{
+    Type_t type = TYPE_FLOAT;
+    float *value = NULL;
+    bool_t ret = TRUE;
+
+    switch (id)
+    {
+        case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_PHI:
+            value = &booz_imu.body_to_imu_phi;
+            break;
+        case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_THETA:
+            value = &booz_imu.body_to_imu_theta;
+            break;
+        case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_PSI:
+            value = &booz_imu.body_to_imu_psi;
             break;
         default:
             ret = FALSE;
             break;
     }
+
+    if (value != NULL)
+        MESSAGE_SEND_SETTING_FLOAT(chan, &id, &type, value);
         
     return ret;
 }
