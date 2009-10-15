@@ -180,11 +180,12 @@ class MessageTreeView(gtk.TreeView):
 
 class SettingsTreeStore(gtk.ListStore):
 
-    NAME_IDX,       \
-    ID_IDX,         \
-    SUPPORTS_GET,   \
-    SUPPORTS_SET,   \
-    OBJECT_IDX =    range(5)
+    NAME_IDX,           \
+    ID_IDX,             \
+    SUPPORTS_GET_IDX,   \
+    SUPPORTS_SET_IDX,   \
+    DYNAMIC_IDX,        \
+    OBJECT_IDX =    range(6)
 
     def __init__(self):
         gtk.ListStore.__init__(self,
@@ -192,25 +193,39 @@ class SettingsTreeStore(gtk.ListStore):
                 int,        #ID, setting ID
                 bool,       #SUPPORTS_GET,
                 bool,       #SUPPORTS_SET,
+                bool,       #DYNAMIC, ie, SUPPORTS_GET || SUPPORTS_SET
                 object)     #OBJECT, the setting object
 
         self._settings = {}
 
     def add_setting(self, setting):
         if setting not in self._settings:
-            self._settings[setting] = self.append( (setting.name, setting.id, setting.get == 1, setting.set == 1, setting) )
+            self._settings[setting] = self.append( (
+                    setting.name,
+                    setting.id,
+                    setting.get == 1,
+                    setting.set == 1,
+                    setting.dynamic,
+                    setting) )
 
 class SettingsTreeView(gtk.TreeView):
-    def __init__(self, settingtreemodel, show_all=False):
-        gtk.TreeView.__init__(self, settingtreemodel)
+    def __init__(self, settingtreemodel, show_only_dynamic=False, show_all_colums=True):
+        #optionally filter and display only dynamic settings
+        if show_only_dynamic:
+            model = settingtreemodel.filter_new()
+            model.set_visible_column(SettingsTreeStore.DYNAMIC_IDX)
+        else:
+            model = settingtreemodel
+        gtk.TreeView.__init__(self, model)
 
         self.insert_column_with_attributes(-1, "Name",
                 gtk.CellRendererText(),
                 text=SettingsTreeStore.NAME_IDX)
 
-        if show_all:
-            for name,id_ in (   ("GET", SettingsTreeStore.SUPPORTS_GET),
-                                ("SET", SettingsTreeStore.SUPPORTS_SET)):
+        if show_all_colums:
+            for name,id_ in (   ("ID", SettingsTreeStore.ID_IDX),
+                                ("GET", SettingsTreeStore.SUPPORTS_GET_IDX),
+                                ("SET", SettingsTreeStore.SUPPORTS_SET_IDX)):
                 self.insert_column_with_attributes(-1, name,
                         gtk.CellRendererText(),
                         text=id_)

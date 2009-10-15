@@ -141,7 +141,7 @@ class SettingsController(gs.ui.GtkBuilderWidget):
         for s in self._settingsfile.all_settings:
             ts.add_setting(s)
 
-        tv = treeview.SettingsTreeView(ts, show_all=False)
+        tv = treeview.SettingsTreeView(ts, show_only_dynamic=True, show_all_colums=False)
 
         btn = self.get_resource("setting_edit_button")
         btn.connect(
