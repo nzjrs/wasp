@@ -1,16 +1,12 @@
 #include "std.h"
-
-#include "config/config.h"
-#include "config/airframe.h"
-
 #include "init.h"
 #include "sys_time.h"
 #include "led.h"
+#include "comm.h"
+#include "actuators.h"
 
 #include "generated/messages.h"
-#include "comm.h"
-
-#include "actuators.h"
+#include "generated/settings.h"
 
 #define MOTOR_SPEED 30
 

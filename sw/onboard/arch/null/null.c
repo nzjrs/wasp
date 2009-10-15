@@ -1,8 +1,6 @@
 /* minimal implementation of all interfaces */
 #include "std.h"
 
-#define NULL '\0'
-
 #include "init.h"
 void hw_init(void) {}
 void int_enable(void) {}
@@ -28,7 +26,7 @@ void led_check ( uint8_t id) {}
 void comm_init ( CommChannel_t chan ) {}
 bool_t comm_ch_available ( CommChannel_t chan ) { return FALSE; }
 void comm_send_ch ( CommChannel_t chan, uint8_t c ) {}
-uint8_t comm_get_ch( CommChannel_t chan ) { return NULL; }
+uint8_t comm_get_ch( CommChannel_t chan ) { return '\0'; }
 bool_t comm_check_free_space ( CommChannel_t chan, uint8_t len ) { return TRUE; }
 void comm_overrun ( CommChannel_t chan ) {}
 
@@ -40,12 +38,12 @@ bool_t rc_event_task ( void ) { return FALSE; }
 #include "imu.h"
 void imu_init(void) {}
 void imu_periodic_task ( void ) {}
-uint8_t imu_event_task ( void ) {}
+uint8_t imu_event_task ( void ) { return 0; }
 
 #include "actuators.h"
-void actuators_init( void ) {}
+void actuators_init( uint8_t bank ) {}
 void actuators_set( ActuatorID_t id, uint8_t value ) {}
-void actuators_commit( void ) {}
+void actuators_commit( uint8_t bank ) {}
 
 #include "gps.h"
 struct Booz_gps_state booz_gps_state;
@@ -63,5 +61,5 @@ uint16_t booz2_analog_baro_value;
 
 void altimeter_init(void) {}
 void altimeter_periodic_task(void) {}
-uint8_t altimeter_event_task ( void ) {}
-int32_t altimeter_get_altitude( void ) {}
+uint8_t altimeter_event_task ( void ) { return 0; }
+int32_t altimeter_get_altitude( void ) { return 0; }

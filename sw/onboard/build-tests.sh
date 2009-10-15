@@ -6,6 +6,7 @@ ARCHES=`ls arch/Makefile.* | cut -d. -f2`
 
 for a in $ARCHES
 do
+    rm -rf bin/$a
     for f in $FILES
     do
 	    t=`echo $f | sed -e 's/\.c//'`
@@ -18,7 +19,6 @@ do
             OK=1
 	    fi
     done
-    rm -rf bin/$a
 done
 
 exit $OK
