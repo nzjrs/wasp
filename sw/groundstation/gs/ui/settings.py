@@ -6,6 +6,13 @@ import wasp.ui.treeview as treeview
 
 LOG = logging.getLogger("settings")
 
+def num_digits(num):
+    digits = 0
+    while num < 1 and (1.0 - num) > 1e-10:
+        digits += 1
+        num /= .1
+    return digits
+
 class _EditSetting(gtk.Frame):
     def __init__(self, setting, source, **msgs):
         gtk.Frame.__init__(self, label=setting.name)
@@ -33,8 +40,9 @@ class _EditSetting(gtk.Frame):
         spin = gtk.SpinButton(self._adj)
 
         if type(default) == float:
-            slider.set_digits(1)
-            spin.set_digits(1)
+            digits = num_digits(step)
+            slider.set_digits(digits)
+            spin.set_digits(digits)
         else:
             slider.set_digits(0)
             spin.set_digits(0)
@@ -79,6 +87,9 @@ class _EditSetting(gtk.Frame):
     def set_size(self, sizegroup):
         sizegroup.add_widget(self._spin)
 
+    def set_value(self, value):
+        self._adj.value = value
+
 class _EditSettingsManager(gtk.ScrolledWindow):
     def __init__(self, source, **msgs):
         gtk.ScrolledWindow.__init__(self)
@@ -93,12 +104,19 @@ class _EditSettingsManager(gtk.ScrolledWindow):
         self.add(self._vb)
 
     def add_setting(self, setting):
-        if setting not in self._settings:
+        if setting.id not in self._settings:
             es = _EditSetting(setting, self._source, **self._msgs)
             es.set_size(self._sg)
             es.show_all()
             self._vb.pack_start(es, False, True)
-            self._settings[setting] = es
+            self._settings[setting.id] = es
+
+    def update_setting_value(self, settingid, value):
+        try:
+            setting = self._settings[settingid]
+            setting.set_value(value)
+        except KeyError:
+            LOG.warn("Could not find setting, id: %d" % settingid)
 
 class SettingsController(gs.ui.GtkBuilderWidget):
 
@@ -144,7 +162,9 @@ class SettingsController(gs.ui.GtkBuilderWidget):
         source.register_interest(self._on_setting, 0, "SETTING_FLOAT")
 
     def _on_setting(self, msg, payload):
-        LOG.debug("Got setting")
+        id_, type_, val = msg.unpack_values(payload)
+        LOG.debug("Got setting: %d %s" % (id_, val))
+        self._sm.update_setting_value(id_, val)
 
     def _on_es_clicked(self, btn, _tv):
         setting = _tv.get_selected_setting()
