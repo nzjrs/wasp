@@ -4,7 +4,7 @@
 #include "booz2_stabilization_rate.h"
 #include "booz2_stabilization_attitude.h"
 #include "booz2_stabilization_attitude_ref_traj_euler.h"
-#include "booz2_fms.h"
+#include "fms/booz2_fms.h"
 #include "booz2_ins.h"
 #include "booz2_navigation.h"
 

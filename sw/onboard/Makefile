@@ -24,9 +24,9 @@ SRC =                               \
     booz2_hf_float.c                \
     booz2_vf_float.c                \
     booz2_navigation.c              \
-    booz2_fms.c                     \
-    booz2_fms_datalink.c            \
-    booz2_fms_test_signal.c         \
+    fms/booz2_fms.c                 \
+    fms/booz2_fms_datalink.c        \
+    fms/booz2_fms_test_signal.c     \
     comm.c                          \
     comm-autopilot.c                \
     settings.c

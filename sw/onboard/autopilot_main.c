@@ -39,7 +39,7 @@
 #include "analog.h"
 #include "altimeter.h"
 
-#include "booz2_fms.h"
+#include "fms/booz2_fms.h"
 #include "booz2_autopilot.h"
 #include "booz2_stabilization_rate.h"
 #include "booz2_stabilization_attitude.h"
