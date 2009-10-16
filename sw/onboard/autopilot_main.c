@@ -49,7 +49,7 @@
 #include "guidance/booz2_guidance_v.h"
 #include "booz2_navigation.h"
 
-#include "booz_ahrs_aligner.h"
+#include "ahrs/booz_ahrs_aligner.h"
 #include "booz_ahrs.h"
 #include "booz2_ins.h"
 

@@ -13,8 +13,6 @@ SRC =                               \
     math/pprz_geodetic_float.c      \
     rc.c                            \
     booz2_autopilot.c               \
-    booz_ahrs_aligner.c             \
-    booz2_filter_attitude_cmpl_euler.c \
     booz2_ins.c                     \
     booz2_navigation.c              \
     ins/booz2_hf_float.c            \
@@ -22,6 +20,8 @@ SRC =                               \
     fms/booz2_fms.c                 \
     fms/booz2_fms_datalink.c        \
     fms/booz2_fms_test_signal.c     \
+    ahrs/booz_ahrs_aligner.c                \
+    ahrs/booz2_filter_attitude_cmpl_euler.c \
     guidance/booz2_guidance_h.c     \
     guidance/booz2_guidance_v.c     \
     stabilization/booz2_stabilization.c           \

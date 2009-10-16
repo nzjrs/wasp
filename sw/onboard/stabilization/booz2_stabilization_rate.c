@@ -1,11 +1,11 @@
 #include "booz2_stabilization_rate.h"
 
-#include "booz_ahrs_aligner.h"
-
-#include "booz2_stabilization.h"
 #include "rc.h"
-#include "config/airframe.h"
 #include "imu.h"
+#include "ahrs/booz_ahrs_aligner.h"
+#include "booz2_stabilization.h"
+
+#include "config/airframe.h"
 
 struct Int32Rates booz2_stabilization_rate_measure;
 struct Int32Rates booz2_stabilization_rate_sp;
