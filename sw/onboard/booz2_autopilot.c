@@ -27,8 +27,8 @@
 #include "rc.h"
 #include "actuators.h"
 #include "booz2_navigation.h"
-#include "booz2_guidance_h.h"
-#include "booz2_guidance_v.h"
+#include "guidance/booz2_guidance_h.h"
+#include "guidance/booz2_guidance_v.h"
 #include "booz2_stabilization.h"
 #include "booz2_supervision.h"
 

@@ -18,8 +18,6 @@ SRC =                               \
     booz2_stabilization.c           \
     booz2_stabilization_rate.c      \
     booz2_stabilization_attitude.c  \
-    booz2_guidance_h.c              \
-    booz2_guidance_v.c              \
     booz2_ins.c                     \
     booz2_hf_float.c                \
     booz2_vf_float.c                \
@@ -27,6 +25,8 @@ SRC =                               \
     fms/booz2_fms.c                 \
     fms/booz2_fms_datalink.c        \
     fms/booz2_fms_test_signal.c     \
+    guidance/booz2_guidance_h.c     \
+    guidance/booz2_guidance_v.c     \
     comm.c                          \
     comm-autopilot.c                \
     settings.c

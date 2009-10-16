@@ -11,8 +11,8 @@
 
 #include "booz2_autopilot.h"
 #include "booz2_ins.h"
-#include "booz2_guidance_h.h"
-#include "booz2_guidance_v.h"
+#include "guidance/booz2_guidance_h.h"
+#include "guidance/booz2_guidance_v.h"
 
 #include "generated/messages.h"
 
