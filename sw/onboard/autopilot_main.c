@@ -41,8 +41,8 @@
 
 #include "fms/booz2_fms.h"
 #include "booz2_autopilot.h"
-#include "booz2_stabilization_rate.h"
-#include "booz2_stabilization_attitude.h"
+#include "stabilization/booz2_stabilization_rate.h"
+#include "stabilization/booz2_stabilization_attitude.h"
 
 #include "gps.h"
 #include "guidance/booz2_guidance_h.h"

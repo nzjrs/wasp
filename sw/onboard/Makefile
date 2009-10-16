@@ -15,9 +15,6 @@ SRC =                               \
     booz2_autopilot.c               \
     booz_ahrs_aligner.c             \
     booz2_filter_attitude_cmpl_euler.c \
-    booz2_stabilization.c           \
-    booz2_stabilization_rate.c      \
-    booz2_stabilization_attitude.c  \
     booz2_ins.c                     \
     booz2_hf_float.c                \
     booz2_vf_float.c                \
@@ -27,6 +24,9 @@ SRC =                               \
     fms/booz2_fms_test_signal.c     \
     guidance/booz2_guidance_h.c     \
     guidance/booz2_guidance_v.c     \
+    stabilization/booz2_stabilization.c           \
+    stabilization/booz2_stabilization_rate.c      \
+    stabilization/booz2_stabilization_attitude.c  \
     comm.c                          \
     comm-autopilot.c                \
     settings.c

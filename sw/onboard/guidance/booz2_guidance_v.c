@@ -5,7 +5,7 @@
 
 #include "rc.h"
 #include "config/airframe.h"
-#include "booz2_stabilization.h"
+#include "stabilization/booz2_stabilization.h"
 #include "fms/booz2_fms.h"
 #include "booz2_navigation.h"
 
