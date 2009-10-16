@@ -7,11 +7,11 @@
 #include "booz_geometry_mixed.h"
 
 #if USE_VFF
-#include "booz2_vf_float.h"
+#include "ins/booz2_vf_float.h"
 #endif
 
 #include "booz_ahrs.h"
-#include "booz2_hf_float.h"
+#include "ins/booz2_hf_float.h"
 
 #include "pprz_geodetic_int.h"
 
