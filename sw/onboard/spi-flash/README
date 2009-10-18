@@ -1,0 +1,11 @@
+This code can be used to interact with AT26df321 flash memory from an LPC2148
+Existing code was modifiewd to create these drivers.
+Not guaranteed to be bug free.
+
+Sample code for the spi_flash sourced from:
+	http://svn.assembla.com/svn/clock_radio/
+	this is for a sam7, but I used the flash driver from here
+	
+The spi-driver sample code is from:
+	http://svn.savannah.gnu.org/viewvc/paparazzi3/trunk/sw/airborne/arm7/lpcusb/examples/?root=paparazzi
+	this uses SPI0 to drive an SD card
