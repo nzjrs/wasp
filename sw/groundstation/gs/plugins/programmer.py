@@ -33,9 +33,9 @@ class TestConfigurable(plugin.Plugin, gs.ui.GtkBuilderWidget):
         self._win = self.get_resource("programmer_window")
         self._status = self.get_resource("status_label")
         self._win.connect("delete-event", self._window_closed)
-        self.get_resource("clear_button").connect("clicked", self._on_clear)
         self.get_resource("program_button").connect("clicked", self._on_program)
         self.get_resource("close_button").connect("clicked", self._on_close)
+        self.get_resource("cancel_button").connect("clicked", self._on_cancel)
 
     def _show_window(self, *args):
         self._win.show_all()
@@ -45,37 +45,46 @@ class TestConfigurable(plugin.Plugin, gs.ui.GtkBuilderWidget):
         self._win.hide()
         return True
 
+    def _set_status_label(self, txt):
+        self._status.set_markup('<span face="monospace">%s</span>' % txt)
+
     def _check_make(self):
         self._process.poll()
         if self._process.returncode != None:
             if self._process.returncode != 0:
-                self._status.set_markup('<span face="monospace">Error</span>')
+                self._set_status_label("Error")
             else:
-                self._status.set_markup('<span face="monospace">Finished</span>')
+                self._set_status_label("Finished")
             self._process = None
             return False
         else:
             self._anim = (self._anim + 1) % len(self.ANIMATION)
-            self._status.set_markup('<span face="monospace">Running (%s)</span>' % self.ANIMATION[self._anim])
+            self._set_status_label("Running (%s)" % self.ANIMATION[self._anim])
             return True
 
     def _run_make(self, target="autopilot_main"):
-        if not self._process:
-            self._process = subprocess.Popen(
-                                "make upload TARGET=%s" % target,
-                                cwd=self._onboard_dir,
-                                shell=True,
-                                stdout=None,
-                                stderr=None)
-            gobject.timeout_add_seconds(1, self._check_make)
-
-    def _on_clear(self, *args):
-        LOG.debug("clear")
+        LOG.info("Running make, target: %s" % target)
+        self._anim = 0
+        self._set_status_label("Running (%s)" % self.ANIMATION[self._anim])
+        self._process = subprocess.Popen(
+                            "make upload TARGET=%s" % target,
+                            cwd=self._onboard_dir,
+                            shell=True,
+                            stdout=None,
+                            stderr=None)
+        gobject.timeout_add_seconds(1, self._check_make)
 
     def _on_program(self, *args):
-        LOG.debug("program")
-        self._run_make()
+        if not self._process:
+            self._run_make()
+        else:
+            LOG.info("Not programming, process allready running")
 
     def _on_close(self, *args):
         self._win.hide()
+
+    def _on_cancel(self, *args):
+        if self._process and self._process.returncode == None:
+            self._process.terminate()
+
 
