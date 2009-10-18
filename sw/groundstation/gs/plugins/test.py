@@ -1,3 +1,4 @@
+import gtk
 import logging
 
 import gs.plugin as plugin
@@ -7,9 +8,12 @@ LOG = logging.getLogger('testmanager')
 
 class TestConfigurable(plugin.Plugin, config.ConfigurableIface):
     CONFIG_SECTION = "TEST"
-    def __init__(self, conf, source, messages_file):
+    def __init__(self, conf, source, messages_file, groundstation_window):
         config.ConfigurableIface.__init__(self, conf)
         self.ck = "0"
+
+#        groundstation_window.add_menu_item("Foo", gtk.MenuItem("test1"))
+#        groundstation_window.add_menu_item("File", gtk.MenuItem("test2"))
 
     def update_state_from_config(self):
         self.ck = self.config_get("Test_Check","0")

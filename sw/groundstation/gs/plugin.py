@@ -5,7 +5,7 @@ import logging
 LOG = logging.getLogger('plugin')
 
 class Plugin(object):
-    def __init__(self, conf, source, message_file):
+    def __init__(self, conf, source, message_file, groundstation_window):
         pass
 
 class PluginManager:

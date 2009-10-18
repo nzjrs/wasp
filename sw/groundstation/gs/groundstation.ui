@@ -74,7 +74,7 @@
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkMenuBar" id="menubar1">
+          <object class="GtkMenuBar" id="main_menubar">
             <property name="visible">True</property>
             <child>
               <object class="GtkMenuItem" id="menu_item_file">
@@ -340,7 +340,7 @@
                 <property name="label" translatable="yes">_UAV</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
-                  <object class="GtkMenu" id="autopilot_menu">
+                  <object class="GtkMenu" id="uav_menu">
                     <property name="visible">True</property>
                     <child>
                       <object class="GtkImageMenuItem" id="menu_item_refresh_uav">

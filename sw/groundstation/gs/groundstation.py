@@ -88,8 +88,18 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._settingsfile = SettingsFile(path=settingsfile)
         self._settings = SettingsController(self._source, self._settingsfile, self._messagesfile)
 
+        #All the menus in the UI. Get them the first time a plugin tries to add a submenu
+        #to the UI to save startup time.
+        self._menus = {
+                "File"      :   None,
+                "Window"    :   None,
+                "Map"       :   None,
+                "UAV"       :   None,
+                "Help"      :   None,
+        }
+
         self._plugin_manager = PluginManager()
-        self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile)
+        self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
 
         self._map = Map(self._config, self._source)
         self._gm = GraphManager(self._config, self._source, self._messagesfile, self.get_resource("graphs_box"), self._window)
@@ -199,6 +209,29 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def _disconnect(self):
         self._source.disconnect_from_uav()
+
+    def add_menu_item(self, name, item):
+        if name in self._menus:
+            menu = self._menus[name]
+            if not menu:
+                menu = self.get_resource("%s_menu" % name.lower())
+        else:
+            #add a new menu
+            menuitem = gtk.MenuItem(name)
+            self.get_resource("main_menubar").append(menuitem)
+            menu = gtk.Menu()
+            menuitem.set_submenu(menu)
+
+        self._menus[name] = menu
+        menu.append(item)
+#            menubar.append(menuitem)
+#            menu = gtk.Menu()
+#            menuitem.set_submenu(menu)
+#            return menu
+
+#        menubar = self.get_resource("main_menubar")
+#        tools_menu = new_menu("tools", self.get_resource("main_menubar"))
+#        tools_menu.append(gtk.MenuItem("test1"))
 
     def update_state_from_config(self):
         self._c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)

@@ -9,7 +9,7 @@ LOG = logging.getLogger('turret')
 
 class Turret(plugin.Plugin, libserial.SerialSender.SerialSender, config.ConfigurableIface):
     CONFIG_SECTION = "TURRET"
-    def __init__(self, conf, source, messages_file):
+    def __init__(self, conf, source, messages_file, groundstation_window):
         libserial.SerialSender.SerialSender.__init__(self, speed=9600)
         config.ConfigurableIface.__init__(self, conf)
 
@@ -31,7 +31,4 @@ class Turret(plugin.Plugin, libserial.SerialSender.SerialSender, config.Configur
         frame = self.build_frame("Turret", items)
 
         return "Turret", frame, items
-
-    def get_data(self):
-        return self._gpggaString
 
