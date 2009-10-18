@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk+" version="2.14"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkWindow" id="programmer_window">
+  <object class="GtkWindow" id="mainwindow">
     <child>
       <object class="GtkAlignment" id="alignment1">
         <property name="visible">True</property>

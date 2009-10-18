@@ -9,7 +9,7 @@ import gs.plugin as plugin
 
 LOG = logging.getLogger('programmer')
 
-class TestConfigurable(plugin.Plugin, gs.ui.GtkBuilderWidget):
+class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
 
     ANIMATION = ("|","/","-","\\")
 
@@ -30,7 +30,7 @@ class TestConfigurable(plugin.Plugin, gs.ui.GtkBuilderWidget):
         #yucky running animation
         self._anim = 0
 
-        self._win = self.get_resource("programmer_window")
+        self._win = self.get_resource("mainwindow")
         self._status = self.get_resource("status_label")
         self._win.connect("delete-event", self._window_closed)
         self.get_resource("program_button").connect("clicked", self._on_program)
