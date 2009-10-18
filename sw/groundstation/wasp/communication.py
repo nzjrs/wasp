@@ -57,6 +57,8 @@ class DummySerialCommunication(gobject.GObject):
         self._generic_send(int(1000/10), "IMU_ACCEL_RAW")
         self._generic_send(int(1000/10), "IMU_MAG_RAW")
         self._generic_send(int(1000/10), "IMU_GYRO_RAW")
+        #PPM at 10hz
+        gobject.timeout_add(int(1000/10), self._do_ppm)
         #AHRS at 10hz
         gobject.timeout_add(int(1000/10), self._do_ahrs)
         #GPS at 4 Hz
@@ -105,6 +107,11 @@ class DummySerialCommunication(gobject.GObject):
 
     def _do_ahrs(self):
         return True
+
+    def _do_ppm(self):
+        msg = self._messages.get_message_by_name("PPM")
+        v = 10000
+        return self._send(msg, v, v, v, v, v, v)
 
     def get_fd(self):
         return self._readfd
