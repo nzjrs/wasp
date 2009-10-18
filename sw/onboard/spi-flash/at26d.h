@@ -53,7 +53,7 @@
 //------------------------------------------------------------------------------
 //         Exported functions
 //------------------------------------------------------------------------------
-extern void AT26D_WaitReady(At26 *pAt26);
+extern void AT26D_WaitReady(At26 *pAt26); //TODO: currently not working
 
 extern unsigned int AT26D_ReadJedecId(At26 *pAt26);
 

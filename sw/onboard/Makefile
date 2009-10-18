@@ -53,7 +53,11 @@ SRCARM +=                           \
     arm7/servos_4017_hw.c           \
     arm7/analog_hw.c                \
     arm7/altimeter_analog_baro_hw.c \
-    arm7/settings_mem_hw.c
+    arm7/settings_mem_hw.c          \
+    spi-flash/spi0.c                \
+    spi-flash/at26.c                \
+    spi-flash/at26d.c               \
+
 
 ASRCARM =                           \
     arm7/crt0.S

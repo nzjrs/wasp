@@ -33,12 +33,12 @@
 
 #include "at26.h"
 #include "at26d.h"
-#include "board.h"
-#include <utility/math.h>
-#include <utility/assert.h>
+//#include "board.h"
+//#include "math.h"
+#include "assert.h"
 
 /*****/
-#include <utility/trace.h>
+//#include "trace.h"
 /*****/
 
 //------------------------------------------------------------------------------
@@ -52,8 +52,9 @@
 static void AT26D_Wait(At26 *pAt26)
 {
     // Wait for transfer to finish
-    while (AT26_IsBusy(pAt26))
-        SPID_Handler(pAt26->pSpid);
+    //TODO: re-implement this
+    /*while (AT26_IsBusy(pAt26))
+        SPID_Handler(pAt26->pSpid);*/
 }
 
 //------------------------------------------------------------------------------
@@ -249,11 +250,11 @@ unsigned char AT26D_EraseBlock(At26 *pAt26, unsigned int address)
 	// Check that the flash is ready and unprotected
 	status = AT26D_ReadStatus(pAt26);
 	if ((status & AT26_STATUS_RDYBSY) != AT26_STATUS_RDYBSY_READY) {
-        trace_LOG(trace_INFO, "-AT26D_EraseBlock  -E- \tFlash busy\n\r");
+        //TODO implement this: trace_LOG(trace_INFO, "-AT26D_EraseBlock  -E- \tFlash busy\n\r");
         return AT26_ERROR_BUSY;
     }
     else if ((status & AT26_STATUS_SWP) != AT26_STATUS_SWP_PROTNONE) {
-        trace_LOG(trace_INFO, "-AT26D_EraseBlock - E - Flash protected\n\r");
+        //TODO implement this: trace_LOG(trace_INFO, "-AT26D_EraseBlock - E - Flash protected\n\r");
         return AT26_ERROR_PROTECTED;
     }
 

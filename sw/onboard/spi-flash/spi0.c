@@ -81,6 +81,7 @@
 #define SPI_PRESCALE_REG  S0SPCCR
 #define SPI_PRESCALE_MIN  8
 
+/* This uses SSEL0 */
 #define SELECT_CARD()   IOCLR0 = (1<<SPI_SS_PIN)
 #define UNSELECT_CARD()	IOSET0 = (1<<SPI_SS_PIN)
 

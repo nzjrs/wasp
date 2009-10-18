@@ -34,7 +34,7 @@
 //         Headers
 //------------------------------------------------------------------------------
 
-#include "spid.h"
+#include "spi0.h"
 
 //------------------------------------------------------------------------------
 //         Macros
@@ -170,21 +170,20 @@ typedef struct _At26Desc {
 typedef struct _At26 {
 
     /// Pointer to the underlying SPI driver.
-	Spid *pSpid;
+	//Spid *pSpid;
     /// Current SPI command sent to the SPI driver.
-	SpidCmd command;
+	//SpidCmd command;
     /// Pointer to a descriptor for the serial firmware flash device.
 	const At26Desc *pDesc;
     /// Command buffer.
 	unsigned int pCmdBuffer[2];
-
 } At26;
 
 //------------------------------------------------------------------------------
 //         Exported functions
 //------------------------------------------------------------------------------
 
-extern void AT26_Configure(At26 *pAt26, Spid *pSpid, unsigned char cs);
+extern void AT26_Configure(At26 *pAt26, unsigned char cs);
 
 extern unsigned char AT26_SendCommand(
 	At26 *pAt26,

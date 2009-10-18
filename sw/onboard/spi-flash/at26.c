@@ -1,3 +1,7 @@
+/*
+ * Modified by the rocket team
+ */
+
 /* ----------------------------------------------------------------------------
  *         ATMEL Microcontroller Software Support 
  * ----------------------------------------------------------------------------
@@ -32,8 +36,8 @@
 //------------------------------------------------------------------------------
 
 #include "at26.h"
-#include <board.h>
-#include <utility/assert.h>
+#include "assert.h"
+#include "LPC21xx.h"
 
 //------------------------------------------------------------------------------
 //         Internal definitions
@@ -41,12 +45,6 @@
 
 /// SPI clock frequency used in Hz.
 #define SPCK            1000000
-
-/// SPI chip select configuration value.
-#define CSR             (AT91C_SPI_NCPHA | \
-	                     SPID_CSR_DLYBCT(BOARD_MCK, 100) | \
-                         SPID_CSR_DLYBS(BOARD_MCK, 5) | \
-                         SPID_CSR_SCBR(BOARD_MCK, SPCK))
 
 /// Number of recognized dataflash.
 #define NUMDATAFLASH    (sizeof(at26Devices) / sizeof(At26Desc))
@@ -61,27 +59,7 @@ static const At26Desc at26Devices[] = {
 	{"AT26DF081A" , 0x0001451F, 1 * 1024 * 1024, 256,  64 * 1024},
 	{"AT26DF0161" , 0x0000461F, 2 * 1024 * 1024, 256,  64 * 1024},
     {"AT26DF161A" , 0x0001461F, 2 * 1024 * 1024, 256,  64 * 1024},
-	{ "AT26DF321" , 0x0000471F, 8 * 1024 * 1024, 256,  64 * 1024},
-	// Manufacturer: ST
-    {"M25P05"     , 0x00102020,       64 * 1024, 256,  32 * 1024},
-    {"M25P10"     , 0x00112020,      128 * 1024, 256,  32 * 1024},
-    {"M25P20"     , 0x00122020,      256 * 1024, 256,  64 * 1024},
-    {"M25P40"     , 0x00132020,      512 * 1024, 256,  64 * 1024},
-    {"M25P80"     , 0x00142020, 1 * 1024 * 1024, 256,  64 * 1024},
-    {"M25P16"     , 0x00152020, 2 * 1024 * 1024, 256,  64 * 1024},
-	{"M25P32"     , 0x00162020, 4 * 1024 * 1024, 256,  64 * 1024},
-	{"M25P64"     , 0x00172020, 8 * 1024 * 1024, 256,  64 * 1024},
-	// Manufacturer: Windbond
-	{"W25X10"     , 0x001130EF,      128 * 1024, 256,   4 * 1024},
-	{"W25X20"     , 0x001230EF,      256 * 1024, 256,   4 * 1024},
-	{"W25X40"     , 0x001330EF,      512 * 1024, 256,   4 * 1024},
-	{"W25X80"     , 0x001430EF, 1 * 1024 * 1024, 256,   4 * 1024},
-	// Manufacturer: Macronix
-    {"MX25L512"   , 0x001020C2,       64 * 1024, 256,   4 * 1024},
-	{"MX25L3205"  , 0x001620C2, 4 * 1024 * 1024, 256,  64 * 1024},
-	{"MX25L6405"  , 0x001720C2, 8 * 1024 * 1024, 256,  64 * 1024},
-	// Other
-    {"SST25VF512" , 0x000048BF,       64 * 1024, 256,   4 * 1024}
+	{ "AT26DF321" , 0x0000471F, 8 * 1024 * 1024, 256,  64 * 1024}
 };
 
 //------------------------------------------------------------------------------
@@ -95,27 +73,26 @@ static const At26Desc at26Devices[] = {
 /// \param pSpid  Pointer to an SPI driver instance.
 /// \param cs  Chip select value to communicate with the serial flash.
 //------------------------------------------------------------------------------
-void AT26_Configure(At26 *pAt26, Spid *pSpid, unsigned char cs)
+void AT26_Configure(At26 *pAt26, unsigned char cs)
 {
-	SpidCmd *pCommand;
 
     SANITY_CHECK(pAt26);
-	SANITY_CHECK(pSpid);
     SANITY_CHECK(cs < 4);
 
 	// Configure the SPI chip select for the serial flash
-	SPID_ConfigureCS(pSpid, cs, CSR);
+	SPIInit();
+	//TODO: pick a speed: SPISetSpeed(uint8_t speed);
 
 	// Initialize the AT26 fields
-	pAt26->pSpid = pSpid;
 	pAt26->pDesc = 0;
-
+/*
 	// Initialize the command structure
     pCommand = &(pAt26->command);
 	pCommand->pCmd = (unsigned char *) pAt26->pCmdBuffer;
 	pCommand->callback = 0;
 	pCommand->pArgument = 0;
 	pCommand->spiCs = cs;	
+*/
 }
 
 //------------------------------------------------------------------------------
@@ -125,7 +102,9 @@ void AT26_Configure(At26 *pAt26, Spid *pSpid, unsigned char cs)
 //------------------------------------------------------------------------------
 unsigned char AT26_IsBusy(At26 *pAt26)
 {
-	return SPID_IsBusy(pAt26->pSpid);
+	//TODO is this necessary?	
+	//return SPID_IsBusy(pAt26->pSpid);
+	return 0;
 }
 	
 //------------------------------------------------------------------------------
@@ -156,7 +135,7 @@ unsigned char AT26_SendCommand(
     SpidCallback callback,
 	void *pArgument)
 
-{
+{/*
 	SpidCmd *pCommand;
 	
 	SANITY_CHECK(pAt26);
@@ -165,14 +144,15 @@ unsigned char AT26_SendCommand(
 	if (AT26_IsBusy(pAt26)) {
     
 		return AT26_ERROR_BUSY;
-    }
+    }*/
 	
 	// Store command and address in command buffer
 	pAt26->pCmdBuffer[0] = (cmd & 0x000000FF)
 	                       | ((address & 0x0000FF) << 24)
 	                       | ((address & 0x00FF00) << 8)
 	                       | ((address & 0xFF0000) >> 8);
-
+	
+	/* Original implementation
 	// Update the SPI transfer descriptor
     pCommand = &(pAt26->command);
  	pCommand->cmdSize = cmdSize;
@@ -186,7 +166,19 @@ unsigned char AT26_SendCommand(
 
  		return AT26_ERROR_SPI;
  	}
- 
+	*/
+	
+	//TODO: check the new implementation utilising spi0
+	//void	SPISendN(uint8_t *pbBuf, int iLen);
+	uint8_t buffer[1+dataSize]; //enough room for command + data
+	buffer[0] = cmd;
+	int i;
+	for(i=0; i<dataSize; i++) {
+			buffer[i+1]=pData[i];
+	} 
+	
+	SPISendN(&buffer[0], cmdSize+dataSize);
+	 
  	return 0;
 }
 

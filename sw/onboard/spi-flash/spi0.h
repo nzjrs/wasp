@@ -36,7 +36,11 @@
 void	SPIInit(void);
 void	SPISetSpeed(uint8_t speed);
 
-uint8_t		SPISend(uint8_t outgoing);
+uint8_t SPISend(uint8_t outgoing);
 void	SPISendN(uint8_t *pbBuf, int iLen);
 void	SPIRecvN(uint8_t *pbBuf, int iLen);
+
+
+/// SPI transfer complete callback - not used at the moment
+typedef void (*SpidCallback )(unsigned char, void *);
 
