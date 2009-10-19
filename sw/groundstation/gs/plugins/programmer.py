@@ -18,7 +18,9 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
         uifile = os.path.join(mydir, "programmer.ui")
         gs.ui.GtkBuilderWidget.__init__(self, uifile)
 
-        item = gtk.MenuItem("Program")
+        pb = gs.ui.get_icon_pixbuf("electronics.svg",size=gtk.ICON_SIZE_MENU)
+        item = gtk.ImageMenuItem("Program Autopilot")
+        item.set_image(gtk.image_new_from_pixbuf(pb))
         item.connect("activate", self._show_window)
         groundstation_window.add_menu_item("UAV", item)
 
@@ -31,8 +33,10 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
         self._anim = 0
 
         self._win = self.get_resource("mainwindow")
-        self._status = self.get_resource("status_label")
+        self._win.set_icon(pb)
+        self._win.set_title("Program Autopilot")
         self._win.connect("delete-event", self._window_closed)
+        self._status = self.get_resource("status_label")
         self.get_resource("program_button").connect("clicked", self._on_program)
         self.get_resource("close_button").connect("clicked", self._on_close)
         self.get_resource("cancel_button").connect("clicked", self._on_cancel)

@@ -25,7 +25,9 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
         uifile = os.path.join(mydir, "radiocalibration.ui")
         gs.ui.GtkBuilderWidget.__init__(self, uifile)
 
-        item = gtk.MenuItem("Calibrate Radio")
+        pb = gs.ui.get_icon_pixbuf("radio.svg",size=gtk.ICON_SIZE_MENU)
+        item = gtk.ImageMenuItem("Calibrate Radio")
+        item.set_image(gtk.image_new_from_pixbuf(pb))
         item.connect("activate", self._show_window)
         groundstation_window.add_menu_item("UAV", item)
 
@@ -33,6 +35,8 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
         self._source = source
         self._initialized = []
         self._win = self.get_resource("mainwindow")
+        self._win.set_icon(pb)
+        self._win.set_title("Calibrate Radio")
         self._win.connect("delete-event", self._window_closed)
         self.get_resource("close_button").connect("clicked", self._on_close)
 
