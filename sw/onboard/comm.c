@@ -13,6 +13,9 @@ CommTXMessageCallback_t  comm_callback_tx[COMM_NB];
 CommMessage_t            comm_message[COMM_NB];
 CommStatus_t             comm_status[COMM_NB];
 bool_t                   comm_channel_used[COMM_NB];
+PeriodicMessage_t        periodic_messages[NUM_PERIODIC_MESSAGES] = PERIODIC_MESSAGE_INITIALIZER;
+
+static bool_t comm_install_new_periodic_task ( CommChannel_t chan, CommMessage_t *request_telemetry_msg );
 
 #define UPDATE_CHECKSUM(_msg, _x)           \
     _msg->ck_a += _x;                       \
@@ -211,6 +214,9 @@ comm_event_task ( CommChannel_t chan )
                 msgid = MESSAGE_REQUEST_MESSAGE_GET_FROM_BUFFER_msgid(msg->payload);
                 ret = comm_send_message_by_id(chan, msgid);
                 break;
+            case MESSAGE_ID_REQUEST_TELEMETRY:
+                ret = comm_install_new_periodic_task(chan, msg);
+                break;
             case MESSAGE_ID_TIME:
             case MESSAGE_ID_STATUS:
             case MESSAGE_ID_COMM_STATUS:
@@ -234,16 +240,13 @@ comm_event_task ( CommChannel_t chan )
 void
 comm_periodic_task ( CommChannel_t chan )
 {
-    static PeriodicMessage_t periodic[NUM_PERIODIC_MESSAGES] = PERIODIC_MESSAGE_INITIALIZER;
-
     uint8_t i;
     PeriodicMessage_t *p;
 
     for (i = 0; i < NUM_PERIODIC_MESSAGES; i++) 
     {
-        p = &periodic[i];
-
-        if (chan == p->chan) {
+        p = &periodic_messages[i];
+        if (p->msgid != MESSAGE_ID_NONE && chan == p->chan) {
             if (p->cnt == p->target) {
                 comm_send_message_by_id(p->chan, p->msgid);
                 p->cnt = 0;
@@ -252,6 +255,28 @@ comm_periodic_task ( CommChannel_t chan )
         }
     }
             
+}
+
+static bool_t
+comm_install_new_periodic_task ( CommChannel_t chan, CommMessage_t *msg )
+{
+    uint8_t i;
+    PeriodicMessage_t *p;
+    float freq = MESSAGE_REQUEST_TELEMETRY_GET_FROM_BUFFER_frequency(msg->payload);
+    uint8_t msgid = MESSAGE_REQUEST_TELEMETRY_GET_FROM_BUFFER_msgid(msg->payload);
+
+    for (i = 0; i < NUM_PERIODIC_MESSAGES; i++) 
+    {
+        p = &periodic_messages[i];
+        if (p->msgid == MESSAGE_ID_NONE) {
+            p->target = 60.0/freq;
+            p->cnt = 0;
+            p->msgid = msgid;
+            p->chan = chan;
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 void

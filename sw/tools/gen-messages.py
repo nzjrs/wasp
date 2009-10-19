@@ -28,16 +28,16 @@ class Periodic:
 
     # The definition this struct is in messages.h
 
-    #use a uint8_t for counting how many main iterations
+    #use a uint16_t for counting how many main iterations
     #to wait until releasing this message for transmission
     CNT_MAX = (2 ** 16) - 1
 
     AVAILABLE_CHANNELS = ("COMM_0", "COMM_1", "COMM_USB")
 
-    def __init__(self, m, chan, periodicfreq=60.0):
+    def __init__(self, name, frequency, chan, periodicfreq=60.0):
         self._periodicfreq = periodicfreq
-        self._message = m.name
-        self._frequency = float(m.frequency)
+        self._message = name
+        self._frequency = float(frequency)
         self._chan = chan
 
         #the main loop runs at periodicfreq. We want to run at frequency
@@ -46,7 +46,7 @@ class Periodic:
         minfreq = periodicfreq/self.CNT_MAX         #can only count to n
 
         if self._frequency > minfreq and self._frequency < maxfreq:
-            self._target = int(60/self._frequency)
+            self._target = int(periodicfreq/self._frequency)
         else:
             raise Exception("periodic freq, f=%s, must be %s < f < %s" % (self._frequency, minfreq, maxfreq))
 
@@ -55,6 +55,10 @@ class Periodic:
 
     def get_initializer(self):
         return "{ %d, %d, MESSAGE_ID_%s, %s }" % (self._target, 0, self._message, self._chan)
+
+class AdjustablePeriodic(Periodic):
+    def __init__(self, chan):
+        Periodic.__init__(self, "NONE", 1, chan)
 
 class CMessage(messages.Message):
 
@@ -100,6 +104,7 @@ class _CWriter(_Writer):
         print "#define COMM_DEFAULT_ACID 120"
         print "#define COMM_NUM_NON_PAYLOAD_BYTES 6"
         print
+        print "#define MESSAGE_ID_NONE 0"
         for m in self.messages:
             m.print_id()
         print
@@ -332,13 +337,22 @@ if __name__ == "__main__":
         for p in xmlobject.ensure_list(x.root.periodic):
             #and it must specify a channel
             chan = p.channel
-
+            
             #but periodic messages are optional
             try: 
                 pm = xmlobject.ensure_list(p.message)
             except AttributeError:
                 pm = []
-            periodic += [Periodic(m, chan) for m in pm]
+            periodic += [Periodic(m.name, m.frequency, chan) for m in pm]
+
+            #the number of adjustable periodic messages are also optional
+            try:
+                num_adj = int(p.adjustable)
+            except AttributeError:
+                num_adj = 0
+
+            #leave a number of spaces for adjustable periodic messages
+            periodic += [AdjustablePeriodic(chan) for i in range(num_adj)]
     except:
         import traceback
         parser.error("invalid xml\n%s" % traceback.format_exc())
