@@ -226,14 +226,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         self._menus[name] = menu
         menu.append(item)
-#            menubar.append(menuitem)
-#            menu = gtk.Menu()
-#            menuitem.set_submenu(menu)
-#            return menu
-
-#        menubar = self.get_resource("main_menubar")
-#        tools_menu = new_menu("tools", self.get_resource("main_menubar"))
-#        tools_menu.append(gtk.MenuItem("test1"))
 
     def update_state_from_config(self):
         self._c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)
@@ -391,9 +383,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         dlg.destroy()
         
     def on_menu_item_dock_all_activate(self, widget):
-        pass
-        #for p in (self._accel_graph, self._attitude_graph, self._rotational_graph):
-        #    p.dock_handler(True)
+        self._message_dialog("Not Implemented")
         
     def db_chooser_callback(self, widget):
         filename = widget.get_filename()
@@ -416,83 +406,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             sw.add(dbw)
             db.close()
 
-    def on_flight_props_activate(self, widget):
-        self._message_dialog("Not Implemented")
-        #dlg = self.get_resource("db_dialog")
-        #sw = self.get_resource("dbscrolledwindow")
-        #db_notes = self.get_resource("db_notes")
-        #buff = gtk.TextBuffer()
-        #file_chooser = self.get_resource("db_file_chooser")
-        
-        #db_notes.set_buffer(buff)
-                
-        #file_chooser.connect("file-set", self.db_chooser_callback)
-        #file_chooser.unselect_all()
-
-        #file_filter = gtk.FileFilter()
-        #file_filter.set_name("sqlite filter")
-        #file_filter.add_mime_type("application/x-sqlite3")
-        #file_chooser.set_filter(file_filter)
-        
-        #source = self._sm.get_source()
-        #db = source.get_db()
-        
-        #if db.is_open():
-        #    file_chooser.set_filename(db.get_filename())
-        #    notes = db.fetchall("select notes from flight where rowid=1")[0][0]
-        #    if (notes):
-        #        buff.set_text(notes)
-        #    dbw = DBWidget(db)
-        #    dbw.show()
-        #    sw.add(dbw)
-        #resp = dlg.run()
-        #if resp == gtk.RESPONSE_OK:
-        #    filename = file_chooser.get_filename()
-        #    if db.is_open() and db.get_filename() != filename:
-        #        source.disconnect_from_aircraft()
-        #        source.connect_to_aircraft(filename)
-        #    else:
-        #        source.get_db().open_from_file(filename)
-        #    db = source.get_db()
-        #    if db.is_open():
-        #        buff = db_notes.get_buffer()
-        #        notes = buff.get_text(buff.get_start_iter(), buff.get_end_iter())
-        #        db.execute("update flight set notes=? where rowid=1", (notes,))
-        #for c in sw.get_children():
-        #    sw.remove(c)
-        #dlg.hide()
-        #db.close()
-
     def on_menu_item_show_previous_activate(self, widget):
-        dlg = self.get_resource("db_dialog")
-        sw = self.get_resource("dbscrolledwindow")
-        db_notes = self.get_resource("db_notes")
-        buff = gtk.TextBuffer()
-        file_chooser = self.get_resource("db_file_chooser")
-        
-        db_notes.set_buffer(buff)
-                
-        file_chooser.connect("file-set", self.db_chooser_callback)
-        file_chooser.unselect_all()
-
-        file_filter = gtk.FileFilter()
-        file_filter.set_name("sqlite filter")
-        file_filter.add_mime_type("application/x-sqlite3")
-        file_chooser.set_filter(file_filter)
-        
-        resp = dlg.run()
-        if (resp == gtk.RESPONSE_OK):
-            pass
-            #filename = file_chooser.get_filename()
-            #db = Database(filename)
-            #track = []
-            #for r in db.fetchall("SELECT %s, %s FROM flight_data" % (data.LAT, data.LON)):
-            #    track.append( (math.radians(r[0]),math.radians(r[1])) )
-            #self._map.add_track(track)
-        for c in sw.get_children():
-            sw.remove(c)
-        dlg.hide()
-        db.close()
+        self._message_dialog("Not Implemented")
 
     def on_menu_item_plane_view_activate(self, widget):
         if self._plane_view == None:
