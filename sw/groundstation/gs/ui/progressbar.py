@@ -57,6 +57,11 @@ class ProgressBar(gtk.HBox):
             frac = ((val - self._min) / (self._max - self._min))
         except ZeroDivisionError:
             frac = 0.0
+
+        if frac < 0:
+            frac = 0
+        if frac > 1.0:
+            frac = 1.0
         self._bar.set_fraction(frac)
 
 if __name__ == "__main__":
