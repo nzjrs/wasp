@@ -11,11 +11,12 @@ Documentation
    :maxdepth: 2
 
    sw/doc/index
-   sw/doc/autopilot
-   sw/doc/onboard
-   sw/doc/comm-protocol
-   sw/doc/coding-standards
    hw/doc/index
+..   sw/doc/autopilot
+..   sw/doc/onboard
+..   sw/doc/comm-protocol
+..   sw/doc/coding-standards
+
 
 
 

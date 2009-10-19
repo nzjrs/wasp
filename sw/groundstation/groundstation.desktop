@@ -5,5 +5,5 @@ Name=UAV Groundstation
 Comment=UAV Groundstation
 Icon=groundstation
 Exec=groundstation.py
-Categories=GNOME;GTK;Electronics;
+Categories=GNOME;GTK;Other;
 
