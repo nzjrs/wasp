@@ -37,7 +37,7 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
         self._win = self.get_resource("mainwindow")
         self._win.set_icon(pb)
         self._win.set_title("Calibrate Radio")
-        self._win.connect("delete-event", self._window_closed)
+        self._win.connect("delete-event", gtk.Widget.hide_on_delete)
         self.get_resource("close_button").connect("clicked", self._on_close)
 
     def _show_window(self, *args):
@@ -58,7 +58,7 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
 
                 #pack a progressbar for each channel
                 hb = self.get_resource("pb_box%d" % i)
-                pb = progressbar.ProgressBar(range=None, average=5)
+                pb = progressbar.ProgressBar(range=(10e3,35e3), average=5)
                 hb.pack_start(pb)
 
                 self._initialized.append((cb, pb))
@@ -72,11 +72,6 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
         ppm = msg.unpack_values(payload)
         for i in range(self._nchannels):
             self._initialized[i][1].set_value(ppm[i])
-
-    def _window_closed(self, *args):
-        #hide window, don't destroy it
-        self._win.hide()
-        return True
 
     def _on_close(self, *args):
         self._win.hide()

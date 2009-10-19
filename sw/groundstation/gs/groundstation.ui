@@ -352,6 +352,15 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkImageMenuItem" id="menu_item_request_telemetry">
+                        <property name="label" translatable="yes">Request Telemetry</property>
+                        <property name="visible">True</property>
+                        <property name="image">image17</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_menu_item_request_telemetry_activate"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="menuitem2">
                         <property name="visible">True</property>
                       </object>
@@ -1732,5 +1741,9 @@
   <object class="GtkImage" id="image16">
     <property name="visible">True</property>
     <property name="stock">gtk-home</property>
+  </object>
+  <object class="GtkImage" id="image17">
+    <property name="visible">True</property>
+    <property name="stock">gtk-info</property>
   </object>
 </interface>

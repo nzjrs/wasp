@@ -21,11 +21,12 @@ from gs.ui.flightplan import FlightPlanEditor
 from gs.ui.log import LogBuffer, LogWindow
 from gs.ui.map import Map
 from gs.ui.settings import SettingsController
+from gs.ui.window import DialogWindow
 
 from wasp.messages import MessagesFile
 from wasp.settings import SettingsFile
 from wasp.ui.treeview import MessageTreeView
-from wasp.ui.senders import RequestMessageSender
+from wasp.ui.senders import RequestMessageSender, RequestTelemetrySender
 
 LOG = logging.getLogger('groundstation')
 
@@ -162,6 +163,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             sw.add(rxtv)
 
             vb = self.get_resource("telemetry_left_vbox")
+
             rm = RequestMessageSender(self._messagesfile)
             rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
             vb.pack_start(rm, False, False)
@@ -296,6 +298,16 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         #so we can be called on timeout_add
         return False
+
+    def on_menu_item_request_telemetry_activate(self, *args):
+        dlg = DialogWindow("Requrest Telemetry")
+
+        rm = RequestTelemetrySender(self._messagesfile)
+        rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
+        rm.show_all()
+        dlg.vbox.pack_start(rm, False, False)
+
+        dlg.show_all()
 
     def on_menu_item_log_activate(self, widget):
         w = LogWindow(self._logbuffer)

@@ -53,7 +53,10 @@ class ProgressBar(gtk.HBox):
                 self._max = val
                 self._lblmax.set_text("%.1f" % self._max)
 
-        frac = ((val - self._min) / (self._max - self._min))
+        try:
+            frac = ((val - self._min) / (self._max - self._min))
+        except ZeroDivisionError:
+            frac = 0.0
         self._bar.set_fraction(frac)
 
 if __name__ == "__main__":

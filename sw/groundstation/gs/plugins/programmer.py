@@ -35,7 +35,7 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
         self._win = self.get_resource("mainwindow")
         self._win.set_icon(pb)
         self._win.set_title("Program Autopilot")
-        self._win.connect("delete-event", self._window_closed)
+        self._win.connect("delete-event", gtk.Widget.hide_on_delete)
         self._status = self.get_resource("status_label")
         self.get_resource("program_button").connect("clicked", self._on_program)
         self.get_resource("close_button").connect("clicked", self._on_close)
@@ -43,11 +43,6 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
 
     def _show_window(self, *args):
         self._win.show_all()
-
-    def _window_closed(self, *args):
-        #hide window, don't destroy it
-        self._win.hide()
-        return True
 
     def _set_status_label(self, txt):
         self._status.set_markup('<span face="monospace">%s</span>' % txt)

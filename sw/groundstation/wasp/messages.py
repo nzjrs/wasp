@@ -49,10 +49,10 @@ class Message:
 
     def __init__(self, m, field_klass):
         self.name = m.name.upper()
-        if int(m.id) <= 255:
+        if int(m.id) <= 255 and int(m.id) > 0:
             self.id = int(m.id)
         else:
-            raise Exception("Message IDs must be <= 255")
+            raise Exception("Message IDs must be 0 > ID <= 255")
         try:
             self.fields = [field_klass(f) for f in xmlobject.ensure_list(m.field)]
         except AttributeError:
