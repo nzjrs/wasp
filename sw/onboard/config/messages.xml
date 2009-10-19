@@ -160,6 +160,12 @@
       <field name="baro_value" type="uint16"/>
    </message>
 
+   <message name="MARK_HOME" id="38">
+      <field name="lat" type="float"/>
+      <field name="lon" type="float"/>
+      <field name="alt" type="float"/>
+   </message>
+
    <!-- Begin periodic messages -->
    <periodic channel="COMM_0">
       <message name="COMM_STATUS" frequency="0.25"/>

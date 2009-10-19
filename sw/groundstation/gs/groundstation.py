@@ -284,8 +284,15 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         try:
             lat = self._state["lat"]
             lon = self._state["lon"]
+            hsl = self._state["hsl"]
             self._map.mark_home(lat,lon)
             self._sb.mark_home(lat, lon)
+
+            #tell the UAV where home is
+            self._source.send_message(
+                    self._messagesfile.get_message_by_name("MARK_HOME"),
+                    (lat,lon,hsl)
+            )
         except KeyError, e:
             msg = self._msgarea.new_from_text_and_icon(
                             gtk.STOCK_DIALOG_ERROR,
