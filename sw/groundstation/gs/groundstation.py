@@ -171,7 +171,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             gb = self.get_resource("graph_button")
             gb.connect("clicked", on_gb_clicked, rxtv, self._gm)
 
-    def _error_message(self, message, secondary=None):
+    def _message_dialog(self, message, dialogtype=gtk.MESSAGE_ERROR, secondary=None):
         m = gtk.MessageDialog(
                     self._window,
                     gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -287,7 +287,28 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             self._map.mark_home(lat,lon)
             self._sb.mark_home(lat, lon)
         except KeyError, e:
-            pass
+            msg = self._msgarea.new_from_text_and_icon(
+                            gtk.STOCK_DIALOG_ERROR,
+                            "Mark Home Failed",
+                            "A GPS location has not been received from the UAV yet",
+                            timeout=5)
+            msg.show_all()
+
+    def on_menu_item_export_kml_activate(self, *args):
+        path = self._map.save_kml()
+        if path:
+            msg = self._msgarea.new_from_text_and_icon(
+                            gtk.STOCK_INFO,
+                            "KML Export Successful",
+                            "The file has been saved to %s" % path,
+                            timeout=5)
+        else:
+            msg = self._msgarea.new_from_text_and_icon(
+                            gtk.STOCK_DIALOG_ERROR,
+                            "KML Export Failed",
+                            "You must mark the home position of the flight first.",
+                            timeout=5)
+        msg.show_all()
 
     def on_menu_item_refresh_uav_activate(self, *args):
         #request a number of messages from the UAV
@@ -389,7 +410,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             db.close()
 
     def on_flight_props_activate(self, widget):
-        self._error_message("Not Implemented")
+        self._message_dialog("Not Implemented")
         #dlg = self.get_resource("db_dialog")
         #sw = self.get_resource("dbscrolledwindow")
         #db_notes = self.get_resource("db_notes")

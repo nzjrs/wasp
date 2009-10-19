@@ -313,6 +313,7 @@
                       <object class="GtkImageMenuItem" id="menu_item_show_previous">
                         <property name="label">Add Previous Path</property>
                         <property name="visible">True</property>
+                        <property name="image">image19</property>
                         <property name="use_stock">False</property>
                         <property name="accel_group">accelgroup1</property>
                         <property name="always_show_image">True</property>
@@ -328,6 +329,15 @@
                         <property name="accel_group">accelgroup1</property>
                         <property name="always_show_image">True</property>
                         <signal name="activate" handler="on_menu_item_clear_previous_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="menu_item_export_kml">
+                        <property name="label" translatable="yes">Export Current Path to KML</property>
+                        <property name="visible">True</property>
+                        <property name="image">image18</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_menu_item_export_kml_activate"/>
                       </object>
                     </child>
                   </object>
@@ -1745,5 +1755,14 @@
   <object class="GtkImage" id="image17">
     <property name="visible">True</property>
     <property name="stock">gtk-info</property>
+  </object>
+  <object class="GtkImage" id="image18">
+    <property name="visible">True</property>
+    <property name="stock">gtk-save-as</property>
+    <property name="icon-size">1</property>
+  </object>
+  <object class="GtkImage" id="image19">
+    <property name="visible">True</property>
+    <property name="stock">gtk-add</property>
   </object>
 </interface>

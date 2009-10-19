@@ -1,6 +1,13 @@
 import distance
 import constants
 
+class GeoPoint:
+    def __init__(self, lat, lon, alt, heading=0):
+        self.lat = lat
+        self.lon = lon
+        self.alt = alt
+        self.heading = heading
+
 def crow_flies_distance_two_point(start, end, method="haverstine"):
     """
     @returns the crow flies distance between the two points in meters
