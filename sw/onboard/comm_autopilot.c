@@ -20,7 +20,7 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#include "comm-autopilot.h"
+#include "comm_autopilot.h"
 
 #include "led.h"
 #include "rc.h"

@@ -33,7 +33,7 @@
 #include "rc.h"
 
 #include "comm.h"
-#include "comm-autopilot.h"
+#include "comm_autopilot.h"
 
 #include "imu.h"
 #include "analog.h"
