@@ -1,6 +1,7 @@
 import gtk
 import gobject
 import os.path
+import glob
 import logging
 import subprocess
 
@@ -27,6 +28,14 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
         #calculate path to onboard dir
         self._onboard_dir = os.path.abspath(os.path.join(mydir, "..", "..", "..", "onboard"))
 
+        #calculate the targets and add to the UI
+        targets = ["autopilot_main"]
+        targets += [
+            os.path.join("test",os.path.basename(p)).replace(".c","")
+                for p in glob.glob(os.path.join(self._onboard_dir, "test", "*_main.c"))]
+        self._setup_target_combobox(targets)
+
+
         #not currently running
         self._process = None
         #yucky running animation
@@ -40,6 +49,19 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
         self.get_resource("program_button").connect("clicked", self._on_program)
         self.get_resource("close_button").connect("clicked", self._on_close)
         self.get_resource("cancel_button").connect("clicked", self._on_cancel)
+
+    def _setup_target_combobox(self, targets):
+        #fill the models with names of targets and add to the combo box
+        model = gtk.ListStore(str)
+        for t in targets:
+            model.append((t,))
+
+        cb = self.get_resource("target_combo")
+        cell = gtk.CellRendererText()
+        cb.pack_start(cell, True)
+        cb.add_attribute(cell, 'text', 0)
+        cb.set_model(model)
+        cb.set_active(0)
 
     def _show_window(self, *args):
         self._win.show_all()
@@ -66,7 +88,7 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
         self._anim = 0
         self._set_status_label("Running (%s)" % self.ANIMATION[self._anim])
         self._process = subprocess.Popen(
-                            "make upload TARGET=%s" % target,
+                            "make reallyclean upload TARGET=%s" % target,
                             cwd=self._onboard_dir,
                             shell=True,
                             stdout=None,
@@ -75,7 +97,8 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
 
     def _on_program(self, *args):
         if not self._process:
-            self._run_make()
+            target = self.get_resource("target_combo").get_active_text()
+            self._run_make(target)
         else:
             LOG.info("Not programming, process allready running")
 
