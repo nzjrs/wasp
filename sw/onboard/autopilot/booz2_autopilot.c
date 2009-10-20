@@ -251,11 +251,6 @@ void autopilot_on_rc_event(void) {
     rc_values_contains_avg_channels = FALSE;
   }
 
-#ifdef KILL_SWITCH
-  if (rc_values[KILL_SWITCH] < 0)
-    autopilot_set_mode(BOOZ2_AP_MODE_KILL);
-#endif
-
   autopilot_check_motors_on();
   autopilot_check_in_flight();
 

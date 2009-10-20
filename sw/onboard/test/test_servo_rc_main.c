@@ -45,8 +45,6 @@ int main( void ) {
     return 0;
 }
 
-#define SERVO_SEPERATION    (0xFF/SERVOS_4017_NB_CHANNELS)
-
 static inline void main_init( void ) {
     hw_init();
     sys_time_init();
