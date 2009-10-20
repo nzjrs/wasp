@@ -72,7 +72,7 @@ static inline void autopilot_main_init( void ) {
   sys_time_init();
   led_init();
 
-  actuators_init(ACTUATOR_BANK_MOTORS);
+  actuators_init(ACTUATOR_BANK_SERVOS);
 
   rc_init();
 
