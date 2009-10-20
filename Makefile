@@ -42,6 +42,9 @@ test: clean
 showdoc: doc
 	@firefox doc/built/html/index.html
 
+uploaddoc: doc
+	@rsync -av doc/built/html/* john@open.grcnz.com:/srv/default/http/downloads/wasp/doc/
+
 ################################################################################
 # Dependencies
 ################################################################################
