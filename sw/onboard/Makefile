@@ -12,6 +12,7 @@ SRC =                               \
     math/pprz_geodetic_int.c        \
     math/pprz_geodetic_float.c      \
     rc.c                            \
+    autopilot.c                     \
     booz2_autopilot.c               \
     booz2_ins.c                     \
     booz2_navigation.c              \

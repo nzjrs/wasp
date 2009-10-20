@@ -40,7 +40,7 @@
 #include "altimeter.h"
 
 #include "fms/booz2_fms.h"
-#include "booz2_autopilot.h"
+#include "autopilot.h"
 #include "stabilization/booz2_stabilization_rate.h"
 #include "stabilization/booz2_stabilization_attitude.h"
 
@@ -91,7 +91,7 @@ static inline void autopilot_main_init( void ) {
   imu_init();
 
   booz_fms_init();
-  booz2_autopilot_init();
+  autopilot_init();
   booz2_nav_init();
   booz2_guidance_h_init();
   booz2_guidance_v_init();
@@ -115,9 +115,9 @@ static inline void autopilot_main_periodic( void ) {
   imu_periodic_task();
 
   /* run control loops */
-  booz2_autopilot_periodic();
+  autopilot_periodic();
   /* set actuators     */
-  booz2_autopilot_set_actuators();
+  autopilot_set_actuators();
 
   /* Run the following tasks 10x times slower than the periodic rate */
   _cnt++;
@@ -133,7 +133,7 @@ static inline void autopilot_main_periodic( void ) {
         else
         {
             led_off(RC_LED);
-            booz2_autopilot_set_mode(BOOZ2_AP_MODE_FAILSAFE);
+            autopilot_set_mode(BOOZ2_AP_MODE_FAILSAFE);
         }
         break;
     case 1:
@@ -152,7 +152,7 @@ static inline void autopilot_main_event( void ) {
   analog_event_task();
 
   if (rc_event_task())
-    booz2_autopilot_on_rc_event();
+    autopilot_on_rc_event();
 
   valid = imu_event_task();
   if ( (valid & IMU_ACC) || (valid & IMU_GYR) ) 
