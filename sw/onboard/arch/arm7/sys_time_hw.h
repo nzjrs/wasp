@@ -1,16 +1,16 @@
 /*
- * Paparazzi $Id$
- *
  * Copyright (C) 2005 Pascal Brisset, Antoine Drouin
+ * Copyright (C) 2008 Antoine Drouin
+ * Copyright (C) 2009 John Stowers
  *
- * This file is part of paparazzi.
+ * This file is part of wasp, some code taken from paparazzi (GPL)
  *
- * paparazzi is free software; you can redistribute it and/or modify
+ * wasp is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
- * paparazzi is distributed in the hope that it will be useful,
+ * wasp is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
