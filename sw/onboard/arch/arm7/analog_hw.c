@@ -79,10 +79,10 @@ void ADC0_ISR ( void )
 {
     ISR_ENTRY();
 
-    uint32_t tmp = AD0GDR;
-    uint16_t tmp2 = (uint16_t)(tmp >> 6) & 0x03FF;
-    uint32_t cal_v = (uint32_t)(tmp2) * BATTERY_SENS_NUM / BATTERY_SENS_DEN;
-    uint32_t sum = (uint32_t)booz2_battery_voltage + cal_v;
+    uint32_t tmp =          AD0GDR;
+    uint16_t tmp2 =         ((uint16_t)(tmp >> 6)) & 0x03FF;
+    uint32_t cal_v =        (uint32_t)((tmp2) * ANALOG_BATTERY_SENS_NUM) / ANALOG_BATTERY_SENS_DEN;
+    uint32_t sum =          ((uint32_t)booz2_battery_voltage) + cal_v;
     booz2_battery_voltage = (uint8_t)(sum/2);
 
     /* trigger next convertion */

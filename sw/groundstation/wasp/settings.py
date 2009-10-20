@@ -164,11 +164,17 @@ class _Setting:
         print "#define %s %s" % (self.name, self.value)
         if self.rational_approximation:
             val = float(self.value)
-            maxval = (2 ** self.rational_approximation) - 1
-
-            num,den = convert_float_to_rational_fraction_approximation(val, maxval)
-            approx = float(num)/float(den)
-            err = (val-approx)/val
+            if val == 0.0:
+                num = 0
+                den = 1
+                err = 0.0
+                approx = 0.0
+            else:
+                #maximum integer to fit in approximation of length
+                maxval = (2 ** self.rational_approximation) - 1
+                num,den = convert_float_to_rational_fraction_approximation(val, maxval)
+                approx = float(num)/float(den)
+                err = (val-approx)/val
             if err > 0.001:
                 raise Exception("Approximation Error: %f != %f" % (val, approx))
 
