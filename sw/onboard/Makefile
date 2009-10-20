@@ -13,7 +13,6 @@ SRC =                               \
     math/pprz_geodetic_float.c      \
     rc.c                            \
     autopilot.c                     \
-    booz2_autopilot.c               \
     booz2_ins.c                     \
     booz2_navigation.c              \
     ins/booz2_hf_float.c            \
@@ -28,6 +27,7 @@ SRC =                               \
     stabilization/booz2_stabilization.c           \
     stabilization/booz2_stabilization_rate.c      \
     stabilization/booz2_stabilization_attitude.c  \
+    autopilot/booz2_autopilot.c     \
     comm.c                          \
     comm-autopilot.c                \
     settings.c
