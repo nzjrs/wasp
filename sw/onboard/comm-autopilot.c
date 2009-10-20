@@ -30,8 +30,8 @@
 #include "altimeter.h"
 #include "settings.h"
 #include "sys_time.h"
+#include "autopilot.h"
 
-#include "booz2_autopilot.h"
 #include "booz2_ins.h"
 #include "guidance/booz2_guidance_h.h"
 #include "guidance/booz2_guidance_v.h"
@@ -112,9 +112,9 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &rc_status,
                     &booz_gps_state.fix,
                     &bat,
-                    &booz2_autopilot_in_flight,
-                    &booz2_autopilot_motors_on,
-                    &booz2_autopilot_mode,
+                    &autopilot_in_flight,
+                    &autopilot_motors_on,
+                    &autopilot_mode,
                     &cpu_usage);
             }
             break;
@@ -132,7 +132,7 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
         case MESSAGE_ID_AUTOPILOT:
             MESSAGE_SEND_AUTOPILOT(
                     chan,
-                    &booz2_autopilot_mode,
+                    &autopilot_mode,
                     &booz2_guidance_h_mode,
                     &booz2_guidance_v_mode);
             break;

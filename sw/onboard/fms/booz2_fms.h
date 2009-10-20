@@ -29,7 +29,6 @@
 #include "config/config.h"
 #include "gps.h"
 #include "booz_geometry_int.h"
-#include "booz2_autopilot.h"
 #include "guidance/booz2_guidance_h.h"
 #include "guidance/booz2_guidance_v.h"
 
