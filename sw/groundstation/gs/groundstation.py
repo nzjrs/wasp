@@ -11,7 +11,7 @@ from gs.config import Config, ConfigurableIface, ConfigWindow
 from gs.source import UAVSource
 from gs.plugin import PluginManager
 
-from gs.ui import GtkBuilderWidget, get_icon_pixbuf
+from gs.ui import GtkBuilderWidget, get_icon_pixbuf, message_dialog
 from gs.ui.graph import Graph, GraphManager
 from gs.ui.tree import DBWidget
 from gs.ui.msgarea import MsgAreaController
@@ -170,18 +170,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
             gb = self.get_resource("graph_button")
             gb.connect("clicked", on_gb_clicked, rxtv, self._gm)
-
-    def _message_dialog(self, message, dialogtype=gtk.MESSAGE_ERROR, secondary=None):
-        m = gtk.MessageDialog(
-                    self._window,
-                    gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                    gtk.MESSAGE_ERROR,
-                    gtk.BUTTONS_OK,
-                    message)
-        if secondary:
-            m.format_secondary_text(secondary)
-        m.run()
-        m.destroy()
 
     def _on_gps(self, msg, payload):
         fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
@@ -383,7 +371,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         dlg.destroy()
         
     def on_menu_item_dock_all_activate(self, widget):
-        self._message_dialog("Not Implemented")
+        message_dialog("Not Implemented", self._window)
         
     def db_chooser_callback(self, widget):
         filename = widget.get_filename()
@@ -407,7 +395,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             db.close()
 
     def on_menu_item_show_previous_activate(self, widget):
-        self._message_dialog("Not Implemented")
+        message_dialog("Not Implemented", self._window)
 
     def on_menu_item_plane_view_activate(self, widget):
         if self._plane_view == None:

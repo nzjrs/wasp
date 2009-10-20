@@ -183,9 +183,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
     def save_kml(self, path=None):
         if self._flight_track and self._flight_started:
             if not path:
-                path = os.path.join(
-                            os.path.expanduser("~"),
-                            "Desktop",
+                path = gs.user_file_path(
                             self._flight_started.strftime("%d-%b-%y %H-%M-%S.kml"))
 
             f = open(path,"w")
