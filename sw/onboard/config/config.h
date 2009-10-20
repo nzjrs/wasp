@@ -42,12 +42,23 @@
 #define AHRS_ALIGNER_LED        3
 
 /* ADC */
+/* battery: P0.29 AD0.2 */
+#define ANALOG_BATT_PINSEL      PINSEL1
+#define ANALOG_BATT_PINSEL_VAL  0x01
+#define ANALOG_BATT_PINSEL_BIT  26
+
+/* adc_spare: P0.13 AD1.4 */
+#define ANALOG_SPARE_PINSEL     PINSEL0
+#define ANALOG_SPARE_PINSEL_VAL 0x03
+#define ANALOG_SPARE_PINSEL_BIT 26
 
 /* pressure : P0.10 AD1.2 */
 #define ANALOG_BARO_PINSEL      PINSEL0
 #define ANALOG_BARO_PINSEL_VAL  0x03
 #define ANALOG_BARO_PINSEL_BIT  20
-#define ANALOG_BARO_ADC         1
+
+/* use the onboard analog baro */
+#define USE_ANALOG_BARO         1
 
 /* Micromag on SSP, IMU connector */
 #define MM_SS_PIN   28
@@ -133,8 +144,6 @@
 
 /* VIC */
 #define TIMER0_VIC_SLOT             1
-#define ADC0_VIC_SLOT               2
-#define ADC1_VIC_SLOT               3
 #define UART0_VIC_SLOT              5
 #define UART1_VIC_SLOT              6
 #define USB_VIC_SLOT                7

@@ -35,19 +35,23 @@ uint16_t booz2_analog_baro_value;
 uint16_t booz2_analog_baro_value_filtered;
 bool_t   booz2_analog_baro_data_available;
 
+// offset on DAC on P0.25
 
-void altimeter_init( void ) {
+void altimeter_init( void ) 
+{
+    altimeter_system_status = STATUS_UNINITIAIZED;
 
-  altimeter_system_status = STATUS_UNINITIAIZED;
+    /* turn on DAC pins */
+    PINSEL1 |= 2 << 18;
 
-  booz2_analog_baro_offset = 1023;
-  Booz2AnalogSetDAC(booz2_analog_baro_offset);
+    booz2_analog_baro_offset = 1023;
+    Booz2AnalogSetDAC(booz2_analog_baro_offset);
 
-  booz2_analog_baro_value = 0;
-  booz2_analog_baro_value_filtered = 0;
-  booz2_analog_baro_data_available = FALSE;
+    booz2_analog_baro_value = 0;
+    booz2_analog_baro_value_filtered = 0;
+    booz2_analog_baro_data_available = FALSE;
 #ifdef BOOZ2_ANALOG_BARO_LED
-  LED_OFF(BOOZ2_ANALOG_BARO_LED);
+    LED_OFF(BOOZ2_ANALOG_BARO_LED);
 #endif
 }
 

@@ -39,7 +39,7 @@
 static inline void
 booz2_analog_baro_calibrate(void)
 {
-    RunOnceEvery(10, {
+    RunOnceEvery(60, {
 	if (booz2_analog_baro_value_filtered < 850 && booz2_analog_baro_offset >= 1) 
     {
         if (booz2_analog_baro_value_filtered == 0)

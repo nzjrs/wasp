@@ -166,6 +166,19 @@
       <field name="alt" type="float"/>
    </message>
 
+   <message name="ANALOG" id="39">
+      <field name="battery" type="uint16"/>
+      <field name="pressure" type="uint16"/>
+      <field name="adc_spare" type="uint16"/>
+      <!--
+      <field name="chan4" type="uint16"/>
+      <field name="chan5" type="uint16"/>
+      <field name="chan6" type="uint16"/>
+      <field name="chan7" type="uint16"/>
+      <field name="chan8" type="uint16"/>
+      -->
+   </message>
+
    <!-- Begin periodic messages -->
    <periodic channel="COMM_0">
       <message name="COMM_STATUS" frequency="0.25"/>

@@ -83,6 +83,9 @@ static inline void autopilot_main_init( void ) {
   gps_init();
 
   analog_init();
+  analog_enable_channel(ANALOG_CHANNEL_BATTERY);
+  analog_enable_channel(ANALOG_CHANNEL_PRESSURE);
+
   altimeter_init();
 
   imu_init();
@@ -105,6 +108,8 @@ static inline void autopilot_main_init( void ) {
 
 static inline void autopilot_main_periodic( void ) {
   static uint8_t _cnt = 0;
+
+  analog_periodic_task();
 
   /* read imu */
   imu_periodic_task();
@@ -143,6 +148,8 @@ static inline void autopilot_main_periodic( void ) {
 
 static inline void autopilot_main_event( void ) {
   uint8_t valid = 0;
+
+  analog_event_task();
 
   if (rc_event_task())
     booz2_autopilot_on_rc_event();

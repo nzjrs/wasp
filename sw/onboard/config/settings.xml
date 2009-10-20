@@ -6,8 +6,8 @@
     <setting name="MODE_AUTO2" value="BOOZ2_AP_MODE_ATTITUDE_DIRECT" doc="Autopilot mode 2"/>
   </section>
   <section name="ANALOG">
-    <setting name="BATTERY_SENS" value="0.0" integer="8"/>
-    <setting name="ADC_SPARE_SENS" value="0.0" integer="8"/>
+    <setting name="BATTERY_SENS" value="0.018387097" integer="16"/>
+    <setting name="ADC_SPARE_SENS" value="0.0" integer="16"/>
   </section>
   <section name="INS">
     <setting name="BARO_SENS" value="15.0" integer="8"/>

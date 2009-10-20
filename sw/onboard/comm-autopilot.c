@@ -122,6 +122,18 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &altimeter_system_status,
                     &comm_system_status);
             break;
+        case MESSAGE_ID_ANALOG:
+            {
+            uint16_t c1 = analog_read_channel(ANALOG_CHANNEL_BATTERY);
+            uint16_t c2 = analog_read_channel(ANALOG_CHANNEL_PRESSURE);
+            uint16_t c3 = analog_read_channel(ANALOG_CHANNEL_ADC_SPARE);
+            MESSAGE_SEND_ANALOG(
+                    chan,
+                    &c1,
+                    &c2,
+                    &c3);
+            }
+            break;
         default:
             ret = FALSE;
             break;
