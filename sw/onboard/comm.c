@@ -268,7 +268,7 @@ comm_install_new_periodic_task ( CommChannel_t chan, CommMessage_t *msg )
     for (i = 0; i < NUM_PERIODIC_MESSAGES; i++) 
     {
         p = &periodic_messages[i];
-        if (p->msgid == MESSAGE_ID_NONE) {
+        if (p->msgid == MESSAGE_ID_NONE || p->msgid == msgid) {
             p->target = 60.0/freq;
             p->cnt = 0;
             p->msgid = msgid;
