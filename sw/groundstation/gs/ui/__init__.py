@@ -4,6 +4,18 @@ import gtk
 
 LOG = logging.getLogger('gs.ui')
 
+def message_dialog(message, parent, dialogtype=gtk.MESSAGE_ERROR, secondary=None):
+    m = gtk.MessageDialog(
+                parent,
+                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                dialogtype,
+                gtk.BUTTONS_OK,
+                message)
+    if secondary:
+        m.format_secondary_text(secondary)
+    m.run()
+    m.destroy()
+
 def make_label(text, width=None):
     l = gtk.Label(text)
     if width == None:
