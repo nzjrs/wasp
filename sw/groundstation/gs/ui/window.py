@@ -1,12 +1,20 @@
 import gtk
 
 class DialogWindow(gtk.Window):
-    def __init__(self, name, hide=True):
+    def __init__(self, name, hide=True, parent=None):
         gtk.Window.__init__(self)
         self.set_title(name)
 
+        if parent:
+            self.set_transient_for(parent)
+            self.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+
+        alignment = gtk.Alignment()
+        alignment.set_padding(5,5,5,5)
+        self.add(alignment)
+
         self.vbox = gtk.VBox(spacing=4)
-        self.add(self.vbox)
+        alignment.add(self.vbox)
 
         bb = gtk.HButtonBox()
         bb.props.layout_style = gtk.BUTTONBOX_END

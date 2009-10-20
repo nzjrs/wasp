@@ -71,7 +71,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._home_lon = self.CONFIG_LON_DEFAULT
         self._home_zoom = self.CONFIG_ZOOM_DEFAULT
 
-        self._window = self.get_resource("main_window")
+        self.window = self.get_resource("main_window")
 
         self._config = Config(filename=prefsfile)
         ConfigurableIface.__init__(self, self._config)
@@ -103,7 +103,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
 
         self._map = Map(self._config, self._source)
-        self._gm = GraphManager(self._config, self._source, self._messagesfile, self.get_resource("graphs_box"), self._window)
+        self._gm = GraphManager(self._config, self._source, self._messagesfile, self.get_resource("graphs_box"), self.window)
         self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
@@ -148,7 +148,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("menu_item_autopilot_disable").set_sensitive(False)
         self.builder_connect_signals()
 
-        self._window.show_all()
+        self.window.show_all()
 
     def _create_telemetry_ui(self):
         def on_gb_clicked(btn, _tv, _gm):
@@ -308,11 +308,12 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         return False
 
     def on_menu_item_request_telemetry_activate(self, *args):
-        dlg = DialogWindow("Requrest Telemetry")
+        dlg = DialogWindow(
+                "Requrest Telemetry",
+                parent=self.window)
 
         rm = RequestTelemetrySender(self._messagesfile)
         rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
-        rm.show_all()
         dlg.vbox.pack_start(rm, False, False)
 
         dlg.show_all()
@@ -338,7 +339,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def on_menu_item_preferences_activate(self, widget):
         if not self._prefs_window:
-            self._prefs_window = ConfigWindow(self._window, self._configurable)
+            self._prefs_window = ConfigWindow(self.window, self._configurable)
 
         resp = self._prefs_window.show(self._config)
         #If the user clicked ok to the dialog, update all 
@@ -371,7 +372,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         dlg.destroy()
         
     def on_menu_item_dock_all_activate(self, widget):
-        message_dialog("Not Implemented", self._window)
+        message_dialog("Not Implemented", self.window)
         
     def db_chooser_callback(self, widget):
         filename = widget.get_filename()
@@ -395,7 +396,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             db.close()
 
     def on_menu_item_show_previous_activate(self, widget):
-        message_dialog("Not Implemented", self._window)
+        message_dialog("Not Implemented", self.window)
 
     def on_menu_item_plane_view_activate(self, widget):
         if self._plane_view == None:

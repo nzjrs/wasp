@@ -50,6 +50,8 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
         self.get_resource("close_button").connect("clicked", self._on_close)
         self.get_resource("cancel_button").connect("clicked", self._on_cancel)
 
+        self._parent_window = groundstation_window.window
+
     def _setup_target_combobox(self, targets):
         #fill the models with names of targets and add to the combo box
         model = gtk.ListStore(str)
@@ -64,6 +66,8 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
         cb.set_active(0)
 
     def _show_window(self, *args):
+        self._win.set_transient_for(self._parent_window)
+        self._win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self._win.show_all()
 
     def _set_status_label(self, txt):
