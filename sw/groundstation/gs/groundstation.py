@@ -439,13 +439,13 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     def on_menu_item_clear_previous_activate(self, widget):
         self._map.clear_tracks()
 
-    def on_map_autocenter_property_change(self, osm, param):
+    def on_map_autocenter_property_change(self, osm, *args):
         self.get_resource("menu_item_auto_centre").set_active(osm.get_property("auto-center"))
         
     def on_menu_item_auto_centre_toggled(self, widget):
         self._map.props.auto_center = widget.get_active()
 
-    def on_map_show_trip_history_property_change(self, osm, param):
+    def on_map_show_trip_history_property_change(self, osm, *args):
         self.get_resource("menu_item_show_path").set_active(osm.get_property("show-trip-history"))
 
     def on_menu_item_show_path_toggled(self, widget):
