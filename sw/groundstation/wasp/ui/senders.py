@@ -67,6 +67,7 @@ class RequestMessageSender(_MessageSender):
             for message in messagefile.get_messages():
                 if message.name != self.REQUEST_MESSAGE_NAME:
                     self._model.append( (message.name, message) )
+        self._cb.set_active(0)
 
     def request_send_message(self, msg):
         self.emit("send-message", self._rm, (msg.id, ))

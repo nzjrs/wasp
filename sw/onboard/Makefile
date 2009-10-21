@@ -29,7 +29,7 @@ SRC =                               \
     stabilization/booz2_stabilization_attitude.c  \
     autopilot/fixedwing_autopilot.c \
     comm.c                          \
-    comm-autopilot.c                \
+    comm_autopilot.c                \
     settings.c
 
 # Include arch specific sources

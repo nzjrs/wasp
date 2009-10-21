@@ -39,7 +39,7 @@ MCU         = arm7tdmi
 THUMB       = -mthumb
 THUMB_IW    = -mthumb-interwork
 FORMAT      = ihex
-LDSCRIPT    = LPC2148-ROM-bl.ld
+LDSCRIPT    = arch/arm7/LPC2148-ROM-bl.ld
 
 # Arch specific flags
 ARCHCFLAGS  = -mcpu=$(MCU) $(THUMB_IW)
