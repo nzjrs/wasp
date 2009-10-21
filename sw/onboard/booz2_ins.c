@@ -1,3 +1,25 @@
+/*
+ * Copyright (C) 2008 Antoine Drouin
+ * Copyright (C) 2009 John Stowers
+ *
+ * This file is part of wasp, some code taken from paparazzi (GPL)
+ *
+ * wasp is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * wasp is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with paparazzi; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ *
+ */
 #include "booz2_ins.h"
 
 #include "imu.h"
@@ -7,11 +29,11 @@
 #include "booz_geometry_mixed.h"
 
 #if USE_VFF
-#include "booz2_vf_float.h"
+#include "ins/booz2_vf_float.h"
 #endif
 
 #include "booz_ahrs.h"
-#include "booz2_hf_float.h"
+#include "ins/booz2_hf_float.h"
 
 #include "pprz_geodetic_int.h"
 
@@ -55,7 +77,7 @@ void booz_ins_init() {
 void booz_ins_propagate() {
 
 #if USE_VFF
-  if (altimeter_status == STATUS_INITIALIZED && booz_ins_baro_initialised) {
+  if (altimeter_system_status == STATUS_INITIALIZED && booz_ins_baro_initialised) {
     float accel_float = BOOZ_ACCEL_F_OF_I(booz_imu.accel.z);
     b2_vff_propagate(accel_float);
     booz_ins_ltp_accel.z = BOOZ_ACCEL_I_OF_F(b2_vff_zdotdot);
@@ -76,7 +98,7 @@ void booz_ins_propagate() {
 void booz_ins_update_baro() {
 
 #if USE_VFF
-  if (altimeter_status == STATUS_INITIALIZED) {
+  if (altimeter_system_status == STATUS_INITIALIZED) {
     uint32_t alt = altimeter_get_altitude();
     if (!booz_ins_baro_initialised) {
       booz_ins_qfe = alt;

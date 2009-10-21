@@ -9,8 +9,15 @@ class GObjectSerialMonitor(gobject.GObject):
 
     def __init__(self, serialsender):
         gobject.GObject.__init__(self)
-        self._watch = None   
+        self._watch = None
 
+        self.change_serialsender(serialsender)
+
+    def change_serialsender(self, serialsender):
+        #remove the old watch
+        if self._watch:
+            gobject.source_remove(self._watch)
+        #wait for connection
         serialsender.connect("serial-connected", self._on_serial_connected)
 
     def _on_serial_connected(self, serial, connected):

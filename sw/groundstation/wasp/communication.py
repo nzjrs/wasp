@@ -42,6 +42,7 @@ class DummySerialCommunication(gobject.GObject):
         self._header = header
 
         self._sendcache = {}
+        self._is_open = False
 
         #Write messages to the pipe, so that it is read and processed by
         #the groundstation
@@ -56,6 +57,8 @@ class DummySerialCommunication(gobject.GObject):
         self._generic_send(int(1000/10), "IMU_ACCEL_RAW")
         self._generic_send(int(1000/10), "IMU_MAG_RAW")
         self._generic_send(int(1000/10), "IMU_GYRO_RAW")
+        #PPM at 10hz
+        gobject.timeout_add(int(1000/10), self._do_ppm)
         #AHRS at 10hz
         gobject.timeout_add(int(1000/10), self._do_ahrs)
         #GPS at 4 Hz
@@ -105,15 +108,25 @@ class DummySerialCommunication(gobject.GObject):
     def _do_ahrs(self):
         return True
 
+    def _do_ppm(self):
+        msg = self._messages.get_message_by_name("PPM")
+        v = 10000
+        return self._send(msg, v, v, v, v, v, v)
+
     def get_fd(self):
         return self._readfd
 
     def connect_to_port(self):
         self.emit("serial-connected", True)
+        self._is_open = True
         return True
 
     def disconnect_from_port(self):
         self.emit("serial-connected", False)
+        self._is_open = False
+
+    def is_open(self):
+        return self._is_open
 
     def write(self, data):
         os.write(self._writefd, data)

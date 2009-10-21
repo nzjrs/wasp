@@ -35,16 +35,22 @@ XML = """<?xml version="1.0"?>
    <message name="REQUEST_MESSAGE" id="5">
      <field name="msgid" type="uint8"/>
    </message>
+   <message name="TEST_COEF" id="9">
+     <field name="a_int8" type="int8" alt_unit_coef="0.5"/>
+     <field name="a_float" type="float" alt_unit_coef="0.5"/>
+   </message>
    <periodic>
       <message name="TEST_MESSAGE" frequency="0.5"/>
    </periodic>
 </messages>"""
-NUM_MESSAGES = 3
+NUM_MESSAGES = 4
 
 PONG_ID = 2
 PONG_NAME = "PONG"
 TEST_ID = 26
 TEST_NAME = "TEST_MESSAGE"
+TEST_COEF_MSG_ID = 9
+TEST_COEF_MSG_NAME = "TEST_COEF"
 
 TEST_ACID = 0x78
 
@@ -55,6 +61,9 @@ TEST_MESSAGE_PAYLOAD = "\x01\xFF\xE8\x03\x18\xFC\xA0\x86\x01\x00\x60\x79\xFE\xFF
 PONG_MESSAGE_VALUES = ()
 PONG_MESSAGE_PRINT = ""
 PONG_MESSAGE_PAYLOAD = ""
+
+TEST_MESSAGE_COEF_VALUES = (10,10.5)
+TEST_MESSAGE_COEF_VALUES_SCALED = [5,5.25]
 
 def get_mf():
     mf = messages.MessagesFile(raw=XML, debug=False)

@@ -1,82 +1,30 @@
+/*
+ * Copyright (C) 2008 Antoine Drouin
+ * Copyright (C) 2009 John Stowers
+ *
+ * This file is part of wasp, some code taken from paparazzi (GPL)
+ *
+ * wasp is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * wasp is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with paparazzi; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ *
+ */
 /* This file has been generated from /home/john/Programming/paparazzi.gitsvn/conf/airframes/booz2_j1.xml */
 /* Please DO NOT EDIT */
 
 #ifndef AIRFRAME_H
 #define AIRFRAME_H 
-
-#define SERVOS_NB 4
-#define SERVO_FRONT 0
-#define SERVO_BACK 1
-#define SERVO_RIGHT 2
-#define SERVO_LEFT 3
-
-#define COMMAND_PITCH 0
-#define COMMAND_ROLL 1
-#define COMMAND_YAW 2
-#define COMMAND_THRUST 3
-#define COMMANDS_NB 4
-#define COMMANDS_FAILSAFE {0,0,0,0}
-
-#define SECTION_BUSS_BLMC 1
-#define BUSS_BLMC_ADDR { 0x52, 0x54, 0x56, 0x58 }
-
-#define SECTION_SUPERVISION 1
-#define SUPERVISION_FRONT_ROTOR_CW 1
-#define SUPERVISION_MIN_MOTOR 2
-#define SUPERVISION_MAX_MOTOR 210
-#define SUPERVISION_TRIM_A 0
-#define SUPERVISION_TRIM_E 0
-#define SUPERVISION_TRIM_R 1
-
-#define SECTION_IMU 1
-#define IMU_GYRO_P_CHAN 1
-#define IMU_GYRO_Q_CHAN 0
-#define IMU_GYRO_R_CHAN 2
-#define IMU_GYRO_P_NEUTRAL 33026
-#define IMU_GYRO_Q_NEUTRAL 32348
-#define IMU_GYRO_R_NEUTRAL 32524
-#define IMU_GYRO_P_SENS  1.01
-#define IMU_GYRO_P_SENS_NUM 101
-#define IMU_GYRO_P_SENS_DEN 100
-#define IMU_GYRO_Q_SENS -1.01
-#define IMU_GYRO_Q_SENS_NUM -101
-#define IMU_GYRO_Q_SENS_DEN 100
-#define IMU_GYRO_R_SENS -1.01
-#define IMU_GYRO_R_SENS_NUM -101
-#define IMU_GYRO_R_SENS_DEN 100
-#define IMU_ACCEL_X_CHAN 3
-#define IMU_ACCEL_Y_CHAN 5
-#define IMU_ACCEL_Z_CHAN 6
-#define IMU_ACCEL_X_SENS -2.44665442
-#define IMU_ACCEL_X_SENS_NUM -69255
-#define IMU_ACCEL_X_SENS_DEN 28306
-#define IMU_ACCEL_Y_SENS -2.44994081
-#define IMU_ACCEL_Y_SENS_NUM -28973
-#define IMU_ACCEL_Y_SENS_DEN 11826
-#define IMU_ACCEL_Z_SENS -2.50555481
-#define IMU_ACCEL_Z_SENS_NUM 18719
-#define IMU_ACCEL_Z_SENS_DEN -7471
-#define IMU_ACCEL_X_NEUTRAL 32311
-#define IMU_ACCEL_Y_NEUTRAL 32536
-#define IMU_ACCEL_Z_NEUTRAL 32779
-#define IMU_MAG_X_CHAN 0
-#define IMU_MAG_Y_CHAN 1
-#define IMU_MAG_Z_CHAN 2
-#define IMU_MAG_X_NEUTRAL -12
-#define IMU_MAG_Y_NEUTRAL -10
-#define IMU_MAG_Z_NEUTRAL -11
-#define IMU_MAG_X_SENS 22.008352
-#define IMU_MAG_X_SENS_NUM 39527
-#define IMU_MAG_X_SENS_DEN 1796
-#define IMU_MAG_Y_SENS -21.79885
-#define IMU_MAG_Y_SENS_NUM -216092
-#define IMU_MAG_Y_SENS_DEN 9913
-#define IMU_MAG_Z_SENS -14.675745
-#define IMU_MAG_Z_SENS_NUM -45803
-#define IMU_MAG_Z_SENS_DEN 3121
-#define IMU_BODY_TO_IMU_PHI ANGLE_BFP_OF_REAL(RadOfDeg(0.75))
-#define IMU_BODY_TO_IMU_THETA ANGLE_BFP_OF_REAL(RadOfDeg(1.50))
-#define IMU_BODY_TO_IMU_PSI ANGLE_BFP_OF_REAL(RadOfDeg(0.00))
 
 #define SECTION_STABILIZATION_RATE 1
 #define BOOZ_STABILIZATION_RATE_SP_MAX_P 10000
@@ -100,11 +48,6 @@
 #define BOOZ_STABILIZATION_ATTITUDE_PSI_DDGAIN  300
 #define BOOZ_STABILIZATION_ATTITUDE_PSI_IGAIN -75
 
-#define SECTION_INS 1
-#define BOOZ_INS_BARO_SENS 15.
-#define BOOZ_INS_BARO_SENS_NUM 15
-#define BOOZ_INS_BARO_SENS_DEN 1
-
 #define SECTION_GUIDANCE_V 1
 #define BOOZ2_GUIDANCE_V_MIN_ERR_Z BOOZ_POS_I_OF_F(-10.)
 #define BOOZ2_GUIDANCE_V_MAX_ERR_Z BOOZ_POS_I_OF_F( 10.)
@@ -120,22 +63,7 @@
 #define BOOZ2_GUIDANCE_H_DGAIN -0
 #define BOOZ2_GUIDANCE_H_IGAIN -5
 
-#define SECTION_BAT 1
-#define MILLIAMP_PER_PERCENT 0.86
-#define CATASTROPHIC_BAT_LEVEL 9.3
-#define BATTERY_SENS 0.48
-#define BATTERY_SENS_NUM 12
-#define BATTERY_SENS_DEN 25
-
-#define SECTION_AUTOPILOT 1
-#define BOOZ2_MODE_MANUAL BOOZ2_AP_MODE_RATE_DIRECT
-#define BOOZ2_MODE_AUTO1 BOOZ2_AP_MODE_HOVER_DIRECT
-#define BOOZ2_MODE_AUTO2 BOOZ2_AP_MODE_ATTITUDE_DIRECT
-
-#define SECTION_FMS 1
-
 #define SECTION_MISC 1
 #define BOOZ2_FACE_REINJ_1 1024
-
 
 #endif // AIRFRAME_H

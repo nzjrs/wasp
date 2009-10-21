@@ -35,7 +35,7 @@ class SettingsTreeviewTest(unittest.TestCase):
         ts = treeview.SettingsTreeStore()
         for s in self.sf.all_settings:
             ts.add_setting(s)
-        tv = treeview.SettingsTreeView(ts, show_all=True)
+        tv = treeview.SettingsTreeView(ts, show_only_dynamic=False, show_all_colums=True)
 
         refresh_gui()
 

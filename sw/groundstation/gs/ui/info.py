@@ -23,10 +23,13 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         self.get_resource("comm_image").set_from_pixbuf(
                 gs.ui.get_icon_pixbuf("radio.svg"))
 
-        self.pb = progressbar.ProgressBar(range=(8,15), average=5)
-        self.get_resource("batt_hbox").pack_start(self.pb, False)
+        self._batt_pb = progressbar.ProgressBar(range=(8,15), average=5)
+        self.get_resource("batt_hbox").pack_start(self._batt_pb, False)
 
-        source.serial.connect("serial-connected", self._on_serial_connected, source)
+        self._cpu_pb = progressbar.ProgressBar(range=(0,100))
+        self.get_resource("cpu_hbox").pack_start(self._cpu_pb, False)
+
+        source.connect("source-connected", self._on_source_connected)
 
         source.register_interest(self._on_status, 5, "STATUS")
         source.register_interest(self._on_comm_status, 5, "COMM_STATUS")
@@ -39,18 +42,17 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         self.get_resource("rate_value").set_text("%.1f msgs/s" % source.get_messages_per_second())
         return True
 
-    def _on_serial_connected(self, serial, connected, source):
+    def _on_source_connected(self, source, connected):
         if connected:
             self.get_resource("connected_value").set_text("YES")
-
-            port, speed = source.get_connection_parameters()
-            self.get_resource("port_value").set_text(port)
-            self.get_resource("speed_value").set_text("%s baud" % speed)
         else:
             self.get_resource("connected_value").set_text("NO")
+        port, speed = source.get_connection_parameters()
+        self.get_resource("port_value").set_text(port)
+        self.get_resource("speed_value").set_text("%s baud" % speed)
 
     def _on_status(self, msg, payload):
-        rc, gps, bv, in_flight, motors_on, autopilot_mode = msg.unpack_values(payload)
+        rc, gps, bv, in_flight, motors_on, autopilot_mode, cpu_usage = msg.unpack_values(payload)
         self.get_resource("rc_value").set_text(
                 msg.get_field_by_name("rc").get_printable_value(rc))
         self.get_resource("gps_value").set_text(
@@ -62,7 +64,8 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         self.get_resource("autopilot_mode_value").set_text(
                 msg.get_field_by_name("autopilot_mode").get_printable_value(autopilot_mode))
 
-        self.pb.set_value(bv/10.0)
+        self._cpu_pb.set_value(cpu_usage)
+        self._batt_pb.set_value(bv/10.0)
 
     def _on_comm_status(self, msg, payload):
         overruns, errors = msg.unpack_printable_values(payload, joiner=None)
@@ -88,14 +91,3 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         t = datetime.datetime.fromtimestamp(int(time))
         self.get_resource("time_value").set_text(t.strftime("%d/%m/%Y %H:%M:%S"))
 
-if __name__ == "__main__":
-    i = InfoBox()
-
-    w = gtk.Window()
-    w.add(i.widget)
-    w.show_all()
-    w.connect("delete-event", lambda *a: gtk.main_quit())
-
-    i.set_build_info("123", 0, 0, 0, 0)
-
-    gtk.main()

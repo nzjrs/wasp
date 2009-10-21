@@ -33,6 +33,7 @@
      <field name="in_flight" type="uint8" values="ON_GROUND|IN_FLIGHT"/>
      <field name="motors_on" type="uint8" values="MOTORS_OFF|MOTORS_ON"/>
      <field name="autopilot_mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|HOVER_DIRECT|HOVER_Z_HOLD|NAV"/>
+     <field name="cpu_usage" type="uint8" unit="pct"/>
    </message>
 
    <message name="BUILD_INFO" id="9">
@@ -67,6 +68,13 @@
      <field name="mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|HOVER_DIRECT|HOVER_Z_HOLD|NAV"/>
      <field name="h_mode" type="uint8" values="KILL|RATE|ATTITUDE|HOVER|NAV"/>
      <field name="v_mode" type="uint8" values="KILL|RC_DIRECT|RC_CLIMB|CLIMB|HOVER|NAV"/>
+   </message>
+
+   <message name="STATUS_LOWLEVEL" id="15">
+     <field name="rc" type="uint8"          values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
+     <field name="gps" type="uint8"         values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
+     <field name="altimeter" type="uint8"   values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
+     <field name="comm" type="uint8"        values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
    </message>
 
    <!-- Begin custom messages at 25 -->
@@ -137,8 +145,9 @@
    <message name="GPS_LLH" id="36">
       <field name="fix" type="uint8" values="NONE|2D|3D"/>
       <field name="sv" type="uint8"/>
-      <field name="lat"  type="int32"/>
-      <field name="lon"  type="int32"/>
+      <!-- scale value of 1e7 taken from ublox datasheet -->
+      <field name="lat"  type="int32" alt_unit_coef="1e-7"/> 
+      <field name="lon"  type="int32" alt_unit_coef="1e-7"/>
       <field name="hsl"  type="int32" unit="mm"/>
       <field name="hacc"  type="int32" unit="mm"/>
       <field name="vacc"  type="int32" unit="mm"/>
@@ -151,14 +160,33 @@
       <field name="baro_value" type="uint16"/>
    </message>
 
+   <message name="MARK_HOME" id="38">
+      <field name="lat" type="float"/>
+      <field name="lon" type="float"/>
+      <field name="alt" type="float"/>
+   </message>
+
+   <message name="ANALOG" id="39">
+      <field name="battery" type="uint16"/>
+      <field name="pressure" type="uint16"/>
+      <field name="adc_spare" type="uint16"/>
+      <!--
+      <field name="chan4" type="uint16"/>
+      <field name="chan5" type="uint16"/>
+      <field name="chan6" type="uint16"/>
+      <field name="chan7" type="uint16"/>
+      <field name="chan8" type="uint16"/>
+      -->
+   </message>
+
    <!-- Begin periodic messages -->
    <periodic channel="COMM_0">
       <message name="COMM_STATUS" frequency="0.25"/>
    </periodic>
 
-   <periodic channel="COMM_1">
+   <periodic channel="COMM_1" adjustable="2">
       <message name="COMM_STATUS" frequency="0.25"/>
-      <message name="STATUS" frequency="0.5"/>
+      <message name="STATUS" frequency="1"/>
       <message name="TIME" frequency="0.1"/>
       <message name="GPS_LLH" frequency="0.1"/>
    </periodic>

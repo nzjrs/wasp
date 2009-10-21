@@ -1,16 +1,16 @@
 /*
- * $Id$
- *  
  * Copyright (C) 2008  Antoine Drouin
+ * Copyright (C) 2008 Antoine Drouin
+ * Copyright (C) 2009 John Stowers
  *
- * This file is part of paparazzi.
+ * This file is part of wasp, some code taken from paparazzi (GPL)
  *
- * paparazzi is free software; you can redistribute it and/or modify
+ * wasp is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
- * paparazzi is distributed in the hope that it will be useful,
+ * wasp is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with paparazzi; see the file COPYING.  If not, write to
  * the Free Software Foundation, 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA. 
+ * Boston, MA 02111-1307, USA.
  *
  */
 
@@ -33,62 +33,65 @@
 #include "rc.h"
 
 #include "comm.h"
-#include "comm-autopilot.h"
+#include "comm_autopilot.h"
 
 #include "imu.h"
 #include "analog.h"
 #include "altimeter.h"
 
-#include "booz2_fms.h"
-#include "booz2_autopilot.h"
-#include "booz2_stabilization_rate.h"
-#include "booz2_stabilization_attitude.h"
+#include "fms/booz2_fms.h"
+#include "autopilot.h"
+#include "stabilization/booz2_stabilization_rate.h"
+#include "stabilization/booz2_stabilization_attitude.h"
 
 #include "gps.h"
-#include "booz2_guidance_h.h"
-#include "booz2_guidance_v.h"
+#include "guidance/booz2_guidance_h.h"
+#include "guidance/booz2_guidance_v.h"
 #include "booz2_navigation.h"
 
-#include "booz_ahrs_aligner.h"
+#include "ahrs/booz_ahrs_aligner.h"
 #include "booz_ahrs.h"
 #include "booz2_ins.h"
 
 #include "autopilot_main.h"
 
-uint32_t t0, t1, diff;
-
 int main( void ) {
-  booz2_main_init();
-  while(1) {
-    if (sys_time_periodic())
-      booz2_main_periodic();
-    booz2_main_event();
-  }
-  return 0;
+    autopilot_main_init();
+    while(1) {
+        if (sys_time_periodic()) {
+            autopilot_main_periodic();
+            sys_time_calculate_cpu_usage();
+        }
+        autopilot_main_event();
+    }
+    return 0;
 }
 
-STATIC_INLINE void booz2_main_init( void ) {
+static inline void autopilot_main_init( void ) {
   hw_init();
   sys_time_init();
   led_init();
 
-  actuators_init();
+  actuators_init(ACTUATOR_BANK_MOTORS);
 
   rc_init();
 
   comm_init(COMM_1);
-  comm_add_tx_callback(COMM_1, comm_autopilot_send);
+  comm_add_tx_callback(COMM_1, comm_autopilot_message_send);
   comm_add_rx_callback(COMM_1, comm_autopilot_message_received);
 
   gps_init();
 
   analog_init();
+  analog_enable_channel(ANALOG_CHANNEL_BATTERY);
+  analog_enable_channel(ANALOG_CHANNEL_PRESSURE);
+
   altimeter_init();
 
   imu_init();
 
   booz_fms_init();
-  booz2_autopilot_init();
+  autopilot_init();
   booz2_nav_init();
   booz2_guidance_h_init();
   booz2_guidance_v_init();
@@ -103,16 +106,18 @@ STATIC_INLINE void booz2_main_init( void ) {
   int_enable();
 }
 
-STATIC_INLINE void booz2_main_periodic( void ) {
+static inline void autopilot_main_periodic( void ) {
   static uint8_t _cnt = 0;
-  //  t0 = T0TC;
 
+  analog_periodic_task();
+
+  /* read imu */
   imu_periodic_task();
 
   /* run control loops */
-  booz2_autopilot_periodic();
+  autopilot_periodic();
   /* set actuators     */
-  booz2_autopilot_set_actuators();
+  autopilot_set_actuators();
 
   /* Run the following tasks 10x times slower than the periodic rate */
   _cnt++;
@@ -128,7 +133,7 @@ STATIC_INLINE void booz2_main_periodic( void ) {
         else
         {
             led_off(RC_LED);
-            booz2_autopilot_set_mode(BOOZ2_AP_MODE_FAILSAFE);
+            autopilot_set_mode(BOOZ2_AP_MODE_FAILSAFE);
         }
         break;
     case 1:
@@ -139,18 +144,15 @@ STATIC_INLINE void booz2_main_periodic( void ) {
         break;
     }
 
-  //  t1 = T0TC;
-  //  diff = t1 - t0;
-  //  RunOnceEvery(100, {DOWNLINK_SEND_TIME(&diff);});
-  //  t0 = t1;
-
 }
 
-STATIC_INLINE void booz2_main_event( void ) {
+static inline void autopilot_main_event( void ) {
   uint8_t valid = 0;
 
+  analog_event_task();
+
   if (rc_event_task())
-    booz2_autopilot_on_rc_event();
+    autopilot_on_rc_event();
 
   valid = imu_event_task();
   if ( (valid & IMU_ACC) || (valid & IMU_GYR) ) 

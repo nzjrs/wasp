@@ -2,7 +2,7 @@ import math
 import os.path
 import logging
 import tempfile
-
+import datetime
 import pango
 import gtk
 import gobject
@@ -17,6 +17,8 @@ except:
 import gs.ui
 import gs.ui.custom as custom
 import gs.config as config
+import gs.geo as geo
+import gs.geo.kml as kml
 
 LOG = logging.getLogger('map')
 
@@ -120,7 +122,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
     CONFIG_SECTION = "MAP"
 
     DEFAULT_PROXY = os.environ.get("http_proxy", "")
-    DEFAULT_CACHE = tempfile.gettempdir()
+    DEFAULT_CACHE = os.environ.get("XDG_CACHE_HOME", os.path.join(os.environ['HOME'], ".cache", "wasp"))
     if os.name == "nt":
         DEFAULT_SOURCE = "0"
     else:
@@ -140,6 +142,10 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         self._cbs = {}
         self._kwargs = {}
 
+        #tracks the flight from Mark Home -> export kml
+        self._flight_track = []
+        self._flight_started = None
+
         self.lat = None
         self.lon = None
 
@@ -158,25 +164,37 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         self._alt.update_pixel_x(allocation.width/2)
 
     def _on_gps(self, msg, payload):
-        fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_values(payload)
+        fix,sv,self.lat,self.lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
 
-        #scale 1e7 from UBlox protocol datasheet
-        lat = lat/1e7
-        lon = lon/1e7
         #convert from mm to m
         hsl = hsl/1000.0
 
-        self.lat = lat
-        self.lon = lon
-
         if fix:
             if MAP_AVAILABLE:
-                self._map.draw_gps(lat, lon, 0)
+                self._map.draw_gps(self.lat, self.lon, 0)
 
                 px, py = self._map.geographic_to_screen(self.lat, self.lon)
                 self._alt.update_pixel_x_and_altitude(px, hsl)
             else:
                 self._alt.update_altitude(hsl)
+
+            self._flight_track.append( geo.GeoPoint(lat=self.lat, lon=self.lon, alt=hsl) )
+
+    def save_kml(self, path=None):
+        if self._flight_track and self._flight_started:
+            if not path:
+                path = gs.user_file_path(
+                            self._flight_started.strftime("%d-%b-%y %H-%M-%S.kml"))
+
+            f = open(path,"w")
+            k = kml.KmlDoc("test")
+            k.add_trackpoints(self._flight_track)
+            k.write(f)
+            f.close()
+        else:
+            path = None
+
+        return path
 
     def get_widget(self):
         return self._pane
@@ -197,6 +215,9 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
             self._proxy = None
         if self._cache == "":
             self._cache = None
+        else:
+            if not os.path.isdir(self._cache):
+                os.makedirs(self._cache)
 
         if not self._map:
             if MAP_AVAILABLE:
@@ -256,6 +277,15 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
     def centre(self):
         self._map.set_zoom(self._map.props.max_zoom)
+
+    def mark_home(self, lat, lon):
+        self._map.add_image(
+                    lat,lon,
+                    gs.ui.get_icon_pixbuf(stock=gtk.STOCK_HOME, size=gtk.ICON_SIZE_MENU))
+
+        #reset the track
+        self._flight_track = []
+        self._flight_started = datetime.datetime.now()
 
     def show_cache_dialog(self, msgarea):
 

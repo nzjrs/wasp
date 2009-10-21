@@ -1,3 +1,25 @@
+/*
+ * Copyright (C) 2008 Antoine Drouin
+ * Copyright (C) 2009 John Stowers
+ *
+ * This file is part of wasp, some code taken from paparazzi (GPL)
+ *
+ * wasp is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * wasp is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with paparazzi; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ *
+ */
 #ifndef CONFIG_BOOZ2_V1_0_H
 #define CONFIG_BOOZ2_V1_0_H
 
@@ -41,18 +63,24 @@
 #define BOOZ2_ANALOG_BARO_LED   2
 #define AHRS_ALIGNER_LED        3
 
-/* PPM : rc rx on P0.28 ( CAP0.2 ) */
-#define PPM_PINSEL      PINSEL1
-#define PPM_PINSEL_VAL  0x02
-#define PPM_PINSEL_BIT  24
-
 /* ADC */
+/* battery: P0.29 AD0.2 */
+#define ANALOG_BATT_PINSEL      PINSEL1
+#define ANALOG_BATT_PINSEL_VAL  0x01
+#define ANALOG_BATT_PINSEL_BIT  26
+
+/* adc_spare: P0.13 AD1.4 */
+#define ANALOG_SPARE_PINSEL     PINSEL0
+#define ANALOG_SPARE_PINSEL_VAL 0x03
+#define ANALOG_SPARE_PINSEL_BIT 26
 
 /* pressure : P0.10 AD1.2 */
 #define ANALOG_BARO_PINSEL      PINSEL0
 #define ANALOG_BARO_PINSEL_VAL  0x03
 #define ANALOG_BARO_PINSEL_BIT  20
-#define ANALOG_BARO_ADC         1
+
+/* use the onboard analog baro */
+#define USE_ANALOG_BARO         1
 
 /* Micromag on SSP, IMU connector */
 #define MM_SS_PIN   28
@@ -72,17 +100,21 @@
 #define MM_DRDY_EINT        3
 #define MM_DRDY_VIC_IT      VIC_EINT3
 
-// damit, we have two of them now
-//#define POWER_SWITCH_LED 3
-
 /* Servos: 4017 servo driver on CAM connector */
-#define USE_SERVOS_4017         0
-#define SERVO_CLOCK_PIN         28          /* P0.28 aka MAT0.2  */
-#define SERVO_CLOCK_PINSEL      PINSEL0
-#define SERVO_CLOCK_PINSEL_VAL  0x02
-#define SERVO_CLOCK_PINSEL_BIT  10
-#define SERVO_DATA_PIN          23          /* p1.23 */
-#define SERVO_RESET_PIN         24          /* p1.24 */
+#define USE_SERVOS_4017         1
+#define SERVOS_4017_NB_CHANNELS 10
+
+#define SERVO_CLOCK_IODIR       IO0DIR
+#define SERVO_CLOCK_PIN         22          /* P0.22 aka MAT0.0  */
+#define SERVO_CLOCK_PINSEL      PINSEL1
+#define SERVO_CLOCK_PINSEL_VAL  0x03
+#define SERVO_CLOCK_PINSEL_BIT  12
+
+#define SERVO_RESET_PIN         21          /* P0.21 aka PWM5 */
+//#define SERVO_RESET_PIN         13          /* P0.13 aka PWM5 aka ADC_SPARE */
+#define SERVO_RESET_IODIR       IO0DIR
+#define SERVO_RESET_IOSET       IO0SET
+#define SERVO_RESET_IOCLR       IO0CLR
 
 /* Time */
 #define PERIODIC_TASK_PERIOD SYS_TICS_OF_SEC((1./512.))
@@ -92,6 +124,12 @@
 #define RC_FUTABA           0
 #define RC_JR               1
 #define RADIO_CONTROL_TYPE  RC_FUTABA
+
+/* PPM : rc rx on P0.28 ( CAP0.2 ) */
+#define PPM_PINSEL      PINSEL1
+#define PPM_PINSEL_VAL  0x02
+#define PPM_PINSEL_BIT  24
+
 
 /* UARTS */
 #define USE_UART0 1
@@ -128,8 +166,6 @@
 
 /* VIC */
 #define TIMER0_VIC_SLOT             1
-#define ADC0_VIC_SLOT               2
-#define ADC1_VIC_SLOT               3
 #define UART0_VIC_SLOT              5
 #define UART1_VIC_SLOT              6
 #define USB_VIC_SLOT                7

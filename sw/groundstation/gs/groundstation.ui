@@ -72,8 +72,9 @@
     <child>
       <object class="GtkVBox" id="window_vbox">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <child>
-          <object class="GtkMenuBar" id="menubar1">
+          <object class="GtkMenuBar" id="main_menubar">
             <property name="visible">True</property>
             <child>
               <object class="GtkMenuItem" id="menu_item_file">
@@ -115,17 +116,6 @@
                         <property name="accel_group">accelgroup1</property>
                         <property name="always_show_image">True</property>
                         <signal name="activate" handler="on_menu_item_preferences_activate"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="menu_item_flight_props">
-                        <property name="label">gtk-execute</property>
-                        <property name="visible">True</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <property name="accel_group">accelgroup1</property>
-                        <property name="always_show_image">True</property>
-                        <signal name="activate" handler="on_flight_props_activate"/>
                       </object>
                     </child>
                     <child>
@@ -312,6 +302,7 @@
                       <object class="GtkImageMenuItem" id="menu_item_show_previous">
                         <property name="label">Add Previous Path</property>
                         <property name="visible">True</property>
+                        <property name="image">image19</property>
                         <property name="use_stock">False</property>
                         <property name="accel_group">accelgroup1</property>
                         <property name="always_show_image">True</property>
@@ -329,6 +320,15 @@
                         <signal name="activate" handler="on_menu_item_clear_previous_activate"/>
                       </object>
                     </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="menu_item_export_kml">
+                        <property name="label" translatable="yes">Export Current Path to KML</property>
+                        <property name="visible">True</property>
+                        <property name="image">image18</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_menu_item_export_kml_activate"/>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>
@@ -339,7 +339,7 @@
                 <property name="label" translatable="yes">_UAV</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
-                  <object class="GtkMenu" id="autopilot_menu">
+                  <object class="GtkMenu" id="uav_menu">
                     <property name="visible">True</property>
                     <child>
                       <object class="GtkImageMenuItem" id="menu_item_refresh_uav">
@@ -348,6 +348,15 @@
                         <property name="image">image15</property>
                         <property name="use_stock">False</property>
                         <signal name="activate" handler="on_menu_item_refresh_uav_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="menu_item_request_telemetry">
+                        <property name="label" translatable="yes">Request Telemetry</property>
+                        <property name="visible">True</property>
+                        <property name="image">image17</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_menu_item_request_telemetry_activate"/>
                       </object>
                     </child>
                     <child>
@@ -376,6 +385,20 @@
                         <property name="accel_group">accelgroup1</property>
                         <property name="always_show_image">True</property>
                         <signal name="activate" handler="on_autopilot_disable_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separatormenuitem3">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="imagemenuitem1">
+                        <property name="label" translatable="yes">Mark Home</property>
+                        <property name="visible">True</property>
+                        <property name="image">image16</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_uav_mark_home"/>
                       </object>
                     </child>
                   </object>
@@ -1380,7 +1403,7 @@
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="button3">
-                <property name="label" translatable="yes">gtk-cancel</property>
+                <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -1394,7 +1417,7 @@
             </child>
             <child>
               <object class="GtkButton" id="button4">
-                <property name="label" translatable="yes">gtk-ok</property>
+                <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -1451,7 +1474,7 @@
                           <object class="GtkHBox" id="hbox3">
                             <property name="visible">True</property>
                             <child>
-                              <object class="GtkLabel" id="label2">
+                              <object class="GtkLabel" id="label200">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
                                 <property name="label" translatable="yes">Date:</property>
@@ -1503,7 +1526,7 @@
                   </object>
                 </child>
                 <child type="label">
-                  <object class="GtkLabel" id="label1">
+                  <object class="GtkLabel" id="label100">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">&lt;b&gt;Flight Details&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
@@ -1570,7 +1593,7 @@
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="button2">
-                <property name="label" translatable="yes">gtk-cancel</property>
+                <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -1584,7 +1607,7 @@
             </child>
             <child>
               <object class="GtkButton" id="button1">
-                <property name="label" translatable="yes">gtk-ok</property>
+                <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -1713,5 +1736,22 @@
     <property name="visible">True</property>
     <property name="stock">gtk-justify-center</property>
     <property name="icon-size">1</property>
+  </object>
+  <object class="GtkImage" id="image16">
+    <property name="visible">True</property>
+    <property name="stock">gtk-home</property>
+  </object>
+  <object class="GtkImage" id="image17">
+    <property name="visible">True</property>
+    <property name="stock">gtk-info</property>
+  </object>
+  <object class="GtkImage" id="image18">
+    <property name="visible">True</property>
+    <property name="stock">gtk-save-as</property>
+    <property name="icon-size">1</property>
+  </object>
+  <object class="GtkImage" id="image19">
+    <property name="visible">True</property>
+    <property name="stock">gtk-add</property>
   </object>
 </interface>

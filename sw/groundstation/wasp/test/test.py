@@ -47,6 +47,7 @@ class MessageTest(unittest.TestCase):
         mf = get_mf()
         self.test = mf.get_message_by_name(TEST_NAME)
         self.pong = mf.get_message_by_name(PONG_NAME)
+        self.test_coef = mf.get_message_by_name(TEST_COEF_MSG_NAME)
 
     def testName(self):
         self.assertEqual(self.test.name, TEST_NAME)
@@ -79,11 +80,18 @@ class MessageTest(unittest.TestCase):
         pr = self.test.unpack_printable_values(pl)
         self.failUnlessEqual(pr, TEST_MESSAGE_PRINT)
 
+    def testTestMessageCoef(self):
+        pl = self.test_coef.pack_values( *TEST_MESSAGE_COEF_VALUES )
+
+        d = self.test_coef.unpack_scaled_values(pl)
+        self.failUnlessEqual(d, TEST_MESSAGE_COEF_VALUES_SCALED)
+
 class FieldTest(unittest.TestCase):
     def setUp(self):
         mf = get_mf()
         self.test = mf.get_message_by_name(TEST_NAME)
         self.pong = mf.get_message_by_name(PONG_NAME)
+        self.test_coef = mf.get_message_by_name(TEST_COEF_MSG_NAME)
 
     def testProps(self):
         u8 = self.test.get_field_by_name("a_uint8")
@@ -165,6 +173,21 @@ class FieldTest(unittest.TestCase):
         f = self.test.get_field_by_name("a_float")
         v = f.get_printable_value( [1,2,3] )
         self.failUnlessEqual( v, "[1, 2, 3]" )
+
+    def testCoef(self):
+        i16 = self.test_coef.get_field_by_name("a_int8")
+        self.failUnless(i16)
+
+        v = i16.get_scaled_value(10)
+        self.failUnlessEqual( v, 5 )
+
+        f = self.test_coef.get_field_by_name("a_float")
+        self.failUnless(f)
+
+        v = f.get_scaled_value(10.5)
+        self.failUnlessEqual( v, 5.25 )
+
+
 
 class TestTransportFieldTest(unittest.TestCase):
     def setUp(self):

@@ -67,9 +67,32 @@ class RequestMessageSender(_MessageSender):
             for message in messagefile.get_messages():
                 if message.name != self.REQUEST_MESSAGE_NAME:
                     self._model.append( (message.name, message) )
+        self._cb.set_active(0)
 
     def request_send_message(self, msg):
         self.emit("send-message", self._rm, (msg.id, ))
+
+class RequestTelemetrySender(RequestMessageSender):
+
+    BUTTON_TEXT = "Request Telemetry"
+    REQUEST_MESSAGE_NAME = "REQUEST_TELEMETRY"
+
+    def __init__(self, *args, **kwargs):
+        RequestMessageSender.__init__(self, *args, **kwargs)
+        
+        hb = gtk.HBox()
+        hb.pack_start(gtk.Label("Frequency: "), expand=False)
+        
+        self._sb = gtk.SpinButton(digits=1)
+        self._sb.set_increments(0.5, 1)
+        self._sb.set_range(0.0, 60)
+        hb.pack_start(self._sb, expand=False)
+        
+        self.pack_start(hb, expand=False, fill=True)
+        self.reorder_child(hb, 1)
+
+    def request_send_message(self, msg):
+        self.emit("send-message", self._rm, (msg.id, self._sb.get_value()))
 
 class _SettingsSender(gtk.HBox):
 
@@ -117,10 +140,12 @@ if __name__ == "__main__":
     w = gtk.Window()
     rm = RequestMessageSender()
     sm = SimpleMessageSender()
+    tm = RequestTelemetrySender()
 
     vb = gtk.VBox()
     vb.pack_start(rm)
     vb.pack_start(sm)
+    vb.pack_start(tm)
 
     w.add(vb)
     w.show_all()

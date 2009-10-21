@@ -43,9 +43,11 @@ class _Setting:
 
     #Converted to an enum to fake dynamic typing, python -> c with consistent
     #type identifiers
+    #WARNING WARNING: THIS MUST BE KEPT CONSISTANT WITH THE VALLUES OF TYPE_T
+    #in std.h
     TYPES = {
-        "uint8" :   ("SETTING_TYPE_UINT8", 0),
-        "float" :   ("SETTING_TYPE_FLOAT", 1),
+        "uint8" :   ("TYPE_UINT8", 0),
+        "float" :   ("TYPE_FLOAT", 6),
     }
 
     TYPE_PYTHON = {
@@ -121,6 +123,17 @@ class _Setting:
         self.id = -1
         self.id_str = "SETTING_ID_%s" % self.name
 
+        if self.dynamic:
+            try:
+                self.step = self.python_type(x.step)
+            except AttributeError:
+                if self.type == "uint8":
+                    self.step = 1
+                elif self.type == "float":
+                    self.step = 0.1
+                else:
+                    raise Exception("Type not supported")
+
     def format_value(self, val=None):
         if val:
             return self.python_type(val)
@@ -131,15 +144,8 @@ class _Setting:
         """
         Returns min, default, max, adjustment
         """
-        if self.type == "uint8":
-            step = 1
-        elif self.type == "float":
-            step = 0.1
-        else:
-            raise Exception("Type not supported")
-
         default = self.python_type(self.value)
-        return self.min, default, self.max, step
+        return self.min, default, self.max, self.step
 
     def get_default_value(self):
         return self.format_value(self.value)
@@ -158,11 +164,17 @@ class _Setting:
         print "#define %s %s" % (self.name, self.value)
         if self.rational_approximation:
             val = float(self.value)
-            maxval = (2 ** self.rational_approximation) - 1
-
-            num,den = convert_float_to_rational_fraction_approximation(val, maxval)
-            approx = float(num)/float(den)
-            err = (val-approx)/val
+            if val == 0.0:
+                num = 0
+                den = 1
+                err = 0.0
+                approx = 0.0
+            else:
+                #maximum integer to fit in approximation of length
+                maxval = (2 ** self.rational_approximation) - 1
+                num,den = convert_float_to_rational_fraction_approximation(val, maxval)
+                approx = float(num)/float(den)
+                err = (val-approx)/val
             if err > 0.001:
                 raise Exception("Approximation Error: %f != %f" % (val, approx))
 
@@ -208,11 +220,6 @@ class Settings:
                     i += 1
 
     def print_typedefs(self):
-        print "typedef enum {"
-        for t,(n,v) in _Setting.TYPES.items():
-            print "\t%s = %d," % (n, v)
-        print "} SettingType_t;"
-        print
         print "typedef bool_t (*SettingSetterCallback_t)(uint8_t chan, void *data);"
         print "typedef bool_t (*SettingGetterCallback_t)(uint8_t chan, void *data);"
         print
