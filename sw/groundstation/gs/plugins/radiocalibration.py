@@ -64,6 +64,9 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
 
                 self._initialized.append((cb, pb))
 
+            #request PPM messages
+            self._source.request_telemetry("PPM", 5)
+
             #register interest in the PPM messags
             self._source.register_interest(self._on_ppm, 0, "PPM")
 

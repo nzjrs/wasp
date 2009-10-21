@@ -63,6 +63,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
         self._messages_file = messages
         self._rm = self._messages_file.get_message_by_name("REQUEST_MESSAGE")
+        self._rt = self._messages_file.get_message_by_name("REQUEST_TELEMETRY")
         self._transport = transport.Transport(check_crc=True, debug=DEBUG)
         self._transport_header = transport.TransportHeaderFooter(acid=0x78)
 
@@ -170,6 +171,10 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
     def request_message(self, message_id):
         self.send_message(self._rm, (message_id,))
+
+    def request_telemetry(self, message_name, frequency):
+        m = self._messages_file.get_message_by_name(message_name)
+        self.send_message(self._rt, (m.id, frequency))
 
     def quit(self):
         self.disconnect_from_uav()

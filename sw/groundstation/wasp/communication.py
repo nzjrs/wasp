@@ -110,8 +110,9 @@ class DummySerialCommunication(gobject.GObject):
 
     def _do_ppm(self):
         msg = self._messages.get_message_by_name("PPM")
-        v = 10000
-        return self._send(msg, v, v, v, v, v, v)
+        v = 20000
+        n = 100
+        return self._send(msg, v+random.randint(-n,n), v, v+random.randint(-n,n), v, v+random.randint(-n,n), v)
 
     def get_fd(self):
         return self._readfd
