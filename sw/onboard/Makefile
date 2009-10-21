@@ -1,6 +1,5 @@
 
-=======
-TARGET          ?= autopilot_main
+TARGET          ?= rocket_main
 ARCH            ?= arm7
 OBJDIR          = bin/$(ARCH)
 Q               = @
