@@ -29,6 +29,7 @@
 #include "led.h"
 
 #include "actuators.h"
+#include "supervision.h"
 
 #include "rc.h"
 
@@ -70,6 +71,7 @@ static inline void autopilot_main_init( void ) {
   sys_time_init();
   led_init();
 
+  supervision_init();
   actuators_init(ACTUATOR_BANK_MOTORS);
 
   rc_init();

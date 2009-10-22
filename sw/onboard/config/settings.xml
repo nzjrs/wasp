@@ -68,7 +68,13 @@
     <setting name="MAX_MOTOR" value="210"/>
     <setting name="TRIM_A" value="0"/>
     <setting name="TRIM_E" value="0"/>
-    <setting name="TRIM_R" value="1"/>
+    <setting name="TRIM_R" value="0"/>
+    <setting name="NB_MOTOR" value="4"/>
+    <setting name="SCALE" value="256"/>
+    <setting name="ROLL_COEF"  value="{    0,    0, -256,  256}"/>
+    <setting name="PITCH_COEF" value="{  256, -256,    0,    0}"/>
+    <setting name="YAW_COEF"   value="{ -256, -256,  256,  256}"/>
+    <setting name="THRUST_COEF" value="{ 256,  256,  256,  256}"/>
   </section>
 </settings>
 

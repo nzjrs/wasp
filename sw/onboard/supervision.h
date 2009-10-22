@@ -25,6 +25,9 @@
 
 #include "std.h"
 
+void
+supervision_init(void);
+
 /** 
  * Run the actuator model.
  * 
