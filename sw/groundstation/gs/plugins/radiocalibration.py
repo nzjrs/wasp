@@ -13,11 +13,11 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
 
     CHANNELS = (
         "THROTTLE",
-        "RUDDER",
-        "AILERON",
-        "ELEVATOR",
-        "APMODE",
-        "SWITCH"
+        "YAW",
+        "ROLL",
+        "PITCH",
+        "MODE",
+        "GAIN1"
     )
 
     def __init__(self, conf, source, messages_file, groundstation_window):
@@ -111,7 +111,7 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
                             float(center_)/PPM_RADIO_SCALE,
                             float(min_)/PPM_RADIO_SCALE,
                             filter_)
-            txt +=  '</radio>'
+            txt +=  '</radio>\n'
         except:
             LOG.warn("Error generating xml", exc_info=True)
             txt = None
