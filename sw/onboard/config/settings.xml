@@ -46,6 +46,12 @@
     <setting name="RIGHT" value="2"/>
     <setting name="LEFT" value="3"/>
   </section>
+  <section name="SERVO">
+    <setting name="THROTTLE" value="4"/>
+    <setting name="ELEVATOR" value="5"/>
+    <setting name="AILERON" value="6"/>
+    <setting name="RUDDER" value="7"/>
+  </section>
   <section name="COMMAND">
     <setting name="NB" value="4"/>
     <setting name="PITCH" value="0"/>
