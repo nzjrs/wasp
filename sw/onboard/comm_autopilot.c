@@ -31,12 +31,10 @@
 #include "settings.h"
 #include "sys_time.h"
 #include "autopilot.h"
+#include "guidance.h"
 
 #include "booz_ahrs.h"
-
 #include "booz2_ins.h"
-#include "guidance/booz2_guidance_h.h"
-#include "guidance/booz2_guidance_v.h"
 
 #include "generated/messages.h"
 

@@ -24,6 +24,7 @@
 
 #include "gps.h"
 #include "imu.h"
+#include "guidance.h"
 
 #include "booz_ahrs.h"
 
