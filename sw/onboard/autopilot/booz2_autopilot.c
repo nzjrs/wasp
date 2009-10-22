@@ -25,11 +25,11 @@
 
 #include "rc.h"
 #include "actuators.h"
+#include "supervision.h"
 #include "booz2_navigation.h"
 #include "guidance/booz2_guidance_h.h"
 #include "guidance/booz2_guidance_v.h"
 #include "stabilization/booz2_stabilization.h"
-#include "booz2_supervision.h"
 
 uint8_t autopilot_mode;
 bool_t  autopilot_motors_on;
@@ -92,7 +92,7 @@ void autopilot_set_actuators(void)
     pprz_t motor_commands[MOTOR_NB] = {0,0,0,0};
 #else
     pprz_t motor_commands[MOTOR_NB];
-    BOOZ2_SUPERVISION_RUN(motor_commands, booz2_commands, autopilot_motors_on);
+    supervision_run(motor_commands, booz2_commands, autopilot_motors_on);
 #endif
     actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_FRONT, motor_commands[MOTOR_FRONT]);
     actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_BACK, motor_commands[MOTOR_BACK]);

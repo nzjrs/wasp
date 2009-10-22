@@ -20,9 +20,9 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef BOOZ2_SUPERVISION_H
-#define BOOZ2_SUPERVISION_H
 
+#include "std.h"
+#include "supervision.h"
 #include "generated/settings.h"
 
 #define FRONT   0
@@ -93,32 +93,29 @@
   }
 
 
-#define BOOZ2_SUPERVISION_RUN(_out, _in,_motors_on) {			\
-    if (_motors_on) {							\
-      SUPERVISION_MIX(_out, _in[COMMAND_ROLL], _in[COMMAND_PITCH], _in[COMMAND_YAW], _in[COMMAND_THRUST]); \
-      pprz_t min_mot;							\
-      SUPERVISION_FIND_MIN_MOTOR(_out, min_mot);			\
-      if (min_mot < SUPERVISION_MIN_MOTOR) {				\
-	pprz_t offset = -(min_mot - SUPERVISION_MIN_MOTOR);		\
-	SUPERVISION_OFFSET_MOTORS(_out, offset) ;			\
-      }									\
-      pprz_t max_mot;							\
-      SUPERVISION_FIND_MAX_MOTOR(_out, max_mot);			\
-      if (max_mot > SUPERVISION_MAX_MOTOR) {				\
-	pprz_t offset = -(max_mot - SUPERVISION_MAX_MOTOR);		\
-	SUPERVISION_OFFSET_MOTORS(_out, offset) ;			\
-      }									\
-      SUPERVISION_BOUND_MOTORS(_out);					\
-    }									\
-    else {								\
-      _out[FRONT] = 0;						\
-      _out[RIGHT] = 0;						\
-      _out[BACK]  = 0;						\
-      _out[LEFT]  = 0;						\
-    }									\
-  }
+void supervision_run(pprz_t _out[], int32_t _in[], bool_t _motors_on)
+{
+    if (_motors_on) {
+      SUPERVISION_MIX(_out, _in[COMMAND_ROLL], _in[COMMAND_PITCH], _in[COMMAND_YAW], _in[COMMAND_THRUST]);
+      pprz_t min_mot;
+      SUPERVISION_FIND_MIN_MOTOR(_out, min_mot);
+      if (min_mot < SUPERVISION_MIN_MOTOR) {
+	pprz_t offset = -(min_mot - SUPERVISION_MIN_MOTOR);
+	SUPERVISION_OFFSET_MOTORS(_out, offset) ;
+      }
+      pprz_t max_mot;
+      SUPERVISION_FIND_MAX_MOTOR(_out, max_mot);
+      if (max_mot > SUPERVISION_MAX_MOTOR) {
+	pprz_t offset = -(max_mot - SUPERVISION_MAX_MOTOR);
+	SUPERVISION_OFFSET_MOTORS(_out, offset) ;
+      }
+      SUPERVISION_BOUND_MOTORS(_out);
+    }
+    else {
+      _out[FRONT] = 0;
+      _out[RIGHT] = 0;
+      _out[BACK]  = 0;
+      _out[LEFT]  = 0;
+    }
+}
 
-
-
-
-#endif /* BOOZ2_SUPERVISION_H */

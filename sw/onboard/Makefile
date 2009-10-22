@@ -33,6 +33,7 @@ SRC =                               \
     stabilization/booz2_stabilization_rate.c      \
     stabilization/booz2_stabilization_attitude.c  \
     autopilot/booz2_autopilot.c     \
+    supervision/booz2_supervision.c \
     comm.c                          \
     comm_autopilot.c                \
     settings.c

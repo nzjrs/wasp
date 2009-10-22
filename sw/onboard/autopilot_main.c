@@ -123,7 +123,6 @@ static inline void autopilot_main_periodic( void ) {
   _cnt++;
   if (_cnt >= 10)
     _cnt = 0;
-
   switch (_cnt)
   {
     case 0:
