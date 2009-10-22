@@ -82,7 +82,7 @@ micromag_read(void)
         SpiClearRti();
         SpiEnableRti();
         control_byte = (micromag_cur_axe+1) << 0 | 3 << 4;
-        SSPDR = control_byte;
+        SpiSend(control_byte);
         MmReset();
         SpiEnable();
     }
@@ -93,8 +93,8 @@ micromag_read(void)
         SpiClearRti();
         SpiEnableRti();
         /* trigger 2 bytes read */
-        SSPDR = 0;
-        SSPDR = 0;
+        SpiSend(0);
+        SpiSend(0);
         SpiEnable();
     }
 }

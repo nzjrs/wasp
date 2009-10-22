@@ -90,7 +90,7 @@ micromag_got_interrupt_retrieve_values(void)
         case MM_SENDING_REQ:
             {
             /* read dummy control byte reply */
-            uint8_t foo __attribute__ ((unused)) = SSPDR;
+            uint8_t foo __attribute__ ((unused)) = SpiRead();
             micromag_status = MM_WAITING_EOC;
             MmUnselect();
             SpiClearRti();
@@ -100,9 +100,9 @@ micromag_got_interrupt_retrieve_values(void)
             break;
         case MM_READING_RES:
             {
-            int16_t new_val;
-            new_val = SSPDR << 8;
-            new_val += SSPDR;
+            int16_t new_val = SpiRead();
+            new_val <<= 8;
+            new_val += SpiRead();
             if (abs(new_val) < 2000)
                 micromag_values[micromag_cur_axe] = new_val;
             MmUnselect();
