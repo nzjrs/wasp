@@ -73,8 +73,6 @@
     SSPDR = a;			\
   }
 
-#define SpiRead(a) {            \
-   a = SSPDR;			\
-  }
+#define SpiRead() SSPDR;
 
 #endif /* SPI_HW_H */

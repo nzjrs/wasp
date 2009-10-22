@@ -402,7 +402,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         if self._plane_view == None:
             try:
                 from gs.ui.plane_view import PlaneView
-                self._plane_view = PlaneView()
+                self._plane_view = PlaneView(self._source)
             except:
                 LOG.warning("Could not initialize plane view", exc_info=True)
                 return
@@ -413,7 +413,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         if self._horizon_view == None:
             try:
                 from gs.ui.horizon import HorizonView
-                self._horizon_view = HorizonView()
+                self._horizon_view = HorizonView(self._source)
             except:
                 LOG.warning("Could not initialize horizon view", exc_info=True)
                 return
