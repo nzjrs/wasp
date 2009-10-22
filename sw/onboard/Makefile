@@ -3,6 +3,11 @@ ARCH            ?= arm7
 OBJDIR          = bin/$(ARCH)
 Q               = @
 TOOLS           = ../tools
+RADIO           = config/radio.xml
+# Be very careful if you change these, by default the groundstation 
+# looks for config/{messages,settings}.xml
+MESSAGES        = config/messages.xml
+SETTINGS        = config/settings.xml
 
 include arch/Makefile.$(ARCH)
 
@@ -28,6 +33,7 @@ SRC =                               \
     stabilization/booz2_stabilization_rate.c      \
     stabilization/booz2_stabilization_attitude.c  \
     autopilot/fixedwing_autopilot.c \
+    supervision/booz2_supervision.c \
     comm.c                          \
     comm_autopilot.c                \
     settings.c
@@ -106,15 +112,15 @@ upload: $(OBJDIR)/$(TARGET).elf programmer
 generated: generated/radio.h generated/build.h generated/messages.h generated/settings.h
 
 # Radio header
-generated/radio.h: config/radio.xml $(TOOLS)/gen-radio.py
+generated/radio.h: $(RADIO) $(TOOLS)/gen-radio.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-radio.py $< > $@
 
-generated/messages.h: config/messages.xml $(TOOLS)/gen-messages.py
+generated/messages.h: $(MESSAGES) $(TOOLS)/gen-messages.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-messages.py --messages=$< > $@
 
-generated/settings.h: config/settings.xml $(TOOLS)/gen-settings.py
+generated/settings.h: $(SETTINGS) $(TOOLS)/gen-settings.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-settings.py --settings=$< > $@
 

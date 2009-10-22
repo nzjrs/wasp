@@ -40,6 +40,22 @@
 #define NULL ((void*)0)
 #endif
 
+#ifndef INT32_MIN
+#define INT32_MIN (-2147483647-1)
+#endif
+
+#ifndef INT32_MAX
+#define INT32_MAX (2147483647)
+#endif
+
+#ifndef INT16_MIN
+#define INT16_MIN (-32767-1)
+#endif
+
+#ifndef INT16_MAX
+#define INT16_MAX (32767)
+#endif
+
 /* Boolean values */
 typedef uint8_t bool_t;
 
