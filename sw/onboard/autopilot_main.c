@@ -41,12 +41,10 @@
 
 #include "fms/booz2_fms.h"
 #include "autopilot.h"
-#include "stabilization/booz2_stabilization_rate.h"
-#include "stabilization/booz2_stabilization_attitude.h"
+#include "stabilization.h"
 
 #include "gps.h"
-#include "guidance/booz2_guidance_h.h"
-#include "guidance/booz2_guidance_v.h"
+#include "guidance.h"
 #include "booz2_navigation.h"
 
 #include "ahrs/booz_ahrs_aligner.h"
@@ -92,11 +90,9 @@ static inline void autopilot_main_init( void ) {
 
   booz_fms_init();
   autopilot_init();
+  guidance_init();
+  stabilization_init();
   booz2_nav_init();
-  booz2_guidance_h_init();
-  booz2_guidance_v_init();
-  booz2_stabilization_rate_init();
-  booz2_stabilization_attitude_init();
 
   booz_ahrs_aligner_init();
   booz_ahrs_init();
