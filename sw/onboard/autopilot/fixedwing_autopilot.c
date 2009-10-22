@@ -109,9 +109,9 @@ void autopilot_set_actuators(void)
     supervision_run(motor_commands, autopilot_commands, autopilot_motors_on);
 
 
-    actuators_set(ACTUATOR_BANK_SERVOS | 0, 0);
-    actuators_set(ACTUATOR_BANK_SERVOS | 0, 0);
-    actuators_set(ACTUATOR_BANK_SERVOS | 0, 0);
-    actuators_set(ACTUATOR_BANK_SERVOS | 0, 0);
+    actuators_set(ACTUATOR_BANK_SERVOS | SERVO_THROTTLE, 0);
+    actuators_set(ACTUATOR_BANK_SERVOS | SERVO_AILERON, 0);
+    actuators_set(ACTUATOR_BANK_SERVOS | SERVO_ELEVATOR, 0);
+    actuators_set(ACTUATOR_BANK_SERVOS | SERVO_RUDDER, 0);
     actuators_commit(ACTUATOR_BANK_SERVOS);
 }
