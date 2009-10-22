@@ -3,7 +3,7 @@ ARCH            ?= arm7
 OBJDIR          = bin/$(ARCH)
 Q               = @
 TOOLS           = ../tools
-RADIO           = config/radio.xml
+RADIO           = config/radio/T6EXAP.xml
 # Be very careful if you change these, by default the groundstation 
 # looks for config/{messages,settings}.xml
 MESSAGES        = config/messages.xml
