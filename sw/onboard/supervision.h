@@ -32,13 +32,13 @@
  * for the actuators, applying any scaling or trimming.
  *
  * @param motor_commands Array of NUM_MOTORS commands in range 
- * MIN_PPRZ -> MAX_PPRZ
+ * INT32_MIN -> INT32_MAX
  * @param autopilot_commands An array of NUM_COMMANDS in range
  * INT32_MIN -> INT32_MAX
  * @param motors_on TRUE if the motors/actuators should be 'on', whatever
  * on means for the specific actuator
  */
 void
-supervision_run(pprz_t motor_commands[], int32_t autopilot_commands[], bool_t motors_on);
+supervision_run(int32_t motor_commands[], int32_t autopilot_commands[], bool_t motors_on);
 
 #endif /* SUPERVISION_H */

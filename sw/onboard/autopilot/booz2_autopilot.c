@@ -89,9 +89,9 @@ void autopilot_periodic(void) {
 void autopilot_set_actuators(void)
 {
 #ifdef KILL_MOTORS
-    pprz_t motor_commands[MOTOR_NB] = {0,0,0,0};
+    int32_t motor_commands[MOTOR_NB] = {0,0,0,0};
 #else
-    pprz_t motor_commands[MOTOR_NB];
+    int32_t motor_commands[MOTOR_NB];
     supervision_run(motor_commands, booz2_commands, autopilot_motors_on);
 #endif
     actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_FRONT, motor_commands[MOTOR_FRONT]);
