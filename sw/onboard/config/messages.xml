@@ -77,6 +77,26 @@
      <field name="comm" type="uint8"        values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
    </message>
 
+  <message name="AHRS_EULER" id="16">
+    <field name="imu_phi"    type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+    <field name="imu_theta"  type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+    <field name="imu_psi"    type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+    <field name="body_phi"   type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+    <field name="body_theta" type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+    <field name="body_psi"   type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+  </message>
+
+  <message name="AHRS_QUAT" id="17">
+    <field name="imu_qi"  type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="imu_qx"  type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="imu_qy"  type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="imu_qz"  type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="body_qi" type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="body_qx" type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="body_qy" type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="body_qz" type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+  </message>
+
    <!-- Begin custom messages at 25 -->
 
    <message name="COMM_STATUS" id="25">

@@ -24,7 +24,7 @@ def showMessage(x, y, msg, scale):
     glPopMatrix()
 
 class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
-    def __init__(self):
+    def __init__(self, source):
         gtk.DrawingArea.__init__(self)
         
         glutInit()
@@ -54,16 +54,29 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
         
         self.win.connect("delete-event", self.on_window_delete)
         
-        self.pitch = 0.0
-        self.roll = 0.0
-        self.yaw = 0.0
-        self.speed = 0.0
-        self.altitude = 0.0
+        self._roll = 0.0
+        self._pitch = 0.0
+        self._yaw = 0.0
+        self._speed = 0.0
+        self._altitude = 0.0
         
         self.win.set_title("Horizon View")
         self.win.set_default_size(400,400)
         
         self.win.add(self)
+
+        source.register_interest(self._on_ahrs, 10, "AHRS_EULER")
+
+    def _on_ahrs(self, msg, payload):
+        imu_phi, imu_theta, imu_psi, body_phi, body_theta, body_psi = msg.unpack_scaled_values(payload)
+
+        #FIXME: we reverse the sign of pitch here
+        self.update(
+                pitch=-body_phi,
+                roll=body_theta,
+                yaw=body_psi,
+                altitude=0,
+                speed=0)
         
     def on_window_delete(self, widget, data=None):
         self.win.hide_all()
@@ -127,7 +140,6 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
         gldrawable.gl_end()
 
     def on_expose_event(self, *args):
-        #print "expose"
         gldrawable = self.get_gl_drawable()
         glcontext = self.get_gl_context()
         gldrawable.gl_begin(glcontext)
@@ -179,7 +191,7 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
             glPopMatrix()
 
         glPushMatrix()
-        glRotatef(self.roll, 0.0, 0.0, 1.0)
+        glRotatef(self._pitch, 0.0, 0.0, 1.0)
         glColor3f(0.85, 0.5, 0.1)
         glBegin( GL_TRIANGLES )
         glVertex3f(0.0, 0.23, -0.9)
@@ -216,8 +228,8 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
 
         glPopMatrix()
 
-        glRotatef(self.roll, 0.0, 0.0, 1.0)
-        glTranslatef(-self.yaw*C_DEG2RAD, 0.0, 0.0)
+        glRotatef(self._pitch, 0.0, 0.0, 1.0)
+        glTranslatef(-self._yaw*C_DEG2RAD, 0.0, 0.0)
         # HORIZON AND YAW TICK LINE **********/
         glColor3f(1.0, 1.0, 1.0)
         glBegin( GL_LINES )
@@ -259,8 +271,8 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
 
         glPushMatrix()
         glLoadIdentity()
-        glRotatef(self.roll, 0.0, 0.0, 1.0)
-        glTranslatef(0.0, -self.pitch*C_DEG2RAD, 0.0)
+        glRotatef(self._pitch, 0.0, 0.0, 1.0)
+        glTranslatef(0.0, -self._roll*C_DEG2RAD, 0.0)
 
         # COLORED PART OF DISPLAY ************/
         glColor3f(0.0, 0.0, 1.0)
@@ -345,22 +357,22 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
         glColor3f(0.0, 1.0, 0.0)
         glPushMatrix()
         glTranslatef(-0.17, 0.140, -0.8)
-        showMessage(-0.01, 0.0, "%3.2fm" % self.altitude, 1.0)
+        showMessage(-0.01, 0.0, "%3.2fm" % self._altitude, 1.0)
         glPopMatrix()
 
         # speed readout
         glPushMatrix()
         glTranslatef(0.12, 0.140, -0.8)
-        showMessage(0.0, 0.0, "%3.2fk" % self.speed, 1.0)
+        showMessage(0.0, 0.0, "%3.2fk" % self._speed, 1.0)
         glPopMatrix()
 
         glPopMatrix()
         
-    def update(self, pitch, yaw, roll, altitude, speed):
-        self.pitch = pitch
-        self.yaw = yaw
-        self.roll = roll
-        self.altitude = altitude
-        self.speed = speed
+    def update(self, pitch, roll, yaw, altitude, speed):
+        self._pitch = pitch
+        self._roll = roll
+        self._yaw = yaw
+        self._altitude = altitude
+        self._speed = speed
         self.queue_draw()
 

@@ -6,7 +6,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
-    def __init__(self):
+    def __init__(self, source):
         gtk.DrawingArea.__init__(self)
         
         self.win = gtk.Window()
@@ -36,13 +36,24 @@ class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
         
         self.win.connect("delete-event", self.on_window_delete)
 
-        self.pitch = 0.0
-        self.yaw = 0.0
-        self.roll = 0.0
+        self._roll = 0.0
+        self._heading = 0.0
+        self._pitch = 0.0
         
         self.win.add(self)
         self.win.set_default_size(500, 400)
         self.win.set_title("Plane View")
+
+        source.register_interest(self._on_ahrs, 10, "AHRS_EULER")
+
+    def _on_ahrs(self, msg, payload):
+        imu_phi, imu_theta, imu_psi, body_phi, body_theta, body_psi = msg.unpack_scaled_values(payload)
+
+        #FIXME: we reverse the sign of roll here
+        self.set_rotations(
+                pitch=body_phi,
+                roll=-body_theta,
+                heading=0)
 
     def _cross_product(self, a, b):
         return [a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0]]
@@ -170,16 +181,16 @@ class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
         
         glRotatef(20.0, 0.0, 1.0, 0.0)
         glRotatef(10.0, 1.0, 0.0, 0.0)
-        glRotatef(self.pitch, 1.0, 0.0, 0.0)
-        glRotatef(self.yaw, 0.0, 1.0, 0.0)
-        glRotatef(self.roll, 0.0, 0.0, 1.0)
+        glRotatef(self._roll, 1.0, 0.0, 0.0)
+        glRotatef(self._heading, 0.0, 1.0, 0.0)
+        glRotatef(self._pitch, 0.0, 0.0, 1.0)
         
         glCallList(self.plane)
         
-    def set_rotations(self, pitch, yaw, roll):
-        self.pitch = pitch
-        self.yaw = yaw
-        self.roll = roll
+    def set_rotations(self, pitch, roll, heading):
+        self._pitch = pitch
+        self._roll = roll
+        self._heading = heading
         self.queue_draw()
 
         	
