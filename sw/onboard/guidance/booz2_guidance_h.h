@@ -23,7 +23,7 @@
 #ifndef BOOZ2_GUIDANCE_H_H
 #define BOOZ2_GUIDANCE_H_H
 
-
+#include "guidance.h"
 #include "booz_geometry_int.h"
 
 #define BOOZ2_GUIDANCE_H_MODE_KILL      0
@@ -31,9 +31,6 @@
 #define BOOZ2_GUIDANCE_H_MODE_ATTITUDE  2
 #define BOOZ2_GUIDANCE_H_MODE_HOVER     3
 #define BOOZ2_GUIDANCE_H_MODE_NAV       4
-
-
-extern uint8_t booz2_guidance_h_mode;
 
 /* horizontal setpoint in NED */
 /* Q_int32_xx_8        */

@@ -27,6 +27,7 @@ SRC =                               \
     fms/booz2_fms_test_signal.c     \
     ahrs/booz_ahrs_aligner.c                \
     ahrs/booz2_filter_attitude_cmpl_euler.c \
+    guidance/booz2_guidance.c       \
     guidance/booz2_guidance_h.c     \
     guidance/booz2_guidance_v.c     \
     stabilization/booz2_stabilization.c           \
