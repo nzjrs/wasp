@@ -24,6 +24,7 @@
 #define AUTOPILOT_H
 
 #include "std.h"
+#include "generated/settings.h"
 
 #define BOOZ2_AP_MODE_FAILSAFE          0
 #define BOOZ2_AP_MODE_KILL              1
@@ -39,15 +40,28 @@
 #define BOOZ2_AP_MODE_HOVER_Z_HOLD      11
 #define BOOZ2_AP_MODE_NAV               12
 
-extern uint8_t      autopilot_mode;
-extern uint8_t      autopilot_mode_auto2;
-extern bool_t       autopilot_motors_on;
-extern bool_t       autopilot_in_flight;
 extern uint32_t     autopilot_motors_on_counter;
 extern uint32_t     autopilot_in_flight_counter;
 
 uint8_t
 autopilot_mode_of_radio(pprz_t mode_channel);
+
+typedef struct __Autopilot {
+    uint8_t mode;
+    uint8_t mode_auto2;
+    bool_t  motors_on;
+    bool_t  in_flight;
+    int32_t commands[COMMAND_NB];
+    int32_t motor_commands[MOTOR_NB];
+} Autopilot_t;
+
+/* Need to rename them both to actuators */
+#if SERVO_NB != MOTOR_NB
+#error NOT IMPLEMETED YET
+#endif
+
+extern Autopilot_t  autopilot;
+
 
 /* Implementations must provide these */
 void

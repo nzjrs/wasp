@@ -112,9 +112,9 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &rc_status,
                     &booz_gps_state.fix,
                     &bat,
-                    &autopilot_in_flight,
-                    &autopilot_motors_on,
-                    &autopilot_mode,
+                    &autopilot.in_flight,
+                    &autopilot.motors_on,
+                    &autopilot.mode,
                     &cpu_usage);
             }
             break;
@@ -132,7 +132,7 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
         case MESSAGE_ID_AUTOPILOT:
             MESSAGE_SEND_AUTOPILOT(
                     chan,
-                    &autopilot_mode,
+                    &autopilot.mode,
                     &booz2_guidance_h_mode,
                     &booz2_guidance_v_mode);
             break;
@@ -177,6 +177,18 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &booz_ahrs.ltp_to_body_euler.phi,
                     &booz_ahrs.ltp_to_body_euler.theta,
                     &booz_ahrs.ltp_to_body_euler.psi);
+            break;
+        case MESSAGE_ID_SUPERVISION:
+            MESSAGE_SEND_SUPERVISION(
+                    chan,
+                    &autopilot.motor_commands[0],
+                    &autopilot.motor_commands[1],
+                    &autopilot.motor_commands[2],
+                    &autopilot.motor_commands[3],
+                    &autopilot.commands[0],
+                    &autopilot.commands[1],
+                    &autopilot.commands[2],
+                    &autopilot.commands[3]);
             break;
         default:
             ret = FALSE;
