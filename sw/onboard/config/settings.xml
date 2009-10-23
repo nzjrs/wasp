@@ -45,12 +45,15 @@
     <setting name="BACK" value="1"/>
     <setting name="RIGHT" value="2"/>
     <setting name="LEFT" value="3"/>
+    <setting name="ADDR" value="{0x52, 0x54, 0x56, 0x58}" doc="The I2C adresses of the motors"/>
   </section>
   <section name="SERVO">
-    <setting name="THROTTLE" value="4"/>
-    <setting name="ELEVATOR" value="5"/>
-    <setting name="AILERON" value="6"/>
-    <setting name="RUDDER" value="7"/>
+    <setting name="NB" value="4"/>
+    <setting name="THROTTLE" value="0"/>
+    <setting name="ELEVATOR" value="1"/>
+    <setting name="AILERON" value="2"/>
+    <setting name="RUDDER" value="3"/>
+    <setting name="ADDR" value="{4, 5, 6, 7}" doc="The channel of the servos"/>
   </section>
   <section name="COMMAND">
     <setting name="NB" value="4"/>
