@@ -2,6 +2,7 @@
 
 OK=0
 FILES=`ls test/test_*_main.c`
+FILES="$FILES autopilot_main.c"
 ARCHES=`ls arch/Makefile.* | cut -d. -f2`
 
 for a in $ARCHES
