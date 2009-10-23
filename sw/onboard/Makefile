@@ -1,5 +1,3 @@
-
-
 TARGET          ?= autopilot_main
 ARCH            ?= arm7
 OBJDIR          = bin/$(ARCH)
