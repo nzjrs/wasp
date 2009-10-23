@@ -40,11 +40,4 @@ Calibrating the Radio
 - Click save, which will generate a file at *~/Desktop/radio.xml*
 - Replace the radio.xml in sw/onboard/config.xml with the new one and reprogram the autopilot. This should then give you proper channel mappings.
 
-Connecting the Autopilot
-************************
-.. image:: Fut_Conn.jpg
-.. image:: JR_Conn.jpg
-.. image:: thumb-Airt_old_Conn.jpg
-.. image:: Hitec_Conn.jpg
-.. image:: thumb-Airt_new_Conn.jpg
-.. image:: DSL4TOP_MK.gif
+
