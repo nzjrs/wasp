@@ -29,7 +29,7 @@ SRC =                               \
     stabilization/booz2_stabilization.c           \
     stabilization/booz2_stabilization_rate.c      \
     stabilization/booz2_stabilization_attitude.c  \
-    autopilot/booz2_autopilot.c     \
+    autopilot/rocket_autopilot.c     \
     comm.c                          \
     comm_autopilot.c                \
     spi-flash/spi0.c                \
