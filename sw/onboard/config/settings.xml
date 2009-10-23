@@ -53,7 +53,7 @@
     <setting name="ELEVATOR" value="1"/>
     <setting name="AILERON" value="2"/>
     <setting name="RUDDER" value="3"/>
-    <setting name="ADDR" value="{4, 5, 6, 7}" doc="The channel of the servos"/>
+    <setting name="ADDR" value="{4, 5, 6, 7}" doc="The channel of the servos, numbered from 0 (the pcb is numbered from 1)"/>
   </section>
   <section name="COMMAND">
     <setting name="NB" value="4"/>
