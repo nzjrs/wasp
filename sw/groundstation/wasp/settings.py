@@ -47,16 +47,19 @@ class _Setting:
     #in std.h
     TYPES = {
         "uint8" :   ("TYPE_UINT8", 0),
+        "int32" :   ("TYPE_INT32", 5),
         "float" :   ("TYPE_FLOAT", 6),
     }
 
     TYPE_PYTHON = {
         "uint8" :   int,
+        "int32" :   int,
         "float" :   float,
     }
 
     TYPE_RANGES = {
         "uint8" :   (0,255),
+        "int32" :   (-0x7fffffff-1,0x7fffffff),
         "float" :   (-100.0, 100.0),
     }
 
@@ -129,6 +132,8 @@ class _Setting:
             except AttributeError:
                 if self.type == "uint8":
                     self.step = 1
+                elif self.type == "int32":
+                    self.step = 100
                 elif self.type == "float":
                     self.step = 0.1
                 else:

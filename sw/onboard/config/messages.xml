@@ -54,6 +54,12 @@
      <field name="value" type="uint8"/>
    </message>
 
+   <message name="SETTING_INT32" id="18">
+     <field name="id" type="uint8"/>
+     <field name="type" type="uint8"/>
+     <field name="value" type="int32"/>
+   </message>
+
    <message name="SETTING_FLOAT" id="12">
      <field name="id" type="uint8"/>
      <field name="type" type="uint8"/>

@@ -66,9 +66,10 @@
   <section name="SUPERVISION">
     <setting name="MIN_MOTOR" value="2"/>
     <setting name="MAX_MOTOR" value="210"/>
-    <setting name="TRIM_A" value="0"/>
-    <setting name="TRIM_E" value="0"/>
-    <setting name="TRIM_R" value="0"/>
+    <setting name="TRIM_A" value="0" type="int32" min="-100" max="100" step="1" set="1" get="1"/>
+    <setting name="TRIM_E" value="0" type="int32" min="-100" max="100" step="1" set="1" get="1"/>
+    <setting name="TRIM_R" value="0" type="int32" min="-100" max="100" step="1" set="1" get="1"/>
+    <setting name="TRIM_T" value="0" type="int32" min="-100" max="100" step="1" set="1" get="1"/>
     <setting name="NB_MOTOR" value="4"/>
     <setting name="SCALE" value="256"/>
     <setting name="ROLL_COEF"  value="{    0,    0, -256,  256}"/>

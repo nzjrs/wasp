@@ -25,6 +25,15 @@
 
 #include "std.h"
 
+typedef struct _SupervisionTrim {
+    int32_t trim_a;
+    int32_t trim_e;
+    int32_t trim_r;
+    int32_t trim_t;
+} Supervision_t;
+
+extern Supervision_t supervision_trim;
+
 void
 supervision_init(void);
 
@@ -43,5 +52,8 @@ supervision_init(void);
  */
 void
 supervision_run(int32_t motor_commands[], int32_t autopilot_commands[], bool_t motors_on);
+
+void
+supervision_set_trim(int32_t trim_a, int32_t trim_e, int32_t trim_r, int32_t trim_t);
 
 #endif /* SUPERVISION_H */

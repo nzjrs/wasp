@@ -37,24 +37,23 @@ static const int32_t pitch_coef[SUPERVISION_NB_MOTOR]  = SUPERVISION_PITCH_COEF;
 static const int32_t yaw_coef[SUPERVISION_NB_MOTOR]    = SUPERVISION_YAW_COEF;
 static const int32_t thrust_coef[SUPERVISION_NB_MOTOR] = SUPERVISION_THRUST_COEF;
 
-void supervision_init(void) {
-    uint8_t i;
-    for (i=0; i<SUPERVISION_NB_MOTOR; i++) {
-        supervision.trim[i] =
-            roll_coef[i]  * SUPERVISION_TRIM_A +
-            pitch_coef[i] * SUPERVISION_TRIM_E +
-            yaw_coef[i]   * SUPERVISION_TRIM_R;
-    }
+Supervision_t supervision_trim;
+
+void supervision_init(void) 
+{
+    supervision_set_trim(SUPERVISION_TRIM_A, SUPERVISION_TRIM_E, SUPERVISION_TRIM_R, 0);
     supervision.nb_failure = 0;
 }
 
-static inline void offset_commands(int32_t commands[], int32_t offset) {
+static inline void offset_commands(int32_t commands[], int32_t offset) 
+{
     uint8_t j;
     for (j=0; j<SUPERVISION_NB_MOTOR; j++)
         commands[j] += (offset);
 }
 
-static inline void bound_commands(int32_t commands[]) {
+static inline void bound_commands(int32_t commands[]) 
+{
     uint8_t j;
     for (j=0; j<SUPERVISION_NB_MOTOR; j++)
         Bound(commands[j], SUPERVISION_MIN_MOTOR, SUPERVISION_MAX_MOTOR);
@@ -91,3 +90,20 @@ void supervision_run(int32_t out_cmd[], int32_t in_cmd[], bool_t motors_on)
     }
 }
 
+void
+supervision_set_trim(int32_t trim_a, int32_t trim_e, int32_t trim_r, int32_t trim_t)
+{
+    uint8_t i;
+
+    supervision_trim.trim_a = trim_a;
+    supervision_trim.trim_e = trim_e;
+    supervision_trim.trim_r = trim_r;
+    supervision_trim.trim_t = trim_t;
+
+    for (i=0; i<SUPERVISION_NB_MOTOR; i++) {
+        supervision.trim[i] =
+            roll_coef[i]  * trim_a +
+            pitch_coef[i] * trim_e +
+            yaw_coef[i]   * trim_r;
+    }
+}
