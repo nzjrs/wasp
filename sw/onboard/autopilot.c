@@ -36,6 +36,5 @@ uint8_t autopilot_mode_of_radio(pprz_t rc)
         return AUTOPILOT_MODE_AUTO1;
     else
         return AUTOPILOT_MODE_MANUAL;
-
 }
 

@@ -30,6 +30,10 @@
 #include "generated/settings.h"
 #include "generated/radio.h"
 
+#include "comm.h"
+#include "messages.h"
+#include "generated/messages.h"
+
 uint8_t     autopilot_mode;
 bool_t      autopilot_motors_on;
 bool_t      autopilot_in_flight;
@@ -46,11 +50,20 @@ stabilized flight, i.e. heading hold */
 
 void autopilot_init(void)
 {
+    uint8_t i;
+
     autopilot_mode = BOOZ2_AP_MODE_FAILSAFE;
     autopilot_motors_on = FALSE;
     autopilot_in_flight = FALSE;
     autopilot_motors_on_counter = 0;
     autopilot_in_flight_counter = 0;
+    autopilot_mode_auto2 = AUTOPILOT_MODE_AUTO2;
+
+    /* set outputs to failsafe positions, except for throttle, which
+    is always 0 at init */
+    for (i = 0; i < COMMAND_NB; i++)
+        autopilot_commands[i] = autopilot_commands_failsafe[i];
+    autopilot_commands[COMMAND_THRUST] = 0;
 }
 
 void autopilot_periodic(void)
@@ -69,7 +82,12 @@ void autopilot_periodic(void)
             autopilot_commands[COMMAND_PITCH] = rc_values[RADIO_PITCH] * (INT32_MAX/MAX_PPRZ);
             autopilot_commands[COMMAND_ROLL] = rc_values[RADIO_ROLL] * (INT32_MAX/MAX_PPRZ);
             autopilot_commands[COMMAND_YAW] = rc_values[RADIO_YAW] * (INT32_MAX/MAX_PPRZ);
-            autopilot_commands[COMMAND_THRUST] = rc_values[RADIO_THROTTLE] * (INT32_MAX/MAX_PPRZ);
+
+            /* RADIO_THROTTLE is 0 -> 9600 */
+            if (rc_values[RADIO_THROTTLE] < 0)
+                autopilot_commands[COMMAND_THRUST] = 0;
+            else
+                autopilot_commands[COMMAND_THRUST] = rc_values[RADIO_THROTTLE] * (INT32_MAX/MAX_PPRZ);
             break;
         case BOOZ2_AP_MODE_ATTITUDE_DIRECT:
             break;
@@ -118,6 +136,19 @@ void autopilot_set_actuators(void)
     int32_t servo_commands[SERVO_NB];
 
     supervision_run(servo_commands, autopilot_commands, autopilot_motors_on);
+
+    RunOnceEvery(50, {
+        MESSAGE_SEND_SUPERVISION(
+            COMM_1,
+            &servo_commands[0],
+            &servo_commands[1],
+            &servo_commands[2],
+            &servo_commands[3],
+            &autopilot_commands[0],
+            &autopilot_commands[1],
+            &autopilot_commands[2],
+            &autopilot_commands[3]);
+    });
 
     for (i = 0; i < SERVO_NB; i++)
         actuators_set(ACTUATOR_BANK_SERVOS | servo_addr[i], servo_commands[i]);

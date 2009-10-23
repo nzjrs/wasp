@@ -199,6 +199,17 @@
       -->
    </message>
 
+  <message name="SUPERVISION" id="40">
+    <field name="servo_throttle" type="int32"/>
+    <field name="servo_elevator" type="int32"/>
+    <field name="servo_aileron" type="int32"/>
+    <field name="servo_rudder" type="int32"/>
+    <field name="cmd_pitch" type="int32"/>
+    <field name="cmd_roll" type="int32"/>
+    <field name="cmd_yaw" type="int32"/>
+    <field name="cmd_thrust" type="int32"/>
+  </message>
+
    <!-- Begin periodic messages -->
    <periodic channel="COMM_0">
       <message name="COMM_STATUS" frequency="0.25"/>
