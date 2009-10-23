@@ -30,7 +30,7 @@ SRC =                               \
     guidance/fixedwing_guidance.c   \
     stabilization/fixedwing_stabilization.c \
     autopilot/fixedwing_autopilot.c \
-    supervision/booz2_supervision.c \
+    supervision/fixedwing_supervision.c     \
     comm.c                          \
     comm_autopilot.c                \
     settings.c
