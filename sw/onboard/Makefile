@@ -174,7 +174,8 @@ clean:
 	$(REMOVE) generated/*.h
 
 reallyclean:
-	$(REMOVE) --recursive ./bin/*
+	$(REMOVE) --recursive ./bin/* 
+	$(REMOVE) generated/*.h
 
 # Listing of phony targets.
 .PHONY : all size build elf lss sym clean upload
