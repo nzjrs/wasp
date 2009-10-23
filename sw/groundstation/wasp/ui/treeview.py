@@ -66,6 +66,7 @@ class MessageTreeView(gtk.TreeView):
             col = gtk.TreeViewColumn("Value", rend, editable=MessageTreeStore.EDITABLE_IDX)
         else:
             col = gtk.TreeViewColumn("Value", rend)
+        col.props.expand = True
         col.set_cell_data_func(rend, self._get_field_value)
         self.append_column(col)
 
