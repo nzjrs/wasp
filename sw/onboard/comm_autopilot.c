@@ -195,6 +195,7 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
     {
         case MESSAGE_ID_GET_SETTING:
         case MESSAGE_ID_SETTING_UINT8:
+        case MESSAGE_ID_SETTING_INT32:
         case MESSAGE_ID_SETTING_FLOAT:
             ret = settings_handle_message_received(chan, message);
             break;

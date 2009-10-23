@@ -24,9 +24,35 @@
 
 #include "comm.h"
 #include "imu.h"
+#include "supervision.h"
 
 #include "generated/messages.h"
 #include "generated/settings.h"
+
+static inline bool_t
+set_setting_i32(uint8_t id, int32_t val)
+{
+    bool_t ret = TRUE;
+
+    switch (id)
+    {
+        case SETTING_ID_SUPERVISION_TRIM_A:
+            supervision_set_trim(val, supervision_trim.trim_e, supervision_trim.trim_r, supervision_trim.trim_t); 
+            break;
+        case SETTING_ID_SUPERVISION_TRIM_E:
+            supervision_set_trim(supervision_trim.trim_a, val, supervision_trim.trim_r, supervision_trim.trim_t); 
+            break;
+        case SETTING_ID_SUPERVISION_TRIM_R:
+            supervision_set_trim(supervision_trim.trim_a, supervision_trim.trim_e, val, supervision_trim.trim_t); 
+            break;
+        case SETTING_ID_SUPERVISION_TRIM_T:
+            supervision_set_trim(supervision_trim.trim_a, supervision_trim.trim_e, supervision_trim.trim_r, val); 
+            break;
+        default:
+            ret = FALSE;
+    }
+    return ret;
+}
 
 static inline bool_t
 set_setting_u8(uint8_t id, uint8_t val)
@@ -60,29 +86,51 @@ set_setting_float(uint8_t id, float val)
 static inline bool_t
 get_setting(CommChannel_t chan, uint8_t id)
 {
-    Type_t type = TYPE_FLOAT;
-    float *value = NULL;
+    Type_t type;
     bool_t ret = TRUE;
 
     switch (id)
     {
         case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_PHI:
-            value = &booz_imu.body_to_imu_phi;
+            type = SETTING_TYPE_IMU_ALIGNMENT_BODY_TO_IMU_PHI;
+            MESSAGE_SEND_SETTING_FLOAT(chan, &id, &type,
+                &booz_imu.body_to_imu_phi);
             break;
         case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_THETA:
-            value = &booz_imu.body_to_imu_theta;
+            type = SETTING_TYPE_IMU_ALIGNMENT_BODY_TO_IMU_THETA;
+            MESSAGE_SEND_SETTING_FLOAT(chan, &id, &type,
+                &booz_imu.body_to_imu_theta);
             break;
         case SETTING_ID_IMU_ALIGNMENT_BODY_TO_IMU_PSI:
-            value = &booz_imu.body_to_imu_psi;
+            type = SETTING_TYPE_IMU_ALIGNMENT_BODY_TO_IMU_PSI;
+            MESSAGE_SEND_SETTING_FLOAT(chan, &id, &type,
+                &booz_imu.body_to_imu_psi);
+            break;
+        case SETTING_ID_SUPERVISION_TRIM_A:
+            type = SETTING_TYPE_SUPERVISION_TRIM_A;
+            MESSAGE_SEND_SETTING_INT32(chan, &id, &type, 
+                &supervision_trim.trim_a);
+            break;
+        case SETTING_ID_SUPERVISION_TRIM_E:
+            type = SETTING_TYPE_SUPERVISION_TRIM_E;
+            MESSAGE_SEND_SETTING_INT32(chan, &id, &type, 
+                &supervision_trim.trim_e);
+            break;
+        case SETTING_ID_SUPERVISION_TRIM_R:
+            type = SETTING_TYPE_SUPERVISION_TRIM_R;
+            MESSAGE_SEND_SETTING_INT32(chan, &id, &type, 
+                &supervision_trim.trim_r);
+            break;
+        case SETTING_ID_SUPERVISION_TRIM_T:
+            type = SETTING_TYPE_SUPERVISION_TRIM_T;
+            MESSAGE_SEND_SETTING_INT32(chan, &id, &type, 
+                &supervision_trim.trim_t);
             break;
         default:
             ret = FALSE;
             break;
     }
 
-    if (value != NULL)
-        MESSAGE_SEND_SETTING_FLOAT(chan, &id, &type, value);
-        
     return ret;
 }
 
@@ -100,15 +148,18 @@ settings_handle_message_received(CommChannel_t chan, CommMessage_t *msg)
             ret = get_setting(chan, id);
             break;
         case MESSAGE_ID_SETTING_UINT8:
+        case MESSAGE_ID_SETTING_INT32:
         case MESSAGE_ID_SETTING_FLOAT:
             {
             float f;
             uint8_t u8;
+            int32_t i32;
 
             id = MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_id(msg->payload);
             type = MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_type(msg->payload);
 
-            switch (type) {
+            switch (type) 
+            {
                 case TYPE_UINT8:
                     u8 = MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_value(msg->payload);
                     ret = set_setting_u8(id, u8);
@@ -117,11 +168,10 @@ settings_handle_message_received(CommChannel_t chan, CommMessage_t *msg)
                     f = MESSAGE_SETTING_FLOAT_GET_FROM_BUFFER_value(msg->payload);
                     ret = set_setting_float(id, f);
                     break;
-                case TYPE_INT8:
-                case TYPE_UINT16:
-                case TYPE_INT16:
-                case TYPE_UINT32:
                 case TYPE_INT32:
+                    i32 = MESSAGE_SETTING_INT32_GET_FROM_BUFFER_value(msg->payload);
+                    ret = set_setting_i32(id, i32);
+                    break;
                 default:
                     ret = FALSE;
                     break;
