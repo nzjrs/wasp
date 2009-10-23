@@ -62,7 +62,7 @@ static inline void main_periodic_task( void ) {
         led_on(RC_LED);
         /* throttle values are in type pprz_t, it ranges from 0->9600
            so we need to scale this to 0->255 */
-        val = (uint8_t)(((uint32_t)rc_values[RADIO_THROTTLE]*0xFF)/MAX_PPRZ);
+        val = (uint8_t)(((uint32_t)rc_values[RADIO_THROTTLE]*UINT8_MAX)/MAX_PPRZ);
     } else {
         led_off(RC_LED);
         val = 0;
