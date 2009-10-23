@@ -47,6 +47,8 @@ void rc_init ( void )
     rc_status = RC_REALLY_LOST;
     time_since_last_ppm = RC_REALLY_LOST_TIME;
     rc_system_status = STATUS_INITIALIZED;
+    state = RADIO_CTL_NB;
+    last = 0;
 }
 
 void rc_periodic_task ( void )
