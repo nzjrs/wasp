@@ -25,8 +25,19 @@
 #include "supervision.h"
 #include "generated/settings.h"
 
+/* scale signed 32bit to unsigned 8bit value for servo and apply trim */
+static inline uint8_t
+trim_and_scale(int32_t command, int32_t trim, int8_t scale)
+{
+    uint32_t c = command + INT32_MAX;
+    return ((c + trim) / scale) / (UINT32_MAX / UINT8_MAX);
+}
+
 void supervision_run(int32_t out[], int32_t in[], bool_t _motors_on)
 {
-    ;
+    out[SERVO_THROTTLE] = trim_and_scale(in[COMMAND_THRUST], 0, 1);
+    out[SERVO_ELEVATOR] = trim_and_scale(in[COMMAND_PITCH], 0, 1);
+    out[SERVO_AILERON] = trim_and_scale(in[COMMAND_ROLL], 0, 1);
+    out[SERVO_RUDDER] = trim_and_scale(in[COMMAND_YAW], 0, 1);
 }
 

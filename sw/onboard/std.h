@@ -56,6 +56,14 @@
 #define INT16_MAX (32767)
 #endif
 
+#ifndef UINT8_MAX
+#define UINT8_MAX (0xFF)
+#endif
+
+#ifndef UINT32_MAX
+#define UINT32_MAX (0xFFFFFFFF)
+#endif
+
 /* Boolean values */
 typedef uint8_t bool_t;
 

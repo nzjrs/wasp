@@ -25,6 +25,8 @@
 #include "actuators.h"
 #include "supervision.h"
 
+#include "guidance/fixedwing_guidance.h"
+
 #include "generated/settings.h"
 #include "generated/radio.h"
 
@@ -36,6 +38,8 @@ uint32_t    autopilot_in_flight_counter;
 
 int32_t autopilot_commands[COMMAND_NB];
 int32_t autopilot_commands_failsafe[COMMAND_NB] = COMMAND_FAILSAFE;
+
+const uint8_t servo_addr[SERVO_NB] = SERVO_ADDR;
 
 /* Autopilot modes: RATE_DIRECT is manual control, ATTITUDE_DIRECT is 
 stabilized flight, i.e. heading hold */
@@ -51,23 +55,31 @@ void autopilot_init(void)
 
 void autopilot_periodic(void)
 {
-    if ( autopilot_mode == BOOZ2_AP_MODE_FAILSAFE ||
-         autopilot_mode == BOOZ2_AP_MODE_KILL ) 
-    {
-        uint8_t i;
+    uint8_t i;
 
-        for (i = 0; i < COMMAND_NB; i++)
-            autopilot_commands[i] = 0;
-    }
-    else
+    switch (autopilot_mode)
     {
-        //fixedwing_guidance_h_run( autopilot_commands[]);        
+        case BOOZ2_AP_MODE_FAILSAFE:
+        case BOOZ2_AP_MODE_KILL:
+            for (i = 0; i < COMMAND_NB; i++)
+                autopilot_commands[i] = autopilot_commands_failsafe[i];
+            break;
+        case BOOZ2_AP_MODE_RATE_DIRECT:
+            /* scale radio values to full range */
+            autopilot_commands[COMMAND_PITCH] = rc_values[RADIO_PITCH] * (INT32_MAX/MAX_PPRZ);
+            autopilot_commands[COMMAND_ROLL] = rc_values[RADIO_ROLL] * (INT32_MAX/MAX_PPRZ);
+            autopilot_commands[COMMAND_YAW] = rc_values[RADIO_YAW] * (INT32_MAX/MAX_PPRZ);
+            autopilot_commands[COMMAND_THRUST] = rc_values[RADIO_THROTTLE] * (INT32_MAX/MAX_PPRZ);
+            break;
+        case BOOZ2_AP_MODE_ATTITUDE_DIRECT:
+            break;
+        default:
+            break;
     }
 }
 
 void autopilot_on_rc_event(void)
 {
-
   /* I think this should be hidden in rc code */
   /* the ap gets a mode everytime - the rc filters it */
   if (rc_values_contains_avg_channels) {
@@ -75,7 +87,6 @@ void autopilot_on_rc_event(void)
     autopilot_set_mode(new_autopilot_mode);
     rc_values_contains_avg_channels = FALSE;
   }
-
 }
 
 void autopilot_set_mode(uint8_t new_autopilot_mode)
@@ -91,7 +102,6 @@ void autopilot_set_mode(uint8_t new_autopilot_mode)
             case BOOZ2_AP_MODE_RATE_DIRECT:
                 break;
             case BOOZ2_AP_MODE_ATTITUDE_DIRECT:
-                /* record current heading */
                 break;
             default:
                 ok = FALSE;
@@ -104,14 +114,12 @@ void autopilot_set_mode(uint8_t new_autopilot_mode)
 
 void autopilot_set_actuators(void)
 {
-    int32_t motor_commands[MOTOR_NB];
+    uint8_t i;
+    int32_t servo_commands[SERVO_NB];
 
-    supervision_run(motor_commands, autopilot_commands, autopilot_motors_on);
+    supervision_run(servo_commands, autopilot_commands, autopilot_motors_on);
 
-
-    actuators_set(ACTUATOR_BANK_SERVOS | SERVO_THROTTLE, 0);
-    actuators_set(ACTUATOR_BANK_SERVOS | SERVO_AILERON, 0);
-    actuators_set(ACTUATOR_BANK_SERVOS | SERVO_ELEVATOR, 0);
-    actuators_set(ACTUATOR_BANK_SERVOS | SERVO_RUDDER, 0);
+    for (i = 0; i < SERVO_NB; i++)
+        actuators_set(ACTUATOR_BANK_SERVOS | servo_addr[i], servo_commands[i]);
     actuators_commit(ACTUATOR_BANK_SERVOS);
 }
