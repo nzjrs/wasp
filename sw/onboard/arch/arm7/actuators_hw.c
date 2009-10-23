@@ -47,6 +47,15 @@ void actuators_set( ActuatorID_t id, uint8_t value )
         /* value is in range 0 -> 255, so scale this
            range to be in the servo range of 1000 - 2000us */
         uint16_t tmp = ((((uint32_t)value*1000)/0xFF) + 1000);
+        /*FIXME: HACK HACK BROKEN BROKEN. 
+        THE FIRST TWO CHANNELS DO NOT SO SUBTRACT 2 FROM THE INDEX.
+        !!!!!!
+        THIS MEANS WE DO NOT HAVE TO CHANGE ANY SETTINGS LATER, BUT LIMITS
+        US TO 6 CHANNELS
+        !!!!!!
+        NEED TO FIX THE TIMING IN SERVOS_4017_HW.c */
+        if (aid >= 2)
+            aid -= 2;
         servos_values[aid] = SERVOS_TICS_OF_USEC(tmp);
     }
 #endif
