@@ -1,4 +1,5 @@
 
+=======
 TARGET          ?= autopilot_main
 ARCH            ?= arm7
 OBJDIR          = bin/$(ARCH)
@@ -28,7 +29,7 @@ SRC =                               \
     stabilization/booz2_stabilization.c           \
     stabilization/booz2_stabilization_rate.c      \
     stabilization/booz2_stabilization_attitude.c  \
-    autopilot/rocket_autopilot.c     \
+    autopilot/booz2_autopilot.c     \
     comm.c                          \
     comm_autopilot.c                \
     spi-flash/spi0.c                \
