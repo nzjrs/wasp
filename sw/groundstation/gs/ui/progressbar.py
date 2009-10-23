@@ -29,9 +29,11 @@ class ProgressBar(gtk.HBox):
             self._avg = None
 
         self._lblmin = gtk.Label("%.1f" % self._min)
+        self._lblmin.props.xalign = 0
         self._bar = gtk.ProgressBar()
         self._bar.set_name("PlainProgress")
         self._lblmax = gtk.Label("%.1f" % self._max)
+        self._lblmax.props.xalign = 0
 
         self.pack_start(self._lblmin, False)
         self.pack_start(self._bar, True)
@@ -63,6 +65,10 @@ class ProgressBar(gtk.HBox):
         if frac > 1.0:
             frac = 1.0
         self._bar.set_fraction(frac)
+
+    def set_same_size(self, sizegroup):
+        sizegroup.add_widget(self._lblmin)
+        sizegroup.add_widget(self._lblmax)
 
 if __name__ == "__main__":
     import random

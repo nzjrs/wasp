@@ -29,6 +29,11 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         self._cpu_pb = progressbar.ProgressBar(range=(0,100))
         self.get_resource("cpu_hbox").pack_start(self._cpu_pb, False)
 
+        #make the progress bars the same size
+        sg = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
+        self._batt_pb.set_same_size(sg)
+        self._cpu_pb.set_same_size(sg)
+
         source.connect("source-connected", self._on_source_connected)
 
         source.register_interest(self._on_status, 5, "STATUS")
