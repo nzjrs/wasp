@@ -21,8 +21,8 @@
  *
  */
 #include "booz2_hf_float.h"
-#include "booz2_ins.h"
 
+#include "ins.h"
 #include "imu.h"
 
 #include "booz_ahrs.h"
@@ -89,9 +89,9 @@ void b2ins_propagate(void) {
 void b2ins_update_gps(void) {
 
   /* FIXME : with Q_int32_XX_8 we overflow for 256m */
-  INT32_VECT3_SCALE_2(b2ins_meas_gps_pos_ned, booz_ins_gps_pos_cm_ned, 
+  INT32_VECT3_SCALE_2(b2ins_meas_gps_pos_ned, ins.gps_pos_cm_ned, 
 		      IPOS_OF_CM_NUM, IPOS_OF_CM_DEN); 
-  INT32_VECT3_SCALE_2(b2ins_meas_gps_speed_ned, booz_ins_gps_speed_cm_s_ned,
+  INT32_VECT3_SCALE_2(b2ins_meas_gps_speed_ned, ins.gps_speed_cm_s_ned,
 		      ISPEED_OF_CM_S_NUM, ISPEED_OF_CM_S_DEN); 
 
 #ifdef UPDATE_FROM_POS

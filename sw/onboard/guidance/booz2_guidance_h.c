@@ -22,16 +22,18 @@
  */
 #include "booz2_guidance_h.h"
 
+#include "rc.h"
+#include "ins.h"
+
 #include "booz_ahrs.h"
 #include "stabilization/booz2_stabilization_rate.h"
 #include "stabilization/booz2_stabilization_attitude.h"
 #include "stabilization/booz2_stabilization_attitude_ref_traj_euler.h"
 #include "fms/booz2_fms.h"
-#include "booz2_ins.h"
+
 #include "booz2_navigation.h"
 
 #include "config/airframe.h"
-#include "rc.h"
 
 uint8_t booz2_guidance_h_mode;
 
@@ -164,12 +166,12 @@ void booz2_guidance_h_run(bool_t  in_flight) {
 static inline void  booz2_guidance_h_hover_run(void) {
 
   /* compute position error    */
-  BOOZ_IVECT2_DIFF(booz2_guidance_h_pos_err, booz_ins_ltp_pos, booz2_guidance_h_pos_sp);
+  BOOZ_IVECT2_DIFF(booz2_guidance_h_pos_err, ins.ltp_pos, booz2_guidance_h_pos_sp);
   /* saturate it               */
   BOOZ_IVECT2_STRIM(booz2_guidance_h_pos_err, -MAX_POS_ERR, MAX_POS_ERR);
 
   /* compute speed error    */
-  BOOZ_IVECT2_COPY(booz2_guidance_h_speed_err, booz_ins_ltp_speed);
+  BOOZ_IVECT2_COPY(booz2_guidance_h_speed_err, ins.ltp_speed);
   /* saturate it               */
   BOOZ_IVECT2_STRIM(booz2_guidance_h_speed_err, -MAX_SPEED_ERR, MAX_SPEED_ERR);
   
@@ -215,7 +217,7 @@ static inline void  booz2_guidance_h_hover_run(void) {
 
 static inline void booz2_guidance_h_hover_enter(void) {
 
-  BOOZ_IVECT2_COPY(booz2_guidance_h_pos_sp, booz_ins_ltp_pos);
+  BOOZ_IVECT2_COPY(booz2_guidance_h_pos_sp, ins.ltp_pos);
 
   BOOZ2_STABILIZATION_ATTITUDE_RESET_PSI_REF( booz2_guidance_h_rc_sp );
 

@@ -26,6 +26,7 @@
 #include "rc.h"
 #include "gps.h"
 #include "imu.h"
+#include "ins.h"
 #include "analog.h"
 #include "altimeter.h"
 #include "settings.h"
@@ -34,7 +35,6 @@
 #include "guidance.h"
 
 #include "booz_ahrs.h"
-#include "booz2_ins.h"
 
 #include "generated/messages.h"
 
