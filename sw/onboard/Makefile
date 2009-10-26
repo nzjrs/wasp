@@ -8,6 +8,7 @@ RADIO           = config/radio/T6EXAP.xml
 # looks for config/{messages,settings}.xml
 MESSAGES        = config/messages.xml
 SETTINGS        = config/settings.xml
+WASPDIR         = $(CURDIR)
 
 include arch/Makefile.$(ARCH)
 
@@ -53,9 +54,11 @@ CFLAGS += -Wall -Wcast-qual -Wimplicit -Wcast-align
 CFLAGS += -Wpointer-arith -Wswitch
 CFLAGS += -Wredundant-decls -Wreturn-type -Wshadow -Wunused
 CFLAGS += -Wa,-adhlns=$(OBJDIR)/$(notdir $(subst $(suffix $<),.lst,$<))
-CFLAGS += -Wstrict-prototypes -Wmissing-declarations
-CFLAGS += -Wmissing-prototypes -Wnested-externs 
-CFLAGS += -std=gnu99
+#CFLAGS += -Wstrict-prototypes
+CFLAGS += -Wmissing-declarations
+#CFLAGS += -Wmissing-prototypes
+#CFLAGS += -Wnested-externs 
+#CFLAGS += -std=gnu99
 CFLAGS += -fshort-enums
 CFLAGS += -ffunction-sections
 CFLAGS += -DARCH=$(ARCH)

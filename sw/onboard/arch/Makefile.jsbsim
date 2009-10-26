@@ -1,0 +1,30 @@
+ARCHSRC =                                       \
+    math/pprz_geodetic_double.c                 \
+    arch/jsbsim/nps_main.c                      \
+    arch/jsbsim/nps_unsimulated_periphials.c    \
+    arch/jsbsim/nps_fdm_jsbsim.c                \
+    arch/jsbsim/nps_flightgear.c                \
+    arch/jsbsim/nps_utils.c
+
+ARCHASMSRC =                            \
+    $(NULL)
+
+JSBSIMDIR=/opt/jsbsim/
+
+# Define programs and commands.
+CC		    = g++
+LD		    = g++
+OBJCOPY     = objcopy
+OBJDUMP     = objdump
+SIZE        = size
+NM          = nm
+
+JSBSIM_CFLAGS   = -I $(JSBSIMDIR)/include/JSBSim/ -DWASPDIR='"$(WASPDIR)"'
+JSBSIM_LDFLAGS  = -L $(JSBSIMDIR)/lib/ -lJSBSim
+GLIB_CFLAGS     = `pkg-config --cflags glib-2.0`
+GLIB_LDFLAGS    = `pkg-config --libs glib-2.0 gthread-2.0`
+
+# Arch specific flags
+ARCHCFLAGS  = -g $(JSBSIM_CFLAGS) $(GLIB_CFLAGS)
+ARCHASFLAGS = 
+ARCHLDFLAGS = $(JSBSIM_LDFLAGS) $(GLIB_LDFLAGS)
