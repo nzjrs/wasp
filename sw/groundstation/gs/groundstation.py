@@ -148,6 +148,12 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("menu_item_autopilot_disable").set_sensitive(False)
         self.builder_connect_signals()
 
+        #FIXME: REMOVE THE AUTOPILOT PAGE
+        nb = self.get_resource("main_notebook")
+        nb.remove_page(
+            nb.page_num(
+                self.get_resource("autopilot_hbox")))
+
         self.window.show_all()
 
     def _create_telemetry_ui(self):
