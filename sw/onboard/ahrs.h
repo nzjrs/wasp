@@ -26,10 +26,7 @@
 #include "std.h"
 #include "pprz_algebra_int.h"
 
-#define BOOZ_AHRS_UNINIT  0
-#define BOOZ_AHRS_RUNNING 1
-
-struct BoozAhrs {
+typedef struct __AHRS {
   struct Int32Eulers ltp_to_body_euler;
   struct Int32Quat   ltp_to_body_quat;
   struct Int32RMat   ltp_to_body_rmat;
@@ -38,15 +35,15 @@ struct BoozAhrs {
   struct Int32RMat   ltp_to_imu_rmat;
   struct Int32Rates  imu_rate;
   struct Int32Rates  body_rate;  
-  uint8_t status;
-};
+} AHRS_t;
 
-extern struct BoozAhrs booz_ahrs;
+extern AHRS_t ahrs;
 
-extern void booz_ahrs_init(void);
-extern void booz_ahrs_align(void);
-extern void booz_ahrs_propagate(void);
-extern void booz_ahrs_update(void);
+extern SystemStatus_t ahrs_status;
 
+extern void ahrs_init(void);
+extern void ahrs_align(void);
+extern void ahrs_propagate(void);
+extern void ahrs_update(void);
 
 #endif /* BOOZ_AHRS_H */

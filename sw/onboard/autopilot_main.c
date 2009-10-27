@@ -48,8 +48,7 @@
 #include "guidance.h"
 #include "booz2_navigation.h"
 
-#include "ahrs/booz_ahrs_aligner.h"
-#include "booz_ahrs.h"
+#include "ahrs.h"
 #include "ins.h"
 
 #include "autopilot_main.h"
@@ -96,9 +95,7 @@ static inline void autopilot_main_init( void ) {
   stabilization_init();
   booz2_nav_init();
 
-  booz_ahrs_aligner_init();
-  booz_ahrs_init();
-
+  ahrs_init();
   ins_init();
 
   int_enable();
@@ -154,16 +151,11 @@ static inline void autopilot_main_event( void ) {
   valid = imu_event_task();
   if ( (valid & IMU_ACC) || (valid & IMU_GYR) ) 
   {
-      if (booz_ahrs.status == BOOZ_AHRS_UNINIT) {
-        // 150
-        booz_ahrs_aligner_run();
-        if (booz_ahrs_aligner.status == BOOZ_AHRS_ALIGNER_LOCKED)
-          booz_ahrs_align();
+      if (ahrs_status != STATUS_INITIALIZED) {
+        ahrs_align();
       }
       else {
-        booz_ahrs_propagate();
-        //    booz2_filter_attitude_update();
-        
+        ahrs_propagate();
         ins_propagate();
       }
   }

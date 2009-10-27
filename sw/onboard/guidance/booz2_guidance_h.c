@@ -24,8 +24,8 @@
 
 #include "rc.h"
 #include "ins.h"
+#include "ahrs.h"
 
-#include "booz_ahrs.h"
 #include "stabilization/booz2_stabilization_rate.h"
 #include "stabilization/booz2_stabilization_attitude.h"
 #include "stabilization/booz2_stabilization_attitude_ref_traj_euler.h"
@@ -193,8 +193,8 @@ static inline void  booz2_guidance_h_hover_run(void) {
 
   /* Rotate to body frame */
   int32_t s_psi, c_psi;
-  BOOZ_ISIN(s_psi, booz_ahrs.ltp_to_body_euler.psi);	
-  BOOZ_ICOS(c_psi, booz_ahrs.ltp_to_body_euler.psi);	
+  BOOZ_ISIN(s_psi, ahrs.ltp_to_body_euler.psi);	
+  BOOZ_ICOS(c_psi, ahrs.ltp_to_body_euler.psi);	
 
 
   // ITRIG_RES - 2: 100mm erreur, gain 100 -> 10000 command | 2 degres = 36000, so multiply by 4

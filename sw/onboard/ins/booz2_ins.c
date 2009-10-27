@@ -24,6 +24,7 @@
 #include "imu.h"
 #include "altimeter.h"
 #include "gps.h"
+#include "ahrs.h"
 
 #include "booz_geometry_mixed.h"
 
@@ -31,7 +32,6 @@
 #include "ins/booz2_vf_float.h"
 #endif
 
-#include "booz_ahrs.h"
 #include "ins/booz2_hf_float.h"
 
 #include "pprz_geodetic_int.h"

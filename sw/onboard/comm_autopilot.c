@@ -27,14 +27,13 @@
 #include "gps.h"
 #include "imu.h"
 #include "ins.h"
+#include "ahrs.h"
 #include "analog.h"
 #include "altimeter.h"
 #include "settings.h"
 #include "sys_time.h"
 #include "autopilot.h"
 #include "guidance.h"
-
-#include "booz_ahrs.h"
 
 #include "generated/messages.h"
 
@@ -142,7 +141,8 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &rc_system_status,
                     &gps_system_status,
                     &altimeter_system_status,
-                    &comm_system_status);
+                    &comm_system_status,
+                    &ahrs_status);
             break;
         case MESSAGE_ID_ANALOG:
             {
@@ -159,24 +159,24 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
         case MESSAGE_ID_AHRS_QUAT:
             MESSAGE_SEND_AHRS_QUAT(
                     chan,
-                    &booz_ahrs.ltp_to_imu_quat.qi,
-                    &booz_ahrs.ltp_to_imu_quat.qx,
-                    &booz_ahrs.ltp_to_imu_quat.qy,
-                    &booz_ahrs.ltp_to_imu_quat.qz,
-                    &booz_ahrs.ltp_to_body_quat.qi,
-                    &booz_ahrs.ltp_to_body_quat.qx,
-                    &booz_ahrs.ltp_to_body_quat.qy,
-                    &booz_ahrs.ltp_to_body_quat.qz);
+                    &ahrs.ltp_to_imu_quat.qi,
+                    &ahrs.ltp_to_imu_quat.qx,
+                    &ahrs.ltp_to_imu_quat.qy,
+                    &ahrs.ltp_to_imu_quat.qz,
+                    &ahrs.ltp_to_body_quat.qi,
+                    &ahrs.ltp_to_body_quat.qx,
+                    &ahrs.ltp_to_body_quat.qy,
+                    &ahrs.ltp_to_body_quat.qz);
             break;
         case MESSAGE_ID_AHRS_EULER:
             MESSAGE_SEND_AHRS_EULER(
                     chan,
-                    &booz_ahrs.ltp_to_imu_euler.phi,
-                    &booz_ahrs.ltp_to_imu_euler.theta,
-                    &booz_ahrs.ltp_to_imu_euler.psi,
-                    &booz_ahrs.ltp_to_body_euler.phi,
-                    &booz_ahrs.ltp_to_body_euler.theta,
-                    &booz_ahrs.ltp_to_body_euler.psi);
+                    &ahrs.ltp_to_imu_euler.phi,
+                    &ahrs.ltp_to_imu_euler.theta,
+                    &ahrs.ltp_to_imu_euler.psi,
+                    &ahrs.ltp_to_body_euler.phi,
+                    &ahrs.ltp_to_body_euler.theta,
+                    &ahrs.ltp_to_body_euler.psi);
             break;
         case MESSAGE_ID_SUPERVISION:
             MESSAGE_SEND_SUPERVISION(

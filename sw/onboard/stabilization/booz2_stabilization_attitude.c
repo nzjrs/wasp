@@ -22,11 +22,12 @@
  */
 #include "booz2_stabilization_attitude.h"
 
+#include "rc.h"
+#include "ahrs.h"
 #include "booz2_stabilization_attitude_ref_traj_euler.h"
 #include "booz2_stabilization.h"
-#include "booz_ahrs.h"
+
 #include "config/airframe.h"
-#include "rc.h"
 
 struct booz_ieuler booz_stabilization_att_sp;
 
@@ -103,7 +104,7 @@ void booz2_stabilization_attitude_run(bool_t  in_flight) {
     booz_stabilization_att_ref.theta >> (ANGLE_REF_RES - IANGLE_RES),
     booz_stabilization_att_ref.psi   >> (ANGLE_REF_RES - IANGLE_RES) };
   struct booz_ieuler att_err;
-  BOOZ_IEULER_DIFF(att_err, booz_ahrs.ltp_to_body_euler, att_ref_scaled);
+  BOOZ_IEULER_DIFF(att_err, ahrs.ltp_to_body_euler, att_ref_scaled);
   BOOZ_ANGLE_NORMALIZE(att_err.psi);
 
   if (in_flight) {
@@ -123,7 +124,7 @@ void booz2_stabilization_attitude_run(bool_t  in_flight) {
     booz_stabilization_rate_ref.y >> (RATE_REF_RES - IRATE_RES),
     booz_stabilization_rate_ref.z >> (RATE_REF_RES - IRATE_RES) };
   struct Int32Rates rate_err;
-  RATES_DIFF(rate_err, booz_ahrs.body_rate, rate_ref_scaled);
+  RATES_DIFF(rate_err, ahrs.body_rate, rate_ref_scaled);
 
   /* compute PID loop                  */
   booz2_stabilization_cmd[COMMAND_ROLL] = booz_stabilization_pgain.x    * att_err.phi +
