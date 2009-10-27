@@ -46,7 +46,7 @@
 
 #include "gps.h"
 #include "guidance.h"
-#include "booz2_navigation.h"
+//#include "booz2_navigation.h"
 
 #include "ahrs.h"
 #include "ins.h"
@@ -93,7 +93,6 @@ static inline void autopilot_main_init( void ) {
   autopilot_init();
   guidance_init();
   stabilization_init();
-  booz2_nav_init();
 
   ahrs_init();
   ins_init();

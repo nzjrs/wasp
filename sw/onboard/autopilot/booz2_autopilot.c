@@ -26,7 +26,7 @@
 #include "rc.h"
 #include "actuators.h"
 #include "supervision.h"
-#include "booz2_navigation.h"
+#include "guidance/booz2_navigation.h"
 #include "guidance/booz2_guidance_h.h"
 #include "guidance/booz2_guidance_v.h"
 #include "stabilization/booz2_stabilization.h"
@@ -72,7 +72,7 @@ void autopilot_periodic(void) {
     }
     else
     {
-        RunOnceEvery(50, nav_periodic_task_10Hz())
+        //RunOnceEvery(50, nav_periodic_task_10Hz())
         booz2_guidance_v_run( autopilot.in_flight );
         booz2_guidance_h_run( autopilot.in_flight );
         autopilot_set_commands(

@@ -4,6 +4,7 @@
 
 void guidance_init(void)
 {
+    //nav_init();
     booz2_guidance_h_init();
     booz2_guidance_v_init();
 }
