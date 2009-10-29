@@ -126,7 +126,7 @@ static inline void autopilot_main_periodic( void ) {
         else
         {
             led_off(RC_LED);
-            autopilot_set_mode(BOOZ2_AP_MODE_FAILSAFE);
+            autopilot_set_mode(AP_MODE_FAILSAFE);
         }
         break;
     case 1:

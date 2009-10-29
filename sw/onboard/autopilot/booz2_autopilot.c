@@ -42,7 +42,7 @@ int32_t     booz2_commands_failsafe[COMMAND_NB] = COMMAND_FAILSAFE;
 #define BOOZ2_AUTOPILOT_YAW_TRESHOLD      (MAX_PPRZ * 19 / 20)
 
 void autopilot_init(void) {
-    autopilot.mode = BOOZ2_AP_MODE_FAILSAFE;
+    autopilot.mode = AP_MODE_FAILSAFE;
     autopilot.motors_on = FALSE;
     autopilot.in_flight = FALSE;
     autopilot.mode_auto2 = AUTOPILOT_MODE_AUTO2;
@@ -59,11 +59,12 @@ static inline void autopilot_set_commands( int32_t *in_cmd, uint8_t in_flight, u
     autopilot.commands[COMMAND_THRUST] = (motors_on) ? in_cmd[COMMAND_THRUST] : 0;
 }
 
-void autopilot_periodic(void) {
+void autopilot_periodic(void) 
+{
   
     if ( !autopilot.motors_on ||
-         autopilot.mode == BOOZ2_AP_MODE_FAILSAFE ||
-         autopilot.mode == BOOZ2_AP_MODE_KILL ) 
+         autopilot.mode == AP_MODE_FAILSAFE ||
+         autopilot.mode == AP_MODE_KILL ) 
     {
         autopilot_set_commands(
             booz2_commands_failsafe, 
@@ -99,65 +100,74 @@ void autopilot_set_actuators(void)
     actuators_commit(ACTUATOR_BANK_MOTORS);
 }
 
-void autopilot_set_mode(uint8_t new_autopilot_mode) {
+void autopilot_set_mode(AutopilotMode_t new_autopilot_mode) 
+{
+    bool_t ok = TRUE;
 
-  if (new_autopilot_mode != autopilot.mode) {
-    /* horizontal mode */
-    switch (new_autopilot_mode) {
-    case BOOZ2_AP_MODE_FAILSAFE:
-    case BOOZ2_AP_MODE_KILL:
-      autopilot.motors_on = FALSE;
-      booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_KILL);
-      break;
-    case BOOZ2_AP_MODE_RATE_DIRECT:
-    case BOOZ2_AP_MODE_RATE_Z_HOLD:
-      booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_RATE);
-      break;
-    case BOOZ2_AP_MODE_ATTITUDE_DIRECT:
-    case BOOZ2_AP_MODE_ATTITUDE_CLIMB:
-    case BOOZ2_AP_MODE_ATTITUDE_Z_HOLD:
-      booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_ATTITUDE);
-      break;
-    case BOOZ2_AP_MODE_HOVER_DIRECT:
-    case BOOZ2_AP_MODE_HOVER_CLIMB:
-    case BOOZ2_AP_MODE_HOVER_Z_HOLD:
-      booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_HOVER);
-      break;
-    case BOOZ2_AP_MODE_NAV:
-      booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_NAV);
-      break;
+    if (new_autopilot_mode != autopilot.mode) {
+        /* horizontal mode */
+        switch (new_autopilot_mode) {
+            case AP_MODE_FAILSAFE:
+            case AP_MODE_KILL:
+                autopilot.motors_on = FALSE;
+                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_KILL);
+                break;
+            case AP_MODE_RATE_DIRECT:
+            case AP_MODE_RATE_Z_HOLD:
+                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_RATE);
+                break;
+            case AP_MODE_ATTITUDE_DIRECT:
+            case AP_MODE_ATTITUDE_CLIMB:
+            case AP_MODE_ATTITUDE_Z_HOLD:
+                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_ATTITUDE);
+                break;
+            case AP_MODE_HOVER_DIRECT:
+            case AP_MODE_HOVER_CLIMB:
+            case AP_MODE_HOVER_Z_HOLD:
+                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_HOVER);
+                break;
+            case AP_MODE_NAV:
+                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_NAV);
+                break;
+            default:
+                ok = FALSE;
+                break;
+        }
+        /* vertical mode */
+        switch (new_autopilot_mode) {
+            case AP_MODE_FAILSAFE:
+            case AP_MODE_KILL:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_KILL);
+                break;
+            case AP_MODE_RATE_DIRECT:
+            case AP_MODE_ATTITUDE_DIRECT:
+            case AP_MODE_HOVER_DIRECT:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_DIRECT);
+                break;
+            case AP_MODE_RATE_RC_CLIMB:
+            case AP_MODE_ATTITUDE_RC_CLIMB:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_CLIMB);
+                break;
+            case AP_MODE_ATTITUDE_CLIMB:
+            case AP_MODE_HOVER_CLIMB:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_CLIMB);
+                break;
+            case AP_MODE_RATE_Z_HOLD:
+            case AP_MODE_ATTITUDE_Z_HOLD:
+            case AP_MODE_HOVER_Z_HOLD:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_HOVER);
+                break;
+            case AP_MODE_NAV:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_NAV);
+                break;
+            default:
+                ok = FALSE;
+                break;
     }
-    /* vertical mode */
-    switch (new_autopilot_mode) {
-    case BOOZ2_AP_MODE_FAILSAFE:
-    case BOOZ2_AP_MODE_KILL:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_KILL);
-      break;
-    case BOOZ2_AP_MODE_RATE_DIRECT:
-    case BOOZ2_AP_MODE_ATTITUDE_DIRECT:
-    case BOOZ2_AP_MODE_HOVER_DIRECT:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_DIRECT);
-      break;
-    case BOOZ2_AP_MODE_RATE_RC_CLIMB:
-    case BOOZ2_AP_MODE_ATTITUDE_RC_CLIMB:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_CLIMB);
-      break;
-    case BOOZ2_AP_MODE_ATTITUDE_CLIMB:
-    case BOOZ2_AP_MODE_HOVER_CLIMB:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_CLIMB);
-      break;
-    case BOOZ2_AP_MODE_RATE_Z_HOLD:
-    case BOOZ2_AP_MODE_ATTITUDE_Z_HOLD:
-    case BOOZ2_AP_MODE_HOVER_Z_HOLD:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_HOVER);
-      break;
-    case BOOZ2_AP_MODE_NAV:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_NAV);
-      break;
-    }
-    autopilot.mode = new_autopilot_mode;
-  } 
-  
+    if (ok)
+        autopilot.mode = new_autopilot_mode;
+    } 
+
 }
 
 static inline void autopilot_check_in_flight(void)
@@ -239,20 +249,21 @@ static inline void autopilot_check_motors_on(void)
     }
 }
 
-void autopilot_on_rc_event(void) {
+void autopilot_on_rc_event(void) 
+{
 
-  /* I think this should be hidden in rc code */
-  /* the ap gets a mode everytime - the rc filters it */
-  if (rc_values_contains_avg_channels) {
-    uint8_t new_autopilot_mode = autopilot_mode_of_radio(rc_values[RADIO_MODE]);
-    autopilot_set_mode(new_autopilot_mode);
-    rc_values_contains_avg_channels = FALSE;
-  }
+    /* I think this should be hidden in rc code */
+    /* the ap gets a mode everytime - the rc filters it */
+    if (rc_values_contains_avg_channels) {
+        uint8_t new_autopilot_mode = autopilot_mode_of_radio(rc_values[RADIO_MODE]);
+        autopilot_set_mode(new_autopilot_mode);
+        rc_values_contains_avg_channels = FALSE;
+    }
 
-  autopilot_check_motors_on();
-  autopilot_check_in_flight();
+    autopilot_check_motors_on();
+    autopilot_check_in_flight();
 
-  booz2_guidance_v_read_rc();
-  booz2_guidance_h_read_rc(autopilot.in_flight);
+    booz2_guidance_v_read_rc();
+    booz2_guidance_h_read_rc(autopilot.in_flight);
 
 }

@@ -45,7 +45,7 @@ void autopilot_init(void)
 {
     uint8_t i;
 
-    autopilot.mode = BOOZ2_AP_MODE_FAILSAFE;
+    autopilot.mode = AP_MODE_FAILSAFE;
     autopilot.motors_on = FALSE;
     autopilot.in_flight = FALSE;
     autopilot.mode_auto2 = AUTOPILOT_MODE_AUTO2;
@@ -63,12 +63,12 @@ void autopilot_periodic(void)
 
     switch (autopilot.mode)
     {
-        case BOOZ2_AP_MODE_FAILSAFE:
-        case BOOZ2_AP_MODE_KILL:
+        case AP_MODE_FAILSAFE:
+        case AP_MODE_KILL:
             for (i = 0; i < COMMAND_NB; i++)
                 autopilot.commands[i] = autopilot_commands_failsafe[i];
             break;
-        case BOOZ2_AP_MODE_RATE_DIRECT:
+        case AP_MODE_RATE_DIRECT:
             /* scale radio values to full range */
             autopilot.commands[COMMAND_PITCH] = rc_values[RADIO_PITCH] * (INT32_MAX/MAX_PPRZ);
             autopilot.commands[COMMAND_ROLL] = rc_values[RADIO_ROLL] * (INT32_MAX/MAX_PPRZ);
@@ -80,7 +80,7 @@ void autopilot_periodic(void)
             else
                 autopilot.commands[COMMAND_THRUST] = rc_values[RADIO_THROTTLE] * (INT32_MAX/MAX_PPRZ);
             break;
-        case BOOZ2_AP_MODE_ATTITUDE_DIRECT:
+        case AP_MODE_ATTITUDE_DIRECT:
             break;
         default:
             break;
@@ -89,28 +89,28 @@ void autopilot_periodic(void)
 
 void autopilot_on_rc_event(void)
 {
-  /* I think this should be hidden in rc code */
-  /* the ap gets a mode everytime - the rc filters it */
-  if (rc_values_contains_avg_channels) {
-    uint8_t new_autopilot_mode = autopilot_mode_of_radio(rc_values[RADIO_MODE]);
-    autopilot_set_mode(new_autopilot_mode);
-    rc_values_contains_avg_channels = FALSE;
-  }
+    /* I think this should be hidden in rc code */
+    /* the ap gets a mode everytime - the rc filters it */
+    if (rc_values_contains_avg_channels) {
+        uint8_t new_autopilot_mode = autopilot_mode_of_radio(rc_values[RADIO_MODE]);
+        autopilot_set_mode(new_autopilot_mode);
+        rc_values_contains_avg_channels = FALSE;
+    }
 }
 
-void autopilot_set_mode(uint8_t new_autopilot_mode)
+void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
 {
     if (new_autopilot_mode != autopilot.mode) 
     {
         bool_t ok = TRUE;
         switch (new_autopilot_mode)
         {
-            case BOOZ2_AP_MODE_FAILSAFE:
-            case BOOZ2_AP_MODE_KILL:
+            case AP_MODE_FAILSAFE:
+            case AP_MODE_KILL:
                 break;
-            case BOOZ2_AP_MODE_RATE_DIRECT:
+            case AP_MODE_RATE_DIRECT:
                 break;
-            case BOOZ2_AP_MODE_ATTITUDE_DIRECT:
+            case AP_MODE_ATTITUDE_DIRECT:
                 break;
             default:
                 ok = FALSE;
