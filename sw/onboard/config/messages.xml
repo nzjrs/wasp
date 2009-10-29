@@ -81,6 +81,7 @@
      <field name="gps" type="uint8"         values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
      <field name="altimeter" type="uint8"   values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
      <field name="comm" type="uint8"        values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
+     <field name="ahrs" type="uint8"        values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
    </message>
 
   <message name="AHRS_EULER" id="16">

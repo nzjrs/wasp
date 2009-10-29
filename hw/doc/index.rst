@@ -40,4 +40,33 @@ Calibrating the Radio
 - Click save, which will generate a file at *~/Desktop/radio.xml*
 - Replace the radio.xml in sw/onboard/config.xml with the new one and reprogram the autopilot. This should then give you proper channel mappings.
 
+If you wish to hand edit the radio xml file, be aware of the following tags::
+
+    <!--
+    -- Attributes of root (Radio) tag :
+    -- name: name of RC
+    -- data_min: min width of a pulse to be considered as a data pulse
+    -- data_max: max width of a pulse to be considered as a data pulse
+    -- sync_min: min width of a pulse to be considered as a synchro pulse
+    -- sync_max: max width of a pulse to be considered as a synchro pulse
+    -- pulse_type: POSITIVE ( Futaba and others) | NEGATIVE (JR)
+    --
+    -- Note: min, max and sync are expressed in micro-seconds
+    -->
+
+    <!-- 
+    -- Attributes of channel tag :
+    -- ctl: name of the command on the transmitter - only for displaying
+    -- no: order in the PPM frame
+    -- function: logical command
+    -- averaged: channel filtered through several frames (for discrete commands)
+    -- min: minimum pulse length (micro-seconds)
+    -- max: maximum pulse length (micro-seconds)
+    -- neutral: neutral pulse length (micro-seconds)
+    --
+    -- Note: a command may be reversed by exchanging min and max values. Neutral does not need
+    --       to be mid way between min and max, for example, neutral = min in the case of
+    --       the throttle
+    -->
+
 

@@ -21,13 +21,12 @@
  *
  */
 #include "booz2_hf_float.h"
-#include "booz2_ins.h"
 
+#include "ins.h"
 #include "imu.h"
+#include "ahrs.h"
 
-#include "booz_ahrs.h"
 #include "booz_geometry_mixed.h"
-
 
 struct Int32Vect3 b2ins_accel_bias;
 struct Int32Vect3 b2ins_accel_ltp;
@@ -69,7 +68,7 @@ void b2ins_propagate(void) {
   /* unbias accelerometers */
   VECT3_DIFF(accel_imu, booz_imu.accel, scaled_biases);
   /* convert to LTP */
-  BOOZ_IQUAT_VDIV(b2ins_accel_ltp, booz_ahrs.ltp_to_imu_quat, accel_imu);
+  BOOZ_IQUAT_VDIV(b2ins_accel_ltp, ahrs.ltp_to_imu_quat, accel_imu);
   /* correct for gravity */
   b2ins_accel_ltp.z += BOOZ_ACCEL_I_OF_F(9.81);
   /* propagate position */
@@ -89,9 +88,9 @@ void b2ins_propagate(void) {
 void b2ins_update_gps(void) {
 
   /* FIXME : with Q_int32_XX_8 we overflow for 256m */
-  INT32_VECT3_SCALE_2(b2ins_meas_gps_pos_ned, booz_ins_gps_pos_cm_ned, 
+  INT32_VECT3_SCALE_2(b2ins_meas_gps_pos_ned, ins.gps_pos_cm_ned, 
 		      IPOS_OF_CM_NUM, IPOS_OF_CM_DEN); 
-  INT32_VECT3_SCALE_2(b2ins_meas_gps_speed_ned, booz_ins_gps_speed_cm_s_ned,
+  INT32_VECT3_SCALE_2(b2ins_meas_gps_speed_ned, ins.gps_speed_cm_s_ned,
 		      ISPEED_OF_CM_S_NUM, ISPEED_OF_CM_S_DEN); 
 
 #ifdef UPDATE_FROM_POS
@@ -124,7 +123,7 @@ void b2ins_update_gps(void) {
   VECT2_SDIV(speed_residual3, (1<<9), speed_residual);
   speed_residual3.z = 0;
   struct Int32Vect3 bias_cor_s;
-  INT32_QUAT_VMULT( bias_cor_s, booz_ahrs.ltp_to_imu_quat, speed_residual3);
+  INT32_QUAT_VMULT( bias_cor_s, ahrs.ltp_to_imu_quat, speed_residual3);
   //  VECT3_ADD(b2ins_accel_bias, bias_cor_s); 
 
 #endif /* UPDATE_FROM_SPEED */ 

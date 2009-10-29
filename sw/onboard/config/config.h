@@ -119,17 +119,13 @@
 /* Time */
 #define PERIODIC_TASK_PERIOD SYS_TICS_OF_SEC((1./512.))
 
-/* Radio Control : Futaba is falling edge clocked whereas JR is rising edge */
-#define RADIO_CONTROL       1
-#define RC_FUTABA           0
-#define RC_JR               1
-#define RADIO_CONTROL_TYPE  RC_FUTABA
+/* Radio Control */
+#define USE_RADIO_CONTROL       1
 
 /* PPM : rc rx on P0.28 ( CAP0.2 ) */
 #define PPM_PINSEL      PINSEL1
 #define PPM_PINSEL_VAL  0x02
 #define PPM_PINSEL_BIT  24
-
 
 /* UARTS */
 #define USE_UART0 1

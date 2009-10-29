@@ -22,9 +22,8 @@
  */
 #define NAV_C
 
+#include "ins.h"
 #include "booz2_navigation.h"
-
-#include "booz2_ins.h"
 
 #include "config/flight_plan.h"
 
@@ -67,7 +66,7 @@ void booz2_nav_run(void) {
 
   /* compute a vector to the waypoint */
   struct Int32Vect2 path_to_waypoint;
-  VECT2_DIFF(path_to_waypoint, booz2_navigation_target, booz_ins_enu_pos);
+  VECT2_DIFF(path_to_waypoint, booz2_navigation_target, ins.enu_pos);
 
   /* saturate it */
   VECT2_STRIM(path_to_waypoint, -(1<<15), (1<<15));
@@ -82,7 +81,7 @@ void booz2_nav_run(void) {
     struct Int32Vect2 path_to_carrot;
     VECT2_SMUL(path_to_carrot, CARROT_DIST, path_to_waypoint);
     VECT2_SDIV(path_to_carrot, dist_to_waypoint, path_to_carrot);
-    VECT2_SUM(booz2_navigation_carrot, path_to_carrot, booz_ins_enu_pos);
+    VECT2_SUM(booz2_navigation_carrot, path_to_carrot, ins.enu_pos);
   }
 }
 
@@ -90,7 +89,7 @@ void booz2_nav_run(void) {
 void nav_route(uint8_t wp_start, uint8_t wp_end) {
   struct Int32Vect2 wp_diff,pos_diff;
   VECT2_DIFF(wp_diff, waypoints[wp_end],waypoints[wp_start]);
-  VECT2_DIFF(pos_diff, booz_ins_enu_pos,waypoints[wp_start]);
+  VECT2_DIFF(pos_diff, ins.enu_pos,waypoints[wp_start]);
   // go back to metric precision or values are too large
   INT32_VECT2_RSHIFT(wp_diff,wp_diff,INT32_POS_FRAC);
   INT32_VECT2_RSHIFT(pos_diff,pos_diff,INT32_POS_FRAC);
@@ -122,7 +121,7 @@ void nav_route(uint8_t wp_start, uint8_t wp_end) {
 bool_t nav_approaching_from(uint8_t wp_idx, uint8_t from_idx) {
   int32_t dist_to_point;
   struct Int32Vect2 diff;
-  VECT2_DIFF(diff, waypoints[wp_idx], booz_ins_enu_pos);
+  VECT2_DIFF(diff, waypoints[wp_idx], ins.enu_pos);
   INT32_VECT2_RSHIFT(diff,diff,INT32_POS_FRAC);
   INT32_VECT2_NORM(dist_to_point, diff);
   //printf("dist %d | %d %d\n", dist_to_point,diff.x,diff.y);
@@ -141,9 +140,9 @@ static int32_t previous_ground_alt;
 
 /** Reset the geographic reference to the current GPS fix */
 unit_t nav_reset_reference( void ) {
-  booz_ins_ltp_initialised = FALSE;
+  ins.ltp_initialised = FALSE;
   previous_ground_alt = ground_alt;
-  ground_alt = booz_ins_enu_pos.z;
+  ground_alt = ins.enu_pos.z;
   return 0;
 }
 
@@ -157,7 +156,7 @@ unit_t nav_update_waypoints_alt( void ) {
 }
 
 void nav_init_stage( void ) {
-  INT32_VECT3_COPY(nav_last_point, booz_ins_enu_pos);
+  INT32_VECT3_COPY(nav_last_point, ins.enu_pos);
   stage_time = 0;
   horizontal_mode = HORIZONTAL_MODE_WAYPOINT;
 }

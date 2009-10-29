@@ -46,11 +46,10 @@
 
 #include "gps.h"
 #include "guidance.h"
-#include "booz2_navigation.h"
+//#include "booz2_navigation.h"
 
-#include "ahrs/booz_ahrs_aligner.h"
-#include "booz_ahrs.h"
-#include "booz2_ins.h"
+#include "ahrs.h"
+#include "ins.h"
 
 #include "autopilot_main.h"
 
@@ -94,12 +93,9 @@ static inline void autopilot_main_init( void ) {
   autopilot_init();
   guidance_init();
   stabilization_init();
-  booz2_nav_init();
 
-  booz_ahrs_aligner_init();
-  booz_ahrs_init();
-
-  booz_ins_init();
+  ahrs_init();
+  ins_init();
 
   int_enable();
 }
@@ -154,29 +150,24 @@ static inline void autopilot_main_event( void ) {
   valid = imu_event_task();
   if ( (valid & IMU_ACC) || (valid & IMU_GYR) ) 
   {
-      if (booz_ahrs.status == BOOZ_AHRS_UNINIT) {
-        // 150
-        booz_ahrs_aligner_run();
-        if (booz_ahrs_aligner.status == BOOZ_AHRS_ALIGNER_LOCKED)
-          booz_ahrs_align();
+      if (ahrs_status != STATUS_INITIALIZED) {
+        ahrs_align();
       }
       else {
-        booz_ahrs_propagate();
-        //    booz2_filter_attitude_update();
-        
-        booz_ins_propagate();
+        ahrs_propagate();
+        ins_propagate();
       }
   }
 
   if ( altimeter_event_task() )
-    booz_ins_update_baro();
+    ins_update_baro();
 
   if ( gps_event_task() ) {
     if (booz_gps_state.fix == GPS_FIX_3D)
         led_on(GPS_LED);
     else
         led_toggle(GPS_LED);
-    booz_ins_update_gps();
+    ins_update_gps();
   }
 
   comm_event_task(COMM_1);

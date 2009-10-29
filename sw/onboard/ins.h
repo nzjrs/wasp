@@ -28,34 +28,35 @@
 #include "booz_geometry_int.h"
 #include "pprz_geodetic_int.h"
 
-/* gps transformed to LTP-NED  */
-extern struct LtpDef_i  booz_ins_ltp_def;
-extern          bool_t  booz_ins_ltp_initialised;
-extern struct NedCoor_i booz_ins_gps_pos_cm_ned;
-extern struct NedCoor_i booz_ins_gps_speed_cm_s_ned;
-
-/* barometer                   */
+typedef struct __INS {
+    /* gps transformed to LTP-NED  */
+    struct LtpDef_i     ltp_def;
+    bool_t              ltp_initialised;
+    struct NedCoor_i    gps_pos_cm_ned;
+    struct NedCoor_i    gps_speed_cm_s_ned;
 #if USE_VFF
-extern int32_t booz_ins_baro_alt;
-extern int32_t booz_ins_qfe;
-extern bool_t  booz_ins_baro_initialised;
-extern bool_t  booz_ins_vff_realign; 
+    /* barometer                   */
+    int32_t             baro_alt;
+    int32_t             qfe;
+    bool_t              baro_initialised;
+    bool_t              vff_realign; 
 #endif
+    /* output LTP NED               */
+    struct NedCoor_i    ltp_pos;
+    struct NedCoor_i    ltp_speed;
+    struct NedCoor_i    ltp_accel;
+    /* output LTP ENU               */
+    struct EnuCoor_i    enu_pos;
+    struct EnuCoor_i    enu_speed;
+    struct EnuCoor_i    enu_accel;
+} INS_t;
 
-/* output LTP NED               */
-extern struct NedCoor_i booz_ins_ltp_pos;
-extern struct NedCoor_i booz_ins_ltp_speed;
-extern struct NedCoor_i booz_ins_ltp_accel;
-/* output LTP ENU               */
-extern struct EnuCoor_i booz_ins_enu_pos;
-extern struct EnuCoor_i booz_ins_enu_speed;
-extern struct EnuCoor_i booz_ins_enu_accel;
+extern INS_t    ins;
 
-
-extern void booz_ins_init( void );
-extern void booz_ins_propagate( void );
-extern void booz_ins_update_baro( void );
-extern void booz_ins_update_gps( void );
+void            ins_init( void );
+void            ins_propagate( void );
+void            ins_update_baro( void );
+void            ins_update_gps( void );
 
 
 #endif /* BOOZ2_INS_H */
