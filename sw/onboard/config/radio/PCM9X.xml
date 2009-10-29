@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE radio SYSTEM "radio.dtd">
-<radio name="pcm9x" data_min="900" data_max="2100" sync_min ="5000" sync_max ="15000">
+<radio name="pcm9x" data_min="900" data_max="2100" sync_min ="5000" sync_max ="15000" pulse_type="POSITIVE">
     <channel ctl="1" function="THROTTLE" max="18967" neutral="1507" min="9780" average="0"/>
     <channel ctl="2" function="ROLL" max="1505" neutral="1495" min="2012" average="0"/>
     <channel ctl="3" function="PITCH" max="2013" neutral="1497" min="978" average="0"/>

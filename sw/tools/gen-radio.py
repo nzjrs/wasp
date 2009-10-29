@@ -11,7 +11,7 @@ import os.path
 import sys
 
 #<!DOCTYPE radio SYSTEM "radio.dtd">
-#<radio name="Futaba T6EXAP" data_min="900" data_max="2100" sync_min ="5000" sync_max ="15000">
+#<radio name="Futaba T6EXAP" data_min="900" data_max="2100" sync_min ="5000" sync_max ="15000" pulse_type="POSITIVE">
 # <channel ctl="1" function="ROLL"     max="1109" neutral="1520" min="1936" average="0"/>
 # <channel ctl="2" function="PITCH"    min="1099" neutral="1525" max="1921" average="0"/>
 # <channel ctl="3" function="THROTTLE" min="1930" neutral="1930" max="1108" average="0"/>
@@ -23,6 +23,11 @@ import sys
 USAGE = "Usage: %s radio_xml_file.xml" % sys.argv[0]
 H = "RADIO_H"
 
+PULSE_TYPES = {
+    "POSITIVE"  :   0,
+    "NEGATIVE"  :   1
+}
+
 if len(sys.argv) != 2:
     print USAGE
     sys.exit(1)
@@ -31,6 +36,7 @@ try:
     x = xmlobject.XMLFile(path=sys.argv[1])
     radio = x.root
     channels = radio.channel
+    pulse_type = PULSE_TYPES[radio.pulse_type]
     avgchans = [c for c in channels if c.average == "1"]
     nrmchans = [c for c in channels if c.average == "0"]
 except:
@@ -48,6 +54,11 @@ gentools.print_header(H, generatedfrom=os.path.abspath(sys.argv[1]))
 print '#define RADIO_NAME "%s"' % radio.name
 print
 print '#define RADIO_CTL_NB', len(channels)
+print
+
+for p in PULSE_TYPES:
+    print "#define PPM_PULSE_TYPE_%s %s" % (p, PULSE_TYPES[p])
+print "#define PPM_PULSE_TYPE PPM_PULSE_TYPE_%s" % radio.pulse_type
 print
 
 i = 0
