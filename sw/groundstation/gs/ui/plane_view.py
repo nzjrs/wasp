@@ -5,20 +5,28 @@ import gtk.gtkgl
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
+class PlaneView(gtk.Window):
+    def __init__(self, source):
+        gtk.Window.__init__(self)
+
+        self.set_default_size(500, 400)
+        self.set_title("Plane View")
+        self.connect("delete-event", self._on_window_delete)
+
+        self.plane = _PlaneWidget(source) 
+        self.add(self.plane)
+
+    def _on_window_delete(self, widget, data=None):
+        self.hide_all()
+        return True
+
+
+class _PlaneWidget(gtk.DrawingArea, gtk.gtkgl.Widget):
     def __init__(self, source):
         gtk.DrawingArea.__init__(self)
-        
-        self.win = gtk.Window()
-        
-        self.plane = None
-
-        self.set_events(gtk.gdk.BUTTON_MOTION_MASK | gtk.gdk.KEY_PRESS_MASK | gtk.gdk.KEY_RELEASE_MASK|
-                        gtk.gdk.POINTER_MOTION_MASK | gtk.gdk.BUTTON_RELEASE_MASK|
-                        gtk.gdk.BUTTON_PRESS_MASK |  gtk.gdk.SCROLL_MASK)
+        self._plane = None
 
         display_mode = (gtk.gdkgl.MODE_RGB | gtk.gdkgl.MODE_DOUBLE)
-
         try:
             glconfig = gtk.gdkgl.Config(mode=display_mode)
         except gtk.gdkgl.NoMatches:            display_mode &= ~gtk.gdkgl.MODE_SINGLE
@@ -30,21 +38,16 @@ class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
                         gtk.gdk.POINTER_MOTION_MASK | gtk.gdk.BUTTON_RELEASE_MASK|
                         gtk.gdk.BUTTON_PRESS_MASK |  gtk.gdk.SCROLL_MASK)
 
-        self.connect( "expose_event", self.on_expose_event )
-        self.connect( "realize", self.on_realize )
-        self.connect( "configure_event", self.on_configure_event )
+        self.connect( "expose_event", self._on_expose_event )
+        self.connect( "realize", self._on_realize )
+        self.connect( "configure_event", self._on_configure_event )
         
-        self.win.connect("delete-event", self.on_window_delete)
-
         self._roll = 0.0
         self._heading = 0.0
         self._pitch = 0.0
         
-        self.win.add(self)
-        self.win.set_default_size(500, 400)
-        self.win.set_title("Plane View")
-
-        source.register_interest(self._on_ahrs, 10, "AHRS_EULER")
+        if source:
+            source.register_interest(self._on_ahrs, 10, "AHRS_EULER")
 
     def _on_ahrs(self, msg, payload):
         imu_phi, imu_theta, imu_psi, body_phi, body_theta, body_psi = msg.unpack_scaled_values(payload)
@@ -64,15 +67,7 @@ class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
         n[1] *= 1.0 / m
         n[2] *= 1.0 / m
 
-    def on_window_delete(self, widget, data=None):
-        self.win.hide_all()
-        return True
-        
-    def show_all(self):
-        self.win.show_all()      
-
-    def on_configure_event(self, *args):
-        #print "configure"
+    def _on_configure_event(self, *args):
         gldrawable = self.get_gl_drawable()
         glcontext = self.get_gl_context()
         gldrawable.gl_begin(glcontext)
@@ -88,16 +83,17 @@ class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
         gldrawable.swap_buffers()
         gldrawable.gl_end()
         
-    def make_plane(self):
-        self.plane = glGenLists(1)
-        glNewList(self.plane, GL_COMPILE)
+    def _make_plane(self):
+        self._plane = glGenLists(1)
+        glNewList(self._plane, GL_COMPILE)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
         glEnable(GL_CULL_FACE)
         glBegin(GL_QUADS)
 
         path = os.path.join(os.path.dirname(__file__), "plane.raw")
-        for line in file(path):
+        for line in file(path, 'r'):
             c = line.split(' ')
             c.remove(c[len(c)-1])
             c = map(float, c)
@@ -106,7 +102,7 @@ class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
                         [c[3]-c[0], c[4]-c[1], c[5]-c[2]],
                         [c[6]-c[0], c[7]-c[1], c[8]-c[2]])
             self._normalize(n)
-                    
+
             glNormal3d(n[0], n[1], n[2])
             glVertex3d(c[0], c[1], c[2])
             glVertex3d(c[3], c[4], c[5])
@@ -118,35 +114,10 @@ class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
         glDisable(GL_DEPTH_TEST)
         glEndList()
 
-    def on_realize(self,*args):
-        #print "realise"
-        gldrawable = self.get_gl_drawable()
-        glcontext = self.get_gl_context()
-        if not gldrawable.gl_begin(glcontext):
-            return
-            
-        w, h = self.get_gl_window().get_size()
+    def _on_realize(self, *args):
+        self._make_plane()
 
-        self.make_plane()
-                    
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
-        glEnable(GL_BLEND)
-        glEnable(GL_NORMALIZE)
-        glShadeModel(GL_SMOOTH)
-        glClearColor(0.5,0.5,1.0,0)
-
-        glMatrixMode(GL_PROJECTION)
-        gluPerspective(45.0,float(w)/float(h),0.1,100.0)
-        glMatrixMode(GL_MODELVIEW)
-       
-        self.display()
-        
-        gldrawable.gl_end()
-
-    def on_expose_event(self, *args):
-        #print "expose"
+    def _on_expose_event(self, *args):
         gldrawable = self.get_gl_drawable()
         glcontext = self.get_gl_context()
         gldrawable.gl_begin(glcontext)
@@ -156,25 +127,17 @@ class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
             h = 1
         glViewport(0, 0, w, h)
         
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
-        glEnable(GL_BLEND)
-        glEnable(GL_NORMALIZE)
-        glShadeModel(GL_SMOOTH)
-        glClearColor(0.0, 0.0, 0.0, 0.0)
-        
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         gluPerspective(45.0, float(w)/float(h), 0.1, 100.0)
         glMatrixMode(GL_MODELVIEW)
         
-        self.display()
+        self._display()
 
         gldrawable.swap_buffers()
         gldrawable.gl_end()
 	        
-    def display(self):
+    def _display(self):
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
         glTranslatef(0.0,0.0,-11.0)
@@ -185,12 +148,31 @@ class PlaneView(gtk.DrawingArea, gtk.gtkgl.Widget):
         glRotatef(self._heading, 0.0, 1.0, 0.0)
         glRotatef(self._pitch, 0.0, 0.0, 1.0)
         
-        glCallList(self.plane)
+        glCallList(self._plane)
+
         
     def set_rotations(self, pitch, roll, heading):
         self._pitch = pitch
         self._roll = roll
         self._heading = heading
         self.queue_draw()
+
+if __name__ == "__main__":
+    import random
+    import gobject
+
+    def rotate(pw):
+        pw.set_rotations(
+                2.0*random.random(),
+                2.0*random.random(),
+                0)
+        return True
+
+    p = PlaneView(None)
+    p.show_all()
+
+    gobject.timeout_add(1000/20,rotate, p.plane)
+
+    gtk.main()
 
         	
