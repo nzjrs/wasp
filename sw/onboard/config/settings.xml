@@ -77,5 +77,16 @@
     <setting name="YAW_COEF"   value="{ -256, -256,  256,  256}"/>
     <setting name="THRUST_COEF" value="{ 256,  256,  256,  256}"/>
   </section>
+  <section name="PID">
+    <setting name="PITCH_P" type="float" value="0.0" set="1" get="1"/>
+    <setting name="PITCH_I" type="float" value="0.0" set="1" get="1"/>
+    <setting name="PITCH_D" type="float" value="0.0" set="1" get="1"/>
+    <setting name="ROLL_P" type="float" value="0.0" set="1" get="1"/>
+    <setting name="ROLL_I" type="float" value="0.0" set="1" get="1"/>
+    <setting name="ROLL_D" type="float" value="0.0" set="1" get="1"/>
+    <setting name="YAW_P" type="float" value="0.0" set="1" get="1"/>
+    <setting name="YAW_I" type="float" value="0.0" set="1" get="1"/>
+    <setting name="YAW_D" type="float" value="0.0" set="1" get="1"/>
+  </section>
 </settings>
 
