@@ -20,24 +20,16 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+#ifndef _FW_STABILIZATION_H_
+#define _FW_STABILIZATION_H_
 
-#include "stabilization.h"
-#include "fixedwing_stabilization.h"
+#include "math/pid_int.h"
 
-void fixedwing_stabiliziation_h_run(void)
-{
-    ;
-}
+PID_t   pid_pitch;
+PID_t   pid_roll;
+PID_t   pid_yaw;
 
-void fixedwing_stabiliziation_v_run(void)
-{
-    ;
-}
+void fixedwing_stabiliziation_h_run(void);
+void fixedwing_stabiliziation_v_run(void);
 
-void stabilization_init(void)
-{
-    pid_init(&pid_pitch, PID_PITCH_P, PID_PITCH_I, PID_PITCH_D);
-    pid_init(&pid_roll, PID_ROLL_P, PID_ROLL_I, PID_ROLL_D);
-    pid_init(&pid_yaw, PID_YAW_P, PID_YAW_I, PID_YAW_D);
-}
-
+#endif /* _FW_STABILIZATION_H_ */
