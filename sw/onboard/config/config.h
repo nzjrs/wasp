@@ -144,16 +144,12 @@
 #define I2C1_SCLH 150
 
 /* GPS */
-#define GPS_LINK Uart0
-
-/* Analog */
-#define BOOZ2_ANALOG_BARO_PERIOD SYS_TICS_OF_SEC((1./100.))
-#define BOOZ2_ANALOG_BATTERY_PERIOD SYS_TICS_OF_SEC((1./10.))
+#define GPS_LINK                    Uart0
 
 /* Control Etc */
-#define USE_VFF 1
-#define DT_VFILTER (1./512.)
-#define HS_YAW 1
+#define USE_VFF                     1
+#define DT_VFILTER                  (1./512.)
+#define HS_YAW                      1
 
 #define BOOZ2_FMS_TYPE_NONE         0
 #define BOOZ2_FMS_TYPE_DATALINK     1
