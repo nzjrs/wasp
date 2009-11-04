@@ -30,10 +30,9 @@
 #include "stabilization/booz2_stabilization_attitude.h"
 #include "stabilization/booz2_stabilization_attitude_ref_traj_euler.h"
 #include "fms/booz2_fms.h"
-
 #include "booz2_navigation.h"
 
-#include "config/airframe.h"
+#include "generated/settings.h"
 
 uint8_t booz2_guidance_h_mode;
 

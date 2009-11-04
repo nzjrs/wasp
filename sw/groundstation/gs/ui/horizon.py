@@ -1,7 +1,4 @@
-#!/usr/bin/python
-
 import math
-
 import gtk
 import gtk.gtkgl
 
@@ -23,20 +20,27 @@ def showMessage(x, y, msg, scale):
     drawText( msg )
     glPopMatrix()
 
-class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
+class HorizonView(gtk.Window):
+    def __init__(self, source):
+        gtk.Window.__init__(self)
+
+        self.set_default_size(400, 400)
+        self.set_title("Horizon View")
+        self.connect("delete-event", self._on_window_delete)
+
+        self.horizon = _HorizonWidget(source) 
+        self.add(self.horizon)
+
+    def _on_window_delete(self, widget, data=None):
+        self.hide_all()
+        return True
+
+class _HorizonWidget(gtk.DrawingArea, gtk.gtkgl.Widget):
     def __init__(self, source):
         gtk.DrawingArea.__init__(self)
         
         glutInit()
-        
-        self.win = gtk.Window()
-
-        self.set_events(gtk.gdk.BUTTON_MOTION_MASK | gtk.gdk.KEY_PRESS_MASK | gtk.gdk.KEY_RELEASE_MASK|
-                        gtk.gdk.POINTER_MOTION_MASK | gtk.gdk.BUTTON_RELEASE_MASK|
-                        gtk.gdk.BUTTON_PRESS_MASK |  gtk.gdk.SCROLL_MASK)
-
         display_mode = (gtk.gdkgl.MODE_RGB | gtk.gdkgl.MODE_DOUBLE)
-
         try:
             glconfig = gtk.gdkgl.Config(mode=display_mode)
         except gtk.gdkgl.NoMatches:            display_mode &= ~gtk.gdkgl.MODE_SINGLE
@@ -48,24 +52,18 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
                         gtk.gdk.POINTER_MOTION_MASK | gtk.gdk.BUTTON_RELEASE_MASK|
                         gtk.gdk.BUTTON_PRESS_MASK |  gtk.gdk.SCROLL_MASK)
 
-        self.connect( "expose_event", self.on_expose_event )
-        self.connect( "realize", self.on_realize )
-        self.connect( "configure_event", self.on_configure_event )
+        self.connect( "expose_event", self._on_expose_event )
+        self.connect( "realize", self._on_realize )
+        self.connect( "configure_event", self._on_configure_event )
         
-        self.win.connect("delete-event", self.on_window_delete)
-        
-        self._roll = 0.0
         self._pitch = 0.0
+        self._roll = 0.0
         self._yaw = 0.0
         self._speed = 0.0
         self._altitude = 0.0
         
-        self.win.set_title("Horizon View")
-        self.win.set_default_size(400,400)
-        
-        self.win.add(self)
-
-        source.register_interest(self._on_ahrs, 10, "AHRS_EULER")
+        if source:
+            source.register_interest(self._on_ahrs, 10, "AHRS_EULER")
 
     def _on_ahrs(self, msg, payload):
         imu_phi, imu_theta, imu_psi, body_phi, body_theta, body_psi = msg.unpack_scaled_values(payload)
@@ -78,15 +76,7 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
                 altitude=0,
                 speed=0)
         
-    def on_window_delete(self, widget, data=None):
-        self.win.hide_all()
-        return True
-        
-    def show_all(self):
-        self.win.show_all()
-
-    def on_configure_event(self, *args):
-        #print "configure"
+    def _on_configure_event(self, *args):
         gldrawable = self.get_gl_drawable()
         glcontext = self.get_gl_context()
         gldrawable.gl_begin(glcontext)
@@ -104,8 +94,7 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
         gldrawable.swap_buffers()
         gldrawable.gl_end()
 
-    def on_realize(self,*args):
-        #print "realise"
+    def _on_realize(self, *args):
         gldrawable = self.get_gl_drawable()
         glcontext = self.get_gl_context()
         if not gldrawable.gl_begin(glcontext):
@@ -135,11 +124,11 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
         glMatrixMode( GL_MODELVIEW )
         glLoadIdentity()
 
-        self.display()
+        self._display()
         
         gldrawable.gl_end()
 
-    def on_expose_event(self, *args):
+    def _on_expose_event(self, *args):
         gldrawable = self.get_gl_drawable()
         glcontext = self.get_gl_context()
         gldrawable.gl_begin(glcontext)
@@ -157,12 +146,12 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
         glMatrixMode( GL_MODELVIEW )
         glLoadIdentity()
         
-        self.display()
+        self._display()
 
         gldrawable.swap_buffers()
         gldrawable.gl_end()
 	        
-    def display(self):
+    def _display(self):
 
         headlabels = [
             "S",
@@ -191,7 +180,7 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
             glPopMatrix()
 
         glPushMatrix()
-        glRotatef(self._pitch, 0.0, 0.0, 1.0)
+        glRotatef(self._roll, 0.0, 0.0, 1.0)
         glColor3f(0.85, 0.5, 0.1)
         glBegin( GL_TRIANGLES )
         glVertex3f(0.0, 0.23, -0.9)
@@ -228,7 +217,7 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
 
         glPopMatrix()
 
-        glRotatef(self._pitch, 0.0, 0.0, 1.0)
+        glRotatef(self._roll, 0.0, 0.0, 1.0)
         glTranslatef(-self._yaw*C_DEG2RAD, 0.0, 0.0)
         # HORIZON AND YAW TICK LINE **********/
         glColor3f(1.0, 1.0, 1.0)
@@ -271,8 +260,8 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
 
         glPushMatrix()
         glLoadIdentity()
-        glRotatef(self._pitch, 0.0, 0.0, 1.0)
-        glTranslatef(0.0, -self._roll*C_DEG2RAD, 0.0)
+        glRotatef(self._roll, 0.0, 0.0, 1.0)
+        glTranslatef(0.0, -self._pitch*C_DEG2RAD, 0.0)
 
         # COLORED PART OF DISPLAY ************/
         glColor3f(0.0, 0.0, 1.0)
@@ -376,3 +365,22 @@ class HorizonView(gtk.DrawingArea, gtk.gtkgl.Widget):
         self._speed = speed
         self.queue_draw()
 
+if __name__ == "__main__":
+    import random
+    import gobject
+
+    def rotate(hw):
+        hw.update(
+                pitch=10,
+                roll=2.0*random.random(),
+                yaw=0,
+                altitude=100,
+                speed=10)
+        return True
+
+    h = HorizonView(None)
+    h.show_all()
+
+    gobject.timeout_add(1000/20,rotate, h.horizon)
+
+    gtk.main()

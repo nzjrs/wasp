@@ -407,7 +407,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     def on_menu_item_plane_view_activate(self, widget):
         if self._plane_view == None:
             try:
-                from gs.ui.plane_view import PlaneView
+                from gs.ui.plane import PlaneView
                 self._plane_view = PlaneView(self._source)
             except:
                 LOG.warning("Could not initialize plane view", exc_info=True)

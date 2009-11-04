@@ -20,8 +20,6 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#include "config/airframe.h"
-
 #include "arm7/sys_time_hw.h"
 #include "arm7/servos_4017_hw.h"
 

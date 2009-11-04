@@ -23,7 +23,6 @@
 #include "std.h"
 
 #include "config/config.h"
-#include "config/airframe.h"
 
 #include "init.h"
 #include "sys_time.h"
