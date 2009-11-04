@@ -82,6 +82,8 @@ void autopilot_periodic(void)
                 autopilot.commands[COMMAND_THRUST] = rc_values[RADIO_THROTTLE] * (INT32_MAX/MAX_PPRZ);
             break;
         case AP_MODE_ATTITUDE_DIRECT:
+            fixedwing_stabiliziation_alt_h_run(autopilot.commands);
+            fixedwing_stabiliziation_alt_v_run(autopilot.commands);
             break;
         default:
             break;
