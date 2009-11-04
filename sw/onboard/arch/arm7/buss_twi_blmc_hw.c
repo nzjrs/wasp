@@ -21,7 +21,6 @@
  *
  */
 #include "config/config.h"
-#include "config/airframe.h"
 
 #include "arm7/i2c_hw.h"
 #include "arm7/buss_twi_blmc_hw.h"

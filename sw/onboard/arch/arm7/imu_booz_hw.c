@@ -23,7 +23,6 @@
 #include "std.h"
 
 #include "config/config.h"
-#include "config/airframe.h"
 #include "generated/settings.h"
 
 #include "imu.h"

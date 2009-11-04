@@ -34,3 +34,7 @@ void stabilization_init(void)
     booz2_stabilization_attitude_init();
 }
 
+void stabilization_tune(uint8_t setting, int32_t val)
+{
+    ;
+}

@@ -27,10 +27,6 @@
 #include "math/pprz_algebra.h"
 #include "math/pprz_algebra_int.h"
 
-/* FIXME: Include these as config/airframe.h
- * For IMU_XXX scale constants */
-#include "config/airframe.h"
-
 typedef struct __IMU {
     float body_to_imu_phi;
     float body_to_imu_theta;

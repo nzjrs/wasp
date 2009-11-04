@@ -27,7 +27,9 @@
 #include "booz_geometry_mixed.h"
 #include "booz_ahrs_aligner.h"
 
-#include "config/airframe.h"
+#include "generated/settings.h"
+
+#define BOOZ2_FACE_REINJ_1 1024
 
 AHRS_t ahrs;
 SystemStatus_t ahrs_status;

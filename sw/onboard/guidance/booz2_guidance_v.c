@@ -26,12 +26,12 @@
 
 #include "rc.h"
 #include "ins.h"
-#include "config/airframe.h"
 #include "stabilization/booz2_stabilization.h"
 #include "fms/booz2_fms.h"
 #include "booz2_navigation.h"
-
 #include "booz_geometry_mixed.h"
+
+#include "generated/settings.h"
 
 uint8_t booz2_guidance_v_mode;
 int32_t booz2_guidance_v_ff_cmd;
