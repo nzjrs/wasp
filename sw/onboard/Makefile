@@ -16,7 +16,7 @@ SRC =                               \
     math/booz_trig_int.c            \
     math/pprz_geodetic_int.c        \
     math/pprz_geodetic_float.c      \
-    math/pid_float.c                \
+    math/pid_int.c                  \
     rc.c                            \
     autopilot.c                     \
     ins/booz2_ins.c                 \
