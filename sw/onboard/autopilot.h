@@ -45,7 +45,8 @@ typedef enum {
     AP_MODE_HOVER_DIRECT,
     AP_MODE_HOVER_CLIMB,
     AP_MODE_HOVER_Z_HOLD,
-    AP_MODE_NAV
+    AP_MODE_NAV,
+    AP_MODE_RC_DIRECT
 } AutopilotMode_t;
 
 typedef struct __Autopilot {

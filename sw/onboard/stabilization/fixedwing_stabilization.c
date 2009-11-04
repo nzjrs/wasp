@@ -21,17 +21,65 @@
  *
  */
 
+#include "rc.h"
+#include "ahrs.h"
 #include "stabilization.h"
 #include "fixedwing_stabilization.h"
 
-void fixedwing_stabiliziation_h_run(void)
+#include "generated/settings.h"
+#include "generated/radio.h"
+
+/* Basic fixed wing autopilot
+
+Horizontal mode PID controllers handle roll,heading,rudder
+ - Ailerons are controlled by roll estimate from the IMU.
+ - Elevators are controlled by the pitch estimate from the IMU
+ - Heading is controlled by the rudder
+
+Vertical mode PID controller handles altitude
+ - Altitude is controlled using the throttle
+
+Note:
+ - Radio values range from -9600 -> 9600
+*/
+
+void fixedwing_stabiliziation_alt_h_run(int32_t *commands)
 {
-    ;
+    int32_t i;
+
+    /* Roll */
+    i = ((int32_t)rc_values[RADIO_ROLL])*(INT32_MAX/MAX_PPRZ);
+    commands[COMMAND_ROLL] = pid_calculate_with_sp(
+            &pid_roll,
+            i,                              /* sp */
+            ahrs.ltp_to_body_euler.theta,   /* val, roll = theta */
+            1);                             /* dt */
+
+    /* Pitch */
+    i = ((int32_t)rc_values[RADIO_PITCH])*(INT32_MAX/MAX_PPRZ);
+    commands[COMMAND_PITCH] = pid_calculate_with_sp(
+            &pid_pitch,
+            i,                              /* sp */
+            ahrs.ltp_to_body_euler.phi,     /* val, pitch = phi */
+            1);                             /* dt */
+
+    /* Heading */
+    i = ((int32_t)rc_values[RADIO_YAW])*(INT32_MAX/MAX_PPRZ);
+    commands[COMMAND_YAW] = pid_calculate_with_sp(
+            &pid_yaw,
+            i,                              /* sp */
+            ahrs.ltp_to_body_euler.psi,     /* val, yaw = psi */
+            1);   
+
 }
 
-void fixedwing_stabiliziation_v_run(void)
+void fixedwing_stabiliziation_alt_v_run(int32_t *commands)
 {
-    ;
+    /* RADIO_THROTTLE is 0 -> 9600 */
+    if (rc_values[RADIO_THROTTLE] < 0)
+        commands[COMMAND_THRUST] = 0;
+    else
+        commands[COMMAND_THRUST] = rc_values[RADIO_THROTTLE] * (INT32_MAX/MAX_PPRZ);
 }
 
 void stabilization_init(void)

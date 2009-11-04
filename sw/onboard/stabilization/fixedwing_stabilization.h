@@ -23,13 +23,14 @@
 #ifndef _FW_STABILIZATION_H_
 #define _FW_STABILIZATION_H_
 
+#include "std.h"
 #include "math/pid_int.h"
 
 PID_t   pid_pitch;
 PID_t   pid_roll;
 PID_t   pid_yaw;
 
-void fixedwing_stabiliziation_h_run(void);
-void fixedwing_stabiliziation_v_run(void);
+void fixedwing_stabiliziation_alt_h_run(int32_t *commands);
+void fixedwing_stabiliziation_alt_v_run(int32_t *commands);
 
 #endif /* _FW_STABILIZATION_H_ */

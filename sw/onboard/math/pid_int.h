@@ -44,19 +44,30 @@ typedef enum {
     PID_ENABLE_WINDUP   =   (1<<0),
     PID_OUTPUT_SAT_MIN  =   (1<<1),
     PID_OUTPUT_SAT_MAX  =   (1<<2),
-    PID_INPUT_HIST      =   (1<<3)
+    PID_INPUT_HIST      =   (1<<3),
+    PID_INPUT_NO_D      =   (1<<4)
 } PIDFeatures_t;
 
 void    pid_init                                    (PID_t          *pid, 
                                                      int32_t          kp, 
                                                      int32_t          ki, 
                                                      int32_t          kd);
+
 void    pid_enable_feature                          (PID_t          *pid, 
                                                      uint8_t   feature,
                                                      int32_t          value);
+
 void    pid_set                                     (PID_t          *pid,
                                                      int32_t          sp);
-int32_t   pid_calculate                               (PID_t          *pid,
+
+void    pid_clear                                   (PID_t          *pid);
+
+int32_t pid_calculate                               (PID_t          *pid,
+                                                     int32_t          val,
+                                                     int32_t          dt);
+
+int32_t pid_calculate_with_sp                       (PID_t          *pid,
+                                                     int32_t          sp,
                                                      int32_t          val,
                                                      int32_t          dt);
 

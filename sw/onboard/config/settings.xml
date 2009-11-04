@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <settings>
   <section name="AUTOPILOT">
-    <setting name="MODE_MANUAL" value="AP_MODE_RATE_DIRECT" doc="Autopilot mode in manual flight"/>
-    <setting name="MODE_AUTO1" value="AP_MODE_RATE_DIRECT" doc="Autopilot mode 1"/>
-    <setting name="MODE_AUTO2" value="AP_MODE_RATE_DIRECT" doc="Autopilot mode 2"/>
+    <setting name="MODE_MANUAL" value="AP_MODE_RC_DIRECT" doc="Autopilot mode in manual flight"/>
+    <setting name="MODE_AUTO1" value="AP_MODE_RC_DIRECT" doc="Autopilot mode 1"/>
+    <setting name="MODE_AUTO2" value="AP_MODE_RC_DIRECT" doc="Autopilot mode 2"/>
   </section>
   <section name="ANALOG">
     <setting name="BATTERY_SENS" value="0.018387097" integer="16"/>
@@ -78,16 +78,16 @@
     <setting name="THRUST_COEF" value="{ 256,  256,  256,  256}"/>
   </section>
   <section name="PID">
-    <setting name="PITCH_P" type="int32" value="0" set="1" get="1"/>
+    <setting name="PITCH_P" type="int32" value="1" set="1" get="1"/>
     <setting name="PITCH_I" type="int32" value="0" set="1" get="1"/>
     <setting name="PITCH_D" type="int32" value="0" set="1" get="1"/>
-    <setting name="ROLL_P" type="int32" value="0" set="1" get="1"/>
+    <setting name="ROLL_P" type="int32" value="1" set="1" get="1"/>
     <setting name="ROLL_I" type="int32" value="0" set="1" get="1"/>
     <setting name="ROLL_D" type="int32" value="0" set="1" get="1"/>
-    <setting name="YAW_P" type="int32" value="0" set="1" get="1"/>
+    <setting name="YAW_P" type="int32" value="1" set="1" get="1"/>
     <setting name="YAW_I" type="int32" value="0" set="1" get="1"/>
     <setting name="YAW_D" type="int32" value="0" set="1" get="1"/>
-    <setting name="ALT_P" type="int32" value="0" set="1" get="1"/>
+    <setting name="ALT_P" type="int32" value="1" set="1" get="1"/>
     <setting name="ALT_I" type="int32" value="0" set="1" get="1"/>
     <setting name="ALT_D" type="int32" value="0" set="1" get="1"/>
   </section>
@@ -124,9 +124,5 @@
     <setting name="H_DGAIN" value="-0"/>
     <setting name="H_IGAIN" value="-5"/>
   </section>
-#define SECTION_MISC 1
-#define BOOZ2_FACE_REINJ_1 1024
-
-
 </settings>
 

@@ -30,6 +30,7 @@
 #define SAT_MIN_ON(_pid)        (_pid->features & PID_OUTPUT_SAT_MIN)
 #define SAT_MAX_ON(_pid)        (_pid->features & PID_OUTPUT_SAT_MAX)
 #define HIST_ON(_pid)           (_pid->features & PID_INPUT_HIST)
+#define NO_D(_pid)              (_pid->features & PID_INPUT_NO_D)
 
 void pid_enable_feature(PID_t *pid, uint8_t feature, int32_t value)
 {
@@ -64,6 +65,9 @@ void pid_init(PID_t *pid, int32_t kp, int32_t ki, int32_t kd)
 	pid->ki = ki;
 	pid->kd = kd;
 
+    if (kd == 0)
+        pid->features |= PID_INPUT_NO_D;
+
 	pid->sp = 0;
 	pid->error_previous = 0;
 	pid->integral = 0;
@@ -75,6 +79,12 @@ void pid_init(PID_t *pid, int32_t kp, int32_t ki, int32_t kd)
 void pid_set(PID_t *pid, int32_t sp)
 {
 	pid->sp = sp;
+	pid->error_previous = 0;
+	pid->integral = 0;
+}
+
+void pid_clear(PID_t *pid)
+{
 	pid->error_previous = 0;
 	pid->integral = 0;
 }
@@ -92,9 +102,13 @@ int32_t pid_calculate(PID_t *pid, int32_t val, int32_t dt)
 
 	error = pid->sp - val;
 	i = pid->integral + (error * dt);
-	d = (error - pid->error_previous) / dt;
 
-    total = (error * pid->kp) + (i * pid->ki) + (d * pid->kd);
+    if ( NO_D(pid) ) {
+        total = (error * pid->kp) + (i * pid->ki);
+    } else  {
+    	d = (error - pid->error_previous) / dt;
+        total = (error * pid->kp) + (i * pid->ki) + (d * pid->kd);
+    }
 
     if ( WINDUP_ON(pid) ) {
         if ( i < 0 )
@@ -112,3 +126,18 @@ int32_t pid_calculate(PID_t *pid, int32_t val, int32_t dt)
 	pid->error_previous = error;
 	return total;
 }
+
+/**
+ *
+ * @param pid
+ * @param sp
+ * @param val
+ * @param dt
+ * @return
+ */
+int32_t pid_calculate_with_sp(PID_t *pid, int32_t sp, int32_t val, int32_t dt)
+{
+    pid->sp = sp;
+    return pid_calculate(pid, val, dt);
+}
+
