@@ -26,6 +26,7 @@
 #include "supervision.h"
 
 #include "guidance/fixedwing_guidance.h"
+#include "stabilization/fixedwing_stabilization.h"
 
 #include "generated/settings.h"
 #include "generated/radio.h"
@@ -68,7 +69,7 @@ void autopilot_periodic(void)
             for (i = 0; i < COMMAND_NB; i++)
                 autopilot.commands[i] = autopilot_commands_failsafe[i];
             break;
-        case AP_MODE_RATE_DIRECT:
+        case AP_MODE_RC_DIRECT:
             /* scale radio values to full range */
             autopilot.commands[COMMAND_PITCH] = rc_values[RADIO_PITCH] * (INT32_MAX/MAX_PPRZ);
             autopilot.commands[COMMAND_ROLL] = rc_values[RADIO_ROLL] * (INT32_MAX/MAX_PPRZ);
@@ -108,7 +109,7 @@ void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
             case AP_MODE_FAILSAFE:
             case AP_MODE_KILL:
                 break;
-            case AP_MODE_RATE_DIRECT:
+            case AP_MODE_RC_DIRECT:
                 break;
             case AP_MODE_ATTITUDE_DIRECT:
                 break;
