@@ -29,6 +29,21 @@
 #include "generated/settings.h"
 #include "generated/radio.h"
 
+typedef struct _Int32RC {
+    int32_t     roll;
+    int32_t     pitch;
+    int32_t     yaw;
+    int32_t     throttle;
+} Int32RC_t;
+
+static void fixedwing_alt_read_rc(Int32RC_t *rc)
+{
+    rc->roll = ((int32_t)rc_values[RADIO_ROLL]) * (INT32_MAX/MAX_PPRZ);
+    rc->pitch = ((int32_t)rc_values[RADIO_PITCH]) * (INT32_MAX/MAX_PPRZ);
+    rc->yaw = ((int32_t)rc_values[RADIO_YAW]) * (INT32_MAX/MAX_PPRZ);
+    rc->throttle = ((int32_t)rc_values[RADIO_THROTTLE]) * (INT32_MAX/MAX_PPRZ);
+}
+
 /* Basic fixed wing autopilot
 
 Horizontal mode PID controllers handle roll,heading,rudder
@@ -45,31 +60,30 @@ Note:
 
 void fixedwing_stabiliziation_alt_h_run(int32_t *commands)
 {
-    int32_t i;
+    Int32RC_t   rc;
+
+    fixedwing_alt_read_rc(&rc);
 
     /* Roll */
-    i = ((int32_t)rc_values[RADIO_ROLL])*(INT32_MAX/MAX_PPRZ);
     commands[COMMAND_ROLL] = pid_calculate_with_sp(
             &pid_roll,
-            i,                              /* sp */
+            rc.roll,                        /* sp */
             ahrs.ltp_to_body_euler.theta,   /* val, roll = theta */
             1);                             /* dt */
 
     /* Pitch */
-    i = ((int32_t)rc_values[RADIO_PITCH])*(INT32_MAX/MAX_PPRZ);
     commands[COMMAND_PITCH] = pid_calculate_with_sp(
             &pid_pitch,
-            i,                              /* sp */
+            rc.pitch,                       /* sp */
             ahrs.ltp_to_body_euler.phi,     /* val, pitch = phi */
             1);                             /* dt */
 
     /* Heading */
-    i = ((int32_t)rc_values[RADIO_YAW])*(INT32_MAX/MAX_PPRZ);
     commands[COMMAND_YAW] = pid_calculate_with_sp(
             &pid_yaw,
-            i,                              /* sp */
+            rc.yaw,                         /* sp */
             ahrs.ltp_to_body_euler.psi,     /* val, yaw = psi */
-            1);   
+            1);                             /* dt */
 
 }
 
