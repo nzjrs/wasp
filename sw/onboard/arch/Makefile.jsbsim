@@ -4,7 +4,8 @@ ARCHSRC =                                       \
     arch/jsbsim/nps_unsimulated_periphials.c    \
     arch/jsbsim/nps_fdm_jsbsim.c                \
     arch/jsbsim/nps_flightgear.c                \
-    arch/jsbsim/nps_utils.c
+    arch/jsbsim/nps_utils.c                     \
+    arch/jsbsim/nps_random.c
 
 ARCHASMSRC =                            \
     $(NULL)
