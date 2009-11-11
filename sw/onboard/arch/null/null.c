@@ -64,6 +64,8 @@ void rc_periodic_task ( void ) {}
 bool_t rc_event_task ( void ) { return FALSE; }
 
 #include "imu.h"
+IMU_t booz_imu;
+
 void imu_init(void) {}
 void imu_periodic_task ( void ) {}
 uint8_t imu_event_task ( void ) { return 0; }

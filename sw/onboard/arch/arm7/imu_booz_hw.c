@@ -39,6 +39,7 @@ typedef enum {
 
 uint8_t         do_max1168_read;
 uint8_t         imu_spi_selected;
+IMU_t           booz_imu;
 
 static void         SSP_ISR(void) __attribute__((naked));
 static inline void  imu_scale_gyro(void);
