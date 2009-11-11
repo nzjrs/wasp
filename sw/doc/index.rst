@@ -1,10 +1,11 @@
+=================
 Software Overview
 =================
 
 Prerequisites for Building
 **************************
 
-Inorder to build the system the following software must be installed on your 
+In order to build the system the following software must be installed on your 
 computer.
 
 Building the Documentation (Optional)
@@ -53,10 +54,10 @@ Build Instructions
 
 ::
 
-    sub submodule init
+    git submodule init
     git submodule update
 
-- Checkout the branch tha represents the configuration you are flying
+- Checkout the branch that represents the configuration you are flying
 
 ::
 
