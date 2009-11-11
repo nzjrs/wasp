@@ -63,6 +63,8 @@
 #define BOOZ2_ANALOG_BARO_LED   2
 #define AHRS_ALIGNER_LED        3
 
+#define NUM_LEDS                4
+
 /* ADC */
 /* battery: P0.29 AD0.2 */
 #define ANALOG_BATT_PINSEL      PINSEL1
@@ -117,7 +119,8 @@
 #define SERVO_RESET_IOCLR       IO0CLR
 
 /* Time */
-#define PERIODIC_TASK_PERIOD SYS_TICS_OF_SEC((1./512.))
+#define PERIODIC_TASK_DT        (1./512.)
+#define PERIODIC_TASK_PERIOD    SYS_TICS_OF_SEC( PERIODIC_TASK_DT )
 
 /* Radio Control */
 #define USE_RADIO_CONTROL       1
