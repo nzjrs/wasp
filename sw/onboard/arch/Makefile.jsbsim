@@ -5,7 +5,15 @@ ARCHSRC =                                       \
     arch/jsbsim/nps_fdm_jsbsim.c                \
     arch/jsbsim/nps_flightgear.c                \
     arch/jsbsim/nps_utils.c                     \
-    arch/jsbsim/nps_random.c
+    arch/jsbsim/nps_random.c                    \
+    arch/jsbsim/nps_sensor_accel.c              \
+    arch/jsbsim/nps_sensor_baro.c               \
+    arch/jsbsim/nps_sensor_gps.c                \
+    arch/jsbsim/nps_sensor_gyro.c               \
+    arch/jsbsim/nps_sensor_mag.c                \
+    arch/jsbsim/nps_sensors.c                   \
+    arch/jsbsim/nps_sensors_utils.c             \
+    $(NULL)
 
 ARCHASMSRC =                            \
     $(NULL)

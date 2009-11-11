@@ -1,11 +1,9 @@
 #include "nps_sensor_baro.h"
 
-#include "airframe.h"
-
 #include "std.h"
 #include "nps_fdm.h"
 #include "nps_random.h"
-#include NPS_SENSORS_PARAMS
+#include "nps_sensors_params_booz2_a1.h"
 
 
 

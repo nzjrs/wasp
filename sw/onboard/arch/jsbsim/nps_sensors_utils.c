@@ -1,6 +1,5 @@
 #include "nps_sensors_utils.h"
 
-//#include <string.h>
 #include "6dof.h"
 #include "math/pprz_algebra.h"
 

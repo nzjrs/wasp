@@ -1,8 +1,7 @@
 #include "nps_sensor_mag.h"
 
-#include "airframe.h"
 #include "nps_fdm.h"
-#include NPS_SENSORS_PARAMS
+#include "nps_sensors_params_booz2_a1.h"
 
 void nps_sensor_mag_init(struct NpsSensorMag* mag, double time) {
   VECT3_ASSIGN(mag->value, 0., 0., 0.);

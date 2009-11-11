@@ -1,8 +1,7 @@
 #include "nps_sensor_gyro.h"
 
-#include "airframe.h"
 #include "nps_fdm.h"
-#include NPS_SENSORS_PARAMS
+#include "nps_sensors_params_booz2_a1.h"
 #include "math/pprz_algebra_int.h"
 #include "nps_random.h"
 
