@@ -44,7 +44,6 @@ void led_init ( void ) {}
 void led_on ( uint8_t id) {}
 void led_off ( uint8_t id) {}
 void led_toggle ( uint8_t id) {}
-void led_check ( uint8_t id) {}
 
 #include "comm.h"
 SystemStatus_t comm_system_status;
