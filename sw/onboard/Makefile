@@ -1,5 +1,5 @@
 TARGET          ?= autopilot_main
-ARCH            ?= arm7
+ARCH            ?= sim
 OBJDIR          = bin/$(ARCH)
 Q               = @
 TOOLS           = ../tools

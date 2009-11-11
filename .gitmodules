@@ -1,3 +1,7 @@
 [submodule "sw/groundstation/libserial"]
 	path = sw/groundstation/libserial
 	url = git://github.com/nzjrs/libserial.git
+[submodule "sw/onboard/arch/sim/crrcsim"]
+        path = sw/onboard/arch/sim/crrcsim"
+        url = hit://github.com/amarburg/crrcsim.git
+  
