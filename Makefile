@@ -45,6 +45,17 @@ showdoc: doc
 uploaddoc: doc
 	@rsync -av doc/built/html/* john@open.grcnz.com:/srv/default/http/downloads/wasp/doc/
 
+dist:
+	@git archive --format=tar --prefix=wasp/ HEAD:sw | gzip > $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)-sw.tar.gz
+	@echo Created $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)-sw.tar.gz
+	@git archive --format=tar --prefix=wasp/ HEAD:hw | gzip > $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)-hw.tar.gz
+	@echo Created $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)-hw.tar.gz
+	@git archive --format=tar --prefix=wasp/ HEAD | gzip > $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3).tar.gz
+	@echo Created $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3).tar.gz
+
+release: dist uploaddoc
+	@rsync -av $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)*.tar.gz john@open.grcnz.com:/srv/default/http/downloads/wasp/
+
 ################################################################################
 # Dependencies
 ################################################################################
