@@ -156,7 +156,7 @@ settings_handle_message_received(CommChannel_t chan, CommMessage_t *msg)
             int32_t i32;
 
             id = MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_id(msg->payload);
-            type = MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_type(msg->payload);
+            type = (Type_t)MESSAGE_SETTING_UINT8_GET_FROM_BUFFER_type(msg->payload);
 
             switch (type) 
             {

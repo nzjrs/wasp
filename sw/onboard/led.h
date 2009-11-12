@@ -45,7 +45,4 @@ led_off ( uint8_t id);
 void
 led_toggle ( uint8_t id);
 
-void
-led_check ( uint8_t id);
-
 #endif /* LED_H */

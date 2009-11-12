@@ -14,7 +14,9 @@ def print_footer(name):
 
 def define_string(name, val, maxwidth=0):
     val = val.strip()
-    if maxwidth and len(val) > maxwidth:
+    #take one off the maxwidth
+    maxwidth -= 1
+    if maxwidth and len(val) != maxwidth:
         val = val.ljust(maxwidth)[0:maxwidth]
     print '#define %s "%s"' % (name.upper(), val)
 

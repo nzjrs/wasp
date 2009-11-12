@@ -65,22 +65,22 @@
     (_c).y = (_a).y - (_b).y;			\
   }
 
-/* _vo = _s * _vi */
-#define VECT2_SMUL(_vo, _s, _vi) {		\
-    (_vo).x = (_s) * (_vi).x;			\
-    (_vo).y = (_s) * (_vi).y;			\
+/* _vo = _vi * _s */
+#define VECT2_SMUL(_vo, _vi, _s) {		\
+    (_vo).x =  (_vi).x * (_s);			\
+    (_vo).y =  (_vi).y * (_s);			\
   }
 
 /* _vo =  _vi / _s */
-#define VECT2_SDIV(_vo, _s, _vi) {		\
+#define VECT2_SDIV(_vo, _vi, _s) {		\
     (_vo).x =  (_vi).x / (_s);			\
     (_vo).y =  (_vi).y / (_s);			\
   }
 
 /* _v = Bound(_v, _min, _max) */
-#define VECT2_STRIM(_v, _min, _max) {				\
-    (_v).x = (_v).x < _min ? _min : (_v).x > _max ? _max : (_v).x;		\
-    (_v).y = (_v).y < _min ? _min : (_v).y > _max ? _max : (_v).y;		\
+#define VECT2_STRIM(_v, _min, _max) {					\
+    (_v).x = (_v).x < _min ? _min : (_v).x > _max ? _max : (_v).x;	\
+    (_v).y = (_v).y < _min ? _min : (_v).y > _max ? _max : (_v).y;	\
   }
 
 
@@ -131,11 +131,11 @@
     (_c).z = (_a).z - (_b).z;			\
   }
 
-/* _vo = _s * _vi */
-#define VECT3_SMUL(_vo, _s, _vi) {			\
-    (_vo).x = (_s) * (_vi).x;				\
-    (_vo).y = (_s) * (_vi).y;				\
-    (_vo).z = (_s) * (_vi).z;				\
+/* _vo = _vi * _s */
+#define VECT3_SMUL(_vo, _vi, _s) {			\
+    (_vo).x =  (_vi).x * (_s);				\
+    (_vo).y =  (_vi).y * (_s);				\
+    (_vo).z =  (_vi).z * (_s);				\
   }
 
 /* _vo =  _vi / _s */
@@ -146,10 +146,10 @@
   }
 
 /* _v = Bound(_v, _min, _max) */
-#define VECT3_STRIM(_v, _min, _max) {				\
-    (_v).x = (_v).x < _min ? _min : (_v).x > _max ? _max : (_v).x;		\
-    (_v).y = (_v).y < _min ? _min : (_v).y > _max ? _max : (_v).y;		\
-    (_v).z = (_v).z < _min ? _min : (_v).z > _max ? _max : (_v).z;		\
+#define VECT3_STRIM(_v, _min, _max) {					\
+    (_v).x = (_v).x < _min ? _min : (_v).x > _max ? _max : (_v).x;	\
+    (_v).y = (_v).y < _min ? _min : (_v).y > _max ? _max : (_v).y;	\
+    (_v).z = (_v).z < _min ? _min : (_v).z > _max ? _max : (_v).z;	\
   }
 
 /*  */
@@ -157,7 +157,30 @@
     (_vo).x =  (_va).x / (_vb).x;				\
     (_vo).y =  (_va).y / (_vb).y;				\
     (_vo).z =  (_va).z / (_vb).z;				\
-  } 
+  }
+
+/*  */
+#define VECT3_EW_MUL(_vo, _va, _vb) {				\
+    (_vo).x =  (_va).x * (_vb).x;				\
+    (_vo).y =  (_va).y * (_vb).y;				\
+    (_vo).z =  (_va).z * (_vb).z;				\
+  }
+
+/*  */
+#define VECT3_BOUND_CUBE(_v, _min, _max) {				\
+    if ((_v).x > (_max)) (_v).x = (_max); else if ((_v).x < (_min)) (_v).x = (_min); \
+    if ((_v).y > (_max)) (_v).y = (_max); else if ((_v).y < (_min)) (_v).y = (_min); \
+    if ((_v).z > (_max)) (_v).z = (_max); else if ((_v).z < (_min)) (_v).z = (_min); \
+  }
+
+/*  */
+#define VECT3_BOUND_BOX(_v, _v_min, _v_max) {				\
+    if ((_v).x > (_v_max.x)) (_v).x = (_v_max.x); else if ((_v).x < (_v_min.x)) (_v).x = (_v_min.x); \
+    if ((_v).y > (_v_max.y)) (_v).y = (_v_max.y); else if ((_v).y < (_v_min.y)) (_v).y = (_v_min.z); \
+    if ((_v).z > (_v_max.y)) (_v).z = (_v_max.z); else if ((_v).z < (_v_min.z)) (_v).z = (_v_min.z); \
+  }
+
+
 
 /*
  * Euler angles
@@ -197,6 +220,13 @@
   }
 
 
+/* _vo =  _vi * _s */
+#define EULERS_SMUL(_eo, _ei, _s) {				\
+    (_eo).phi   =  (_ei).phi   * (_s);				\
+    (_eo).theta =  (_ei).theta * (_s);				\
+    (_eo).psi   =  (_ei).psi   * (_s);				\
+  }
+
 /* _vo =  _vi / _s */
 #define EULERS_SDIV(_eo, _ei, _s) {				\
     (_eo).phi   =  (_ei).phi   / (_s);				\
@@ -204,6 +234,12 @@
     (_eo).psi   =  (_ei).psi   / (_s);				\
   }
 
+/* _v = Bound(_v, _min, _max) */
+#define EULERS_BOUND_CUBE(_v, _min, _max) {				           \
+    (_v).phi   = (_v).phi   < _min ? _min : (_v).phi   > _max ? _max : (_v).phi;   \
+    (_v).theta = (_v).theta < _min ? _min : (_v).theta > _max ? _max : (_v).theta; \
+    (_v).psi   = (_v).psi   < _min ? _min : (_v).psi   > _max ? _max : (_v).psi;   \
+  }
 
 /*
  * Rates
@@ -237,11 +273,25 @@
     (_a).r -= (_b).r;				\
   }
 
+/* c = a + b */
+#define RATES_SUM(_c, _a, _b) {			\
+    (_c).p = (_a).p + (_b).p;			\
+    (_c).q = (_a).q + (_b).q;			\
+    (_c).r = (_a).r + (_b).r;			\
+  }
+
 /* c = a - b */
 #define RATES_DIFF(_c, _a, _b) {                \
     (_c).p = (_a).p - (_b).p;			\
     (_c).q = (_a).q - (_b).q;			\
     (_c).r = (_a).r - (_b).r;			\
+  }
+
+/* _ro =  _ri * _s */
+#define RATES_SMUL(_ro, _ri, _s) {		\
+    (_ro).p =  (_ri).p * (_s);			\
+    (_ro).q =  (_ri).q * (_s);			\
+    (_ro).r =  (_ri).r * (_s);			\
   }
 
 /* _ro =  _ri / _s */
@@ -259,20 +309,79 @@
   }
 
 
+/* _v = Bound(_v, _min, _max) */
+#define RATES_BOUND_CUBE(_v, _min, _max) {				\
+    (_v).p = (_v).p < _min ? _min : (_v).p > _max ? _max : (_v).p;	\
+    (_v).q = (_v).q < _min ? _min : (_v).q > _max ? _max : (_v).q;	\
+    (_v).r = (_v).r < _min ? _min : (_v).r > _max ? _max : (_v).r;	\
+  }
+
+#define RATES_BOUND_BOX(_v, _v_min, _v_max) {				\
+    if ((_v).p > (_v_max.p)) (_v).p = (_v_max.p); else if ((_v).p < (_v_min.p)) (_v).p = (_v_min.p); \
+    if ((_v).q > (_v_max.q)) (_v).q = (_v_max.q); else if ((_v).q < (_v_min.q)) (_v).q = (_v_min.q); \
+    if ((_v).r > (_v_max.r)) (_v).r = (_v_max.r); else if ((_v).r < (_v_min.r)) (_v).r = (_v_min.r); \
+  }
+
+
+
+/*
+ * 3x3 matrices
+ */
+/* accessor : row and col range from 0 to 2 */
+#define MAT33_ELMT(_m, _row, _col) ((_m).m[_row*3+_col])
+
+#define MAT33_COPY(_mat1,_mat2) {			\
+    MAT33_ELMT((_mat1),0,0) = MAT33_ELMT((_mat2),0,0);	\
+    MAT33_ELMT((_mat1),0,1) = MAT33_ELMT((_mat2),0,1);	\
+    MAT33_ELMT((_mat1),0,2) = MAT33_ELMT((_mat2),0,2);	\
+    MAT33_ELMT((_mat1),1,0) = MAT33_ELMT((_mat2),1,0);	\
+    MAT33_ELMT((_mat1),1,1) = MAT33_ELMT((_mat2),1,1);	\
+    MAT33_ELMT((_mat1),1,2) = MAT33_ELMT((_mat2),1,2);	\
+    MAT33_ELMT((_mat1),2,0) = MAT33_ELMT((_mat2),2,0);	\
+    MAT33_ELMT((_mat1),2,1) = MAT33_ELMT((_mat2),2,1);	\
+    MAT33_ELMT((_mat1),2,2) = MAT33_ELMT((_mat2),2,2);	\
+}
+
 
 /* multiply _vin by _mat, store in _vout */
 #define MAT33_VECT3_MUL(_vout, _mat, _vin) {				\
-    (_vout).x = (_mat)[0]*(_vin).x + (_mat)[1]*(_vin).y + (_mat)[2]*(_vin).z; \
-    (_vout).y = (_mat)[3]*(_vin).x + (_mat)[4]*(_vin).y + (_mat)[5]*(_vin).z; \
-    (_vout).z = (_mat)[6]*(_vin).x + (_mat)[7]*(_vin).y + (_mat)[8]*(_vin).z; \
+    (_vout).x = MAT33_ELMT((_mat), 0, 0) * (_vin).x +			\
+                MAT33_ELMT((_mat), 0, 1) * (_vin).y +			\
+                MAT33_ELMT((_mat), 0, 2) * (_vin).z;			\
+    (_vout).y = MAT33_ELMT((_mat), 1, 0) * (_vin).x +                   \
+                MAT33_ELMT((_mat), 1, 1) * (_vin).y +                   \
+                MAT33_ELMT((_mat), 1, 2) * (_vin).z;			\
+    (_vout).z = MAT33_ELMT((_mat), 2, 0) * (_vin).x +			\
+                MAT33_ELMT((_mat), 2, 1) * (_vin).y +			\
+                MAT33_ELMT((_mat), 2, 2) * (_vin).z;			\
   }
 
 /* multiply _vin by transpose of _mat, store in _vout */
 #define MAT33_VECT3_TRANSP_MUL(_vout, _mat, _vin) {			\
-    (_vout).x = (_mat)[0]*(_vin).x + (_mat)[3]*(_vin).y + (_mat)[6]*(_vin).z; \
-    (_vout).y = (_mat)[1]*(_vin).x + (_mat)[4]*(_vin).y + (_mat)[7]*(_vin).z; \
-    (_vout).z = (_mat)[2]*(_vin).x + (_mat)[5]*(_vin).y + (_mat)[8]*(_vin).z; \
+    (_vout).x = MAT33_ELMT((_mat), 0, 0) * (_vin).x +			\
+                MAT33_ELMT((_mat), 1, 0) * (_vin).y +			\
+                MAT33_ELMT((_mat), 2, 0) * (_vin).z;			\
+    (_vout).y = MAT33_ELMT((_mat), 0, 1) * (_vin).x +                   \
+                MAT33_ELMT((_mat), 1, 1) * (_vin).y +                   \
+                MAT33_ELMT((_mat), 2, 1) * (_vin).z;			\
+    (_vout).z = MAT33_ELMT((_mat), 0, 2) * (_vin).x +			\
+                MAT33_ELMT((_mat), 1, 2) * (_vin).y +			\
+                MAT33_ELMT((_mat), 2, 2) * (_vin).z;			\
   }
+
+//
+//
+// Quaternions
+//
+//
+#define QUAT_ASSIGN(_q, _i, _x, _y, _z) {   \
+    (_q).qi = (_i);                        \
+    (_q).qx = (_x);                        \
+    (_q).qy = (_y);                        \
+    (_q).qz = (_z);                        \
+  }
+
+
 
 #define QUAT_DIFF(_qc, _qa, _qb) {				\
     (_qc).qi = (_qa).qi - (_qb).qi;				\
@@ -281,12 +390,53 @@
     (_qc).qz = (_qa).qz - (_qb).qz;				\
   }
 
-#define QUAT_COPY(_qo, _qi) {			\
-    (_qo).qi = (_qi).qi;			\
-    (_qo).qx = (_qi).qx;			\
-    (_qo).qy = (_qi).qy;			\
-    (_qo).qz = (_qi).qz;			\
+#define QUAT_COPY(_qo, _qi) {			                \
+    (_qo).qi = (_qi).qi;					\
+    (_qo).qx = (_qi).qx;					\
+    (_qo).qy = (_qi).qy;					\
+    (_qo).qz = (_qi).qz;					\
   }
+
+#define QUAT_EXPLEMENTARY(b,a) {				\
+    b.qi = -a.qi;                                               \
+    b.qx = -a.qx;                                               \
+    b.qy = -a.qy;                                               \
+    b.qz = -a.qz;                                               \
+  }
+
+
+#define QUAT_SMUL(_qo, _qi, _s) {				\
+    (_qo).qi = (_qi).qi * _s;					\
+    (_qo).qx = (_qi).qx * _s;					\
+    (_qo).qy = (_qi).qy * _s;					\
+    (_qo).qz = (_qi).qz * _s;					\
+  }
+
+#define QUAT_ADD(_qo, _qi) {					\
+    (_qo).qi += (_qi).qi;					\
+    (_qo).qx += (_qi).qx;					\
+    (_qo).qy += (_qi).qy;					\
+    (_qo).qz += (_qi).qz;					\
+  }
+
+#define QUAT_INVERT(_qo, _qi) {					\
+    (_qo).qi =  (_qi).qi;						\
+    (_qo).qx = -(_qi).qx;						\
+    (_qo).qy = -(_qi).qy;						\
+    (_qo).qz = -(_qi).qz;						\
+  }
+
+
+/*
+ * Rotation Matrices
+ */
+
+/* accessor : row and col range from 0 to 2 */
+#define RMAT_ELMT(_rm, _row, _col) MAT33_ELMT(_rm, _row, _col)
+
+/* trace */
+#define RMAT_TRACE(_rm) (RMAT_ELMT(_rm, 0, 0)+RMAT_ELMT(_rm, 1, 1)+RMAT_ELMT(_rm, 2, 2))
+
 
 #define RMAT_DIFF(_c, _a, _b) {					\
     (_c).m[0] = (_a).m[0] - (_b).m[0];				\
@@ -300,7 +450,18 @@
     (_c).m[8] = (_a).m[8] - (_b).m[8];				\
   }
 
-
+/* multiply _vin by _rmat, store in _vout */
+#define RMAT_VECT3_MUL(_vout, _rmat, _vin) {				\
+    (_vout).x = RMAT_ELMT((_rmat), 0, 0) * (_vin).x +			\
+                RMAT_ELMT((_rmat), 0, 1) * (_vin).y +			\
+                RMAT_ELMT((_rmat), 0, 2) * (_vin).z;			\
+    (_vout).y = RMAT_ELMT((_rmat), 1, 0) * (_vin).x +           \
+                RMAT_ELMT((_rmat), 1, 1) * (_vin).y +           \
+                RMAT_ELMT((_rmat), 1, 2) * (_vin).z;			\
+    (_vout).z = RMAT_ELMT((_rmat), 2, 0) * (_vin).x +			\
+                RMAT_ELMT((_rmat), 2, 1) * (_vin).y +			\
+                RMAT_ELMT((_rmat), 2, 2) * (_vin).z;			\
+  }
 
 
 
@@ -361,18 +522,41 @@
     (_qi).qz = QUAT1_BFP_OF_REAL((_qf).qz);		\
   }
 
-#define RATES_FLOAT_OF_BFP(_ef, _ei) {				\
-    (_ef).phi   = RATE_FLOAT_OF_BFP((_ei).phi);		\
-    (_ef).theta = RATE_FLOAT_OF_BFP((_ei).theta);		\
-    (_ef).psi   = RATE_FLOAT_OF_BFP((_ei).psi);		\
+#define RATES_FLOAT_OF_BFP(_rf, _ri) {			\
+    (_rf).p = RATE_FLOAT_OF_BFP((_ri).p);		\
+    (_rf).q = RATE_FLOAT_OF_BFP((_ri).q);	\
+    (_rf).r = RATE_FLOAT_OF_BFP((_ri).r);		\
   }
 
-#define RATES_BFP_OF_REAL(_ei, _ef) {			\
-    (_ei).phi   = RATE_BFP_OF_REAL((_ef).phi);		\
-    (_ei).theta = RATE_BFP_OF_REAL((_ef).theta);	\
-    (_ei).psi   = RATE_BFP_OF_REAL((_ef).psi);		\
+#define RATES_BFP_OF_REAL(_ri, _rf) {			\
+    (_ri).p = RATE_BFP_OF_REAL((_rf).p);		\
+    (_ri).q = RATE_BFP_OF_REAL((_rf).q);	\
+    (_ri).r = RATE_BFP_OF_REAL((_rf).r);		\
   }
 
+#define ACCELS_FLOAT_OF_BFP(_ef, _ei) {				\
+    (_ef).x   = ACCEL_FLOAT_OF_BFP((_ei).x);		\
+    (_ef).y   = ACCEL_FLOAT_OF_BFP((_ei).y);		\
+    (_ef).z   = ACCEL_FLOAT_OF_BFP((_ei).z);		\
+  }
+
+#define ACCELS_BFP_OF_REAL(_ef, _ei) {				\
+    (_ef).x   = ACCEL_BFP_OF_REAL((_ei).x);		\
+    (_ef).y   = ACCEL_BFP_OF_REAL((_ei).y);		\
+    (_ef).z   = ACCEL_BFP_OF_REAL((_ei).z);		\
+  }
+
+#define MAGS_FLOAT_OF_BFP(_ef, _ei) {				\
+    (_ef).x   = ACCEL_FLOAT_OF_BFP((_ei).x);		\
+    (_ef).y   = ACCEL_FLOAT_OF_BFP((_ei).y);		\
+    (_ef).z   = ACCEL_FLOAT_OF_BFP((_ei).z);		\
+  }
+
+#define MAGS_BFP_OF_REAL(_ef, _ei) {				\
+    (_ef).x   = ACCEL_BFP_OF_REAL((_ei).x);		\
+    (_ef).y   = ACCEL_BFP_OF_REAL((_ei).y);		\
+    (_ef).z   = ACCEL_BFP_OF_REAL((_ei).z);		\
+  }
 
 #endif /* PPRZ_ALGEBRA_H */
 

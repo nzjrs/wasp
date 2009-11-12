@@ -96,31 +96,31 @@ void b2ins_update_gps(void) {
 #ifdef UPDATE_FROM_POS
   struct Int64Vect2 scaled_pos_meas;
   VECT2_COPY(scaled_pos_meas, b2ins_meas_gps_pos_ned);
-  VECT2_SMUL(scaled_pos_meas, (1<<(B2INS_POS_LTP_FRAC-IPOS_FRAC)), scaled_pos_meas);
+  VECT2_SMUL(scaled_pos_meas, scaled_pos_meas, (1<<(B2INS_POS_LTP_FRAC-IPOS_FRAC)));
   struct Int64Vect3 pos_residual;
   VECT2_DIFF(pos_residual, scaled_pos_meas, b2ins_pos_ltp); 
   struct Int32Vect2 pos_cor_1;
-  VECT2_SDIV(pos_cor_1, (1<<K_POS), pos_residual);
+  VECT2_SDIV(pos_cor_1, pos_residual, (1<<K_POS));
   VECT2_ADD(b2ins_pos_ltp, pos_cor_1);
   struct Int32Vect2 speed_cor_1;
-  VECT2_SDIV(speed_cor_1, (1<<(K_POS+9)), pos_residual);
+  VECT2_SDIV(speed_cor_1, pos_residual, (1<<(K_POS+9)));
   VECT2_ADD(b2ins_speed_ltp, speed_cor_1);
 #endif /* UPDATE_FROM_POS */
 
 #ifdef UPDATE_FROM_SPEED
   struct Int32Vect2 scaled_speed_meas;
-  VECT2_SMUL(scaled_speed_meas, (1<<(B2INS_SPEED_LTP_FRAC-ISPEED_RES)), b2ins_meas_gps_speed_ned);
+  VECT2_SMUL(scaled_speed_meas, b2ins_meas_gps_speed_ned, (1<<(B2INS_SPEED_LTP_FRAC-ISPEED_RES)));
   struct Int32Vect2 speed_residual;
   VECT2_DIFF(speed_residual, scaled_speed_meas, b2ins_speed_ltp);
   struct Int32Vect2 pos_cor_s;
-  VECT2_SDIV(pos_cor_s, (1<<(K_SPEED-9)), speed_residual);
+  VECT2_SDIV(pos_cor_s, speed_residual, (1<<(K_SPEED-9)));
   VECT2_ADD(b2ins_pos_ltp, pos_cor_s);
   struct Int32Vect2 speed_cor_s;
-  VECT2_SDIV(speed_cor_s, (1<<K_SPEED), speed_residual);
+  VECT2_SDIV(speed_cor_s, speed_residual, (1<<K_SPEED));
   VECT2_ADD(b2ins_speed_ltp, speed_cor_s);
 
   struct Int32Vect3 speed_residual3;
-  VECT2_SDIV(speed_residual3, (1<<9), speed_residual);
+  VECT2_SDIV(speed_residual3, speed_residual, (1<<9));
   speed_residual3.z = 0;
   struct Int32Vect3 bias_cor_s;
   INT32_QUAT_VMULT( bias_cor_s, ahrs.ltp_to_imu_quat, speed_residual3);

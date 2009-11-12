@@ -26,7 +26,7 @@
 #define TRESHOLD_1_PPRZ (MIN_PPRZ / 2)
 #define TRESHOLD_2_PPRZ (MAX_PPRZ / 2)
 
-uint8_t autopilot_mode_of_radio(pprz_t rc)
+AutopilotMode_t autopilot_mode_of_radio(pprz_t rc)
 {
     if (rc > TRESHOLD_2_PPRZ)
         return autopilot.mode_auto2;
