@@ -28,7 +28,7 @@
 #include "std.h"
 #include "gps.h"
 #include "guidance.h"
-#include "booz_geometry_int.h"
+#include "math/pprz_algebra_int.h"
 
 #include "generated/settings.h"
 
@@ -37,22 +37,22 @@
 #define BOOZ2_FMS_TYPE_TEST_SIGNAL  2
 
 struct Booz_fms_imu_info {
-  struct Pprz_int16_vect3 gyro;
-  struct Pprz_int16_vect3 accel;
-  struct Pprz_int16_vect3 mag;
+  struct Int16Vect3 gyro;
+  struct Int16Vect3 accel;
+  struct Int16Vect3 mag;
 };
 
 struct Booz_fms_gps_info {
-  struct Pprz_int32_vect3   pos;
-  struct Pprz_int16_vect3   speed;
+  struct Int32Vect3   pos;
+  struct Int16Vect3   speed;
   int32_t                   pacc;
   uint8_t                   num_sv;
   GpsFix_t                  fix;
 };
 
 struct Booz_fms_ahrs_info {
-  struct Pprz_int16_euler euler;
-  struct Pprz_int16_rate  rate;
+  struct Int16Eulers euler;
+  struct Int16Eulers  rate;
 };
 
 struct Booz_fms_info {
@@ -64,10 +64,10 @@ struct Booz_fms_info {
 
 struct Booz_fms_command {
   union {
-    struct booz_ivect  rate;
-    struct booz_ieuler attitude;
-    struct booz_ivect2 speed;
-    struct booz_ivect pos; //FIXME Warning z is heading
+    struct Int32Vect3  rate;
+    struct Int32Eulers attitude;
+    struct Int32Vect2 speed;
+    struct Int32Vect3 pos; //FIXME Warning z is heading
   } h_sp;
   union {
     int32_t direct;

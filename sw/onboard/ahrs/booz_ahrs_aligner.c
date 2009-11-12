@@ -22,6 +22,7 @@
  */
 #include "booz_ahrs_aligner.h"
 
+#include <stdlib.h> /* for abs() */
 #include "led.h"
 #include "imu.h"
 

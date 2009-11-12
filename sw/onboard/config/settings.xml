@@ -129,10 +129,10 @@
     <setting name="ATTITUDE_PSI_IGAIN" value="-75"/>
   </section>
   <section name="BOOZ2_GUIDANCE">
-    <setting name="V_MIN_ERR_Z" value="BOOZ_POS_I_OF_F(-10.)"/>
-    <setting name="V_MAX_ERR_Z" value="BOOZ_POS_I_OF_F( 10.)"/>
-    <setting name="V_MIN_ERR_ZD" value="BOOZ_SPEED_I_OF_F(-10.)"/>
-    <setting name="V_MAX_ERR_ZD" value="BOOZ_SPEED_I_OF_F( 10.)"/>
+    <setting name="V_MIN_ERR_Z" value="POS_BFP_OF_REAL(-10.)"/>
+    <setting name="V_MAX_ERR_Z" value="POS_BFP_OF_REAL( 10.)"/>
+    <setting name="V_MIN_ERR_ZD" value="SPEED_BFP_OF_REAL(-10.)"/>
+    <setting name="V_MAX_ERR_ZD" value="SPEED_BFP_OF_REAL( 10.)"/>
     <setting name="V_HOVER_KP" value="-300"/>
     <setting name="V_HOVER_KD" value="-400"/>
     <setting name="V_RC_CLIMB_COEF" value="163"/>

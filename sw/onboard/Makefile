@@ -14,7 +14,7 @@ include arch/Makefile.$(ARCH)
 
 SRC =                               \
     $(TARGET).c                     \
-    math/booz_trig_int.c            \
+    math/pprz_trig_int.c            \
     math/pprz_geodetic_int.c        \
     math/pprz_geodetic_float.c      \
     rc.c                            \

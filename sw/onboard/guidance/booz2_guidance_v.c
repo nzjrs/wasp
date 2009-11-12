@@ -28,8 +28,9 @@
 #include "ins.h"
 #include "stabilization/booz2_stabilization.h"
 #include "fms/booz2_fms.h"
-#include "booz2_navigation.h"
-#include "booz_geometry_mixed.h"
+#include "guidance/booz2_navigation.h"
+
+#include "math/pprz_algebra_int.h"
 
 #include "generated/settings.h"
 
@@ -51,7 +52,7 @@ int32_t booz2_guidance_v_z_sp;
 /* vertical speed setpoint in meter/s (input)     */
 /* Q12.19 : accuracy 0.0000019, range +/-4096     */
 int32_t booz2_guidance_v_zd_sp;
-#define BOOZ2_GUIDANCE_V_ZD_SP_FRAC ISPEED_RES
+#define BOOZ2_GUIDANCE_V_ZD_SP_FRAC INT32_SPEED_FRAC
 
 /* altitude reference in meter                    */
 /* Q23.8 : accuracy 0.0039, range 8388km          */
@@ -196,10 +197,10 @@ void booz2_guidance_v_run(bool_t in_flight) {
 static inline void run_hover_loop(bool_t in_flight) {
 
   /* convert our reference to generic representation */
-  int64_t tmp  = b2_gv_z_ref>>(B2_GV_Z_REF_FRAC - IPOS_FRAC);
+  int64_t tmp  = b2_gv_z_ref>>(B2_GV_Z_REF_FRAC - INT32_POS_FRAC);
   booz2_guidance_v_z_ref = (int32_t)tmp;
-  booz2_guidance_v_zd_ref = b2_gv_zd_ref<<(ISPEED_RES - B2_GV_ZD_REF_FRAC);
-  booz2_guidance_v_zdd_ref = b2_gv_zdd_ref<<(IACCEL_RES - B2_GV_ZDD_REF_FRAC);
+  booz2_guidance_v_zd_ref = b2_gv_zd_ref<<(INT32_SPEED_FRAC - B2_GV_ZD_REF_FRAC);
+  booz2_guidance_v_zdd_ref = b2_gv_zdd_ref<<(INT32_ACCEL_FRAC - B2_GV_ZDD_REF_FRAC);
   /* compute the error to our reference */
   int32_t err_z  =  ins.ltp_pos.z - booz2_guidance_v_z_ref;
   Bound(err_z, BOOZ2_GUIDANCE_V_MIN_ERR_Z, BOOZ2_GUIDANCE_V_MAX_ERR_Z);
@@ -214,8 +215,9 @@ static inline void run_hover_loop(bool_t in_flight) {
   /* our nominal command : (g + zdd)*m   */
   //const int32_t inv_m = BOOZ_INT_OF_FLOAT(0.140, IACCEL_RES);
   const int32_t inv_m =  b2_gv_adapt_X>>(B2_GV_ADAPT_X_FRAC - FF_CMD_FRAC);
-  const int32_t g_m_zdd = (int32_t)BOOZ_INT_OF_FLOAT(9.81, FF_CMD_FRAC) - 
-                          (booz2_guidance_v_zdd_ref<<(FF_CMD_FRAC - IACCEL_RES));
+  const int32_t g_m_zdd = (int32_t)BFP_OF_REAL(9.81, FF_CMD_FRAC) - 
+                          (booz2_guidance_v_zdd_ref<<(FF_CMD_FRAC - INT32_ACCEL_FRAC));
+
   if (g_m_zdd > 0) 
     booz2_guidance_v_ff_cmd = ( g_m_zdd + (inv_m>>1)) / inv_m;
   else

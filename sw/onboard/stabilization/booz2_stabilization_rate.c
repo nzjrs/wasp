@@ -25,7 +25,7 @@
 #include "rc.h"
 #include "imu.h"
 #include "ahrs/booz_ahrs_aligner.h"
-#include "booz2_stabilization.h"
+#include "stabilization/booz2_stabilization.h"
 
 #include "generated/settings.h"
 

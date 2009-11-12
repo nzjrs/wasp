@@ -25,12 +25,13 @@
 #include "altimeter.h"
 #include "gps.h"
 #include "ahrs.h"
-#include "pprz_geodetic_int.h"
-#include "booz_geometry_mixed.h"
+#include "math/pprz_algebra_int.h"
+#include "math/pprz_geodetic_int.h"
 
+/* FIXME: Conditional includes are soo 1984, that is
+   why generated/settings must be included first, it defines 
+   CONTROL_USE_VFF */
 #include "generated/settings.h"
-
-/* FIXME: Conditional includes are soo 1984 */
 #if CONTROL_USE_VFF
 #include "ins/booz2_vf_float.h"
 #endif
@@ -55,11 +56,11 @@ void ins_propagate() {
 
 #if CONTROL_USE_VFF
   if (altimeter_system_status == STATUS_INITIALIZED && ins.baro_initialised) {
-    float accel_float = BOOZ_ACCEL_F_OF_I(booz_imu.accel.z);
+    float accel_float = ACCEL_FLOAT_OF_BFP(booz_imu.accel.z);
     b2_vff_propagate(accel_float);
-    ins.ltp_accel.z = BOOZ_ACCEL_I_OF_F(b2_vff_zdotdot);
-    ins.ltp_speed.z = BOOZ_SPEED_I_OF_F(b2_vff_zdot);
-    ins.ltp_pos.z = BOOZ_POS_I_OF_F(b2_vff_z);
+    ins.ltp_accel.z = ACCEL_BFP_OF_REAL(b2_vff_zdotdot);
+    ins.ltp_speed.z = SPEED_BFP_OF_REAL(b2_vff_zdot);
+    ins.ltp_pos.z = POS_BFP_OF_REAL(b2_vff_z);
     ins.enu_pos.z = -ins.ltp_pos.z;
     ins.enu_speed.z = -ins.ltp_speed.z;
     ins.enu_accel.z = -ins.ltp_accel.z;
@@ -82,7 +83,7 @@ void ins_update_baro() {
       ins.baro_initialised = TRUE;
     }
     ins.baro_alt = alt - ins.qfe;
-    float alt_float = BOOZ_POS_F_OF_I(ins.baro_alt);
+    float alt_float = POS_FLOAT_OF_BFP(ins.baro_alt);
     if (ins.vff_realign) {
       ins.vff_realign = FALSE;
       ins.qfe = alt;
@@ -105,9 +106,13 @@ void ins_update_gps(void) {
     ned_of_ecef_vect_i(&ins.gps_speed_cm_s_ned, &ins.ltp_def, &booz_gps_state.ecef_speed);
 #ifdef USE_HFF
     b2ins_update_gps();
-    VECT2_SDIV(ins.ltp_pos, (1<<(B2INS_POS_LTP_FRAC-IPOS_FRAC)), b2ins_pos_ltp);
-    VECT2_SDIV(ins.ltp_speed, (1<<(B2INS_SPEED_LTP_FRAC-ISPEED_RES)), b2ins_speed_ltp);
+    VECT2_SDIV(ins.ltp_pos, (1<<(B2INS_POS_LTP_FRAC-INT32_POS_FRAC)), b2ins_pos_ltp);
+    VECT2_SDIV(ins.ltp_speed, (1<<(B2INS_SPEED_LTP_FRAC-INT32_SPEED_FRAC)), b2ins_speed_ltp);
 #else
+    INT32_VECT3_SCALE_2(b2ins_meas_gps_pos_ned, ins.gps_pos_cm_ned, 
+		INT32_POS_OF_CM_NUM, INT32_POS_OF_CM_DEN); 
+    INT32_VECT3_SCALE_2(b2ins_meas_gps_speed_ned, ins.gps_speed_cm_s_ned,
+		INT32_SPEED_OF_CM_S_NUM, INT32_SPEED_OF_CM_S_DEN); 
     VECT3_COPY(ins.ltp_pos,   b2ins_meas_gps_pos_ned);
     VECT3_COPY(ins.ltp_speed, b2ins_meas_gps_speed_ned);
 #endif

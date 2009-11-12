@@ -24,8 +24,7 @@
 #define BOOZ2_INS_H
 
 #include "std.h"
-#include "booz_geometry_int.h"
-#include "pprz_geodetic_int.h"
+#include "math/pprz_geodetic_int.h"
 
 typedef struct __INS {
     /* gps transformed to LTP-NED  */

@@ -29,6 +29,8 @@
 #include "arm7/max1168.h"
 #include "arm7/micromag.h"
 
+#include "math/pprz_algebra_int.h"
+
 #include "generated/settings.h"
 
 typedef enum {
@@ -178,7 +180,7 @@ imu_adjust_alignment( float phi, float theta, float psi )
     Compute quaternion and rotation matrix
     for conversions between body and imu frame
     */
-    struct booz_ieuler body_to_imu_eulers = {
+    struct Int32Eulers body_to_imu_eulers = {
             ANGLE_BFP_OF_REAL(RadOfDeg(phi)),
             ANGLE_BFP_OF_REAL(RadOfDeg(theta)),
             ANGLE_BFP_OF_REAL(RadOfDeg(psi))
