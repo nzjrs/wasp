@@ -51,7 +51,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
     PING_TIME = 3
 
-    def __init__(self, conf, messages, use_test_source):
+    def __init__(self, conf, messages, source_name, **source_options):
         config.ConfigurableIface.__init__(self, conf)
 
         self._port = self.config_get("serial_port", self.DEFAULT_PORT)
@@ -67,12 +67,23 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         self._transport = transport.Transport(check_crc=True, debug=DEBUG)
         self._transport_header = transport.TransportHeaderFooter(acid=0x78)
 
-        self._use_test_source = use_test_source
-        if use_test_source:
-            self.serial = communication.DummySerialCommunication(messages, self._transport, self._transport_header)
-            LOG.info("Test source enabled")
-        else:
-            self.serial = communication.SerialCommunication(port=self._port, speed=int(self._speed), timeout=1)
+        #set up the all the possible source options for all possible
+        #communication sources. 
+
+        #FIXME: Command line options override those that for serial port
+        #should override those in config file
+        sourceopts = {
+            "serial_port"   :   self._port,
+            "serial_speed"  :   int(self._speed),
+            "serial_timeout":   1,
+            "messages"      :   self._messages_file,
+            "transport"     :   self._transport,
+            "header"        :   self._transport_header
+        }
+
+        self.serial = communication.communication_factory(source_name, **sourceopts)
+        self._use_test_source = source_name == "test"
+        LOG.info("Source enabled: %s" % source_name)
 
         monitor.GObjectSerialMonitor.__init__(self, self.serial)
 

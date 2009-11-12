@@ -94,7 +94,7 @@ if __name__ == "__main__":
     default_messages = os.path.join(thisdir, "..", "..", "onboard", "config", "messages.xml")
 
     parser = optparse.OptionParser()
-    wasp.setup_comm_optparse_options(parser, default_messages)
+    communication.setup_optparse_options(parser, default_messages)
     parser.add_option("-d", "--debug",
                     action="store_true",
                     help="print extra debugging information")
@@ -104,10 +104,18 @@ if __name__ == "__main__":
     options, args = parser.parse_args()
 
     m = messages.MessagesFile(path=options.messages, debug=options.debug)
-    s = communication.SerialCommunication(port=options.port, speed=options.speed, timeout=options.timeout)
+    m.parse()
+
     t = transport.Transport(check_crc=True, debug=options.debug)
 
-    m.parse()
+    #test source requires some extra options, everything else comes from the
+    #command line (or command line defaults)
+    source_options = {
+            "messages"      :   m,
+            "transport"     :   t,
+            "header"        :   transport.TransportHeaderFooter(acid=0x78)
+    }        
+    s = communication.communication_factory_from_commandline(options, **source_options)
 
     ui = UI(m, s, t, debug=options.debug_tx)
     gtk.main()

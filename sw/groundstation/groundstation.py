@@ -12,6 +12,7 @@ logging.basicConfig(
     )
 
 import gs.groundstation as groundstation
+import wasp.communication as communication
 
 if __name__ == "__main__":
     thisdir = os.path.abspath(os.path.dirname(__file__))
@@ -24,28 +25,33 @@ if __name__ == "__main__":
     prefs = os.path.join(confdir, "groundstation.ini")
 
     parser = optparse.OptionParser()
-    parser.add_option("-m", "--messages",
-                    default=default_messages,
-                    help="Messages xml file", metavar="FILE")
-    parser.add_option("-s", "--settings",
+    communication.setup_optparse_options(parser, default_messages)
+    parser.add_option("-e", "--settings",
                     default=default_settings,
                     help="Settings xml file", metavar="FILE")
-    parser.add_option("-p", "--preferences",
+    parser.add_option("-P", "--preferences",
                     default=prefs,
                     help="User preferences file", metavar="FILE")
     parser.add_option("-t", "--use-test-source",
                     action="store_true", default=False,
-                    help="Dont connect to the UAV, use a test source")
+                    help="Use a test source, same as --source-name=test")
 
     options, args = parser.parse_args()
 
     if not os.path.exists(options.messages):
         parser.error("could not find messages.xml")
 
+    source_opts = {}
+    if options.use_test_source:
+        source_name = "test"
+    else:
+        source_name = options.source_name
+
     gs = groundstation.Groundstation(
             os.path.abspath(options.preferences),
             os.path.abspath(options.messages),
             os.path.abspath(options.settings),
-            options.use_test_source
+            source_name,
+            **source_opts
     )
     gs.main()

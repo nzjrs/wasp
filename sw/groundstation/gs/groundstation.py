@@ -40,7 +40,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     CONFIG_LON_DEFAULT = 172.582377
     CONFIG_ZOOM_DEFAULT = 12
 
-    def __init__(self, prefsfile, messagesfile, settingsfile, use_test_source):
+    def __init__(self, prefsfile, messagesfile, settingsfile, source_name, **source_opts):
         gtk.gdk.threads_init()
 
         #connect our log buffer to the python logging subsystem
@@ -79,7 +79,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._messagesfile = MessagesFile(path=messagesfile, debug=False)
         self._messagesfile.parse()
 
-        self._source = UAVSource(self._config, self._messagesfile, use_test_source)
+        self._source = UAVSource(self._config, self._messagesfile, source_name, **source_opts)
         self._source.connect("source-connected", self._on_source_connected)
 
         #track the state of a few key variables received from the plane

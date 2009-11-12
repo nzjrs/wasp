@@ -1,11 +1,44 @@
 import random
-import os
+import os.path
 import gobject
 import serial
+import optparse
 
 import libserial.SerialSender
 
 import wasp
+
+class _CommunicationIface:
+    def get_fd(self):
+        raise NotImplementedError
+
+    def connect_to_port(self):
+        raise NotImplementedError
+
+    def disconnect_from_port(self):
+        raise NotImplementedError
+
+    def is_open(self):
+        raise NotImplementedError
+
+    def write(self, data):
+        raise NotImplementedError
+
+    def read(self, nbytes=5):
+        raise NotImplementedError
+
+class FileCommunication(_CommunicationIface):
+    def __init__(self, path, create):
+        pass
+#        path = os.path.abspath(path)
+#        if create:
+#            if os.path.exists(path):
+#                os.unlink(path)
+            
+
+class NetworkCommunication(_CommunicationIface):
+    def __init__(self, host, port):
+        pass
 
 class SerialCommunication(libserial.SerialSender.SerialSender):
     """
@@ -23,7 +56,7 @@ class SerialCommunication(libserial.SerialSender.SerialSender):
         if self.is_open():
             self._serial.write(data)
 
-class DummySerialCommunication(gobject.GObject):
+class TestCommunication(gobject.GObject):
     """
     For testing groundstation with no UAV
     """
@@ -142,6 +175,72 @@ class DummySerialCommunication(gobject.GObject):
     def read(self, nbytes=5):
         return os.read(self._readfd, nbytes)
 
+# All available communication types
+communication_types = (
+    "serial",
+    "test",
+#    "file",
+#    "network",
+)
 
+def communication_factory(name, **kwargs):
+    if name == "serial":
+        return SerialCommunication(
+                    kwargs["serial_port"],
+                    kwargs["serial_speed"],
+                    kwargs["serial_timeout"])
+    elif name == "test":
+        return TestCommunication(
+                    kwargs["messages"],
+                    kwargs["transport"],
+                    kwargs["header"])
+    elif name == "file":
+        return FileCommunication(
+                    kwargs["file_path"],
+                    kwargs["file_create"])
+    elif name == "network":
+        return NetworkCommunication(
+                    kwargs["network_host"],
+                    kwargs["network_port"])
+    else:
+        raise Exception("Invalid communication type: %s" % name)
 
+def communication_factory_from_commandline(options, **extra):
+    extra["serial_port"] = options.serial_port
+    extra["serial_speed"] = options.serial_speed
+    extra["serial_timeout"] = options.serial_timeout
+
+    extra["file_path"] = options.file_path
+    extra["file_create"] = options.file_create
+
+    return communication_factory(options.source_name, **extra)
+
+def setup_optparse_options(parser, default_messages="/dev/null"):
+    """
+    Adds a number of communication related command line options to an
+    optparse parser instance.
+    """
+    parser.add_option("-m", "--messages",
+                    default=default_messages,
+                    help="messages xml file", metavar="FILE")
+    parser.add_option("-p", "--serial_port",
+                    default="/dev/ttyUSB0",
+                    help="serial port")
+    parser.add_option("-s", "--serial_speed",
+                    type="int", default=57600,
+                    help="serial port baud rate")
+    parser.add_option("-T", "--serial_timeout",
+                    type="int", default=1,
+                    help="serial port timeout (in seconds)")
+    parser.add_option("-S", "--source-name",
+                    default="serial",
+                    help="UAV Source [%s]" % ",".join(communication_types),
+                    metavar="NAME",
+                    choices=communication_types)
+    parser.add_option("--file-path",
+                    default="",
+                    help="path to fifo file")
+    parser.add_option("--file-create",
+                    action="store_true",
+                    help="create fifo file if it doesnt exist")
 
