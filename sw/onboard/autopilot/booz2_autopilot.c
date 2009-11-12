@@ -255,7 +255,7 @@ void autopilot_on_rc_event(void)
     /* I think this should be hidden in rc code */
     /* the ap gets a mode everytime - the rc filters it */
     if (rc_values_contains_avg_channels) {
-        uint8_t new_autopilot_mode = autopilot_mode_of_radio(rc_values[RADIO_MODE]);
+        AutopilotMode_t new_autopilot_mode = autopilot_mode_of_radio(rc_values[RADIO_MODE]);
         autopilot_set_mode(new_autopilot_mode);
         rc_values_contains_avg_channels = FALSE;
     }

@@ -52,7 +52,7 @@ typedef enum {
     IMU_MAG =   1 << 2
 } IMUComponentMast_t;
 
-IMU_t               booz_imu;
+extern IMU_t booz_imu;
 
 void
 imu_init(void);

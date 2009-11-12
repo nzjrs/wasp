@@ -44,7 +44,6 @@ void led_init ( void ) {}
 void led_on ( uint8_t id) {}
 void led_off ( uint8_t id) {}
 void led_toggle ( uint8_t id) {}
-void led_check ( uint8_t id) {}
 
 #include "comm.h"
 SystemStatus_t comm_system_status;
@@ -64,6 +63,8 @@ void rc_periodic_task ( void ) {}
 bool_t rc_event_task ( void ) { return FALSE; }
 
 #include "imu.h"
+IMU_t booz_imu;
+
 void imu_init(void) {}
 void imu_periodic_task ( void ) {}
 uint8_t imu_event_task ( void ) { return 0; }
