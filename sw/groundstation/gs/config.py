@@ -62,7 +62,12 @@ class ConfigurableIface:
     def make_sizegroup(self):
         return gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
 
-    def build_label(self, label, widget, sg=None):
+    def _add_sizegroup(self, lbl, **kwargs):
+        sg = kwargs.get("sg")
+        if sg:
+            sg.add_widget(lbl)
+
+    def build_label(self, label, widget, **kwargs):
         b = gtk.HBox(spacing=5)
 
         lbl = gtk.Label(label)
@@ -71,8 +76,7 @@ class ConfigurableIface:
         b.pack_start(lbl)
         b.pack_start(widget)
 
-        if sg:
-            sg.add_widget(lbl)
+        self._add_sizegroup(lbl, **kwargs)
 
         return b
 
@@ -90,44 +94,50 @@ class ConfigurableIface:
 
         return widget
 
-    def build_combo(self, name, *options):
+    def build_combo(self, name, *options, **kwargs):
         model = gtk.ListStore(str)
         for o in options:
             model.append((o,))
-        return self._build_combo_widget(name, model)
+        widget = self._build_combo_widget(name, model)
+        self._add_sizegroup(widget, **kwargs)
+        return widget
 
-    def build_combo_with_model(self, name, *options):
+    def build_combo_with_model(self, name, *options, **kwargs):
         model = gtk.ListStore(str, str)
         for n,o in options:
             model.append((n,o))
         widget = self._build_combo_widget(name, model)
         widget.set_data("MODEL_DATA_INDEX", 1)
+        self._add_sizegroup(widget, **kwargs)
         return widget
 
-    def build_entry(self, name):
+    def build_entry(self, name, **kwargs):
         section = self.CONFIG_SECTION
         widget = gtk.Entry()
         widget.set_data("CONFIG_NAME", name)
         widget.set_data("CONFIG_SECTION", section)
+        self._add_sizegroup(widget, **kwargs)
         return widget
 
-    def build_checkbutton(self, name):
+    def build_checkbutton(self, name, **kwargs):
         section = self.CONFIG_SECTION
         widget = gtk.CheckButton(label=name.replace("_"," "))
         widget.set_data("CONFIG_NAME", name)
         widget.set_data("CONFIG_SECTION", section)
+        self._add_sizegroup(widget, **kwargs)
         return widget
 
-    def build_radio(self, name, item):
-        button = gtk.RadioButton(label=item)
+    def build_radio(self, name, item, **kwargs):
         section = self.CONFIG_SECTION
-        button.set_data("CONFIG_NAME", name)
-        button.set_data("CONFIG_SECTION", section)
-        return button
+        widget = gtk.RadioButton(label=item)
+        widget.set_data("CONFIG_NAME", name)
+        widget.set_data("CONFIG_SECTION", section)
+        self._add_sizegroup(widget, **kwargs)
+        return widget
 
-    def build_radio_group(self, name, *items):
+    def build_radio_group(self, name, *items, **kwargs):
         section = self.CONFIG_SECTION
-        buttons = [self.build_radio(name, i) for i in items]
+        buttons = [self.build_radio(name, i, **kwargs) for i in items]
 
         #make them part of the same group
         for b in buttons[1:]:
@@ -135,7 +145,7 @@ class ConfigurableIface:
 
         return buttons
 
-    def build_frame(self, name, items):
+    def build_frame(self, name, items, **kwargs):
         f = gtk.Frame(name)
         f.set_shadow_type(gtk.SHADOW_NONE)
 

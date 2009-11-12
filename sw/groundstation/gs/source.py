@@ -229,17 +229,17 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         self.config_set("serial_speed", self._speed or self.DEFAULT_SPEED)
 
     def get_preference_widgets(self):
-        ser_port_cb = self.build_combo("serial_port", *libserial.get_ports())
-        ser_speed_cb = self.build_combo("serial_speed", *libserial.get_speeds())
+        sg = self.make_sizegroup()
+        ser_port_cb = self.build_combo("serial_port", *libserial.get_ports(), sg=sg)
+        ser_speed_cb = self.build_combo("serial_speed", *libserial.get_speeds(), sg=sg)
 
         #all following items configuration is saved
         items = [ser_port_cb, ser_speed_cb]
 
         #the gui looks like
-        sg = self.make_sizegroup()
         frame = self.build_frame(None, [
-            self.build_label("Serial Port", ser_port_cb, sg),
-            self.build_label("Serial Baud", ser_speed_cb, sg),
+            self.build_label("Serial Port", ser_port_cb),
+            self.build_label("Serial Baud", ser_speed_cb),
         ])
 
         return "UAV Source", frame, items

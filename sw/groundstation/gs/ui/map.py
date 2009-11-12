@@ -263,15 +263,15 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         cache = self.build_entry("cache")
 
         if MAP_AVAILABLE:
+            sg = self.make_sizegroup()
             sources = [(osmgpsmap.source_get_friendly_name(i),str(i)) for i in range(10)]
-            source = self.build_combo_with_model("source", *sources)
+            source = self.build_combo_with_model("source", *sources, sg=sg)
 
             items = [proxy, cache, source]
-            sg = self.make_sizegroup()
             frame = self.build_frame(None, [
-                    self.build_label("Source", source, sg),
-                    self.build_label("Proxy", proxy, sg),
-                    self.build_label("Cache", cache, sg)
+                    self.build_label("Source", source),
+                    self.build_label("Proxy", proxy),
+                    self.build_label("Cache", cache)
                 ])
         else:
             frame = None
