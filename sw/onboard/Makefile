@@ -1,5 +1,5 @@
 TARGET          ?= autopilot_main
-ARCH            ?= sim
+ARCH            ?= jsbsim
 OBJDIR          = bin/$(ARCH)
 Q               = @
 TOOLS           = ../tools
