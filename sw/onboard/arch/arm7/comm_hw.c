@@ -34,6 +34,8 @@ SystemStatus_t comm_system_status = STATUS_UNINITIAIZED;
 void
 comm_init ( CommChannel_t chan )
 {
+    uint8_t i;
+
 #if USE_UART0
     if ( chan == COMM_0 ) {
         uart0_init_tx();
@@ -53,7 +55,7 @@ comm_init ( CommChannel_t chan )
     }
 #endif
 
-    for (uint8_t i = 0; i < COMM_NB; i++) {
+    for (i = 0; i < COMM_NB; i++) {
         comm_callback_rx[i] = 0;
         comm_callback_tx[i] = 0;
     
