@@ -53,6 +53,7 @@
 SystemStatus_t  comm_system_status;
 int             write_fd;
 int             read_fd;
+uint8_t         read_ch;
 
 static bool_t make_fifo(const char *path)
 {
@@ -98,6 +99,10 @@ void comm_init ( CommChannel_t chan )
 
 bool_t comm_ch_available ( CommChannel_t chan )
 {
+    /* read one byte at a time */
+    if ((chan == COMM_1) && (comm_system_status == STATUS_INITIALIZED))
+        return read(read_fd, &read_ch, 1) == 1;
+
     return FALSE;
 }
 
@@ -110,6 +115,9 @@ void comm_send_ch (CommChannel_t chan, uint8_t c)
 
 uint8_t comm_get_ch(CommChannel_t chan)
 {
+    if ((chan == COMM_1) && (comm_system_status == STATUS_INITIALIZED))
+        return read_ch;
+
     return '\0';
 }
 
