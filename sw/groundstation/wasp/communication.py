@@ -8,35 +8,53 @@ import libserial.SerialSender
 
 import wasp
 
-class _CommunicationIface:
+class _UnixFDCommunication(gobject.GObject):
+
+    __gsignals__ = {
+        "serial-connected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+            gobject.TYPE_BOOLEAN]),     #True if successfully connected to the port
+        }
+
+    def __init__(self, *args, **kwargs):
+        gobject.GObject.__init__(self)
+        self._is_open = False
+        self._readfd = -1
+        self._writefd = -1
+
     def get_fd(self):
-        raise NotImplementedError
+        return self._readfd
 
     def connect_to_port(self):
-        raise NotImplementedError
+        self.emit("serial-connected", True)
+        self._is_open = True
+        return True
 
     def disconnect_from_port(self):
-        raise NotImplementedError
+        self.emit("serial-connected", False)
+        self._is_open = False
 
     def is_open(self):
-        raise NotImplementedError
+        return self._is_open
 
     def write(self, data):
-        raise NotImplementedError
+        if self._writefd != -1:
+            os.write(self._writefd, data)
 
     def read(self, nbytes=5):
-        raise NotImplementedError
+        if self._readfd != -1:
+            return os.read(self._readfd, nbytes)
 
-class FileCommunication(_CommunicationIface):
-    def __init__(self, path, create):
-        pass
-#        path = os.path.abspath(path)
-#        if create:
-#            if os.path.exists(path):
-#                os.unlink(path)
-            
+class FIFOCommunication(_UnixFDCommunication):
+    def __init__(self, path):
+        _UnixFDCommunication.__init__(self)
 
-class NetworkCommunication(_CommunicationIface):
+        rdpath = path + "_SOGI"
+        wrpath = path + "_SIGO"
+
+        self._readfd = os.open(rdpath, os.O_RDONLY)
+        self._writefd = os.open(wrpath, os.O_WRONLY)
+
+class NetworkCommunication(_UnixFDCommunication):
     def __init__(self, host, port):
         pass
 
@@ -56,18 +74,12 @@ class SerialCommunication(libserial.SerialSender.SerialSender):
         if self.is_open():
             self._serial.write(data)
 
-class TestCommunication(gobject.GObject):
+class TestCommunication(_UnixFDCommunication):
     """
     For testing groundstation with no UAV
     """
-
-    __gsignals__ = {
-        "serial-connected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
-            gobject.TYPE_BOOLEAN]),     #True if successfully connected to the port
-        }
-
     def __init__(self, messages, transport, header):
-        gobject.GObject.__init__(self)
+        _UnixFDCommunication.__init__(self)
         self._readfd, self._writefd = os.pipe()
 
         self._messages = messages        
@@ -154,32 +166,11 @@ class TestCommunication(gobject.GObject):
         n = 100
         return self._send(msg, v+random.randint(-n,n), v, v+random.randint(-n,n), v, v+random.randint(-n,n), v)
 
-    def get_fd(self):
-        return self._readfd
-
-    def connect_to_port(self):
-        self.emit("serial-connected", True)
-        self._is_open = True
-        return True
-
-    def disconnect_from_port(self):
-        self.emit("serial-connected", False)
-        self._is_open = False
-
-    def is_open(self):
-        return self._is_open
-
-    def write(self, data):
-        os.write(self._writefd, data)
-
-    def read(self, nbytes=5):
-        return os.read(self._readfd, nbytes)
-
 # All available communication types
 communication_types = (
     "serial",
     "test",
-#    "file",
+    "fifo",
 #    "network",
 )
 
@@ -194,10 +185,9 @@ def communication_factory(name, **kwargs):
                     kwargs["messages"],
                     kwargs["transport"],
                     kwargs["header"])
-    elif name == "file":
-        return FileCommunication(
-                    kwargs["file_path"],
-                    kwargs["file_create"])
+    elif name == "fifo":
+        return FIFOCommunication(
+                    kwargs["fifo_path"])
     elif name == "network":
         return NetworkCommunication(
                     kwargs["network_host"],
@@ -210,8 +200,7 @@ def communication_factory_from_commandline(options, **extra):
     extra["serial_speed"] = options.serial_speed
     extra["serial_timeout"] = options.serial_timeout
 
-    extra["file_path"] = options.file_path
-    extra["file_create"] = options.file_create
+    extra["fifo_path"] = options.fifo_path
 
     return communication_factory(options.source_name, **extra)
 
@@ -220,7 +209,7 @@ def setup_optparse_options(parser, default_messages="/dev/null"):
     Adds a number of communication related command line options to an
     optparse parser instance.
     """
-    parser.add_option("-m", "--messages",
+    parser.add_option("-m", "--messages-file",
                     default=default_messages,
                     help="messages xml file", metavar="FILE")
     parser.add_option("-p", "--serial_port",
@@ -237,10 +226,6 @@ def setup_optparse_options(parser, default_messages="/dev/null"):
                     help="UAV Source [%s]" % ",".join(communication_types),
                     metavar="NAME",
                     choices=communication_types)
-    parser.add_option("--file-path",
-                    default="",
-                    help="path to fifo file")
-    parser.add_option("--file-create",
-                    action="store_true",
-                    help="create fifo file if it doesnt exist")
-
+    parser.add_option("--fifo-path",
+                    default="/tmp/WASP_COMM_1",
+                    help="base path to pair of FIFO files")

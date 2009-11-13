@@ -78,7 +78,8 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
             "serial_timeout":   1,
             "messages"      :   self._messages_file,
             "transport"     :   self._transport,
-            "header"        :   self._transport_header
+            "header"        :   self._transport_header,
+            "fifo_path"     :   source_options.get("fifo_path"),
         }
 
         self.serial = communication.communication_factory(source_name, **sourceopts)

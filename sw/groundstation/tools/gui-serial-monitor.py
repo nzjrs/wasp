@@ -103,7 +103,7 @@ if __name__ == "__main__":
                     help="print extra debugging information about TX")
     options, args = parser.parse_args()
 
-    m = messages.MessagesFile(path=options.messages, debug=options.debug)
+    m = messages.MessagesFile(path=options.messages_file, debug=options.debug)
     m.parse()
 
     t = transport.Transport(check_crc=True, debug=options.debug)
