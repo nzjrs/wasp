@@ -2,6 +2,7 @@ ARCHSRC =                                       \
     math/pprz_trig_int.c                        \
     math/pprz_geodetic_double.c                 \
     arch/jsbsim/nps_main.c                      \
+    arch/jsbsim/nps_comm.c                      \
     arch/jsbsim/nps_unsimulated_periphials.c    \
     arch/jsbsim/nps_fdm_jsbsim.c                \
     arch/jsbsim/nps_flightgear.c                \
