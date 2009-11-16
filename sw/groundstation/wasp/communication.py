@@ -51,8 +51,9 @@ class FIFOCommunication(_UnixFDCommunication):
         rdpath = path + "_SOGI"
         wrpath = path + "_SIGO"
 
-        self._readfd = os.open(rdpath, os.O_RDONLY)
-        self._writefd = os.open(wrpath, os.O_WRONLY)
+        if os.path.exists(rdpath) and os.path.exists(wrpath):
+            self._readfd = os.open(rdpath, os.O_RDONLY)
+            self._writefd = os.open(wrpath, os.O_WRONLY)
 
 class NetworkCommunication(_UnixFDCommunication):
     def __init__(self, host, port):

@@ -53,7 +53,13 @@
 SystemStatus_t  comm_system_status;
 int             write_fd;
 int             read_fd;
-uint8_t         read_ch;
+
+/* simple circular buffer for comm, insert char into head,
+ pull from tail */
+#define CBUF_SIZE   256
+uint8_t             read_buf[CBUF_SIZE];
+uint8_t             read_head;
+uint8_t             read_tail;
 
 static bool_t make_fifo(const char *path)
 {
@@ -84,6 +90,8 @@ static bool_t make_fifo(const char *path)
 
 void comm_init ( CommChannel_t chan )
 {
+    int i;
+
     if (chan == COMM_1) {
         if (make_fifo(FIFO_WRITE) && make_fifo(FIFO_READ)) {
             /* Open the write end with O_RDWR, to prevent errors when writing 
@@ -91,17 +99,41 @@ void comm_init ( CommChannel_t chan )
             write_fd = open(FIFO_WRITE, O_RDWR | O_NONBLOCK);
             /* Open the read end normally */
             read_fd = open(FIFO_READ, O_RDONLY | O_NONBLOCK);
-            comm_system_status = (write_fd != 0 && read_fd != 0 ? STATUS_INITIALIZED : STATUS_FAIL);
+            /* mark channel as used */
+            comm_channel_used[chan] = (write_fd != -1 && read_fd != -1);
         } else 
             comm_system_status = STATUS_FAIL;
     }
+
+    for (i = 0; i < COMM_NB; i++) {
+        comm_callback_rx[i] = 0;
+        comm_callback_tx[i] = 0;
+    
+        comm_status[i].parse_state = STATE_UNINIT;
+        comm_status[i].msg_received = FALSE;
+        comm_status[i].buffer_overrun = 0;
+        comm_status[i].parse_error = 0;
+    }
+
+    comm_system_status = STATUS_INITIALIZED;
+
+    read_head = read_tail = 0;
+
 }
 
 bool_t comm_ch_available ( CommChannel_t chan )
 {
     /* read one byte at a time */
-    if ((chan == COMM_1) && (comm_system_status == STATUS_INITIALIZED))
-        return read(read_fd, &read_ch, 1) == 1;
+    if ((chan == COMM_1) && (comm_system_status == STATUS_INITIALIZED)) {
+        uint8_t ch;
+        int i;
+
+        i = read(read_fd, &read_buf[read_head], 1);
+        if (i == 1)
+            read_head = (read_head + 1) % CBUF_SIZE;
+
+        return read_head > read_tail;
+    }
 
     return FALSE;
 }
@@ -115,8 +147,14 @@ void comm_send_ch (CommChannel_t chan, uint8_t c)
 
 uint8_t comm_get_ch(CommChannel_t chan)
 {
-    if ((chan == COMM_1) && (comm_system_status == STATUS_INITIALIZED))
-        return read_ch;
+    if ((chan == COMM_1) && (comm_system_status == STATUS_INITIALIZED)) {
+        uint8_t c;
+
+        c = read_buf[read_tail];
+        read_tail = (read_tail + 1) % CBUF_SIZE;
+
+        return c;
+    }
 
     return '\0';
 }

@@ -114,7 +114,9 @@ comm_parse ( CommChannel_t chan )
 
     while ( comm_ch_available(chan) && !comm_status[chan].msg_received ) 
     {
-        uint8_t c = comm_get_ch(chan);
+        uint8_t c;
+
+        c = comm_get_ch(chan);
         switch (comm_status[chan].parse_state) 
         {
             case STATE_UNINIT:
