@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/groups/flyingkiwi09/!svn/ver/141/cad%20models/Electronics
+END
+Board1.SLDPRT
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/groups/flyingkiwi09/!svn/ver/124/cad%20models/Electronics/Board1.SLDPRT
+END
+GPS.SLDPRT
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/groups/flyingkiwi09/!svn/ver/124/cad%20models/Electronics/GPS.SLDPRT
+END
+Power.SLDPRT
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/groups/flyingkiwi09/!svn/ver/141/cad%20models/Electronics/Power.SLDPRT
+END
+Connections_and_Misc.SLDPRT
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/groups/flyingkiwi09/!svn/ver/124/cad%20models/Electronics/Connections_and_Misc.SLDPRT
+END
+Main_and_IMU.SLDPRT
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/groups/flyingkiwi09/!svn/ver/141/cad%20models/Electronics/Main_and_IMU.SLDPRT
+END
+Electronics_Assembly.SLDASM
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/groups/flyingkiwi09/!svn/ver/141/cad%20models/Electronics/Electronics_Assembly.SLDASM
+END
+Expansion.SLDPRT
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/groups/flyingkiwi09/!svn/ver/141/cad%20models/Electronics/Expansion.SLDPRT
+END
+Nylon_Spacer_Column.SLDASM
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/groups/flyingkiwi09/!svn/ver/141/cad%20models/Electronics/Nylon_Spacer_Column.SLDASM
+END
+Small_Nylon_Spacer.SLDPRT
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/groups/flyingkiwi09/!svn/ver/141/cad%20models/Electronics/Small_Nylon_Spacer.SLDPRT
+END
+XBee_and_Logger.SLDPRT
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/groups/flyingkiwi09/!svn/ver/141/cad%20models/Electronics/XBee_and_Logger.SLDPRT
+END

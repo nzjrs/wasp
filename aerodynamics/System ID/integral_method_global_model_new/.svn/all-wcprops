@@ -1,0 +1,161 @@
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/groups/flyingkiwi09/!svn/ver/126/aerodynamics/System%20ID/integral_method_global_model_new
+END
+r_RPM1.mat
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/r_RPM1.mat
+END
+r_RPM2.mat
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/r_RPM2.mat
+END
+ra_RPM1.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/ra_RPM1.mat
+END
+r_RPM3.mat
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/r_RPM3.mat
+END
+ra_RPM2.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/ra_RPM2.mat
+END
+rb_RPM1.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/rb_RPM1.mat
+END
+r_RPM4.mat
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/r_RPM4.mat
+END
+ra_RPM3.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/ra_RPM3.mat
+END
+rb_RPM2.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/rb_RPM2.mat
+END
+ra_RPM4.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/ra_RPM4.mat
+END
+rb_RPM3.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/rb_RPM3.mat
+END
+v_RPM1.mat
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/v_RPM1.mat
+END
+va_RPM1.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/va_RPM1.mat
+END
+linear_model.m
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/linear_model.m
+END
+rb_RPM4.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/rb_RPM4.mat
+END
+v_RPM2.mat
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/v_RPM2.mat
+END
+v_RPM3.mat
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/v_RPM3.mat
+END
+va_RPM2.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/va_RPM2.mat
+END
+vb_RPM1.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/vb_RPM1.mat
+END
+v_RPM4.mat
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/v_RPM4.mat
+END
+va_RPM3.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/va_RPM3.mat
+END
+vb_RPM2.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/vb_RPM2.mat
+END
+va_RPM4.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/va_RPM4.mat
+END
+vb_RPM3.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/vb_RPM3.mat
+END
+vb_RPM4.mat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/groups/flyingkiwi09/!svn/ver/121/aerodynamics/System%20ID/integral_method_global_model_new/vb_RPM4.mat
+END
+integral_method_global_model_new.m
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/groups/flyingkiwi09/!svn/ver/126/aerodynamics/System%20ID/integral_method_global_model_new/integral_method_global_model_new.m
+END
