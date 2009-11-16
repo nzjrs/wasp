@@ -48,17 +48,6 @@ void sys_time_usleep ( uint32_t us ) {}
 void sys_time_calculate_cpu_usage ( void ) {}
 
 
-#include "comm.h"
-SystemStatus_t comm_system_status;
-
-void comm_init ( CommChannel_t chan ) {}
-bool_t comm_ch_available ( CommChannel_t chan ) { return FALSE; }
-void comm_send_ch ( CommChannel_t chan, uint8_t c ) {}
-uint8_t comm_get_ch( CommChannel_t chan ) { return '\0'; }
-bool_t comm_check_free_space ( CommChannel_t chan, uint8_t len ) { return TRUE; }
-void comm_overrun ( CommChannel_t chan ) {}
-
-
 #include "analog.h"
 void analog_init( void ) {}
 void analog_enable_channel( AnalogChannel_t channel ) {}

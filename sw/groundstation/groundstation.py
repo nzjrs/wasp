@@ -26,10 +26,10 @@ if __name__ == "__main__":
 
     parser = optparse.OptionParser()
     communication.setup_optparse_options(parser, default_messages)
-    parser.add_option("-e", "--settings",
+    parser.add_option("-e", "--settings-file",
                     default=default_settings,
                     help="Settings xml file", metavar="FILE")
-    parser.add_option("-P", "--preferences",
+    parser.add_option("-P", "--preferences-file",
                     default=prefs,
                     help="User preferences file", metavar="FILE")
     parser.add_option("-t", "--use-test-source",
@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     options, args = parser.parse_args()
 
-    if not os.path.exists(options.messages):
+    if not os.path.exists(options.messages_file):
         parser.error("could not find messages.xml")
 
     source_opts = {}
@@ -46,11 +46,19 @@ if __name__ == "__main__":
         source_name = "test"
     else:
         source_name = options.source_name
+        #yuck, if only options was a dict
+        #instead, manually copy all options stored in the option instance into 
+        #the options dict. 
+        for i in parser.option_list:
+            if i.type in ("string", "int", "choice"):
+                #exclude source_name, it is passed seperately
+                if i.dest != "source_name":
+                    source_opts[i.dest] = getattr(options,i.dest)
 
     gs = groundstation.Groundstation(
-            os.path.abspath(options.preferences),
-            os.path.abspath(options.messages),
-            os.path.abspath(options.settings),
+            os.path.abspath(options.preferences_file),
+            os.path.abspath(options.messages_file),
+            os.path.abspath(options.settings_file),
             source_name,
             **source_opts
     )

@@ -30,12 +30,10 @@ if __name__ == "__main__":
 
     options, args = parser.parse_args()
 
-    print options, options.__class__.__name__
-
     if options.source_name != "serial":
         parser.error("only serial source supported")
 
-    m = messages.MessagesFile(path=options.messages, debug=options.debug)
+    m = messages.MessagesFile(path=options.messages_file, debug=options.debug)
     s = communication.communication_factory_from_commandline(options)
     t = transport.Transport(check_crc=options.crc, debug=options.debug)
 
