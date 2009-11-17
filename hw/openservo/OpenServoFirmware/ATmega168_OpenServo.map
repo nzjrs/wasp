@@ -1,0 +1,454 @@
+Archive member included because of file (symbol)
+
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_mulsi3.o)
+                              pid.o (__mulsi3)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_udivmodsi4.o)
+                              pwm.o (__udivmodsi4)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_copy_data.o)
+                              main.o (__do_copy_data)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_clear_bss.o)
+                              main.o (__do_clear_bss)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_addsub_sf.o)
+                              motion.o (__addsf3)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_mul_sf.o)
+                              motion.o (__mulsf3)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_div_sf.o)
+                              curve.o (__divsf3)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_si_to_sf.o)
+                              motion.o (__floatsisf)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_sf_to_si.o)
+                              motion.o (__fixsfsi)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_thenan_sf.o)
+                              C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_addsub_sf.o) (__thenan_sf)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_prologue.o)
+                              C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_addsub_sf.o) (__prologue_saves__)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_epilogue.o)
+                              C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_addsub_sf.o) (__epilogue_restores__)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_pack_sf.o)
+                              C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_addsub_sf.o) (__pack_f)
+C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_unpack_sf.o)
+                              C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_addsub_sf.o) (__unpack_f)
+C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(memset.o)
+                              registers.o (memset)
+C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(ee_rblk.1F2021.o)
+                              eeprom.o (__eeprom_read_block_1F2021)
+C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(ee_wblk.1F2021.o)
+                              eeprom.o (__eeprom_write_block_1F2021)
+C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(ee_rb.1F2021.o)
+                              C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(ee_rblk.1F2021.o) (__eeprom_read_byte_1F2021)
+C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(ee_wb.1F2021.o)
+                              C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(ee_wblk.1F2021.o) (__eeprom_write_byte_1F2021)
+
+Allocating common symbols
+Common symbol       size              file
+
+adc_position_ready  0x1               adc.o
+curve_p0            0x4               curve.o
+curve_t1            0x2               curve.o
+registers           0x48              registers.o
+motion_tail         0x1               motion.o
+adc_channel         0x1               adc.o
+curve_v1            0x4               curve.o
+adc_power_ready     0x1               adc.o
+curve_p1            0x4               curve.o
+motion_counter      0x4               motion.o
+curve_v0            0x4               curve.o
+motion_duration     0x4               motion.o
+motion_head         0x1               motion.o
+adc_position_value  0x2               adc.o
+adc_power_value     0x2               adc.o
+curve_t0            0x2               curve.o
+adc_voltage_needed  0x1               adc.o
+curve_duration      0x2               curve.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+text             0x00000000         0x00020000         xr
+data             0x00800060         0x0000ffa0         rw !x
+eeprom           0x00810000         0x00010000         rw !x
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+Address of section .data set to 0x800100
+LOAD bootcrt.o
+LOAD main.o
+LOAD adc.o
+LOAD registers.o
+LOAD eeprom.o
+LOAD watchdog.o
+LOAD motion.o
+LOAD math.o
+LOAD ipd.o
+LOAD pid.o
+LOAD regulator.o
+LOAD power.o
+LOAD twi.o
+LOAD pwm.o
+LOAD estimator.o
+LOAD seek.o
+LOAD timer.o
+LOAD curve.o
+LOAD pulsectl.o
+LOAD C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a
+LOAD C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a
+LOAD C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a
+
+.hash
+ *(.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.init
+ *(.rel.init)
+
+.rela.init
+ *(.rela.init)
+
+.rel.text
+ *(.rel.text)
+ *(.rel.text.*)
+ *(.rel.gnu.linkonce.t*)
+
+.rela.text
+ *(.rela.text)
+ *(.rela.text.*)
+ *(.rela.gnu.linkonce.t*)
+
+.rel.fini
+ *(.rel.fini)
+
+.rela.fini
+ *(.rela.fini)
+
+.rel.rodata
+ *(.rel.rodata)
+ *(.rel.rodata.*)
+ *(.rel.gnu.linkonce.r*)
+
+.rela.rodata
+ *(.rela.rodata)
+ *(.rela.rodata.*)
+ *(.rela.gnu.linkonce.r*)
+
+.rel.data
+ *(.rel.data)
+ *(.rel.data.*)
+ *(.rel.gnu.linkonce.d*)
+
+.rela.data
+ *(.rela.data)
+ *(.rela.data.*)
+ *(.rela.gnu.linkonce.d*)
+
+.rel.ctors
+ *(.rel.ctors)
+
+.rela.ctors
+ *(.rela.ctors)
+
+.rel.dtors
+ *(.rel.dtors)
+
+.rela.dtors
+ *(.rela.dtors)
+
+.rel.got
+ *(.rel.got)
+
+.rela.got
+ *(.rela.got)
+
+.rel.bss
+ *(.rel.bss)
+
+.rela.bss
+ *(.rela.bss)
+
+.rel.plt
+ *(.rel.plt)
+
+.rela.plt
+ *(.rela.plt)
+
+.text           0x00000000     0x27ce
+ *(.vectors)
+ .vectors       0x00000000       0x6c bootcrt.o
+                0x00000000                __vectors
+                0x00000000                __vector_default
+                0x00000068                __boot_vector
+                0x0000006c                __ctors_start = .
+ *(.ctors)
+                0x0000006c                __ctors_end = .
+                0x0000006c                __dtors_start = .
+ *(.dtors)
+                0x0000006c                __dtors_end = .
+ *(.progmem.gcc*)
+ *(.progmem*)
+                0x0000006c                . = ALIGN (0x2)
+ *(.init0)
+ *(.init1)
+ *(.init2)
+ .init2         0x0000006c        0xc bootcrt.o
+ *(.init3)
+ *(.init4)
+ .init4         0x00000078       0x16 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_copy_data.o)
+                0x00000078                __do_copy_data
+ .init4         0x0000008e       0x10 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_clear_bss.o)
+                0x0000008e                __do_clear_bss
+ *(.init5)
+ *(.init6)
+ *(.init7)
+ *(.init8)
+ *(.init9)
+ .init9         0x0000009e        0x4 bootcrt.o
+ *(.text)
+ .text          0x000000a2        0x4 bootcrt.o
+                0x000000a2                __vector_22
+                0x000000a2                __vector_1
+                0x000000a2                __vector_12
+                0x000000a2                __bad_interrupt
+                0x000000a2                __vector_6
+                0x000000a2                __vector_3
+                0x000000a2                __vector_23
+                0x000000a2                __vector_25
+                0x000000a2                __vector_11
+                0x000000a2                __vector_13
+                0x000000a2                __vector_17
+                0x000000a2                __vector_19
+                0x000000a2                __vector_7
+                0x000000a2                __vector_5
+                0x000000a2                __vector_4
+                0x000000a2                __vector_9
+                0x000000a2                __vector_2
+                0x000000a2                __vector_15
+                0x000000a2                __vector_8
+                0x000000a2                __vector_10
+                0x000000a2                __vector_16
+                0x000000a2                __vector_18
+                0x000000a2                __vector_20
+ .text          0x000000a6      0x1c2 main.o
+                0x000000a6                main
+ .text          0x00000268      0x182 adc.o
+                0x00000268                adc_init
+                0x0000031e                __vector_21
+                0x000002be                __vector_14
+ .text          0x000003ea       0xa0 registers.o
+                0x00000442                registers_read_word
+                0x000003ea                registers_defaults
+                0x000003fa                registers_init
+                0x0000046a                registers_write_word
+ .text          0x0000048a      0x152 eeprom.o
+                0x000004a2                eeprom_erase
+                0x000004fa                eeprom_restore_registers
+                0x00000570                eeprom_save_registers
+ .text          0x000005dc       0x2c watchdog.o
+                0x000005f2                watchdog_hard_reset
+                0x000005dc                watchdog_init
+ .text          0x00000608      0x632 motion.o
+                0x00000850                motion_append
+                0x00000798                motion_init
+                0x00000692                motion_registers_reset
+                0x00000676                motion_buffer_left
+                0x000006d0                motion_reset
+                0x000009a8                motion_next
+ .text          0x00000c3a      0x380 pid.o
+                0x00000c98                pid_position_to_pwm
+                0x00000c4c                pid_registers_defaults
+                0x00000c3a                pid_init
+ .text          0x00000fba       0x6a power.o
+                0x00000fdc                power_update
+                0x00000fba                power_init
+ .text          0x00001024      0x2f6 twi.o
+                0x000010cc                twi_receive_byte
+                0x0000110e                __vector_24
+                0x000010f6                twi_data_in_receive_buffer
+                0x000010b0                twi_slave_init
+ .text          0x0000131a      0x398 pwm.o
+                0x0000138c                pwm_init
+                0x0000137e                pwm_registers_defaults
+                0x0000131a                pwm_stop
+                0x00001408                pwm_update
+ .text          0x000016b2      0x502 curve.o
+                0x000016b2                curve_init
+                0x000018f6                curve_solve
+ .text          0x00001bb4      0x314 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_addsub_sf.o)
+                0x00001e5e                __subsf3
+                0x00001dfc                __addsf3
+ .text          0x00001ec8      0x236 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_mul_sf.o)
+                0x00001ec8                __mulsf3
+ .text          0x000020fe      0x160 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_div_sf.o)
+                0x000020fe                __divsf3
+ .text          0x0000225e       0xc8 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_si_to_sf.o)
+                0x0000225e                __floatsisf
+ .text          0x00002326       0xa4 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_sf_to_si.o)
+                0x00002326                __fixsfsi
+ .text          0x000023ca      0x1d0 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_pack_sf.o)
+                0x000023ca                __pack_f
+ .text          0x0000259a       0xf4 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_unpack_sf.o)
+                0x0000259a                __unpack_f
+ .text          0x0000268e       0x14 C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(memset.o)
+                0x0000268e                memset
+                0x000026a2                . = ALIGN (0x2)
+ *(.text.*)
+ .text.libgcc   0x000026a2       0x3e C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_mulsi3.o)
+                0x000026a2                __mulsi3
+ .text.libgcc   0x000026e0       0x44 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_udivmodsi4.o)
+                0x000026e0                __udivmodsi4
+ .text.libgcc   0x00002724       0x38 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_prologue.o)
+                0x00002724                __prologue_saves__
+ .text.libgcc   0x0000275c       0x36 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_epilogue.o)
+                0x0000275c                __epilogue_restores__
+ .text.eeprom   0x00002792        0xa C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(ee_rblk.1F2021.o)
+                0x00002792                __eeprom_read_block_1F2021
+ .text.eeprom   0x0000279c        0xa C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(ee_wblk.1F2021.o)
+                0x0000279c                __eeprom_write_block_1F2021
+ .text.eeprom   0x000027a6       0x10 C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(ee_rb.1F2021.o)
+                0x000027a6                __eeprom_read_byte_1F2021
+ .text.eeprom   0x000027b6       0x18 C:/WinAVR/bin/../lib/gcc/avr/3.4.6/../../../../avr/lib/avr5\libc.a(ee_wb.1F2021.o)
+                0x000027b6                __eeprom_write_byte_1F2021
+                0x000027ce                . = ALIGN (0x2)
+ *(.fini9)
+ *(.fini8)
+ *(.fini7)
+ *(.fini6)
+ *(.fini5)
+ *(.fini4)
+ *(.fini3)
+ *(.fini2)
+ *(.fini1)
+ *(.fini0)
+                0x000027ce                _etext = .
+
+.data           0x00800100        0x8 load address 0x000027ce
+                0x00800100                PROVIDE (__data_start, .)
+ *(.data)
+ .data          0x00800100        0x8 C:/WinAVR/lib/gcc/avr/3.4.6/avr5\libgcc.a(_thenan_sf.o)
+                0x00800100                __thenan_sf
+ *(.gnu.linkonce.d*)
+                0x00800108                . = ALIGN (0x2)
+                0x00800108                _edata = .
+                0x00800108                PROVIDE (__data_end, .)
+
+.bss            0x00800108      0x147
+                0x00800108                PROVIDE (__bss_start, .)
+ *(.bss)
+ .bss           0x00800108       0x70 motion.o
+ .bss           0x00800178       0x22 pid.o
+ .bss           0x0080019a       0x11 power.o
+ .bss           0x008001ab       0x1c twi.o
+ .bss           0x008001c7        0x4 pwm.o
+ .bss           0x008001cb       0x14 curve.o
+ *(COMMON)
+ COMMON         0x008001df        0x8 adc.o
+                0x008001df                adc_position_ready
+                0x008001e0                adc_channel
+                0x008001e1                adc_power_ready
+                0x008001e2                adc_position_value
+                0x008001e4                adc_power_value
+                0x008001e6                adc_voltage_needed
+ COMMON         0x008001e7       0x48 registers.o
+                0x008001e7                registers
+ COMMON         0x0080022f        0xa motion.o
+                0x0080022f                motion_tail
+                0x00800230                motion_counter
+                0x00800234                motion_duration
+                0x00800238                motion_head
+ COMMON         0x00800239       0x16 curve.o
+                0x00800239                curve_p0
+                0x0080023d                curve_t1
+                0x0080023f                curve_v1
+                0x00800243                curve_p1
+                0x00800247                curve_v0
+                0x0080024b                curve_t0
+                0x0080024d                curve_duration
+                0x0080024f                PROVIDE (__bss_end, .)
+                0x000027ce                __data_load_start = LOADADDR (.data)
+                0x000027d6                __data_load_end = (__data_load_start + SIZEOF (.data))
+
+.noinit         0x0080024f        0x0
+                0x0080024f                PROVIDE (__noinit_start, .)
+ *(.noinit*)
+                0x0080024f                PROVIDE (__noinit_end, .)
+                0x0080024f                _end = .
+                0x0080024f                PROVIDE (__heap_start, .)
+
+.eeprom         0x00810000        0x0
+ *(.eeprom*)
+                0x00810000                __eeprom_end = .
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment
+ *(.comment)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info)
+ *(.gnu.linkonce.wi.*)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+OUTPUT(ATmega168_OpenServo.elf elf32-avr)

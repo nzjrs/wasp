@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/groups/flyingkiwi09/!svn/ver/36/hardware/altium_library
+END
+rocket.PcbLib
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/groups/flyingkiwi09/!svn/ver/36/hardware/altium_library/rocket.PcbLib
+END
+libraries_used.txt
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/groups/flyingkiwi09/!svn/ver/15/hardware/altium_library/libraries_used.txt
+END
+rocket.SchLib
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/groups/flyingkiwi09/!svn/ver/36/hardware/altium_library/rocket.SchLib
+END
+rocket.LibPkg
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/groups/flyingkiwi09/!svn/ver/15/hardware/altium_library/rocket.LibPkg
+END

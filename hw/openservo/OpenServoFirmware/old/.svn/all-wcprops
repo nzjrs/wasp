@@ -1,0 +1,233 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old
+END
+power.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/power.h
+END
+pwm.c
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/pwm.c
+END
+twi.c
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/twi.c
+END
+pwm.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/pwm.h
+END
+twi.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/twi.h
+END
+config.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/config.h
+END
+ipd.c
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/ipd.c
+END
+ipd.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/ipd.h
+END
+curve.c
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/curve.c
+END
+openservo.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/openservo.h
+END
+eeprom.c
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/eeprom.c
+END
+curve.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/curve.h
+END
+math.c
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/math.c
+END
+pulsectl.c
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/pulsectl.c
+END
+eeprom.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/eeprom.h
+END
+math.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/math.h
+END
+watchdog.c
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/watchdog.c
+END
+pulsectl.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/pulsectl.h
+END
+regulator.c
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/regulator.c
+END
+watchdog.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/watchdog.h
+END
+motion.c
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/motion.c
+END
+estimator.c
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/estimator.c
+END
+registers.c
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/registers.c
+END
+regulator.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/regulator.h
+END
+motion.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/motion.h
+END
+estimator.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/estimator.h
+END
+pid.c
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/pid.c
+END
+registers.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/registers.h
+END
+timer.c
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/timer.c
+END
+pid.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/pid.h
+END
+main.c
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/main.c
+END
+timer.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/timer.h
+END
+seek.c
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/seek.c
+END
+adc.c
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/adc.c
+END
+macros.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/macros.h
+END
+power.c
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/power.c
+END
+adc.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/adc.h
+END
+seek.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/groups/flyingkiwi09/!svn/ver/104/hardware/openservo/OpenServoFirmware/old/seek.h
+END

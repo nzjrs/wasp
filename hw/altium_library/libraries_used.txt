@@ -1,0 +1,5 @@
+rocket.LibPkg
+
+<Altium_Install_Dir>/Library/Atmel/Atmel Microcontroller 8-Bit AVR.IntLib
+<Altium_Install_Dir>/Library/Miscellaneous Connectors.IntLib
+<Altium_Install_Dir>/Library/Miscellaneous Devices.IntLib
