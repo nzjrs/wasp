@@ -62,8 +62,11 @@ class Camera(gtk.DrawingArea):
                 # Assign the viewport so the video does not
                 # show in a new window
                 #imagesink = message.src
+                gtk.gdk.threads_enter()
+                gtk.gdk.display_get_default().sync()
                 message.src.set_property("force-aspect-ratio", True)
                 message.src.set_xwindow_id(self.window.xid)
+                gtk.gdk.threads_leave()
 
     def start(self, *args):
         if self.pipeline:

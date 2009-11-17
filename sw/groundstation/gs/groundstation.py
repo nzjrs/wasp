@@ -41,6 +41,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     CONFIG_ZOOM_DEFAULT = 12
 
     def __init__(self, prefsfile, messagesfile, settingsfile, use_test_source):
+        gobject.threads_init()
         gtk.gdk.threads_init()
 
         #connect our log buffer to the python logging subsystem
@@ -458,7 +459,5 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map.props.show_trip_history = widget.get_active()
 
     def main(self):
-        gtk.gdk.threads_enter()
         gtk.main()
-        gtk.gdk.threads_leave()
 
