@@ -119,7 +119,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         #Lazy initialize the following when first needed
         self._plane_view = None
         self._horizon_view = None
-        self._camera_window = None
         self._prefs_window = None
 
         #create the map
@@ -426,19 +425,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                 return
 
         self._horizon_view.show_all()
-
-    def on_menu_item_camera_view_activate(self, widget):
-        if self._camera_window == None:
-            try:
-                from gs.ui.camera import CameraWindow
-                self._camera_window = CameraWindow(self._config)
-            except:
-                LOG.warning("Could not initialize camera window", exc_info=True)
-                return
-
-        self._configurable.append(self._camera_window)
-        self._camera_window.start()
-        self._camera_window.show()
 
     def on_menu_item_clear_path_activate(self, widget):
         self._map.clear_gps()

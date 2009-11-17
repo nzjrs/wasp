@@ -147,6 +147,17 @@
                   <object class="GtkMenu" id="window_menu">
                     <property name="visible">True</property>
                     <child>
+                      <object class="GtkImageMenuItem" id="menu_item_dock_all">
+                        <property name="label">Dock All</property>
+                        <property name="visible">True</property>
+                        <property name="image">image2</property>
+                        <property name="use_stock">False</property>
+                        <property name="accel_group">accelgroup1</property>
+                        <property name="always_show_image">True</property>
+                        <signal name="activate" handler="on_menu_item_dock_all_activate"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkImageMenuItem" id="menu_item_plane_view">
                         <property name="label">Plane View</property>
                         <property name="visible">True</property>
@@ -166,28 +177,6 @@
                         <property name="accel_group">accelgroup1</property>
                         <property name="always_show_image">True</property>
                         <signal name="activate" handler="on_menu_item_horizon_view_activate"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="menu_item_camera_view">
-                        <property name="label">Camera View</property>
-                        <property name="visible">True</property>
-                        <property name="image">image5</property>
-                        <property name="use_stock">False</property>
-                        <property name="accel_group">accelgroup1</property>
-                        <property name="always_show_image">True</property>
-                        <signal name="activate" handler="on_menu_item_camera_view_activate"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="menu_item_dock_all">
-                        <property name="label">Dock All</property>
-                        <property name="visible">True</property>
-                        <property name="image">image2</property>
-                        <property name="use_stock">False</property>
-                        <property name="accel_group">accelgroup1</property>
-                        <property name="always_show_image">True</property>
-                        <signal name="activate" handler="on_menu_item_dock_all_activate"/>
                       </object>
                     </child>
                   </object>
@@ -1681,11 +1670,6 @@
     <property name="stock">gtk-missing-image</property>
   </object>
   <object class="GtkImage" id="image4">
-    <property name="visible">True</property>
-    <property name="stock">gtk-missing-image</property>
-    <property name="icon-size">1</property>
-  </object>
-  <object class="GtkImage" id="image5">
     <property name="visible">True</property>
     <property name="stock">gtk-missing-image</property>
     <property name="icon-size">1</property>
