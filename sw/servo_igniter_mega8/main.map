@@ -1,0 +1,534 @@
+Archive member included because of file (symbol)
+
+c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_mulsi3.o)
+                              timer.o (__mulsi3)
+c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodhi4.o)
+                              rprintf.o (__udivmodhi4)
+c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodsi4.o)
+                              timer.o (__udivmodsi4)
+c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_divmodsi4.o)
+                              timer.o (__divmodsi4)
+c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_exit.o)
+                              c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o (exit)
+c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_clear_bss.o)
+                              timer.o (__do_clear_bss)
+
+Allocating common symbols
+Common symbol       size              file
+
+Timer0Reg0          0x4               timer.o
+TimerPauseReg       0x4               timer.o
+Timer2Reg0          0x4               timer.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+text             0x00000000         0x00002000         xr
+data             0x00800060         0x0000ffa0         rw !x
+eeprom           0x00810000         0x00010000         rw !x
+fuse             0x00820000         0x00000400         rw !x
+lock             0x00830000         0x00000400         rw !x
+signature        0x00840000         0x00000400         rw !x
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+LOAD main.o
+LOAD timer.o
+LOAD rprintf.o
+LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4\libm.a
+LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a
+LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4\libc.a
+LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a
+
+.hash
+ *(.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.init
+ *(.rel.init)
+
+.rela.init
+ *(.rela.init)
+
+.rel.text
+ *(.rel.text)
+ *(.rel.text.*)
+ *(.rel.gnu.linkonce.t*)
+
+.rela.text
+ *(.rela.text)
+ *(.rela.text.*)
+ *(.rela.gnu.linkonce.t*)
+
+.rel.fini
+ *(.rel.fini)
+
+.rela.fini
+ *(.rela.fini)
+
+.rel.rodata
+ *(.rel.rodata)
+ *(.rel.rodata.*)
+ *(.rel.gnu.linkonce.r*)
+
+.rela.rodata
+ *(.rela.rodata)
+ *(.rela.rodata.*)
+ *(.rela.gnu.linkonce.r*)
+
+.rel.data
+ *(.rel.data)
+ *(.rel.data.*)
+ *(.rel.gnu.linkonce.d*)
+
+.rela.data
+ *(.rela.data)
+ *(.rela.data.*)
+ *(.rela.gnu.linkonce.d*)
+
+.rel.ctors
+ *(.rel.ctors)
+
+.rela.ctors
+ *(.rela.ctors)
+
+.rel.dtors
+ *(.rel.dtors)
+
+.rela.dtors
+ *(.rela.dtors)
+
+.rel.got
+ *(.rel.got)
+
+.rela.got
+ *(.rela.got)
+
+.rel.bss
+ *(.rel.bss)
+
+.rela.bss
+ *(.rela.bss)
+
+.rel.plt
+ *(.rel.plt)
+
+.rela.plt
+ *(.rela.plt)
+
+.text           0x00000000      0xb9a
+ *(.vectors)
+ .vectors       0x00000000       0x26 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+                0x00000000                __vectors
+                0x00000000                __vector_default
+ *(.vectors)
+ *(.progmem.gcc*)
+ *(.progmem*)
+ .progmem.data  0x00000026       0x1c timer.o
+                0x00000032                TimerRTCPrescaleFactor
+                0x00000026                TimerPrescaleFactor
+ .progmem.data  0x00000042       0x11 rprintf.o
+                0x00000054                . = ALIGN (0x2)
+ *fill*         0x00000053        0x1 00
+                0x00000054                __trampolines_start = .
+ *(.trampolines)
+ .trampolines   0x00000054        0x0 linker stubs
+ *(.trampolines*)
+                0x00000054                __trampolines_end = .
+ *(.jumptables)
+ *(.jumptables*)
+ *(.lowtext)
+ *(.lowtext*)
+                0x00000054                __ctors_start = .
+ *(.ctors)
+                0x00000054                __ctors_end = .
+                0x00000054                __dtors_start = .
+ *(.dtors)
+                0x00000054                __dtors_end = .
+ SORT(*)(.ctors)
+ SORT(*)(.dtors)
+ *(.init0)
+ .init0         0x00000054        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+                0x00000054                __init
+ *(.init0)
+ *(.init1)
+ *(.init1)
+ *(.init2)
+ .init2         0x00000054        0xc c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+ *(.init2)
+ *(.init3)
+ *(.init3)
+ *(.init4)
+ .init4         0x00000060       0x10 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_clear_bss.o)
+                0x00000060                __do_clear_bss
+ *(.init4)
+ *(.init5)
+ *(.init5)
+ *(.init6)
+ *(.init6)
+ *(.init7)
+ *(.init7)
+ *(.init8)
+ *(.init8)
+ *(.init9)
+ .init9         0x00000070        0x4 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+ *(.init9)
+ *(.text)
+ .text          0x00000074        0x2 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+                0x00000074                __vector_1
+                0x00000074                __vector_12
+                0x00000074                __bad_interrupt
+                0x00000074                __vector_11
+                0x00000074                __vector_13
+                0x00000074                __vector_17
+                0x00000074                __vector_2
+                0x00000074                __vector_15
+                0x00000074                __vector_14
+                0x00000074                __vector_10
+                0x00000074                __vector_16
+                0x00000074                __vector_18
+ .text          0x00000076       0x2c main.o
+                0x00000076                init_ddr
+                0x00000080                main
+                0x0000007c                set_servos
+ .text          0x000000a2      0x664 timer.o
+                0x00000348                timer2GetOverflowCount
+                0x000001ee                timerDetach
+                0x00000176                timer1SetPrescaler
+                0x00000404                timer1PWMBOff
+                0x000001be                timer2GetPrescaler
+                0x0000059e                __vector_6
+                0x00000114                timer0Init
+                0x000003f6                timer1PWMAOff
+                0x00000418                timer1PWMBSet
+                0x000006ac                __vector_3
+                0x0000038e                timer1PWMInitICR
+                0x0000018a                timer0GetPrescaler
+                0x000005f8                __vector_7
+                0x00000320                timer0GetOverflowCount
+                0x00000652                __vector_5
+                0x000000a4                timerInit
+                0x00000180                timer2SetPrescaler
+                0x000003da                timer1PWMAOn
+                0x0000016c                timer0SetPrescaler
+                0x000000a2                delay_us
+                0x0000051e                __vector_4
+                0x0000030e                timer0ClearOverflowCount
+                0x0000041e                __vector_9
+                0x00000136                timer1Init
+                0x0000035e                timer1PWMInit
+                0x000003e8                timer1PWMBOn
+                0x0000014a                timer2Init
+                0x000004c4                __vector_8
+                0x00000412                timer1PWMASet
+                0x000001d8                timerAttach
+                0x000003b4                timer1PWMOff
+                0x000001a4                timer1GetPrescaler
+                0x00000336                timer2ClearOverflowCount
+                0x00000204                timerPause
+ .text          0x00000706      0x3b0 rprintf.o
+                0x0000099c                rprintf1RamRom
+                0x000007e2                rprintfu08
+                0x00000804                rprintfu32
+                0x00000734                rprintfStr
+                0x00000750                rprintfStrLen
+                0x000007aa                rprintfProgStr
+                0x000007f4                rprintfu16
+                0x00000706                rprintfInit
+                0x00000710                rprintfChar
+                0x000007c8                rprintfCRLF
+                0x000007ce                rprintfu04
+                0x00000826                rprintfNum
+ .text          0x00000ab6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_mulsi3.o)
+ .text          0x00000ab6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodhi4.o)
+ .text          0x00000ab6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodsi4.o)
+ .text          0x00000ab6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_divmodsi4.o)
+ .text          0x00000ab6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_exit.o)
+ .text          0x00000ab6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_clear_bss.o)
+                0x00000ab6                . = ALIGN (0x2)
+ *(.text.*)
+ .text.libgcc   0x00000ab6       0x3e c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_mulsi3.o)
+                0x00000ab6                __mulsi3
+ .text.libgcc   0x00000af4       0x28 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodhi4.o)
+                0x00000af4                __udivmodhi4
+ .text.libgcc   0x00000b1c       0x44 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodsi4.o)
+                0x00000b1c                __udivmodsi4
+ .text.libgcc   0x00000b60       0x36 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_divmodsi4.o)
+                0x00000b60                __divmodsi4
+ .text.libgcc   0x00000b96        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_exit.o)
+ .text.libgcc   0x00000b96        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_clear_bss.o)
+                0x00000b96                . = ALIGN (0x2)
+ *(.fini9)
+ .fini9         0x00000b96        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_exit.o)
+                0x00000b96                exit
+                0x00000b96                _exit
+ *(.fini9)
+ *(.fini8)
+ *(.fini8)
+ *(.fini7)
+ *(.fini7)
+ *(.fini6)
+ *(.fini6)
+ *(.fini5)
+ *(.fini5)
+ *(.fini4)
+ *(.fini4)
+ *(.fini3)
+ *(.fini3)
+ *(.fini2)
+ *(.fini2)
+ *(.fini1)
+ *(.fini1)
+ *(.fini0)
+ .fini0         0x00000b96        0x4 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_exit.o)
+ *(.fini0)
+                0x00000b9a                _etext = .
+
+.data           0x00800060        0x0 load address 0x00000b9a
+                0x00800060                PROVIDE (__data_start, .)
+ *(.data)
+ .data          0x00800060        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+ .data          0x00800060        0x0 main.o
+ .data          0x00800060        0x0 timer.o
+ .data          0x00800060        0x0 rprintf.o
+ .data          0x00800060        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_mulsi3.o)
+ .data          0x00800060        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodhi4.o)
+ .data          0x00800060        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodsi4.o)
+ .data          0x00800060        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_divmodsi4.o)
+ .data          0x00800060        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_exit.o)
+ .data          0x00800060        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_clear_bss.o)
+ *(.data*)
+ *(.rodata)
+ *(.rodata*)
+ *(.gnu.linkonce.d*)
+                0x00800060                . = ALIGN (0x2)
+                0x00800060                _edata = .
+                0x00800060                PROVIDE (__data_end, .)
+
+.bss            0x00800060       0x1c
+                0x00800060                PROVIDE (__bss_start, .)
+ *(.bss)
+ .bss           0x00800060        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+ .bss           0x00800060        0x0 main.o
+ .bss           0x00800060        0xe timer.o
+ .bss           0x0080006e        0x2 rprintf.o
+ .bss           0x00800070        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_mulsi3.o)
+ .bss           0x00800070        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodhi4.o)
+ .bss           0x00800070        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodsi4.o)
+ .bss           0x00800070        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_divmodsi4.o)
+ .bss           0x00800070        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_exit.o)
+ .bss           0x00800070        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_clear_bss.o)
+ *(.bss*)
+ *(COMMON)
+ COMMON         0x00800070        0xc timer.o
+                0x00800070                Timer0Reg0
+                0x00800074                TimerPauseReg
+                0x00800078                Timer2Reg0
+                0x0080007c                PROVIDE (__bss_end, .)
+                0x00000b9a                __data_load_start = LOADADDR (.data)
+                0x00000b9a                __data_load_end = (__data_load_start + SIZEOF (.data))
+
+.noinit         0x0080007c        0x0
+                0x0080007c                PROVIDE (__noinit_start, .)
+ *(.noinit*)
+                0x0080007c                PROVIDE (__noinit_end, .)
+                0x0080007c                _end = .
+                0x0080007c                PROVIDE (__heap_start, .)
+
+.eeprom         0x00810000        0x0
+ *(.eeprom*)
+                0x00810000                __eeprom_end = .
+
+.fuse
+ *(.fuse)
+ *(.lfuse)
+ *(.hfuse)
+ *(.efuse)
+
+.lock
+ *(.lock*)
+
+.signature
+ *(.signature*)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment
+ *(.comment)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info)
+ *(.gnu.linkonce.wi.*)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+OUTPUT(main.elf elf32-avr)
+LOAD linker stubs
+
+Cross Reference Table
+
+Symbol                                            File
+Timer0Reg0                                        timer.o
+Timer2Reg0                                        timer.o
+TimerPauseReg                                     timer.o
+TimerPrescaleFactor                               timer.o
+TimerRTCPrescaleFactor                            timer.o
+__bad_interrupt                                   c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__bss_end                                         c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_clear_bss.o)
+__bss_start                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_clear_bss.o)
+__divmodsi4                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_divmodsi4.o)
+                                                  timer.o
+__do_clear_bss                                    c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_clear_bss.o)
+                                                  rprintf.o
+                                                  timer.o
+__heap_end                                        c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__init                                            c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__mulsi3                                          c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_mulsi3.o)
+                                                  timer.o
+__stack                                           c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__udivmodhi4                                      c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodhi4.o)
+                                                  rprintf.o
+__udivmodsi4                                      c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_udivmodsi4.o)
+                                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_divmodsi4.o)
+                                                  rprintf.o
+                                                  timer.o
+__vector_1                                        c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_10                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_11                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_12                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_13                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_14                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_15                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_16                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_17                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_18                                       c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_2                                        c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_3                                        timer.o
+                                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_4                                        timer.o
+                                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_5                                        timer.o
+                                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_6                                        timer.o
+                                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_7                                        timer.o
+                                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_8                                        timer.o
+                                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_9                                        timer.o
+                                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vector_default                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+__vectors                                         c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+_exit                                             c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_exit.o)
+delay_us                                          timer.o
+exit                                              c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr4\libgcc.a(_exit.o)
+                                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+init_ddr                                          main.o
+main                                              main.o
+                                                  c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr4/crtm8.o
+rprintf1RamRom                                    rprintf.o
+rprintfCRLF                                       rprintf.o
+rprintfChar                                       rprintf.o
+rprintfInit                                       rprintf.o
+rprintfNum                                        rprintf.o
+rprintfProgStr                                    rprintf.o
+rprintfStr                                        rprintf.o
+rprintfStrLen                                     rprintf.o
+rprintfu04                                        rprintf.o
+rprintfu08                                        rprintf.o
+rprintfu16                                        rprintf.o
+rprintfu32                                        rprintf.o
+set_servos                                        main.o
+timer0ClearOverflowCount                          timer.o
+timer0GetOverflowCount                            timer.o
+timer0GetPrescaler                                timer.o
+timer0Init                                        timer.o
+timer0SetPrescaler                                timer.o
+timer1GetPrescaler                                timer.o
+timer1Init                                        timer.o
+                                                  main.o
+timer1PWMAOff                                     timer.o
+timer1PWMAOn                                      timer.o
+timer1PWMASet                                     timer.o
+timer1PWMBOff                                     timer.o
+timer1PWMBOn                                      timer.o
+timer1PWMBSet                                     timer.o
+timer1PWMInit                                     timer.o
+timer1PWMInitICR                                  timer.o
+timer1PWMOff                                      timer.o
+timer1SetPrescaler                                timer.o
+                                                  main.o
+timer2ClearOverflowCount                          timer.o
+timer2GetOverflowCount                            timer.o
+timer2GetPrescaler                                timer.o
+timer2Init                                        timer.o
+timer2SetPrescaler                                timer.o
+timerAttach                                       timer.o
+timerDetach                                       timer.o
+timerInit                                         timer.o
+timerPause                                        timer.o

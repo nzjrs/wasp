@@ -1,0 +1,64 @@
+   1               		.file	"main.c"
+   2               	__SREG__ = 0x3f
+   3               	__SP_H__ = 0x3e
+   4               	__SP_L__ = 0x3d
+   5               	__CCP__  = 0x34
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.global	init_ddr
+  11               	init_ddr:
+  12               	/* prologue: function */
+  13               	/* frame size = 0 */
+  14 0000 8FEF      		ldi r24,lo8(-1)
+  15 0002 87B9      		out 39-32,r24
+  16               	/* epilogue start */
+  17 0004 0895      		ret
+  19               	.global	set_servos
+  21               	set_servos:
+  22               	/* prologue: function */
+  23               	/* frame size = 0 */
+  24 0006 86B1      		in r24,38-32
+  25               	/* epilogue start */
+  26 0008 0895      		ret
+  28               	.global	main
+  30               	main:
+  31               	/* prologue: function */
+  32               	/* frame size = 0 */
+  33 000a 8FEF      		ldi r24,lo8(-1)
+  34 000c 87B9      		out 39-32,r24
+  35               	/* #APP */
+  36               	 ;  57 "main.c" 1
+  37 000e 7894      		sei
+  38               	 ;  0 "" 2
+  39               	/* #NOAPP */
+  40 0010 0E94 0000 		call timer1Init
+  41 0014 85E0      		ldi r24,lo8(5)
+  42 0016 0E94 0000 		call timer1SetPrescaler
+  43 001a 00C0      		rjmp .L10
+  44               	.L7:
+  45 001c 0196      		adiw r24,1
+  46               	.L9:
+  47 001e 8430      		cpi r24,4
+  48 0020 9105      		cpc r25,__zero_reg__
+  49 0022 04F0      		brlt .L7
+  50 0024 86B1      		in r24,38-32
+  51               	.L10:
+  52 0026 80E0      		ldi r24,lo8(0)
+  53 0028 90E0      		ldi r25,hi8(0)
+  54 002a 00C0      		rjmp .L9
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/cccaEvJM.s:2      *ABS*:0000003f __SREG__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/cccaEvJM.s:3      *ABS*:0000003e __SP_H__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/cccaEvJM.s:4      *ABS*:0000003d __SP_L__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/cccaEvJM.s:5      *ABS*:00000034 __CCP__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/cccaEvJM.s:6      *ABS*:00000000 __tmp_reg__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/cccaEvJM.s:7      *ABS*:00000001 __zero_reg__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/cccaEvJM.s:11     .text:00000000 init_ddr
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/cccaEvJM.s:21     .text:00000006 set_servos
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/cccaEvJM.s:30     .text:0000000a main
+
+UNDEFINED SYMBOLS
+timer1Init
+timer1SetPrescaler
