@@ -1,9 +1,10 @@
-TARGET          ?= autopilot_main
-ARCH            ?= arm7
-OBJDIR          = bin/$(ARCH)
-Q               = @
-TOOLS           = ../tools
-RADIO           = config/radio/T6EXAP.xml
+TARGET              ?= autopilot_main
+ARCH                ?= arm7
+INCLUDE_BUILD_INFO  ?= 1
+OBJDIR              = bin/$(ARCH)
+Q                   = @
+TOOLS               = ../tools
+RADIO               = config/radio/T6EXAP.xml
 # Be very careful if you change these, by default the groundstation 
 # looks for config/{messages,settings}.xml
 MESSAGES        = config/messages.xml
@@ -49,18 +50,25 @@ REMOVE      = rm -f
 CFLAGS = -I. -I math -I arch -I arch/$(ARCH)/include
 CFLAGS += -Os
 CFLAGS += -Winline
-CFLAGS += -Wall -Wcast-qual -Wimplicit -Wcast-align
-CFLAGS += -Wpointer-arith -Wswitch
-CFLAGS += -Wredundant-decls -Wreturn-type -Wshadow -Wunused
+CFLAGS += -Wall
+CFLAGS += -Wcast-qual
+CFLAGS += -Wimplicit
+CFLAGS += -Wcast-align
+CFLAGS += -Wpointer-arith
+CFLAGS += -Wswitch
+CFLAGS += -Wredundant-decls
+CFLAGS += -Wreturn-type
+CFLAGS += -Wshadow
+CFLAGS += -Wunused
 CFLAGS += -Wa,-adhlns=$(OBJDIR)/$(notdir $(subst $(suffix $<),.lst,$<))
-CFLAGS += -Wstrict-prototypes -Wmissing-declarations
-CFLAGS += -Wmissing-prototypes -Wnested-externs 
+CFLAGS += -Wstrict-prototypes
+CFLAGS += -Wmissing-declarations
+CFLAGS += -Wmissing-prototypes
+CFLAGS += -Wnested-externs 
 CFLAGS += -std=gnu99
 CFLAGS += -fshort-enums
 CFLAGS += -ffunction-sections
 CFLAGS += -DARCH=$(ARCH)
-
-INCLUDE_BUILD_INFO ?= 1
 CFLAGS += -DINCLUDE_BUILD_INFO=$(INCLUDE_BUILD_INFO)
 
 # Linker flags.
