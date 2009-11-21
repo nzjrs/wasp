@@ -1,0 +1,1023 @@
+   1               		.file	"timer.c"
+   2               	__SREG__ = 0x3f
+   3               	__SP_H__ = 0x3e
+   4               	__SP_L__ = 0x3d
+   5               	__CCP__  = 0x34
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.global	delay_us
+  11               	delay_us:
+  12               	/* prologue: function */
+  13               	/* frame size = 0 */
+  14               	/* epilogue start */
+  15 0000 0895      		ret
+  17               	.global	timerInit
+  19               	timerInit:
+  20               	/* prologue: function */
+  21               	/* frame size = 0 */
+  22 0002 80E0      		ldi r24,lo8(0)
+  23 0004 90E0      		ldi r25,hi8(0)
+  24               	.L4:
+  25 0006 FC01      		movw r30,r24
+  26 0008 EE0F      		lsl r30
+  27 000a FF1F      		rol r31
+  28 000c E050      		subi r30,lo8(-(TimerIntFunc))
+  29 000e F040      		sbci r31,hi8(-(TimerIntFunc))
+  30 0010 1182      		std Z+1,__zero_reg__
+  31 0012 1082      		st Z,__zero_reg__
+  32 0014 0196      		adiw r24,1
+  33 0016 8730      		cpi r24,7
+  34 0018 9105      		cpc r25,__zero_reg__
+  35 001a 01F4      		brne .L4
+  36 001c 83B7      		in r24,83-32
+  37 001e 887F      		andi r24,lo8(-8)
+  38 0020 8260      		ori r24,lo8(2)
+  39 0022 83BF      		out 83-32,r24
+  40 0024 12BE      		out 82-32,__zero_reg__
+  41 0026 89B7      		in r24,89-32
+  42 0028 8160      		ori r24,lo8(1)
+  43 002a 89BF      		out 89-32,r24
+  44 002c 1092 0000 		sts Timer0Reg0,__zero_reg__
+  45 0030 1092 0000 		sts (Timer0Reg0)+1,__zero_reg__
+  46 0034 1092 0000 		sts (Timer0Reg0)+2,__zero_reg__
+  47 0038 1092 0000 		sts (Timer0Reg0)+3,__zero_reg__
+  48 003c 8EB5      		in r24,78-32
+  49 003e 887F      		andi r24,lo8(-8)
+  50 0040 8360      		ori r24,lo8(3)
+  51 0042 8EBD      		out 78-32,r24
+  52 0044 1DBC      		out 77-32,__zero_reg__
+  53 0046 1CBC      		out 76-32,__zero_reg__
+  54 0048 89B7      		in r24,89-32
+  55 004a 8460      		ori r24,lo8(4)
+  56 004c 89BF      		out 89-32,r24
+  57 004e 85B5      		in r24,69-32
+  58 0050 887F      		andi r24,lo8(-8)
+  59 0052 8460      		ori r24,lo8(4)
+  60 0054 85BD      		out 69-32,r24
+  61 0056 14BC      		out 68-32,__zero_reg__
+  62 0058 89B7      		in r24,89-32
+  63 005a 8064      		ori r24,lo8(64)
+  64 005c 89BF      		out 89-32,r24
+  65 005e 1092 0000 		sts Timer2Reg0,__zero_reg__
+  66 0062 1092 0000 		sts (Timer2Reg0)+1,__zero_reg__
+  67 0066 1092 0000 		sts (Timer2Reg0)+2,__zero_reg__
+  68 006a 1092 0000 		sts (Timer2Reg0)+3,__zero_reg__
+  69               	/* #APP */
+  70               	 ;  90 "timer.c" 1
+  71 006e 7894      		sei
+  72               	 ;  0 "" 2
+  73               	/* epilogue start */
+  74               	/* #NOAPP */
+  75 0070 0895      		ret
+  77               	.global	timer0Init
+  79               	timer0Init:
+  80               	/* prologue: function */
+  81               	/* frame size = 0 */
+  82 0072 83B7      		in r24,83-32
+  83 0074 887F      		andi r24,lo8(-8)
+  84 0076 8260      		ori r24,lo8(2)
+  85 0078 83BF      		out 83-32,r24
+  86 007a 12BE      		out 82-32,__zero_reg__
+  87 007c 89B7      		in r24,89-32
+  88 007e 8160      		ori r24,lo8(1)
+  89 0080 89BF      		out 89-32,r24
+  90 0082 1092 0000 		sts Timer0Reg0,__zero_reg__
+  91 0086 1092 0000 		sts (Timer0Reg0)+1,__zero_reg__
+  92 008a 1092 0000 		sts (Timer0Reg0)+2,__zero_reg__
+  93 008e 1092 0000 		sts (Timer0Reg0)+3,__zero_reg__
+  94               	/* epilogue start */
+  95 0092 0895      		ret
+  97               	.global	timer1Init
+  99               	timer1Init:
+ 100               	/* prologue: function */
+ 101               	/* frame size = 0 */
+ 102 0094 8EB5      		in r24,78-32
+ 103 0096 887F      		andi r24,lo8(-8)
+ 104 0098 8360      		ori r24,lo8(3)
+ 105 009a 8EBD      		out 78-32,r24
+ 106 009c 1DBC      		out 77-32,__zero_reg__
+ 107 009e 1CBC      		out 76-32,__zero_reg__
+ 108 00a0 89B7      		in r24,89-32
+ 109 00a2 8460      		ori r24,lo8(4)
+ 110 00a4 89BF      		out 89-32,r24
+ 111               	/* epilogue start */
+ 112 00a6 0895      		ret
+ 114               	.global	timer2Init
+ 116               	timer2Init:
+ 117               	/* prologue: function */
+ 118               	/* frame size = 0 */
+ 119 00a8 85B5      		in r24,69-32
+ 120 00aa 887F      		andi r24,lo8(-8)
+ 121 00ac 8460      		ori r24,lo8(4)
+ 122 00ae 85BD      		out 69-32,r24
+ 123 00b0 14BC      		out 68-32,__zero_reg__
+ 124 00b2 89B7      		in r24,89-32
+ 125 00b4 8064      		ori r24,lo8(64)
+ 126 00b6 89BF      		out 89-32,r24
+ 127 00b8 1092 0000 		sts Timer2Reg0,__zero_reg__
+ 128 00bc 1092 0000 		sts (Timer2Reg0)+1,__zero_reg__
+ 129 00c0 1092 0000 		sts (Timer2Reg0)+2,__zero_reg__
+ 130 00c4 1092 0000 		sts (Timer2Reg0)+3,__zero_reg__
+ 131               	/* epilogue start */
+ 132 00c8 0895      		ret
+ 134               	.global	timer0SetPrescaler
+ 136               	timer0SetPrescaler:
+ 137               	/* prologue: function */
+ 138               	/* frame size = 0 */
+ 139 00ca 93B7      		in r25,83-32
+ 140 00cc 987F      		andi r25,lo8(-8)
+ 141 00ce 982B      		or r25,r24
+ 142 00d0 93BF      		out 83-32,r25
+ 143               	/* epilogue start */
+ 144 00d2 0895      		ret
+ 146               	.global	timer1SetPrescaler
+ 148               	timer1SetPrescaler:
+ 149               	/* prologue: function */
+ 150               	/* frame size = 0 */
+ 151 00d4 9EB5      		in r25,78-32
+ 152 00d6 987F      		andi r25,lo8(-8)
+ 153 00d8 982B      		or r25,r24
+ 154 00da 9EBD      		out 78-32,r25
+ 155               	/* epilogue start */
+ 156 00dc 0895      		ret
+ 158               	.global	timer2SetPrescaler
+ 160               	timer2SetPrescaler:
+ 161               	/* prologue: function */
+ 162               	/* frame size = 0 */
+ 163 00de 95B5      		in r25,69-32
+ 164 00e0 987F      		andi r25,lo8(-8)
+ 165 00e2 982B      		or r25,r24
+ 166 00e4 95BD      		out 69-32,r25
+ 167               	/* epilogue start */
+ 168 00e6 0895      		ret
+ 170               	.global	timer0GetPrescaler
+ 172               	timer0GetPrescaler:
+ 173               	/* prologue: function */
+ 174               	/* frame size = 0 */
+ 175 00e8 83B7      		in r24,83-32
+ 176 00ea E82F      		mov r30,r24
+ 177 00ec F0E0      		ldi r31,lo8(0)
+ 178 00ee E770      		andi r30,lo8(7)
+ 179 00f0 F070      		andi r31,hi8(7)
+ 180 00f2 EE0F      		lsl r30
+ 181 00f4 FF1F      		rol r31
+ 182 00f6 E050      		subi r30,lo8(-(TimerPrescaleFactor))
+ 183 00f8 F040      		sbci r31,hi8(-(TimerPrescaleFactor))
+ 184               	/* #APP */
+ 185               	 ;  147 "timer.c" 1
+ 186 00fa 2591      		lpm r18, Z+
+ 187 00fc 3491      		lpm r19, Z
+ 188               		
+ 189               	 ;  0 "" 2
+ 190               	/* #NOAPP */
+ 191 00fe C901      		movw r24,r18
+ 192               	/* epilogue start */
+ 193 0100 0895      		ret
+ 195               	.global	timer1GetPrescaler
+ 197               	timer1GetPrescaler:
+ 198               	/* prologue: function */
+ 199               	/* frame size = 0 */
+ 200 0102 8EB5      		in r24,78-32
+ 201 0104 E82F      		mov r30,r24
+ 202 0106 F0E0      		ldi r31,lo8(0)
+ 203 0108 E770      		andi r30,lo8(7)
+ 204 010a F070      		andi r31,hi8(7)
+ 205 010c EE0F      		lsl r30
+ 206 010e FF1F      		rol r31
+ 207 0110 E050      		subi r30,lo8(-(TimerPrescaleFactor))
+ 208 0112 F040      		sbci r31,hi8(-(TimerPrescaleFactor))
+ 209               	/* #APP */
+ 210               	 ;  153 "timer.c" 1
+ 211 0114 2591      		lpm r18, Z+
+ 212 0116 3491      		lpm r19, Z
+ 213               		
+ 214               	 ;  0 "" 2
+ 215               	/* #NOAPP */
+ 216 0118 C901      		movw r24,r18
+ 217               	/* epilogue start */
+ 218 011a 0895      		ret
+ 220               	.global	timer2GetPrescaler
+ 222               	timer2GetPrescaler:
+ 223               	/* prologue: function */
+ 224               	/* frame size = 0 */
+ 225 011c 85B5      		in r24,69-32
+ 226 011e E82F      		mov r30,r24
+ 227 0120 F0E0      		ldi r31,lo8(0)
+ 228 0122 E770      		andi r30,lo8(7)
+ 229 0124 F070      		andi r31,hi8(7)
+ 230 0126 EE0F      		lsl r30
+ 231 0128 FF1F      		rol r31
+ 232 012a E050      		subi r30,lo8(-(TimerRTCPrescaleFactor))
+ 233 012c F040      		sbci r31,hi8(-(TimerRTCPrescaleFactor))
+ 234               	/* #APP */
+ 235               	 ;  163 "timer.c" 1
+ 236 012e 2591      		lpm r18, Z+
+ 237 0130 3491      		lpm r19, Z
+ 238               		
+ 239               	 ;  0 "" 2
+ 240               	/* #NOAPP */
+ 241 0132 C901      		movw r24,r18
+ 242               	/* epilogue start */
+ 243 0134 0895      		ret
+ 245               	.global	timerAttach
+ 247               	timerAttach:
+ 248               	/* prologue: function */
+ 249               	/* frame size = 0 */
+ 250 0136 8730      		cpi r24,lo8(7)
+ 251 0138 00F4      		brsh .L27
+ 252 013a E82F      		mov r30,r24
+ 253 013c F0E0      		ldi r31,lo8(0)
+ 254 013e EE0F      		lsl r30
+ 255 0140 FF1F      		rol r31
+ 256 0142 E050      		subi r30,lo8(-(TimerIntFunc))
+ 257 0144 F040      		sbci r31,hi8(-(TimerIntFunc))
+ 258 0146 7183      		std Z+1,r23
+ 259 0148 6083      		st Z,r22
+ 260               	.L27:
+ 261 014a 0895      		ret
+ 263               	.global	timerDetach
+ 265               	timerDetach:
+ 266               	/* prologue: function */
+ 267               	/* frame size = 0 */
+ 268 014c 8730      		cpi r24,lo8(7)
+ 269 014e 00F4      		brsh .L30
+ 270 0150 E82F      		mov r30,r24
+ 271 0152 F0E0      		ldi r31,lo8(0)
+ 272 0154 EE0F      		lsl r30
+ 273 0156 FF1F      		rol r31
+ 274 0158 E050      		subi r30,lo8(-(TimerIntFunc))
+ 275 015a F040      		sbci r31,hi8(-(TimerIntFunc))
+ 276 015c 1182      		std Z+1,__zero_reg__
+ 277 015e 1082      		st Z,__zero_reg__
+ 278               	.L30:
+ 279 0160 0895      		ret
+ 281               	.global	timerPause
+ 283               	timerPause:
+ 284 0162 EF92      		push r14
+ 285 0164 FF92      		push r15
+ 286 0166 0F93      		push r16
+ 287 0168 1F93      		push r17
+ 288 016a CF93      		push r28
+ 289 016c DF93      		push r29
+ 290               	/* prologue: function */
+ 291               	/* frame size = 0 */
+ 292 016e EC01      		movw r28,r24
+ 293 0170 12B7      		in r17,82-32
+ 294 0172 1092 0000 		sts TimerPauseReg,__zero_reg__
+ 295 0176 1092 0000 		sts (TimerPauseReg)+1,__zero_reg__
+ 296 017a 1092 0000 		sts (TimerPauseReg)+2,__zero_reg__
+ 297 017e 1092 0000 		sts (TimerPauseReg)+3,__zero_reg__
+ 298 0182 83B7      		in r24,83-32
+ 299 0184 E82F      		mov r30,r24
+ 300 0186 F0E0      		ldi r31,lo8(0)
+ 301 0188 E770      		andi r30,lo8(7)
+ 302 018a F070      		andi r31,hi8(7)
+ 303 018c EE0F      		lsl r30
+ 304 018e FF1F      		rol r31
+ 305 0190 E050      		subi r30,lo8(-(TimerPrescaleFactor))
+ 306 0192 F040      		sbci r31,hi8(-(TimerPrescaleFactor))
+ 307               	/* #APP */
+ 308               	 ;  147 "timer.c" 1
+ 309 0194 2591      		lpm r18, Z+
+ 310 0196 3491      		lpm r19, Z
+ 311               		
+ 312               	 ;  0 "" 2
+ 313               	/* #NOAPP */
+ 314 0198 40E0      		ldi r20,lo8(0)
+ 315 019a 50E0      		ldi r21,hi8(0)
+ 316 019c 60E0      		ldi r22,lo8(7372800)
+ 317 019e 70E8      		ldi r23,hi8(7372800)
+ 318 01a0 80E7      		ldi r24,hlo8(7372800)
+ 319 01a2 90E0      		ldi r25,hhi8(7372800)
+ 320 01a4 00D0      		rcall __divmodsi4
+ 321 01a6 B901      		movw r22,r18
+ 322 01a8 CA01      		movw r24,r20
+ 323 01aa 693B      		cpi r22,lo8(429497)
+ 324 01ac 2DE8      		ldi r18,hi8(429497)
+ 325 01ae 7207      		cpc r23,r18
+ 326 01b0 26E0      		ldi r18,hlo8(429497)
+ 327 01b2 8207      		cpc r24,r18
+ 328 01b4 20E0      		ldi r18,hhi8(429497)
+ 329 01b6 9207      		cpc r25,r18
+ 330 01b8 00F4      		brsh .L32
+ 331 01ba 37E2      		ldi r19,hi8(10001)
+ 332 01bc C131      		cpi r28,lo8(10001)
+ 333 01be D307      		cpc r29,r19
+ 334 01c0 00F4      		brsh .L32
+ 335 01c2 9E01      		movw r18,r28
+ 336 01c4 40E0      		ldi r20,lo8(0)
+ 337 01c6 50E0      		ldi r21,hi8(0)
+ 338 01c8 00D0      		rcall __mulsi3
+ 339 01ca 28EE      		ldi r18,lo8(1000)
+ 340 01cc 33E0      		ldi r19,hi8(1000)
+ 341 01ce 40E0      		ldi r20,hlo8(1000)
+ 342 01d0 50E0      		ldi r21,hhi8(1000)
+ 343 01d2 00D0      		rcall __udivmodsi4
+ 344 01d4 C901      		movw r24,r18
+ 345 01d6 DA01      		movw r26,r20
+ 346 01d8 BC01      		movw r22,r24
+ 347 01da CD01      		movw r24,r26
+ 348 01dc 00C0      		rjmp .L33
+ 349               	.L32:
+ 350 01de 28EE      		ldi r18,lo8(1000)
+ 351 01e0 33E0      		ldi r19,hi8(1000)
+ 352 01e2 40E0      		ldi r20,hlo8(1000)
+ 353 01e4 50E0      		ldi r21,hhi8(1000)
+ 354 01e6 00D0      		rcall __udivmodsi4
+ 355 01e8 CA01      		movw r24,r20
+ 356 01ea B901      		movw r22,r18
+ 357 01ec 9E01      		movw r18,r28
+ 358 01ee 40E0      		ldi r20,lo8(0)
+ 359 01f0 50E0      		ldi r21,hi8(0)
+ 360 01f2 00D0      		rcall __mulsi3
+ 361 01f4 00C0      		rjmp .L33
+ 362               	.L34:
+ 363 01f6 8091 0000 		lds r24,TimerPauseReg
+ 364 01fa 9091 0000 		lds r25,(TimerPauseReg)+1
+ 365 01fe A091 0000 		lds r26,(TimerPauseReg)+2
+ 366 0202 B091 0000 		lds r27,(TimerPauseReg)+3
+ 367 0206 85B7      		in r24,85-32
+ 368 0208 8F78      		andi r24,lo8(-113)
+ 369 020a 85BF      		out 85-32,r24
+ 370 020c 85B7      		in r24,85-32
+ 371 020e 8068      		ori r24,lo8(-128)
+ 372 0210 85BF      		out 85-32,r24
+ 373               	/* #APP */
+ 374               	 ;  233 "timer.c" 1
+ 375 0212 8895      		sleep
+ 376               		
+ 377               	 ;  0 "" 2
+ 378               	/* #NOAPP */
+ 379 0214 85B7      		in r24,85-32
+ 380 0216 8F77      		andi r24,lo8(127)
+ 381 0218 85BF      		out 85-32,r24
+ 382 021a 00C0      		rjmp .L36
+ 383               	.L33:
+ 384 021c 9B01      		movw r18,r22
+ 385 021e AC01      		movw r20,r24
+ 386 0220 210F      		add r18,r17
+ 387 0222 311D      		adc r19,__zero_reg__
+ 388 0224 411D      		adc r20,__zero_reg__
+ 389 0226 511D      		adc r21,__zero_reg__
+ 390 0228 7901      		movw r14,r18
+ 391 022a 8A01      		movw r16,r20
+ 392               	.L36:
+ 393 022c 2091 0000 		lds r18,TimerPauseReg
+ 394 0230 3091 0000 		lds r19,(TimerPauseReg)+1
+ 395 0234 4091 0000 		lds r20,(TimerPauseReg)+2
+ 396 0238 5091 0000 		lds r21,(TimerPauseReg)+3
+ 397 023c 82B7      		in r24,82-32
+ 398 023e 90E0      		ldi r25,lo8(0)
+ 399 0240 A0E0      		ldi r26,lo8(0)
+ 400 0242 B0E0      		ldi r27,hi8(0)
+ 401 0244 542F      		mov r21,r20
+ 402 0246 432F      		mov r20,r19
+ 403 0248 322F      		mov r19,r18
+ 404 024a 2227      		clr r18
+ 405 024c 822B      		or r24,r18
+ 406 024e 932B      		or r25,r19
+ 407 0250 A42B      		or r26,r20
+ 408 0252 B52B      		or r27,r21
+ 409 0254 8E15      		cp r24,r14
+ 410 0256 9F05      		cpc r25,r15
+ 411 0258 A007      		cpc r26,r16
+ 412 025a B107      		cpc r27,r17
+ 413 025c 00F0      		brlo .L34
+ 414               	/* epilogue start */
+ 415 025e DF91      		pop r29
+ 416 0260 CF91      		pop r28
+ 417 0262 1F91      		pop r17
+ 418 0264 0F91      		pop r16
+ 419 0266 FF90      		pop r15
+ 420 0268 EF90      		pop r14
+ 421 026a 0895      		ret
+ 423               	.global	timer0ClearOverflowCount
+ 425               	timer0ClearOverflowCount:
+ 426               	/* prologue: function */
+ 427               	/* frame size = 0 */
+ 428 026c 1092 0000 		sts Timer0Reg0,__zero_reg__
+ 429 0270 1092 0000 		sts (Timer0Reg0)+1,__zero_reg__
+ 430 0274 1092 0000 		sts (Timer0Reg0)+2,__zero_reg__
+ 431 0278 1092 0000 		sts (Timer0Reg0)+3,__zero_reg__
+ 432               	/* epilogue start */
+ 433 027c 0895      		ret
+ 435               	.global	timer0GetOverflowCount
+ 437               	timer0GetOverflowCount:
+ 438               	/* prologue: function */
+ 439               	/* frame size = 0 */
+ 440 027e 2091 0000 		lds r18,Timer0Reg0
+ 441 0282 3091 0000 		lds r19,(Timer0Reg0)+1
+ 442 0286 4091 0000 		lds r20,(Timer0Reg0)+2
+ 443 028a 5091 0000 		lds r21,(Timer0Reg0)+3
+ 444 028e B901      		movw r22,r18
+ 445 0290 CA01      		movw r24,r20
+ 446               	/* epilogue start */
+ 447 0292 0895      		ret
+ 449               	.global	timer2ClearOverflowCount
+ 451               	timer2ClearOverflowCount:
+ 452               	/* prologue: function */
+ 453               	/* frame size = 0 */
+ 454 0294 1092 0000 		sts Timer2Reg0,__zero_reg__
+ 455 0298 1092 0000 		sts (Timer2Reg0)+1,__zero_reg__
+ 456 029c 1092 0000 		sts (Timer2Reg0)+2,__zero_reg__
+ 457 02a0 1092 0000 		sts (Timer2Reg0)+3,__zero_reg__
+ 458               	/* epilogue start */
+ 459 02a4 0895      		ret
+ 461               	.global	timer2GetOverflowCount
+ 463               	timer2GetOverflowCount:
+ 464               	/* prologue: function */
+ 465               	/* frame size = 0 */
+ 466 02a6 2091 0000 		lds r18,Timer2Reg0
+ 467 02aa 3091 0000 		lds r19,(Timer2Reg0)+1
+ 468 02ae 4091 0000 		lds r20,(Timer2Reg0)+2
+ 469 02b2 5091 0000 		lds r21,(Timer2Reg0)+3
+ 470 02b6 B901      		movw r22,r18
+ 471 02b8 CA01      		movw r24,r20
+ 472               	/* epilogue start */
+ 473 02ba 0895      		ret
+ 475               	.global	timer1PWMInit
+ 477               	timer1PWMInit:
+ 478               	/* prologue: function */
+ 479               	/* frame size = 0 */
+ 480 02bc 8930      		cpi r24,lo8(9)
+ 481 02be 01F4      		brne .L46
+ 482 02c0 8FB5      		in r24,79-32
+ 483 02c2 8260      		ori r24,lo8(2)
+ 484 02c4 8FBD      		out 79-32,r24
+ 485 02c6 8FB5      		in r24,79-32
+ 486 02c8 8E7F      		andi r24,lo8(-2)
+ 487 02ca 00C0      		rjmp .L50
+ 488               	.L46:
+ 489 02cc 8A30      		cpi r24,lo8(10)
+ 490 02ce 01F4      		brne .L48
+ 491 02d0 8FB5      		in r24,79-32
+ 492 02d2 8260      		ori r24,lo8(2)
+ 493 02d4 00C0      		rjmp .L51
+ 494               	.L48:
+ 495 02d6 8FB5      		in r24,79-32
+ 496 02d8 8D7F      		andi r24,lo8(-3)
+ 497               	.L51:
+ 498 02da 8FBD      		out 79-32,r24
+ 499 02dc 8FB5      		in r24,79-32
+ 500 02de 8160      		ori r24,lo8(1)
+ 501               	.L50:
+ 502 02e0 8FBD      		out 79-32,r24
+ 503 02e2 1BBC      		out 75-32,__zero_reg__
+ 504 02e4 1ABC      		out 74-32,__zero_reg__
+ 505 02e6 19BC      		out 73-32,__zero_reg__
+ 506 02e8 18BC      		out 72-32,__zero_reg__
+ 507               	/* epilogue start */
+ 508 02ea 0895      		ret
+ 510               	.global	timer1PWMInitICR
+ 512               	timer1PWMInitICR:
+ 513               	/* prologue: function */
+ 514               	/* frame size = 0 */
+ 515 02ec 2FB5      		in r18,79-32
+ 516 02ee 2E7F      		andi r18,lo8(-2)
+ 517 02f0 2FBD      		out 79-32,r18
+ 518 02f2 2FB5      		in r18,79-32
+ 519 02f4 2260      		ori r18,lo8(2)
+ 520 02f6 2FBD      		out 79-32,r18
+ 521 02f8 2EB5      		in r18,78-32
+ 522 02fa 2860      		ori r18,lo8(8)
+ 523 02fc 2EBD      		out 78-32,r18
+ 524 02fe 2EB5      		in r18,78-32
+ 525 0300 2061      		ori r18,lo8(16)
+ 526 0302 2EBD      		out 78-32,r18
+ 527 0304 97BD      		out (70)+1-32,r25
+ 528 0306 86BD      		out 70-32,r24
+ 529 0308 1BBC      		out (74)+1-32,__zero_reg__
+ 530 030a 1ABC      		out 74-32,__zero_reg__
+ 531 030c 19BC      		out (72)+1-32,__zero_reg__
+ 532 030e 18BC      		out 72-32,__zero_reg__
+ 533               	/* epilogue start */
+ 534 0310 0895      		ret
+ 536               	.global	timer1PWMOff
+ 538               	timer1PWMOff:
+ 539               	/* prologue: function */
+ 540               	/* frame size = 0 */
+ 541 0312 8FB5      		in r24,79-32
+ 542 0314 8D7F      		andi r24,lo8(-3)
+ 543 0316 8FBD      		out 79-32,r24
+ 544 0318 8FB5      		in r24,79-32
+ 545 031a 8E7F      		andi r24,lo8(-2)
+ 546 031c 8FBD      		out 79-32,r24
+ 547 031e 8FB5      		in r24,79-32
+ 548 0320 8F77      		andi r24,lo8(127)
+ 549 0322 8FBD      		out 79-32,r24
+ 550 0324 8FB5      		in r24,79-32
+ 551 0326 8F7B      		andi r24,lo8(-65)
+ 552 0328 8FBD      		out 79-32,r24
+ 553 032a 8FB5      		in r24,79-32
+ 554 032c 8F7D      		andi r24,lo8(-33)
+ 555 032e 8FBD      		out 79-32,r24
+ 556 0330 8FB5      		in r24,79-32
+ 557 0332 8F7E      		andi r24,lo8(-17)
+ 558 0334 8FBD      		out 79-32,r24
+ 559               	/* epilogue start */
+ 560 0336 0895      		ret
+ 562               	.global	timer1PWMAOn
+ 564               	timer1PWMAOn:
+ 565               	/* prologue: function */
+ 566               	/* frame size = 0 */
+ 567 0338 8FB5      		in r24,79-32
+ 568 033a 8068      		ori r24,lo8(-128)
+ 569 033c 8FBD      		out 79-32,r24
+ 570 033e 8FB5      		in r24,79-32
+ 571 0340 8F7B      		andi r24,lo8(-65)
+ 572 0342 8FBD      		out 79-32,r24
+ 573               	/* epilogue start */
+ 574 0344 0895      		ret
+ 576               	.global	timer1PWMBOn
+ 578               	timer1PWMBOn:
+ 579               	/* prologue: function */
+ 580               	/* frame size = 0 */
+ 581 0346 8FB5      		in r24,79-32
+ 582 0348 8062      		ori r24,lo8(32)
+ 583 034a 8FBD      		out 79-32,r24
+ 584 034c 8FB5      		in r24,79-32
+ 585 034e 8F7E      		andi r24,lo8(-17)
+ 586 0350 8FBD      		out 79-32,r24
+ 587               	/* epilogue start */
+ 588 0352 0895      		ret
+ 590               	.global	timer1PWMAOff
+ 592               	timer1PWMAOff:
+ 593               	/* prologue: function */
+ 594               	/* frame size = 0 */
+ 595 0354 8FB5      		in r24,79-32
+ 596 0356 8F77      		andi r24,lo8(127)
+ 597 0358 8FBD      		out 79-32,r24
+ 598 035a 8FB5      		in r24,79-32
+ 599 035c 8F7B      		andi r24,lo8(-65)
+ 600 035e 8FBD      		out 79-32,r24
+ 601               	/* epilogue start */
+ 602 0360 0895      		ret
+ 604               	.global	timer1PWMBOff
+ 606               	timer1PWMBOff:
+ 607               	/* prologue: function */
+ 608               	/* frame size = 0 */
+ 609 0362 8FB5      		in r24,79-32
+ 610 0364 8F7D      		andi r24,lo8(-33)
+ 611 0366 8FBD      		out 79-32,r24
+ 612 0368 8FB5      		in r24,79-32
+ 613 036a 8F7E      		andi r24,lo8(-17)
+ 614 036c 8FBD      		out 79-32,r24
+ 615               	/* epilogue start */
+ 616 036e 0895      		ret
+ 618               	.global	timer1PWMASet
+ 620               	timer1PWMASet:
+ 621               	/* prologue: function */
+ 622               	/* frame size = 0 */
+ 623 0370 9BBD      		out (74)+1-32,r25
+ 624 0372 8ABD      		out 74-32,r24
+ 625               	/* epilogue start */
+ 626 0374 0895      		ret
+ 628               	.global	timer1PWMBSet
+ 630               	timer1PWMBSet:
+ 631               	/* prologue: function */
+ 632               	/* frame size = 0 */
+ 633 0376 99BD      		out (72)+1-32,r25
+ 634 0378 88BD      		out 72-32,r24
+ 635               	/* epilogue start */
+ 636 037a 0895      		ret
+ 638               	.global	__vector_9
+ 640               	__vector_9:
+ 641 037c 1F92      		push __zero_reg__
+ 642 037e 0F92      		push r0
+ 643 0380 0FB6      		in r0,__SREG__
+ 644 0382 0F92      		push r0
+ 645 0384 1124      		clr __zero_reg__
+ 646 0386 2F93      		push r18
+ 647 0388 3F93      		push r19
+ 648 038a 4F93      		push r20
+ 649 038c 5F93      		push r21
+ 650 038e 6F93      		push r22
+ 651 0390 7F93      		push r23
+ 652 0392 8F93      		push r24
+ 653 0394 9F93      		push r25
+ 654 0396 AF93      		push r26
+ 655 0398 BF93      		push r27
+ 656 039a EF93      		push r30
+ 657 039c FF93      		push r31
+ 658               	/* prologue: Signal */
+ 659               	/* frame size = 0 */
+ 660 039e 8091 0000 		lds r24,Timer0Reg0
+ 661 03a2 9091 0000 		lds r25,(Timer0Reg0)+1
+ 662 03a6 A091 0000 		lds r26,(Timer0Reg0)+2
+ 663 03aa B091 0000 		lds r27,(Timer0Reg0)+3
+ 664 03ae 0196      		adiw r24,1
+ 665 03b0 A11D      		adc r26,__zero_reg__
+ 666 03b2 B11D      		adc r27,__zero_reg__
+ 667 03b4 8093 0000 		sts Timer0Reg0,r24
+ 668 03b8 9093 0000 		sts (Timer0Reg0)+1,r25
+ 669 03bc A093 0000 		sts (Timer0Reg0)+2,r26
+ 670 03c0 B093 0000 		sts (Timer0Reg0)+3,r27
+ 671 03c4 8091 0000 		lds r24,TimerPauseReg
+ 672 03c8 9091 0000 		lds r25,(TimerPauseReg)+1
+ 673 03cc A091 0000 		lds r26,(TimerPauseReg)+2
+ 674 03d0 B091 0000 		lds r27,(TimerPauseReg)+3
+ 675 03d4 0196      		adiw r24,1
+ 676 03d6 A11D      		adc r26,__zero_reg__
+ 677 03d8 B11D      		adc r27,__zero_reg__
+ 678 03da 8093 0000 		sts TimerPauseReg,r24
+ 679 03de 9093 0000 		sts (TimerPauseReg)+1,r25
+ 680 03e2 A093 0000 		sts (TimerPauseReg)+2,r26
+ 681 03e6 B093 0000 		sts (TimerPauseReg)+3,r27
+ 682 03ea 8091 0000 		lds r24,TimerIntFunc
+ 683 03ee 9091 0000 		lds r25,(TimerIntFunc)+1
+ 684 03f2 892B      		or r24,r25
+ 685 03f4 01F0      		breq .L70
+ 686 03f6 E091 0000 		lds r30,TimerIntFunc
+ 687 03fa F091 0000 		lds r31,(TimerIntFunc)+1
+ 688 03fe 0995      		icall
+ 689               	.L70:
+ 690               	/* epilogue start */
+ 691 0400 FF91      		pop r31
+ 692 0402 EF91      		pop r30
+ 693 0404 BF91      		pop r27
+ 694 0406 AF91      		pop r26
+ 695 0408 9F91      		pop r25
+ 696 040a 8F91      		pop r24
+ 697 040c 7F91      		pop r23
+ 698 040e 6F91      		pop r22
+ 699 0410 5F91      		pop r21
+ 700 0412 4F91      		pop r20
+ 701 0414 3F91      		pop r19
+ 702 0416 2F91      		pop r18
+ 703 0418 0F90      		pop r0
+ 704 041a 0FBE      		out __SREG__,r0
+ 705 041c 0F90      		pop r0
+ 706 041e 1F90      		pop __zero_reg__
+ 707 0420 1895      		reti
+ 709               	.global	__vector_8
+ 711               	__vector_8:
+ 712 0422 1F92      		push __zero_reg__
+ 713 0424 0F92      		push r0
+ 714 0426 0FB6      		in r0,__SREG__
+ 715 0428 0F92      		push r0
+ 716 042a 1124      		clr __zero_reg__
+ 717 042c 2F93      		push r18
+ 718 042e 3F93      		push r19
+ 719 0430 4F93      		push r20
+ 720 0432 5F93      		push r21
+ 721 0434 6F93      		push r22
+ 722 0436 7F93      		push r23
+ 723 0438 8F93      		push r24
+ 724 043a 9F93      		push r25
+ 725 043c AF93      		push r26
+ 726 043e BF93      		push r27
+ 727 0440 EF93      		push r30
+ 728 0442 FF93      		push r31
+ 729               	/* prologue: Signal */
+ 730               	/* frame size = 0 */
+ 731 0444 8091 0000 		lds r24,TimerIntFunc+2
+ 732 0448 9091 0000 		lds r25,(TimerIntFunc+2)+1
+ 733 044c 892B      		or r24,r25
+ 734 044e 01F0      		breq .L73
+ 735 0450 E091 0000 		lds r30,TimerIntFunc+2
+ 736 0454 F091 0000 		lds r31,(TimerIntFunc+2)+1
+ 737 0458 0995      		icall
+ 738               	.L73:
+ 739               	/* epilogue start */
+ 740 045a FF91      		pop r31
+ 741 045c EF91      		pop r30
+ 742 045e BF91      		pop r27
+ 743 0460 AF91      		pop r26
+ 744 0462 9F91      		pop r25
+ 745 0464 8F91      		pop r24
+ 746 0466 7F91      		pop r23
+ 747 0468 6F91      		pop r22
+ 748 046a 5F91      		pop r21
+ 749 046c 4F91      		pop r20
+ 750 046e 3F91      		pop r19
+ 751 0470 2F91      		pop r18
+ 752 0472 0F90      		pop r0
+ 753 0474 0FBE      		out __SREG__,r0
+ 754 0476 0F90      		pop r0
+ 755 0478 1F90      		pop __zero_reg__
+ 756 047a 1895      		reti
+ 758               	.global	__vector_4
+ 760               	__vector_4:
+ 761 047c 1F92      		push __zero_reg__
+ 762 047e 0F92      		push r0
+ 763 0480 0FB6      		in r0,__SREG__
+ 764 0482 0F92      		push r0
+ 765 0484 1124      		clr __zero_reg__
+ 766 0486 2F93      		push r18
+ 767 0488 3F93      		push r19
+ 768 048a 4F93      		push r20
+ 769 048c 5F93      		push r21
+ 770 048e 6F93      		push r22
+ 771 0490 7F93      		push r23
+ 772 0492 8F93      		push r24
+ 773 0494 9F93      		push r25
+ 774 0496 AF93      		push r26
+ 775 0498 BF93      		push r27
+ 776 049a EF93      		push r30
+ 777 049c FF93      		push r31
+ 778               	/* prologue: Signal */
+ 779               	/* frame size = 0 */
+ 780 049e 8091 0000 		lds r24,Timer2Reg0
+ 781 04a2 9091 0000 		lds r25,(Timer2Reg0)+1
+ 782 04a6 A091 0000 		lds r26,(Timer2Reg0)+2
+ 783 04aa B091 0000 		lds r27,(Timer2Reg0)+3
+ 784 04ae 0196      		adiw r24,1
+ 785 04b0 A11D      		adc r26,__zero_reg__
+ 786 04b2 B11D      		adc r27,__zero_reg__
+ 787 04b4 8093 0000 		sts Timer2Reg0,r24
+ 788 04b8 9093 0000 		sts (Timer2Reg0)+1,r25
+ 789 04bc A093 0000 		sts (Timer2Reg0)+2,r26
+ 790 04c0 B093 0000 		sts (Timer2Reg0)+3,r27
+ 791 04c4 8091 0000 		lds r24,TimerIntFunc+10
+ 792 04c8 9091 0000 		lds r25,(TimerIntFunc+10)+1
+ 793 04cc 892B      		or r24,r25
+ 794 04ce 01F0      		breq .L76
+ 795 04d0 E091 0000 		lds r30,TimerIntFunc+10
+ 796 04d4 F091 0000 		lds r31,(TimerIntFunc+10)+1
+ 797 04d8 0995      		icall
+ 798               	.L76:
+ 799               	/* epilogue start */
+ 800 04da FF91      		pop r31
+ 801 04dc EF91      		pop r30
+ 802 04de BF91      		pop r27
+ 803 04e0 AF91      		pop r26
+ 804 04e2 9F91      		pop r25
+ 805 04e4 8F91      		pop r24
+ 806 04e6 7F91      		pop r23
+ 807 04e8 6F91      		pop r22
+ 808 04ea 5F91      		pop r21
+ 809 04ec 4F91      		pop r20
+ 810 04ee 3F91      		pop r19
+ 811 04f0 2F91      		pop r18
+ 812 04f2 0F90      		pop r0
+ 813 04f4 0FBE      		out __SREG__,r0
+ 814 04f6 0F90      		pop r0
+ 815 04f8 1F90      		pop __zero_reg__
+ 816 04fa 1895      		reti
+ 818               	.global	__vector_6
+ 820               	__vector_6:
+ 821 04fc 1F92      		push __zero_reg__
+ 822 04fe 0F92      		push r0
+ 823 0500 0FB6      		in r0,__SREG__
+ 824 0502 0F92      		push r0
+ 825 0504 1124      		clr __zero_reg__
+ 826 0506 2F93      		push r18
+ 827 0508 3F93      		push r19
+ 828 050a 4F93      		push r20
+ 829 050c 5F93      		push r21
+ 830 050e 6F93      		push r22
+ 831 0510 7F93      		push r23
+ 832 0512 8F93      		push r24
+ 833 0514 9F93      		push r25
+ 834 0516 AF93      		push r26
+ 835 0518 BF93      		push r27
+ 836 051a EF93      		push r30
+ 837 051c FF93      		push r31
+ 838               	/* prologue: Signal */
+ 839               	/* frame size = 0 */
+ 840 051e 8091 0000 		lds r24,TimerIntFunc+4
+ 841 0522 9091 0000 		lds r25,(TimerIntFunc+4)+1
+ 842 0526 892B      		or r24,r25
+ 843 0528 01F0      		breq .L79
+ 844 052a E091 0000 		lds r30,TimerIntFunc+4
+ 845 052e F091 0000 		lds r31,(TimerIntFunc+4)+1
+ 846 0532 0995      		icall
+ 847               	.L79:
+ 848               	/* epilogue start */
+ 849 0534 FF91      		pop r31
+ 850 0536 EF91      		pop r30
+ 851 0538 BF91      		pop r27
+ 852 053a AF91      		pop r26
+ 853 053c 9F91      		pop r25
+ 854 053e 8F91      		pop r24
+ 855 0540 7F91      		pop r23
+ 856 0542 6F91      		pop r22
+ 857 0544 5F91      		pop r21
+ 858 0546 4F91      		pop r20
+ 859 0548 3F91      		pop r19
+ 860 054a 2F91      		pop r18
+ 861 054c 0F90      		pop r0
+ 862 054e 0FBE      		out __SREG__,r0
+ 863 0550 0F90      		pop r0
+ 864 0552 1F90      		pop __zero_reg__
+ 865 0554 1895      		reti
+ 867               	.global	__vector_7
+ 869               	__vector_7:
+ 870 0556 1F92      		push __zero_reg__
+ 871 0558 0F92      		push r0
+ 872 055a 0FB6      		in r0,__SREG__
+ 873 055c 0F92      		push r0
+ 874 055e 1124      		clr __zero_reg__
+ 875 0560 2F93      		push r18
+ 876 0562 3F93      		push r19
+ 877 0564 4F93      		push r20
+ 878 0566 5F93      		push r21
+ 879 0568 6F93      		push r22
+ 880 056a 7F93      		push r23
+ 881 056c 8F93      		push r24
+ 882 056e 9F93      		push r25
+ 883 0570 AF93      		push r26
+ 884 0572 BF93      		push r27
+ 885 0574 EF93      		push r30
+ 886 0576 FF93      		push r31
+ 887               	/* prologue: Signal */
+ 888               	/* frame size = 0 */
+ 889 0578 8091 0000 		lds r24,TimerIntFunc+6
+ 890 057c 9091 0000 		lds r25,(TimerIntFunc+6)+1
+ 891 0580 892B      		or r24,r25
+ 892 0582 01F0      		breq .L82
+ 893 0584 E091 0000 		lds r30,TimerIntFunc+6
+ 894 0588 F091 0000 		lds r31,(TimerIntFunc+6)+1
+ 895 058c 0995      		icall
+ 896               	.L82:
+ 897               	/* epilogue start */
+ 898 058e FF91      		pop r31
+ 899 0590 EF91      		pop r30
+ 900 0592 BF91      		pop r27
+ 901 0594 AF91      		pop r26
+ 902 0596 9F91      		pop r25
+ 903 0598 8F91      		pop r24
+ 904 059a 7F91      		pop r23
+ 905 059c 6F91      		pop r22
+ 906 059e 5F91      		pop r21
+ 907 05a0 4F91      		pop r20
+ 908 05a2 3F91      		pop r19
+ 909 05a4 2F91      		pop r18
+ 910 05a6 0F90      		pop r0
+ 911 05a8 0FBE      		out __SREG__,r0
+ 912 05aa 0F90      		pop r0
+ 913 05ac 1F90      		pop __zero_reg__
+ 914 05ae 1895      		reti
+ 916               	.global	__vector_5
+ 918               	__vector_5:
+ 919 05b0 1F92      		push __zero_reg__
+ 920 05b2 0F92      		push r0
+ 921 05b4 0FB6      		in r0,__SREG__
+ 922 05b6 0F92      		push r0
+ 923 05b8 1124      		clr __zero_reg__
+ 924 05ba 2F93      		push r18
+ 925 05bc 3F93      		push r19
+ 926 05be 4F93      		push r20
+ 927 05c0 5F93      		push r21
+ 928 05c2 6F93      		push r22
+ 929 05c4 7F93      		push r23
+ 930 05c6 8F93      		push r24
+ 931 05c8 9F93      		push r25
+ 932 05ca AF93      		push r26
+ 933 05cc BF93      		push r27
+ 934 05ce EF93      		push r30
+ 935 05d0 FF93      		push r31
+ 936               	/* prologue: Signal */
+ 937               	/* frame size = 0 */
+ 938 05d2 8091 0000 		lds r24,TimerIntFunc+8
+ 939 05d6 9091 0000 		lds r25,(TimerIntFunc+8)+1
+ 940 05da 892B      		or r24,r25
+ 941 05dc 01F0      		breq .L85
+ 942 05de E091 0000 		lds r30,TimerIntFunc+8
+ 943 05e2 F091 0000 		lds r31,(TimerIntFunc+8)+1
+ 944 05e6 0995      		icall
+ 945               	.L85:
+ 946               	/* epilogue start */
+ 947 05e8 FF91      		pop r31
+ 948 05ea EF91      		pop r30
+ 949 05ec BF91      		pop r27
+ 950 05ee AF91      		pop r26
+ 951 05f0 9F91      		pop r25
+ 952 05f2 8F91      		pop r24
+ 953 05f4 7F91      		pop r23
+ 954 05f6 6F91      		pop r22
+ 955 05f8 5F91      		pop r21
+ 956 05fa 4F91      		pop r20
+ 957 05fc 3F91      		pop r19
+ 958 05fe 2F91      		pop r18
+ 959 0600 0F90      		pop r0
+ 960 0602 0FBE      		out __SREG__,r0
+ 961 0604 0F90      		pop r0
+ 962 0606 1F90      		pop __zero_reg__
+ 963 0608 1895      		reti
+ 965               	.global	__vector_3
+ 967               	__vector_3:
+ 968 060a 1F92      		push __zero_reg__
+ 969 060c 0F92      		push r0
+ 970 060e 0FB6      		in r0,__SREG__
+ 971 0610 0F92      		push r0
+ 972 0612 1124      		clr __zero_reg__
+ 973 0614 2F93      		push r18
+ 974 0616 3F93      		push r19
+ 975 0618 4F93      		push r20
+ 976 061a 5F93      		push r21
+ 977 061c 6F93      		push r22
+ 978 061e 7F93      		push r23
+ 979 0620 8F93      		push r24
+ 980 0622 9F93      		push r25
+ 981 0624 AF93      		push r26
+ 982 0626 BF93      		push r27
+ 983 0628 EF93      		push r30
+ 984 062a FF93      		push r31
+ 985               	/* prologue: Signal */
+ 986               	/* frame size = 0 */
+ 987 062c 8091 0000 		lds r24,TimerIntFunc+12
+ 988 0630 9091 0000 		lds r25,(TimerIntFunc+12)+1
+ 989 0634 892B      		or r24,r25
+ 990 0636 01F0      		breq .L88
+ 991 0638 E091 0000 		lds r30,TimerIntFunc+12
+ 992 063c F091 0000 		lds r31,(TimerIntFunc+12)+1
+ 993 0640 0995      		icall
+ 994               	.L88:
+ 995               	/* epilogue start */
+ 996 0642 FF91      		pop r31
+ 997 0644 EF91      		pop r30
+ 998 0646 BF91      		pop r27
+ 999 0648 AF91      		pop r26
+ 1000 064a 9F91      		pop r25
+ 1001 064c 8F91      		pop r24
+ 1002 064e 7F91      		pop r23
+ 1003 0650 6F91      		pop r22
+ 1004 0652 5F91      		pop r21
+ 1005 0654 4F91      		pop r20
+ 1006 0656 3F91      		pop r19
+ 1007 0658 2F91      		pop r18
+ 1008 065a 0F90      		pop r0
+ 1009 065c 0FBE      		out __SREG__,r0
+ 1010 065e 0F90      		pop r0
+ 1011 0660 1F90      		pop __zero_reg__
+ 1012 0662 1895      		reti
+ 1014               	.global	TimerPrescaleFactor
+ 1015               		.section	.progmem.data,"a",@progbits
+ 1018               	TimerPrescaleFactor:
+ 1019 0000 0000      		.word	0
+ 1020 0002 0100      		.word	1
+ 1021 0004 0800      		.word	8
+ 1022 0006 4000      		.word	64
+ 1023 0008 0001      		.word	256
+ 1024 000a 0004      		.word	1024
+ 1025               	.global	TimerRTCPrescaleFactor
+ 1028               	TimerRTCPrescaleFactor:
+ 1029 000c 0000      		.word	0
+ 1030 000e 0100      		.word	1
+ 1031 0010 0800      		.word	8
+ 1032 0012 2000      		.word	32
+ 1033 0014 4000      		.word	64
+ 1034 0016 8000      		.word	128
+ 1035 0018 0001      		.word	256
+ 1036 001a 0004      		.word	1024
+ 1037               		.lcomm TimerIntFunc,14
+ 1038               		.comm TimerPauseReg,4,1
+ 1039               		.comm Timer0Reg0,4,1
+ 1040               		.comm Timer2Reg0,4,1
+ 1041               	.global __do_clear_bss
+DEFINED SYMBOLS
+                            *ABS*:00000000 timer.c
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:2      *ABS*:0000003f __SREG__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:3      *ABS*:0000003e __SP_H__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:4      *ABS*:0000003d __SP_L__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:5      *ABS*:00000034 __CCP__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:6      *ABS*:00000000 __tmp_reg__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:7      *ABS*:00000001 __zero_reg__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:11     .text:00000000 delay_us
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:19     .text:00000002 timerInit
+                             .bss:00000000 TimerIntFunc
+                            *COM*:00000004 Timer0Reg0
+                            *COM*:00000004 Timer2Reg0
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:79     .text:00000072 timer0Init
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:99     .text:00000094 timer1Init
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:116    .text:000000a8 timer2Init
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:136    .text:000000ca timer0SetPrescaler
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:148    .text:000000d4 timer1SetPrescaler
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:160    .text:000000de timer2SetPrescaler
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:172    .text:000000e8 timer0GetPrescaler
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:1018   .progmem.data:00000000 TimerPrescaleFactor
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:197    .text:00000102 timer1GetPrescaler
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:222    .text:0000011c timer2GetPrescaler
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:1028   .progmem.data:0000000c TimerRTCPrescaleFactor
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:247    .text:00000136 timerAttach
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:265    .text:0000014c timerDetach
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:283    .text:00000162 timerPause
+                            *COM*:00000004 TimerPauseReg
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:425    .text:0000026c timer0ClearOverflowCount
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:437    .text:0000027e timer0GetOverflowCount
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:451    .text:00000294 timer2ClearOverflowCount
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:463    .text:000002a6 timer2GetOverflowCount
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:477    .text:000002bc timer1PWMInit
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:512    .text:000002ec timer1PWMInitICR
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:538    .text:00000312 timer1PWMOff
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:564    .text:00000338 timer1PWMAOn
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:578    .text:00000346 timer1PWMBOn
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:592    .text:00000354 timer1PWMAOff
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:606    .text:00000362 timer1PWMBOff
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:620    .text:00000370 timer1PWMASet
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:630    .text:00000376 timer1PWMBSet
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:640    .text:0000037c __vector_9
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:711    .text:00000422 __vector_8
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:760    .text:0000047c __vector_4
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:820    .text:000004fc __vector_6
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:869    .text:00000556 __vector_7
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:918    .text:000005b0 __vector_5
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccZPJL2j.s:967    .text:0000060a __vector_3
+
+UNDEFINED SYMBOLS
+__divmodsi4
+__mulsi3
+__udivmodsi4
+__do_clear_bss

@@ -1,0 +1,120 @@
+   1               		.file	"main.c"
+   2               	__SREG__ = 0x3f
+   3               	__SP_H__ = 0x3e
+   4               	__SP_L__ = 0x3d
+   5               	__CCP__  = 0x34
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.global	init_ddr
+  11               	init_ddr:
+  12               	/* prologue: function */
+  13               	/* frame size = 0 */
+  14 0000 8FEF      		ldi r24,lo8(-1)
+  15 0002 87BB      		out 55-32,r24
+  16               	/* epilogue start */
+  17 0004 0895      		ret
+  19               	.global	set_servos
+  21               	set_servos:
+  22               	/* prologue: function */
+  23               	/* frame size = 0 */
+  24 0006 83B3      		in r24,51-32
+  25               	/* epilogue start */
+  26 0008 0895      		ret
+  28               	.global	phase_freq_correct_init
+  30               	phase_freq_correct_init:
+  31               	/* prologue: function */
+  32               	/* frame size = 0 */
+  33 000a 80EA      		ldi r24,lo8(-96)
+  34 000c 8FBD      		out 79-32,r24
+  35 000e 81E1      		ldi r24,lo8(17)
+  36 0010 8EBD      		out 78-32,r24
+  37               	/* epilogue start */
+  38 0012 0895      		ret
+  40               	.global	main
+  42               	main:
+  43               	/* prologue: function */
+  44               	/* frame size = 0 */
+  45 0014 8FEF      		ldi r24,lo8(-1)
+  46 0016 87BB      		out 55-32,r24
+  47               	/* #APP */
+  48               	 ;  63 "main.c" 1
+  49 0018 7894      		sei
+  50               	 ;  0 "" 2
+  51               	/* #NOAPP */
+  52 001a 80EA      		ldi r24,lo8(-96)
+  53 001c 8FBD      		out 79-32,r24
+  54 001e 81E1      		ldi r24,lo8(17)
+  55 0020 8EBD      		out 78-32,r24
+  56 0022 00D0      		rcall timer0Init
+  57 0024 85E0      		ldi r24,lo8(5)
+  58 0026 00D0      		rcall timer0SetPrescaler
+  59 0028 80E1      		ldi r24,lo8(10000)
+  60 002a 97E2      		ldi r25,hi8(10000)
+  61 002c 97BD      		out (70)+1-32,r25
+  62 002e 86BD      		out 70-32,r24
+  63 0030 88E5      		ldi r24,lo8(600)
+  64 0032 92E0      		ldi r25,hi8(600)
+  65 0034 9BBD      		out (74)+1-32,r25
+  66 0036 8ABD      		out 74-32,r24
+  67 0038 99BD      		out (72)+1-32,r25
+  68 003a 88BD      		out 72-32,r24
+  69 003c 20E0      		ldi r18,lo8(0)
+  70 003e 30E0      		ldi r19,hi8(0)
+  71 0040 40E0      		ldi r20,lo8(0)
+  72 0042 50E0      		ldi r21,hi8(0)
+  73               	.L14:
+  74 0044 82B7      		in r24,82-32
+  75 0046 8536      		cpi r24,lo8(101)
+  76 0048 00F0      		brlo .L8
+  77 004a 4F5F      		subi r20,lo8(-(1))
+  78 004c 5F4F      		sbci r21,hi8(-(1))
+  79 004e 12BE      		out 82-32,__zero_reg__
+  80               	.L8:
+  81 0050 4B30      		cpi r20,11
+  82 0052 5105      		cpc r21,__zero_reg__
+  83 0054 00F0      		brlo .L9
+  84 0056 2D5F      		subi r18,lo8(-(3))
+  85 0058 3F4F      		sbci r19,hi8(-(3))
+  86 005a 40E0      		ldi r20,lo8(0)
+  87 005c 50E0      		ldi r21,hi8(0)
+  88               	.L9:
+  89 005e 61E0      		ldi r22,hi8(500)
+  90 0060 243F      		cpi r18,lo8(500)
+  91 0062 3607      		cpc r19,r22
+  92 0064 00F0      		brlo .L10
+  93 0066 20E0      		ldi r18,lo8(0)
+  94 0068 30E0      		ldi r19,hi8(0)
+  95               	.L10:
+  96 006a 2C50      		subi r18,lo8(-(500))
+  97 006c 3E4F      		sbci r19,hi8(-(500))
+  98 006e 3BBD      		out (74)+1-32,r19
+  99 0070 2ABD      		out 74-32,r18
+ 100 0072 245F      		subi r18,lo8(-(-500))
+ 101 0074 3140      		sbci r19,hi8(-(-500))
+ 102 0076 8CB5      		in r24,76-32
+ 103 0078 9DB5      		in r25,(76)+1-32
+ 104 007a 8958      		subi r24,lo8(5001)
+ 105 007c 9341      		sbci r25,hi8(5001)
+ 106 007e 00F0      		brlo .L11
+ 107 0080 C09A      		sbi 56-32,0
+ 108 0082 00C0      		rjmp .L14
+ 109               	.L11:
+ 110 0084 C098      		cbi 56-32,0
+ 111 0086 00C0      		rjmp .L14
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccULPCjh.s:2      *ABS*:0000003f __SREG__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccULPCjh.s:3      *ABS*:0000003e __SP_H__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccULPCjh.s:4      *ABS*:0000003d __SP_L__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccULPCjh.s:5      *ABS*:00000034 __CCP__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccULPCjh.s:6      *ABS*:00000000 __tmp_reg__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccULPCjh.s:7      *ABS*:00000001 __zero_reg__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccULPCjh.s:11     .text:00000000 init_ddr
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccULPCjh.s:21     .text:00000006 set_servos
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccULPCjh.s:30     .text:0000000a phase_freq_correct_init
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccULPCjh.s:42     .text:00000014 main
+
+UNDEFINED SYMBOLS
+timer0Init
+timer0SetPrescaler
