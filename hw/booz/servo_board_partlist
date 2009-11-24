@@ -1,0 +1,29 @@
+Partlist
+
+Exported from servo_board - no power.sch at 11/24/2009 3:39:06 PM
+
+EAGLE Version 5.6.0 Copyright (c) 1988-2009 CadSoft
+
+Part     Value          Device            Package    Library    Sheet
+
+BATT_IN                 MA04-1            MA04-1     con-lstb   1
+C1       100n           C-EUC0805         C0805      rcl        1
+C2       10u            CPOL-EUC/6032-28R C/6032-28R rcl        1
+C3       100n           C-EUC0805         C0805      rcl        1
+C5       100n           C-EUC0805         C0805      rcl        1
+IC1      LD117ADT50TR   LD117ADT50TR      DPACK      v-reg      1
+JP1                     JP1E              JP1        jumper     1
+JP3                     JP1E              JP1        jumper     1
+LED1                    LEDSMT1206        1206       led        1
+LED2                    LEDSMT1206        1206       led        1
+POWER_IN 6-JST-XH       6-JST-XH          6          con-jst-xh 1
+R1       4K7            RESISTOR0603-RES  0603-RES   SparkFun   1
+R2       4K7            RESISTOR0603-RES  0603-RES   SparkFun   1
+SERVOA                  MA03-1            MA03-1     con-lstb   1
+SERVOB                  MA03-1            MA03-1     con-lstb   1
+SERVOC                  MA03-1            MA03-1     con-lstb   1
+SERVOD                  MA03-1            MA03-1     con-lstb   1
+SV1                     MA05-2LARGE_PAD   MA05-2A    con-lstb   1
+U1       ATMEGA168      ATMEGA168         TQFP32-08  SparkFun   1
+U2       ATMEGA168      ATMEGA168         TQFP32-08  SparkFun   1
+UART+I2C 6-JST-XH       6-JST-XH          6          con-jst-xh 1
