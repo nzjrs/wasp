@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <settings>
   <section name="AUTOPILOT">
-    <setting name="MODE_MANUAL" value="BOOZ2_AP_MODE_RATE_DIRECT" doc="Autopilot mode in manual flight"/>
-    <setting name="MODE_AUTO1" value="BOOZ2_AP_MODE_HOVER_DIRECT" doc="Autopilot mode 1"/>
-    <setting name="MODE_AUTO2" value="BOOZ2_AP_MODE_ATTITUDE_DIRECT" doc="Autopilot mode 2"/>
+    <setting name="MODE_MANUAL" value="AP_MODE_RATE_DIRECT" doc="Autopilot mode in manual flight"/>
+    <setting name="MODE_AUTO1" value="AP_MODE_HOVER_DIRECT" doc="Autopilot mode 1"/>
+    <setting name="MODE_AUTO2" value="AP_MODE_ATTITUDE_DIRECT" doc="Autopilot mode 2"/>
   </section>
   <section name="ANALOG">
     <setting name="BATTERY_SENS" value="0.018387097" integer="16"/>
@@ -45,6 +45,15 @@
     <setting name="BACK" value="1"/>
     <setting name="RIGHT" value="2"/>
     <setting name="LEFT" value="3"/>
+    <setting name="ADDR" value="{0x52, 0x54, 0x56, 0x58}" doc="The I2C adresses of the motors"/>
+  </section>
+  <section name="SERVO">
+    <setting name="NB" value="4"/>
+    <setting name="THROTTLE" value="0"/>
+    <setting name="ELEVATOR" value="1"/>
+    <setting name="AILERON" value="2"/>
+    <setting name="RUDDER" value="3"/>
+    <setting name="ADDR" value="{4, 5, 6, 7}" doc="The channel of the servos, numbered from 0 (the pcb is numbered from 1)"/>
   </section>
   <section name="COMMAND">
     <setting name="NB" value="4"/>
@@ -55,12 +64,65 @@
     <setting name="FAILSAFE" value="{0,0,0,0}"/>
   </section>
   <section name="SUPERVISION">
-    <setting name="FRONT_ROTOR_CW" value="1"/>
     <setting name="MIN_MOTOR" value="2"/>
     <setting name="MAX_MOTOR" value="210"/>
-    <setting name="TRIM_A" value="0"/>
-    <setting name="TRIM_E" value="0"/>
-    <setting name="TRIM_R" value="1"/>
+    <setting name="TRIM_A" value="0" type="int32" min="-100" max="100" step="1" set="1" get="1"/>
+    <setting name="TRIM_E" value="0" type="int32" min="-100" max="100" step="1" set="1" get="1"/>
+    <setting name="TRIM_R" value="0" type="int32" min="-100" max="100" step="1" set="1" get="1"/>
+    <setting name="TRIM_T" value="0" type="int32" min="-100" max="100" step="1" set="1" get="1"/>
+    <setting name="NB_MOTOR" value="4"/>
+    <setting name="SCALE" value="256"/>
+    <setting name="ROLL_COEF"  value="{    0,    0, -256,  256}"/>
+    <setting name="PITCH_COEF" value="{  256, -256,    0,    0}"/>
+    <setting name="YAW_COEF"   value="{ -256, -256,  256,  256}"/>
+    <setting name="THRUST_COEF" value="{ 256,  256,  256,  256}"/>
+  </section>
+  <section name="PID">
+    <setting name="PITCH_P" type="int32" value="1" set="1" get="1"/>
+    <setting name="PITCH_I" type="int32" value="0" set="1" get="1"/>
+    <setting name="PITCH_D" type="int32" value="0" set="1" get="1"/>
+    <setting name="ROLL_P" type="int32" value="1" set="1" get="1"/>
+    <setting name="ROLL_I" type="int32" value="0" set="1" get="1"/>
+    <setting name="ROLL_D" type="int32" value="0" set="1" get="1"/>
+    <setting name="YAW_P" type="int32" value="1" set="1" get="1"/>
+    <setting name="YAW_I" type="int32" value="0" set="1" get="1"/>
+    <setting name="YAW_D" type="int32" value="0" set="1" get="1"/>
+    <setting name="ALT_P" type="int32" value="1" set="1" get="1"/>
+    <setting name="ALT_I" type="int32" value="0" set="1" get="1"/>
+    <setting name="ALT_D" type="int32" value="0" set="1" get="1"/>
+  </section>
+  <section name="BOOZ_STABILIZATION">
+    <setting name="RATE_SP_MAX_P" value="10000"/>
+    <setting name="RATE_SP_MAX_Q" value="10000"/>
+    <setting name="RATE_SP_MAX_R" value="10000"/>
+    <setting name="RATE_GAIN_P" value="-400"/>
+    <setting name="RATE_GAIN_Q" value="-400"/>
+    <setting name="RATE_GAIN_R" value="-350"/>
+    <setting name="ATTITUDE_SP_MAX_PHI" value="3000"/>
+    <setting name="ATTITUDE_SP_MAX_THETA" value="3000"/>
+    <setting name="ATTITUDE_SP_MAX_R" value="5500"/>
+    <setting name="ATTITUDE_DEADBAND_R" value="250"/>
+    <setting name="ATTITUDE_PHI_THETA_PGAIN" value="-400"/>
+    <setting name="ATTITUDE_PHI_THETA_DGAIN" value="-300"/>
+    <setting name="ATTITUDE_PHI_THETA_DDGAIN" value="300"/>
+    <setting name="ATTITUDE_PHI_THETA_IGAIN" value="-200"/>
+    <setting name="ATTITUDE_PSI_PGAIN" value="-380"/>
+    <setting name="ATTITUDE_PSI_DGAIN" value="-320"/>
+    <setting name="ATTITUDE_PSI_DDGAIN" value="300"/>
+    <setting name="ATTITUDE_PSI_IGAIN" value="-75"/>
+  </section>
+  <section name="BOOZ2_GUIDANCE">
+    <setting name="V_MIN_ERR_Z" value="BOOZ_POS_I_OF_F(-10.)"/>
+    <setting name="V_MAX_ERR_Z" value="BOOZ_POS_I_OF_F( 10.)"/>
+    <setting name="V_MIN_ERR_ZD" value="BOOZ_SPEED_I_OF_F(-10.)"/>
+    <setting name="V_MAX_ERR_ZD" value="BOOZ_SPEED_I_OF_F( 10.)"/>
+    <setting name="V_HOVER_KP" value="-300"/>
+    <setting name="V_HOVER_KD" value="-400"/>
+    <setting name="V_RC_CLIMB_COEF" value="163"/>
+    <setting name="V_RC_CLIMB_DEAD_BAND" value="160000"/>
+    <setting name="H_PGAIN" value="-20"/>
+    <setting name="H_DGAIN" value="-0"/>
+    <setting name="H_IGAIN" value="-5"/>
   </section>
 </settings>
 

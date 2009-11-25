@@ -25,20 +25,16 @@
 
 #include "rc.h"
 #include "actuators.h"
-#include "booz2_navigation.h"
+#include "supervision.h"
+#include "guidance/booz2_navigation.h"
 #include "guidance/booz2_guidance_h.h"
 #include "guidance/booz2_guidance_v.h"
 #include "stabilization/booz2_stabilization.h"
-#include "booz2_supervision.h"
 
-uint8_t autopilot_mode;
-bool_t  autopilot_motors_on;
-bool_t  autopilot_in_flight;
-uint32_t autopilot_motors_on_counter;
-uint32_t autopilot_in_flight_counter;
-
-int32_t booz2_commands[COMMAND_NB];
-int32_t booz2_commands_failsafe[COMMAND_NB] = COMMAND_FAILSAFE;
+Autopilot_t autopilot;
+uint32_t    autopilot_motors_on_counter;
+uint32_t    autopilot_in_flight_counter;
+int32_t     booz2_commands_failsafe[COMMAND_NB] = COMMAND_FAILSAFE;
 
 #define BOOZ2_AUTOPILOT_MOTOR_ON_TIME     40
 #define BOOZ2_AUTOPILOT_IN_FLIGHT_TIME    40
@@ -46,42 +42,44 @@ int32_t booz2_commands_failsafe[COMMAND_NB] = COMMAND_FAILSAFE;
 #define BOOZ2_AUTOPILOT_YAW_TRESHOLD      (MAX_PPRZ * 19 / 20)
 
 void autopilot_init(void) {
-    autopilot_mode = BOOZ2_AP_MODE_FAILSAFE;
-    autopilot_motors_on = FALSE;
-    autopilot_in_flight = FALSE;
+    autopilot.mode = AP_MODE_FAILSAFE;
+    autopilot.motors_on = FALSE;
+    autopilot.in_flight = FALSE;
+    autopilot.mode_auto2 = AUTOPILOT_MODE_AUTO2;
+
     autopilot_motors_on_counter = 0;
     autopilot_in_flight_counter = 0;
-    autopilot_mode_auto2 = AUTOPILOT_MODE_AUTO2;
 }
 
 static inline void autopilot_set_commands( int32_t *in_cmd, uint8_t in_flight, uint8_t motors_on )
 {
-    booz2_commands[COMMAND_PITCH]  = in_cmd[COMMAND_PITCH];
-    booz2_commands[COMMAND_ROLL]   = in_cmd[COMMAND_ROLL];
-    booz2_commands[COMMAND_YAW]    = (in_flight) ? in_cmd[COMMAND_YAW] : 0;
-    booz2_commands[COMMAND_THRUST] = (motors_on) ? in_cmd[COMMAND_THRUST] : 0;
+    autopilot.commands[COMMAND_PITCH]  = in_cmd[COMMAND_PITCH];
+    autopilot.commands[COMMAND_ROLL]   = in_cmd[COMMAND_ROLL];
+    autopilot.commands[COMMAND_YAW]    = (in_flight) ? in_cmd[COMMAND_YAW] : 0;
+    autopilot.commands[COMMAND_THRUST] = (motors_on) ? in_cmd[COMMAND_THRUST] : 0;
 }
 
-void autopilot_periodic(void) {
+void autopilot_periodic(void) 
+{
   
-    if ( !autopilot_motors_on ||
-         autopilot_mode == BOOZ2_AP_MODE_FAILSAFE ||
-         autopilot_mode == BOOZ2_AP_MODE_KILL ) 
+    if ( !autopilot.motors_on ||
+         autopilot.mode == AP_MODE_FAILSAFE ||
+         autopilot.mode == AP_MODE_KILL ) 
     {
         autopilot_set_commands(
             booz2_commands_failsafe, 
-            autopilot_in_flight,
-            autopilot_motors_on);
+            autopilot.in_flight,
+            autopilot.motors_on);
     }
     else
     {
-        RunOnceEvery(50, nav_periodic_task_10Hz())
-        booz2_guidance_v_run( autopilot_in_flight );
-        booz2_guidance_h_run( autopilot_in_flight );
+        //RunOnceEvery(50, nav_periodic_task_10Hz())
+        booz2_guidance_v_run( autopilot.in_flight );
+        booz2_guidance_h_run( autopilot.in_flight );
         autopilot_set_commands(
             booz2_stabilization_cmd, 
-            autopilot_in_flight,
-            autopilot_motors_on);
+            autopilot.in_flight,
+            autopilot.motors_on);
     }
 
 }
@@ -89,82 +87,92 @@ void autopilot_periodic(void) {
 void autopilot_set_actuators(void)
 {
 #ifdef KILL_MOTORS
-    pprz_t motor_commands[MOTOR_NB] = {0,0,0,0};
+    uint8_t i;
+    for (i = 0; i < MOTOR_NB; i++)
+        autopilot.motor_commands = 0;
 #else
-    pprz_t motor_commands[MOTOR_NB];
-    BOOZ2_SUPERVISION_RUN(motor_commands, booz2_commands, autopilot_motors_on);
+    supervision_run(autopilot.motor_commands, autopilot.commands, autopilot.motors_on);
 #endif
-    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_FRONT, motor_commands[MOTOR_FRONT]);
-    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_BACK, motor_commands[MOTOR_BACK]);
-    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_RIGHT, motor_commands[MOTOR_RIGHT]);
-    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_LEFT, motor_commands[MOTOR_LEFT]);
+    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_FRONT, autopilot.motor_commands[MOTOR_FRONT]);
+    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_BACK, autopilot.motor_commands[MOTOR_BACK]);
+    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_RIGHT, autopilot.motor_commands[MOTOR_RIGHT]);
+    actuators_set(ACTUATOR_BANK_MOTORS | MOTOR_LEFT, autopilot.motor_commands[MOTOR_LEFT]);
     actuators_commit(ACTUATOR_BANK_MOTORS);
 }
 
-void autopilot_set_mode(uint8_t new_autopilot_mode) {
+void autopilot_set_mode(AutopilotMode_t new_autopilot_mode) 
+{
+    bool_t ok = TRUE;
 
-  if (new_autopilot_mode != autopilot_mode) {
-    /* horizontal mode */
-    switch (new_autopilot_mode) {
-    case BOOZ2_AP_MODE_FAILSAFE:
-    case BOOZ2_AP_MODE_KILL:
-      autopilot_motors_on = FALSE;
-      booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_KILL);
-      break;
-    case BOOZ2_AP_MODE_RATE_DIRECT:
-    case BOOZ2_AP_MODE_RATE_Z_HOLD:
-      booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_RATE);
-      break;
-    case BOOZ2_AP_MODE_ATTITUDE_DIRECT:
-    case BOOZ2_AP_MODE_ATTITUDE_CLIMB:
-    case BOOZ2_AP_MODE_ATTITUDE_Z_HOLD:
-      booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_ATTITUDE);
-      break;
-    case BOOZ2_AP_MODE_HOVER_DIRECT:
-    case BOOZ2_AP_MODE_HOVER_CLIMB:
-    case BOOZ2_AP_MODE_HOVER_Z_HOLD:
-      booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_HOVER);
-      break;
-    case BOOZ2_AP_MODE_NAV:
-      booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_NAV);
-      break;
+    if (new_autopilot_mode != autopilot.mode) {
+        /* horizontal mode */
+        switch (new_autopilot_mode) {
+            case AP_MODE_FAILSAFE:
+            case AP_MODE_KILL:
+                autopilot.motors_on = FALSE;
+                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_KILL);
+                break;
+            case AP_MODE_RATE_DIRECT:
+            case AP_MODE_RATE_Z_HOLD:
+                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_RATE);
+                break;
+            case AP_MODE_ATTITUDE_DIRECT:
+            case AP_MODE_ATTITUDE_CLIMB:
+            case AP_MODE_ATTITUDE_Z_HOLD:
+                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_ATTITUDE);
+                break;
+            case AP_MODE_HOVER_DIRECT:
+            case AP_MODE_HOVER_CLIMB:
+            case AP_MODE_HOVER_Z_HOLD:
+                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_HOVER);
+                break;
+            case AP_MODE_NAV:
+                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_NAV);
+                break;
+            default:
+                ok = FALSE;
+                break;
+        }
+        /* vertical mode */
+        switch (new_autopilot_mode) {
+            case AP_MODE_FAILSAFE:
+            case AP_MODE_KILL:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_KILL);
+                break;
+            case AP_MODE_RATE_DIRECT:
+            case AP_MODE_ATTITUDE_DIRECT:
+            case AP_MODE_HOVER_DIRECT:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_DIRECT);
+                break;
+            case AP_MODE_RATE_RC_CLIMB:
+            case AP_MODE_ATTITUDE_RC_CLIMB:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_CLIMB);
+                break;
+            case AP_MODE_ATTITUDE_CLIMB:
+            case AP_MODE_HOVER_CLIMB:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_CLIMB);
+                break;
+            case AP_MODE_RATE_Z_HOLD:
+            case AP_MODE_ATTITUDE_Z_HOLD:
+            case AP_MODE_HOVER_Z_HOLD:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_HOVER);
+                break;
+            case AP_MODE_NAV:
+                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_NAV);
+                break;
+            default:
+                ok = FALSE;
+                break;
     }
-    /* vertical mode */
-    switch (new_autopilot_mode) {
-    case BOOZ2_AP_MODE_FAILSAFE:
-    case BOOZ2_AP_MODE_KILL:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_KILL);
-      break;
-    case BOOZ2_AP_MODE_RATE_DIRECT:
-    case BOOZ2_AP_MODE_ATTITUDE_DIRECT:
-    case BOOZ2_AP_MODE_HOVER_DIRECT:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_DIRECT);
-      break;
-    case BOOZ2_AP_MODE_RATE_RC_CLIMB:
-    case BOOZ2_AP_MODE_ATTITUDE_RC_CLIMB:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_CLIMB);
-      break;
-    case BOOZ2_AP_MODE_ATTITUDE_CLIMB:
-    case BOOZ2_AP_MODE_HOVER_CLIMB:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_CLIMB);
-      break;
-    case BOOZ2_AP_MODE_RATE_Z_HOLD:
-    case BOOZ2_AP_MODE_ATTITUDE_Z_HOLD:
-    case BOOZ2_AP_MODE_HOVER_Z_HOLD:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_HOVER);
-      break;
-    case BOOZ2_AP_MODE_NAV:
-      booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_NAV);
-      break;
-    }
-    autopilot_mode = new_autopilot_mode;
-  } 
-  
+    if (ok)
+        autopilot.mode = new_autopilot_mode;
+    } 
+
 }
 
 static inline void autopilot_check_in_flight(void)
 {
-    if (autopilot_in_flight) 
+    if (autopilot.in_flight) 
     {
         if (autopilot_in_flight_counter > 0) 
         {
@@ -173,7 +181,7 @@ static inline void autopilot_check_in_flight(void)
                 autopilot_in_flight_counter--;
                 if (autopilot_in_flight_counter == 0) 
                 {
-                    autopilot_in_flight = FALSE;
+                    autopilot.in_flight = FALSE;
                 }
             }
             else
@@ -185,13 +193,13 @@ static inline void autopilot_check_in_flight(void)
     else
     { /* not in flight */
         if (autopilot_in_flight_counter < BOOZ2_AUTOPILOT_IN_FLIGHT_TIME &&
-            autopilot_motors_on) 
+            autopilot.motors_on) 
         {
             if (rc_values[RADIO_THROTTLE] > BOOZ2_AUTOPILOT_THROTTLE_TRESHOLD) 
             {
                 autopilot_in_flight_counter++;
                 if (autopilot_in_flight_counter == BOOZ2_AUTOPILOT_IN_FLIGHT_TIME)
-                    autopilot_in_flight = TRUE;
+                    autopilot.in_flight = TRUE;
             }
             else
             { /*  rc throttle < threshold */
@@ -203,7 +211,7 @@ static inline void autopilot_check_in_flight(void)
 
 static inline void autopilot_check_motors_on(void)
 {
-    if (autopilot_motors_on)
+    if (autopilot.motors_on)
     {
         if (rc_values[RADIO_THROTTLE] < BOOZ2_AUTOPILOT_THROTTLE_TRESHOLD &&
             (rc_values[RADIO_YAW] > BOOZ2_AUTOPILOT_YAW_TRESHOLD ||
@@ -213,7 +221,7 @@ static inline void autopilot_check_motors_on(void)
             {
                 autopilot_motors_on_counter--;
                 if (autopilot_motors_on_counter == 0)
-                    autopilot_motors_on = FALSE;
+                    autopilot.motors_on = FALSE;
             }
         }
         else
@@ -231,7 +239,7 @@ static inline void autopilot_check_motors_on(void)
             {
                 autopilot_motors_on_counter++;
                 if (autopilot_motors_on_counter == BOOZ2_AUTOPILOT_MOTOR_ON_TIME)
-                    autopilot_motors_on = TRUE;
+                    autopilot.motors_on = TRUE;
             }
         }
         else
@@ -241,20 +249,21 @@ static inline void autopilot_check_motors_on(void)
     }
 }
 
-void autopilot_on_rc_event(void) {
+void autopilot_on_rc_event(void) 
+{
 
-  /* I think this should be hidden in rc code */
-  /* the ap gets a mode everytime - the rc filters it */
-  if (rc_values_contains_avg_channels) {
-    uint8_t new_autopilot_mode = autopilot_mode_of_radio(rc_values[RADIO_MODE]);
-    autopilot_set_mode(new_autopilot_mode);
-    rc_values_contains_avg_channels = FALSE;
-  }
+    /* I think this should be hidden in rc code */
+    /* the ap gets a mode everytime - the rc filters it */
+    if (rc_values_contains_avg_channels) {
+        AutopilotMode_t new_autopilot_mode = autopilot_mode_of_radio(rc_values[RADIO_MODE]);
+        autopilot_set_mode(new_autopilot_mode);
+        rc_values_contains_avg_channels = FALSE;
+    }
 
-  autopilot_check_motors_on();
-  autopilot_check_in_flight();
+    autopilot_check_motors_on();
+    autopilot_check_in_flight();
 
-  booz2_guidance_v_read_rc();
-  booz2_guidance_h_read_rc(autopilot_in_flight);
+    booz2_guidance_v_read_rc();
+    booz2_guidance_h_read_rc(autopilot.in_flight);
 
 }

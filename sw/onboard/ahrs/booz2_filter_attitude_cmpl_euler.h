@@ -23,8 +23,8 @@
 #ifndef BOOZ2_FILTER_ATTITUDE_CMPL_EULER_H
 #define BOOZ2_FILTER_ATTITUDE_CMPL_EULER_H
 
-#include "booz_ahrs.h"
 #include "std.h"
+#include "ahrs.h"
 #include "pprz_algebra_int.h"
 
 extern struct Int32Rates  booz2_face_gyro_bias;

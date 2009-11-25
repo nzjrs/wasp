@@ -220,7 +220,7 @@ class FunctionWriter(_CWriter):
 
 class RSTWriter(_Writer):
 
-    TABLE_COL_W  = 10
+    TABLE_COL_W  = 25
     TABLE_GAP_W  = 1
     TABLE_HEADER = '='*TABLE_COL_W
     HEADING_LEVELS = ('=','-','^','"')

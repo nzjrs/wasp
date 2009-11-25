@@ -133,6 +133,7 @@ class SettingsController(gs.ui.GtkBuilderWidget):
         self._sm = _EditSettingsManager(source,
                         get=messagesfile.get_message_by_name("GET_SETTING"),
                         uint8=messagesfile.get_message_by_name("SETTING_UINT8"),
+                        int32=messagesfile.get_message_by_name("SETTING_INT32"),
                         float=messagesfile.get_message_by_name("SETTING_FLOAT")
         )
         self.get_resource("setting_right_vbox").pack_start(self._sm, False, True)
@@ -160,6 +161,7 @@ class SettingsController(gs.ui.GtkBuilderWidget):
         #listen for settings messages
         source.register_interest(self._on_setting, 0, "SETTING_UINT8")
         source.register_interest(self._on_setting, 0, "SETTING_FLOAT")
+        source.register_interest(self._on_setting, 0, "SETTING_INT32")
 
     def _on_setting(self, msg, payload):
         id_, type_, val = msg.unpack_values(payload)

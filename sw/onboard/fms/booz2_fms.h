@@ -26,12 +26,11 @@
 #define BOOZ2_FMS_H
 
 #include "std.h"
-#include "config/config.h"
 #include "gps.h"
+#include "guidance.h"
 #include "booz_geometry_int.h"
-#include "guidance/booz2_guidance_h.h"
-#include "guidance/booz2_guidance_v.h"
 
+#include "config/config.h"
 
 struct Booz_fms_imu_info {
   struct Pprz_int16_vect3 gyro;

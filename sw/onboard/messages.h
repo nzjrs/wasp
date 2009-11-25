@@ -51,7 +51,7 @@ typedef struct __CommMessage {
     uint8_t acid;   /**< Aircraft ID, id of message sender */
     uint8_t msgid;  /**< ID of message in payload */
     uint8_t len;    /**< Length of payload */
-    uint8_t payload[COMM_MAX_PAYLOAD_LEN] __attribute__ ((aligned));
+    uint8_t payload[COMM_MAX_PAYLOAD_LEN] __attribute__ ((aligned));    /**< Payload */
     uint8_t ck_a;   /**< Checksum high byte */
     uint8_t ck_b;   /**< Checksum low byte */
     uint8_t idx;    /**< State vaiable when filling payload. Not sent */

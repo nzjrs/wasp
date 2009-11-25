@@ -29,6 +29,7 @@
 #include "led.h"
 
 #include "actuators.h"
+#include "supervision.h"
 
 #include "rc.h"
 
@@ -41,17 +42,14 @@
 
 #include "fms/booz2_fms.h"
 #include "autopilot.h"
-#include "stabilization/booz2_stabilization_rate.h"
-#include "stabilization/booz2_stabilization_attitude.h"
+#include "stabilization.h"
 
 #include "gps.h"
-#include "guidance/booz2_guidance_h.h"
-#include "guidance/booz2_guidance_v.h"
-#include "booz2_navigation.h"
+#include "guidance.h"
+//#include "booz2_navigation.h"
 
-#include "ahrs/booz_ahrs_aligner.h"
-#include "booz_ahrs.h"
-#include "booz2_ins.h"
+#include "ahrs.h"
+#include "ins.h"
 
 #include "autopilot_main.h"
 
@@ -72,6 +70,7 @@ static inline void autopilot_main_init( void ) {
   sys_time_init();
   led_init();
 
+  supervision_init();
   actuators_init(ACTUATOR_BANK_MOTORS);
 
   rc_init();
@@ -92,16 +91,11 @@ static inline void autopilot_main_init( void ) {
 
   booz_fms_init();
   autopilot_init();
-  booz2_nav_init();
-  booz2_guidance_h_init();
-  booz2_guidance_v_init();
-  booz2_stabilization_rate_init();
-  booz2_stabilization_attitude_init();
+  guidance_init();
+  stabilization_init();
 
-  booz_ahrs_aligner_init();
-  booz_ahrs_init();
-
-  booz_ins_init();
+  ahrs_init();
+  ins_init();
 
   int_enable();
 }
@@ -123,7 +117,6 @@ static inline void autopilot_main_periodic( void ) {
   _cnt++;
   if (_cnt >= 10)
     _cnt = 0;
-
   switch (_cnt)
   {
     case 0:
@@ -133,7 +126,7 @@ static inline void autopilot_main_periodic( void ) {
         else
         {
             led_off(RC_LED);
-            autopilot_set_mode(BOOZ2_AP_MODE_FAILSAFE);
+            autopilot_set_mode(AP_MODE_FAILSAFE);
         }
         break;
     case 1:
@@ -157,29 +150,24 @@ static inline void autopilot_main_event( void ) {
   valid = imu_event_task();
   if ( (valid & IMU_ACC) || (valid & IMU_GYR) ) 
   {
-      if (booz_ahrs.status == BOOZ_AHRS_UNINIT) {
-        // 150
-        booz_ahrs_aligner_run();
-        if (booz_ahrs_aligner.status == BOOZ_AHRS_ALIGNER_LOCKED)
-          booz_ahrs_align();
+      if (ahrs_status != STATUS_INITIALIZED) {
+        ahrs_align();
       }
       else {
-        booz_ahrs_propagate();
-        //    booz2_filter_attitude_update();
-        
-        booz_ins_propagate();
+        ahrs_propagate();
+        ins_propagate();
       }
   }
 
   if ( altimeter_event_task() )
-    booz_ins_update_baro();
+    ins_update_baro();
 
   if ( gps_event_task() ) {
     if (booz_gps_state.fix == GPS_FIX_3D)
         led_on(GPS_LED);
     else
         led_toggle(GPS_LED);
-    booz_ins_update_gps();
+    ins_update_gps();
   }
 
   comm_event_task(COMM_1);

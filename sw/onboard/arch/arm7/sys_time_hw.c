@@ -47,7 +47,7 @@ void TIMER0_ISR ( void ) {
   ISR_ENTRY();
 
   while (T0IR & TIMER0_IT_MASK) {
-#ifdef RADIO_CONTROL
+#ifdef USE_RADIO_CONTROL
     if (T0IR&TIR_CR2I) {
       ppm_isr();
       /* clear interrupt */

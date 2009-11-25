@@ -24,7 +24,7 @@
 
 #if BOOZ2_FMS_TYPE == BOOZ2_FMS_TYPE_TEST_SIGNAL
 
-#include "booz2_ins.h"
+#include "ins.h"
 #include "booz_geometry_mixed.h"
 
 #define BOOZ2_FMS_TEST_SIGNAL_DEFAULT_PERIOD    300;
@@ -66,7 +66,7 @@ void booz_fms_impl_periodic(void) {
     
   case BOOZ_FMS_TEST_SIGNAL_MODE_VERTICAL: {
     if (booz2_guidance_v_mode < BOOZ2_GUIDANCE_V_MODE_HOVER)
-      booz_fms_test_signal_start_z = booz_ins_ltp_pos.z;
+      booz_fms_test_signal_start_z = ins.ltp_pos.z;
     else {
       booz_fms_input.v_sp.height = (booz_fms_test_signal_counter < booz_fms_test_signal_period) ?
 	booz_fms_test_signal_start_z : 

@@ -21,7 +21,6 @@
  *
  */
 #include "config/config.h"
-#include "config/airframe.h"
 
 #include "arm7/i2c_hw.h"
 #include "arm7/buss_twi_blmc_hw.h"
@@ -31,12 +30,12 @@
 
 uint8_t twi_blmc_nb_err;
 
-uint8_t buss_twi_blmc_motor_power[BUSS_TWI_BLMC_NB];
+uint8_t buss_twi_blmc_motor_power[MOTOR_NB];
 volatile bool_t  buss_twi_blmc_status;
 volatile bool_t  buss_twi_blmc_i2c_done;
 volatile uint8_t buss_twi_blmc_idx;
 
-const uint8_t buss_twi_blmc_addr[BUSS_TWI_BLMC_NB] = BUSS_BLMC_ADDR;
+const uint8_t buss_twi_blmc_addr[MOTOR_NB] = MOTOR_ADDR;
 
 void buss_twi_blmc_next(void);
 
@@ -49,7 +48,7 @@ static inline void buss_twi_blmc_send(void)
 void buss_twi_blmc_next(void)
 {
     buss_twi_blmc_idx++;
-    if (buss_twi_blmc_idx < BUSS_TWI_BLMC_NB) {
+    if (buss_twi_blmc_idx < MOTOR_NB) {
         buss_twi_blmc_send();
     }
     else {
@@ -64,7 +63,7 @@ void buss_twi_blmc_init (void)
     i2c_init();
     i2c_stop_callback = buss_twi_blmc_next;
 
-    for (i=0; i<BUSS_TWI_BLMC_NB;i++)
+    for (i=0; i<MOTOR_NB;i++)
         buss_twi_blmc_motor_power[i] = 0;
 
     buss_twi_blmc_status = BUSS_TWI_BLMC_STATUS_IDLE;

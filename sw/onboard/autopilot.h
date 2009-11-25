@@ -24,32 +24,48 @@
 #define AUTOPILOT_H
 
 #include "std.h"
+#include "generated/settings.h"
 
-#define BOOZ2_AP_MODE_FAILSAFE          0
-#define BOOZ2_AP_MODE_KILL              1
-#define BOOZ2_AP_MODE_RATE_DIRECT       2
-#define BOOZ2_AP_MODE_ATTITUDE_DIRECT   3
-#define BOOZ2_AP_MODE_RATE_RC_CLIMB     4
-#define BOOZ2_AP_MODE_ATTITUDE_RC_CLIMB 5
-#define BOOZ2_AP_MODE_ATTITUDE_CLIMB    6
-#define BOOZ2_AP_MODE_RATE_Z_HOLD       7
-#define BOOZ2_AP_MODE_ATTITUDE_Z_HOLD   8
-#define BOOZ2_AP_MODE_HOVER_DIRECT      9
-#define BOOZ2_AP_MODE_HOVER_CLIMB       10
-#define BOOZ2_AP_MODE_HOVER_Z_HOLD      11
-#define BOOZ2_AP_MODE_NAV               12
+/* Need to rename them both to actuators */
+#if SERVO_NB != MOTOR_NB
+#error NOT IMPLEMETED YET
+#endif
 
-extern uint8_t      autopilot_mode;
-extern uint8_t      autopilot_mode_auto2;
-extern bool_t       autopilot_motors_on;
-extern bool_t       autopilot_in_flight;
-extern uint32_t     autopilot_motors_on_counter;
-extern uint32_t     autopilot_in_flight_counter;
+typedef enum {
+    AP_MODE_FAILSAFE = 0,
+    AP_MODE_KILL,
+    AP_MODE_RATE_DIRECT,
+    AP_MODE_ATTITUDE_DIRECT,
+    AP_MODE_RATE_RC_CLIMB,
+    AP_MODE_ATTITUDE_RC_CLIMB,
+    AP_MODE_ATTITUDE_CLIMB,
+    AP_MODE_RATE_Z_HOLD,
+    AP_MODE_ATTITUDE_Z_HOLD,
+    AP_MODE_ATTITUDE_HOLD,
+    AP_MODE_HOVER_DIRECT,
+    AP_MODE_HOVER_CLIMB,
+    AP_MODE_HOVER_Z_HOLD,
+    AP_MODE_NAV,
+    AP_MODE_RC_DIRECT
+} AutopilotMode_t;
 
-uint8_t
+typedef struct __Autopilot {
+    AutopilotMode_t mode;
+    AutopilotMode_t mode_auto2;
+    bool_t          motors_on;
+    bool_t          in_flight;
+    int32_t         commands[COMMAND_NB];
+    int32_t         motor_commands[MOTOR_NB];
+} Autopilot_t;
+
+AutopilotMode_t
 autopilot_mode_of_radio(pprz_t mode_channel);
 
 /* Implementations must provide these */
+extern uint32_t     autopilot_motors_on_counter;
+extern uint32_t     autopilot_in_flight_counter;
+extern Autopilot_t  autopilot;
+
 void
 autopilot_init(void);
 
@@ -60,7 +76,7 @@ void
 autopilot_on_rc_event(void);
 
 void
-autopilot_set_mode(uint8_t new_autopilot_mode);
+autopilot_set_mode(AutopilotMode_t new_autopilot_mode);
 
 void
 autopilot_set_actuators(void);

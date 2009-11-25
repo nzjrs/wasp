@@ -1,8 +1,14 @@
-TARGET          ?= autopilot_main
-ARCH            ?= arm7
-OBJDIR          = bin/$(ARCH)
-Q               = @
-TOOLS           = ../tools
+TARGET              ?= autopilot_main
+ARCH                ?= arm7
+INCLUDE_BUILD_INFO  ?= 1
+OBJDIR              = bin/$(ARCH)
+Q                   = @
+TOOLS               = ../tools
+RADIO               = config/radio/T6EXAP.xml
+# Be very careful if you change these, by default the groundstation 
+# looks for config/{messages,settings}.xml
+MESSAGES        = config/messages.xml
+SETTINGS        = config/settings.xml
 
 include arch/Makefile.$(ARCH)
 
@@ -13,8 +19,7 @@ SRC =                               \
     math/pprz_geodetic_float.c      \
     rc.c                            \
     autopilot.c                     \
-    booz2_ins.c                     \
-    booz2_navigation.c              \
+    ins/booz2_ins.c                 \
     ins/booz2_hf_float.c            \
     ins/booz2_vf_float.c            \
     fms/booz2_fms.c                 \
@@ -22,12 +27,14 @@ SRC =                               \
     fms/booz2_fms_test_signal.c     \
     ahrs/booz_ahrs_aligner.c                \
     ahrs/booz2_filter_attitude_cmpl_euler.c \
+    guidance/booz2_guidance.c       \
     guidance/booz2_guidance_h.c     \
     guidance/booz2_guidance_v.c     \
     stabilization/booz2_stabilization.c           \
     stabilization/booz2_stabilization_rate.c      \
     stabilization/booz2_stabilization_attitude.c  \
     autopilot/rocket_autopilot.c     \
+    supervision/booz2_supervision.c \
     comm.c                          \
     comm_autopilot.c                \
     spi-flash/spi0.c                \
@@ -43,18 +50,25 @@ REMOVE      = rm -f
 CFLAGS = -I. -I math -I arch -I arch/$(ARCH)/include
 CFLAGS += -Os
 CFLAGS += -Winline
-CFLAGS += -Wall -Wcast-qual -Wimplicit -Wcast-align
-CFLAGS += -Wpointer-arith -Wswitch
-CFLAGS += -Wredundant-decls -Wreturn-type -Wshadow -Wunused
+CFLAGS += -Wall
+CFLAGS += -Wcast-qual
+CFLAGS += -Wimplicit
+CFLAGS += -Wcast-align
+CFLAGS += -Wpointer-arith
+CFLAGS += -Wswitch
+CFLAGS += -Wredundant-decls
+CFLAGS += -Wreturn-type
+CFLAGS += -Wshadow
+CFLAGS += -Wunused
 CFLAGS += -Wa,-adhlns=$(OBJDIR)/$(notdir $(subst $(suffix $<),.lst,$<))
-CFLAGS += -Wstrict-prototypes -Wmissing-declarations
-CFLAGS += -Wmissing-prototypes -Wnested-externs 
+CFLAGS += -Wstrict-prototypes
+CFLAGS += -Wmissing-declarations
+CFLAGS += -Wmissing-prototypes
+CFLAGS += -Wnested-externs 
 CFLAGS += -std=gnu99
 CFLAGS += -fshort-enums
 CFLAGS += -ffunction-sections
 CFLAGS += -DARCH=$(ARCH)
-
-INCLUDE_BUILD_INFO ?= 1
 CFLAGS += -DINCLUDE_BUILD_INFO=$(INCLUDE_BUILD_INFO)
 
 # Linker flags.
@@ -106,15 +120,15 @@ upload: $(OBJDIR)/$(TARGET).elf programmer
 generated: generated/radio.h generated/build.h generated/messages.h generated/settings.h
 
 # Radio header
-generated/radio.h: config/radio.xml $(TOOLS)/gen-radio.py
+generated/radio.h: $(RADIO) $(TOOLS)/gen-radio.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-radio.py $< > $@
 
-generated/messages.h: config/messages.xml $(TOOLS)/gen-messages.py
+generated/messages.h: $(MESSAGES) $(TOOLS)/gen-messages.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-messages.py --messages=$< > $@
 
-generated/settings.h: config/settings.xml $(TOOLS)/gen-settings.py
+generated/settings.h: $(SETTINGS) $(TOOLS)/gen-settings.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-settings.py --settings=$< > $@
 
@@ -167,7 +181,8 @@ clean:
 	$(REMOVE) generated/*.h
 
 reallyclean:
-	$(REMOVE) --recursive ./bin/*
+	$(REMOVE) --recursive ./bin/* 
+	$(REMOVE) generated/*.h
 
 # Listing of phony targets.
 .PHONY : all size build elf lss sym clean upload

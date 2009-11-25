@@ -41,6 +41,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     CONFIG_ZOOM_DEFAULT = 12
 
     def __init__(self, prefsfile, messagesfile, settingsfile, use_test_source):
+        gobject.threads_init()
         gtk.gdk.threads_init()
 
         #connect our log buffer to the python logging subsystem
@@ -118,7 +119,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         #Lazy initialize the following when first needed
         self._plane_view = None
         self._horizon_view = None
-        self._camera_window = None
         self._prefs_window = None
 
         #create the map
@@ -147,6 +147,12 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("menu_item_disconnect").set_sensitive(False)
         self.get_resource("menu_item_autopilot_disable").set_sensitive(False)
         self.builder_connect_signals()
+
+        #FIXME: REMOVE THE AUTOPILOT PAGE
+        nb = self.get_resource("main_notebook")
+        nb.remove_page(
+            nb.page_num(
+                self.get_resource("autopilot_hbox")))
 
         self.window.show_all()
 
@@ -401,8 +407,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     def on_menu_item_plane_view_activate(self, widget):
         if self._plane_view == None:
             try:
-                from gs.ui.plane_view import PlaneView
-                self._plane_view = PlaneView()
+                from gs.ui.plane import PlaneView
+                self._plane_view = PlaneView(self._source)
             except:
                 LOG.warning("Could not initialize plane view", exc_info=True)
                 return
@@ -413,25 +419,12 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         if self._horizon_view == None:
             try:
                 from gs.ui.horizon import HorizonView
-                self._horizon_view = HorizonView()
+                self._horizon_view = HorizonView(self._source)
             except:
                 LOG.warning("Could not initialize horizon view", exc_info=True)
                 return
 
         self._horizon_view.show_all()
-
-    def on_menu_item_camera_view_activate(self, widget):
-        if self._camera_window == None:
-            try:
-                from gs.ui.camera import CameraWindow
-                self._camera_window = CameraWindow(self._config)
-            except:
-                LOG.warning("Could not initialize camera window", exc_info=True)
-                return
-
-        self._configurable.append(self._camera_window)
-        self._camera_window.start()
-        self._camera_window.show()
 
     def on_menu_item_clear_path_activate(self, widget):
         self._map.clear_gps()
@@ -439,20 +432,18 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     def on_menu_item_clear_previous_activate(self, widget):
         self._map.clear_tracks()
 
-    def on_map_autocenter_property_change(self, osm, param):
+    def on_map_autocenter_property_change(self, osm, *args):
         self.get_resource("menu_item_auto_centre").set_active(osm.get_property("auto-center"))
         
     def on_menu_item_auto_centre_toggled(self, widget):
         self._map.props.auto_center = widget.get_active()
 
-    def on_map_show_trip_history_property_change(self, osm, param):
+    def on_map_show_trip_history_property_change(self, osm, *args):
         self.get_resource("menu_item_show_path").set_active(osm.get_property("show-trip-history"))
 
     def on_menu_item_show_path_toggled(self, widget):
         self._map.props.show_trip_history = widget.get_active()
 
     def main(self):
-        gtk.gdk.threads_enter()
         gtk.main()
-        gtk.gdk.threads_leave()
 

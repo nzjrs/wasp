@@ -26,15 +26,14 @@
 #include "rc.h"
 #include "gps.h"
 #include "imu.h"
+#include "ins.h"
+#include "ahrs.h"
 #include "analog.h"
 #include "altimeter.h"
 #include "settings.h"
 #include "sys_time.h"
 #include "autopilot.h"
-
-#include "booz2_ins.h"
-#include "guidance/booz2_guidance_h.h"
-#include "guidance/booz2_guidance_v.h"
+#include "guidance.h"
 
 #include "generated/messages.h"
 
@@ -112,9 +111,9 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &rc_status,
                     &booz_gps_state.fix,
                     &bat,
-                    &autopilot_in_flight,
-                    &autopilot_motors_on,
-                    &autopilot_mode,
+                    &autopilot.in_flight,
+                    &autopilot.motors_on,
+                    &autopilot.mode,
                     &cpu_usage);
             }
             break;
@@ -132,7 +131,7 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
         case MESSAGE_ID_AUTOPILOT:
             MESSAGE_SEND_AUTOPILOT(
                     chan,
-                    &autopilot_mode,
+                    &autopilot.mode,
                     &booz2_guidance_h_mode,
                     &booz2_guidance_v_mode);
             break;
@@ -142,7 +141,8 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &rc_system_status,
                     &gps_system_status,
                     &altimeter_system_status,
-                    &comm_system_status);
+                    &comm_system_status,
+                    &ahrs_status);
             break;
         case MESSAGE_ID_ANALOG:
             {
@@ -155,6 +155,40 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &c2,
                     &c3);
             }
+            break;
+        case MESSAGE_ID_AHRS_QUAT:
+            MESSAGE_SEND_AHRS_QUAT(
+                    chan,
+                    &ahrs.ltp_to_imu_quat.qi,
+                    &ahrs.ltp_to_imu_quat.qx,
+                    &ahrs.ltp_to_imu_quat.qy,
+                    &ahrs.ltp_to_imu_quat.qz,
+                    &ahrs.ltp_to_body_quat.qi,
+                    &ahrs.ltp_to_body_quat.qx,
+                    &ahrs.ltp_to_body_quat.qy,
+                    &ahrs.ltp_to_body_quat.qz);
+            break;
+        case MESSAGE_ID_AHRS_EULER:
+            MESSAGE_SEND_AHRS_EULER(
+                    chan,
+                    &ahrs.ltp_to_imu_euler.phi,
+                    &ahrs.ltp_to_imu_euler.theta,
+                    &ahrs.ltp_to_imu_euler.psi,
+                    &ahrs.ltp_to_body_euler.phi,
+                    &ahrs.ltp_to_body_euler.theta,
+                    &ahrs.ltp_to_body_euler.psi);
+            break;
+        case MESSAGE_ID_SUPERVISION:
+            MESSAGE_SEND_SUPERVISION(
+                    chan,
+                    &autopilot.motor_commands[0],
+                    &autopilot.motor_commands[1],
+                    &autopilot.motor_commands[2],
+                    &autopilot.motor_commands[3],
+                    &autopilot.commands[0],
+                    &autopilot.commands[1],
+                    &autopilot.commands[2],
+                    &autopilot.commands[3]);
             break;
         default:
             ret = FALSE;
@@ -173,6 +207,7 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
     {
         case MESSAGE_ID_GET_SETTING:
         case MESSAGE_ID_SETTING_UINT8:
+        case MESSAGE_ID_SETTING_INT32:
         case MESSAGE_ID_SETTING_FLOAT:
             ret = settings_handle_message_received(chan, message);
             break;

@@ -239,6 +239,10 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
                     except KeyError:
                         break
 
+                #generate notify events to keep the groundstation ui in sync
+                self._map.props.auto_center = self._map.props.auto_center
+                self._map.props.show_trip_history = self._map.props.show_trip_history
+
                 self._map.connect_after('button-release-event', self._on_map_button_release)
                 self._map.connect('size-allocate', self._on_map_size_allocate)
 

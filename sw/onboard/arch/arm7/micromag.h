@@ -20,17 +20,17 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef _MM_H_FUCK_
-#define _MM_H_FUCK_
+#ifndef _MICROMAG_H_
+#define _MICROMAG_H_
 
-/* PNI micromag3 connected on SPI1 
-  IMU b2
-  SS on P1.28
-  RESET on P1.19
-  DRDY on P0.30 ( EINT3)
+/* 
+PNI micromag3 connected on SPI1 (IMU b2)
+SS on P1.28
+RESET on P1.19
+DRDY on P0.30 ( EINT3)
 */
 
-#include <stdlib.h>  // for abs
+#include <stdlib.h>
 
 #include "std.h"
 #include "LPC21xx.h"
@@ -90,7 +90,7 @@ micromag_got_interrupt_retrieve_values(void)
         case MM_SENDING_REQ:
             {
             /* read dummy control byte reply */
-            uint8_t foo __attribute__ ((unused)) = SSPDR;
+            uint8_t foo __attribute__ ((unused)) = SpiRead();
             micromag_status = MM_WAITING_EOC;
             MmUnselect();
             SpiClearRti();
@@ -100,28 +100,28 @@ micromag_got_interrupt_retrieve_values(void)
             break;
         case MM_READING_RES:
             {
-	        int16_t new_val;
-            new_val = SSPDR << 8;
-            new_val += SSPDR;
+            int16_t new_val = SpiRead();
+            new_val <<= 8;
+            new_val += SpiRead();
             if (abs(new_val) < 2000)
-	            micromag_values[micromag_cur_axe] = new_val;
+                micromag_values[micromag_cur_axe] = new_val;
             MmUnselect();
             SpiClearRti();
             SpiDisableRti();
             SpiDisable();
             micromag_cur_axe++;
-        	if (micromag_cur_axe > 2)
+            if (micromag_cur_axe > 2)
             {
-	            micromag_cur_axe = 0;
-	            micromag_status = MM_DATA_AVAILABLE;
-	        }
-	        else
+                micromag_cur_axe = 0;
+                micromag_status = MM_DATA_AVAILABLE;
+            }
+            else
             {
-	            micromag_status = MM_IDLE;
+                micromag_status = MM_IDLE;
             }
             }
             break;
     }
 }
 
-#endif /* _MM_H_FUCK_ */
+#endif /* _MICROMAG_H_ */

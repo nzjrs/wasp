@@ -34,12 +34,11 @@
 
 int32_t avg_rc_values[RADIO_CTL_NB];
 bool_t  ppm_valid;
+uint8_t state;
+uint32_t last;
 
 static inline void ppm_isr ( void )
 {
-    static uint8_t state = RADIO_CTL_NB;
-    static uint32_t last;
-
     uint32_t now = T0CR2;
     uint32_t length = now - last;
     last = now;

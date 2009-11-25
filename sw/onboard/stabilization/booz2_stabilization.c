@@ -20,7 +20,21 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
+#include "stabilization.h"
 #include "booz2_stabilization.h"
+#include "booz2_stabilization_rate.h"
+#include "booz2_stabilization_attitude.h"
 
 int32_t booz2_stabilization_cmd[COMMAND_NB];
 
+void stabilization_init(void)
+{
+    booz2_stabilization_rate_init();
+    booz2_stabilization_attitude_init();
+}
+
+void stabilization_tune(uint8_t setting, int32_t val)
+{
+    ;
+}

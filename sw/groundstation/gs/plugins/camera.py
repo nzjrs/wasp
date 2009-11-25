@@ -3,12 +3,13 @@ import subprocess
 import gtk
 import gst
 
+import gs.plugin as plugin
 import gs.config as config
 
 LOG = logging.getLogger('camera')
 
-class Camera(gtk.DrawingArea):
-    def __init__(self, source="v4l2src", device="/dev/video0", norm="PAL-N", input_channel="Composite1"):
+class _Camera(gtk.DrawingArea):
+    def __init__(self, source="v4l2src", device="/dev/video0", norm="", input_channel=""):
         gtk.DrawingArea.__init__(self)
         self._playing = False
         self._pb = None
@@ -62,8 +63,11 @@ class Camera(gtk.DrawingArea):
                 # Assign the viewport so the video does not
                 # show in a new window
                 #imagesink = message.src
+                gtk.gdk.threads_enter()
+                gtk.gdk.display_get_default().sync()
                 message.src.set_property("force-aspect-ratio", True)
                 message.src.set_xwindow_id(self.window.xid)
+                gtk.gdk.threads_leave()
 
     def start(self, *args):
         if self.pipeline:
@@ -80,7 +84,7 @@ class Camera(gtk.DrawingArea):
             self._playing = False
             self.pipeline.set_state(gst.STATE_PAUSED)
 
-class CameraWindow(gtk.Window, config.ConfigurableIface):
+class CameraWindow(plugin.Plugin, config.ConfigurableIface):
 
     CONFIG_SECTION = "CAMERA"
 
@@ -89,17 +93,27 @@ class CameraWindow(gtk.Window, config.ConfigurableIface):
     DEFAULT_NORM = "PAL-N"
     DEFAULT_INPUT_CHANNEL = "Composite1"
 
-    def __init__(self, conf):
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+    def __init__(self, conf, source, messages_file, groundstation_window):
         config.ConfigurableIface.__init__(self, conf)
+
+        #add an entry to the window menu
+        item = gtk.MenuItem("Camera View")
+        item.connect("activate", self._show_window)
+        groundstation_window.add_menu_item("Window", item)
 
         #initialize self._source, etc with the default ^^^ values
         self.autobind_config("source", "device", "norm", "input_channel")
 
-        self._cam = Camera(self._source, self._device, self._norm, self._input_channel)
-        self._cam.show()
-        self.add(self._cam)
-        self.connect("destroy", self.stop)
+        self._cam = None
+        self._win = gtk.Window()
+        self._win.connect("destroy", self.stop)
+
+    def _show_window(self, *args):
+        if not self._cam:
+            self._cam = _Camera(self._source, self._device, self._norm, self._input_channel)
+            self._win.add(self._cam)
+            self._win.show_all()
+            self._cam.start()
 
     def start(self, *args):
         self._cam.start()
@@ -136,7 +150,7 @@ if __name__ == "__main__":
     gtk.gdk.threads_init()
 
     win = gtk.Window()
-    cam = Camera(
+    cam = _Camera(
             device='/dev/video0',
             norm='PAL-N',
             input_channel='Composite1')

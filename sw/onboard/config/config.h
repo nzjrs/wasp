@@ -63,6 +63,8 @@
 #define BOOZ2_ANALOG_BARO_LED   2
 #define AHRS_ALIGNER_LED        3
 
+#define NUM_LEDS                4
+
 /* ADC */
 /* battery: P0.29 AD0.2 */
 #define ANALOG_BATT_PINSEL      PINSEL1
@@ -117,19 +119,16 @@
 #define SERVO_RESET_IOCLR       IO0CLR
 
 /* Time */
-#define PERIODIC_TASK_PERIOD SYS_TICS_OF_SEC((1./512.))
+#define PERIODIC_TASK_DT        (1./512.)
+#define PERIODIC_TASK_PERIOD    SYS_TICS_OF_SEC( PERIODIC_TASK_DT )
 
-/* Radio Control : Futaba is falling edge clocked whereas JR is rising edge */
-#define RADIO_CONTROL       1
-#define RC_FUTABA           0
-#define RC_JR               1
-#define RADIO_CONTROL_TYPE  RC_FUTABA
+/* Radio Control */
+#define USE_RADIO_CONTROL       1
 
 /* PPM : rc rx on P0.28 ( CAP0.2 ) */
 #define PPM_PINSEL      PINSEL1
 #define PPM_PINSEL_VAL  0x02
 #define PPM_PINSEL_BIT  24
-
 
 /* UARTS */
 #define USE_UART0 1
@@ -148,16 +147,12 @@
 #define I2C1_SCLH 150
 
 /* GPS */
-#define GPS_LINK Uart0
-
-/* Analog */
-#define BOOZ2_ANALOG_BARO_PERIOD SYS_TICS_OF_SEC((1./100.))
-#define BOOZ2_ANALOG_BATTERY_PERIOD SYS_TICS_OF_SEC((1./10.))
+#define GPS_LINK                    Uart0
 
 /* Control Etc */
-#define USE_VFF 1
-#define DT_VFILTER (1./512.)
-#define HS_YAW 1
+#define USE_VFF                     1
+#define DT_VFILTER                  (1./512.)
+#define HS_YAW                      1
 
 #define BOOZ2_FMS_TYPE_NONE         0
 #define BOOZ2_FMS_TYPE_DATALINK     1

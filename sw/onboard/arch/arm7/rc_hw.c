@@ -21,12 +21,12 @@
  *
  */
 #include "std.h"
-#include "config/config.h"
-
-#include "arm7/led_hw.h"
 
 #include "rc.h"
 #include "arm7/rc_hw.h"
+#include "arm7/led_hw.h"
+
+#include "config/config.h"
 
 SystemStatus_t rc_system_status = STATUS_UNINITIAIZED;
 
@@ -35,18 +35,20 @@ void rc_init ( void )
     /* select pin for capture */
     PPM_PINSEL |= PPM_PINSEL_VAL << PPM_PINSEL_BIT;
     /* enable capture 0.2 on falling edge + trigger interrupt */
-#if RADIO_CONTROL_TYPE == RC_FUTABA
+#if PPM_PULSE_TYPE == PPM_PULSE_TYPE_POSITIVE
     T0CCR = TCCR_CR2_F | TCCR_CR2_I;
-#elif RADIO_CONTROL_TYPE == RC_JR
+#elif PPM_PULSE_TYPE == PPM_PULSE_TYPE_NEGATIVE
     T0CCR = TCCR_CR2_R | TCCR_CR2_I;
 #else
-    #error "rc_hw.c: Unknown RADIO_CONTROL_TYPE"
+    #error "Invalid ppm pulse type, check radio.xml"
 #endif
 
     ppm_valid = FALSE;
     rc_status = RC_REALLY_LOST;
     time_since_last_ppm = RC_REALLY_LOST_TIME;
     rc_system_status = STATUS_INITIALIZED;
+    state = RADIO_CTL_NB;
+    last = 0;
 }
 
 void rc_periodic_task ( void )

@@ -24,8 +24,8 @@
 
 #include "gps.h"
 #include "imu.h"
-
-#include "booz_ahrs.h"
+#include "ahrs.h"
+#include "guidance.h"
 
 bool_t  booz_fms_on;
 bool_t  booz_fms_timeout;

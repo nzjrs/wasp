@@ -106,12 +106,20 @@ class DummySerialCommunication(gobject.GObject):
         return self._send(msg, self._t)
 
     def _do_ahrs(self):
-        return True
+        msg = self._messages.get_message_by_name("AHRS_EULER")
+
+        #pitch down by 10 degress, right by 30, heading 0
+        scale = 0.0139882
+        phi = 10/scale;
+        theta = 30/scale
+        psi = 0
+        return self._send(msg, phi, theta, psi, phi, theta, psi)
 
     def _do_ppm(self):
         msg = self._messages.get_message_by_name("PPM")
-        v = 10000
-        return self._send(msg, v, v, v, v, v, v)
+        v = 20000
+        n = 100
+        return self._send(msg, v+random.randint(-n,n), v, v+random.randint(-n,n), v, v+random.randint(-n,n), v)
 
     def get_fd(self):
         return self._readfd

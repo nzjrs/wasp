@@ -32,7 +32,7 @@
      <field name="vsupply" type="uint8" unit="decivolt"/>
      <field name="in_flight" type="uint8" values="ON_GROUND|IN_FLIGHT"/>
      <field name="motors_on" type="uint8" values="MOTORS_OFF|MOTORS_ON"/>
-     <field name="autopilot_mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|HOVER_DIRECT|HOVER_Z_HOLD|NAV"/>
+     <field name="autopilot_mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|ATTITUDE_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|ATTITUDE_HOLD|HOVER_DIRECT|HOVER_CLIMB|HOVER_Z_HOLD|NAV|RC_DIRECT"/>
      <field name="cpu_usage" type="uint8" unit="pct"/>
    </message>
 
@@ -54,6 +54,12 @@
      <field name="value" type="uint8"/>
    </message>
 
+   <message name="SETTING_INT32" id="18">
+     <field name="id" type="uint8"/>
+     <field name="type" type="uint8"/>
+     <field name="value" type="int32"/>
+   </message>
+
    <message name="SETTING_FLOAT" id="12">
      <field name="id" type="uint8"/>
      <field name="type" type="uint8"/>
@@ -65,7 +71,7 @@
    </message>
 
    <message name="AUTOPILOT" id="14">
-     <field name="mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|HOVER_DIRECT|HOVER_Z_HOLD|NAV"/>
+     <field name="mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|ATTITUDE_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|ATTITUDE_HOLD|HOVER_DIRECT|HOVER_CLIMB|HOVER_Z_HOLD|NAV|RC_DIRECT"/>
      <field name="h_mode" type="uint8" values="KILL|RATE|ATTITUDE|HOVER|NAV"/>
      <field name="v_mode" type="uint8" values="KILL|RC_DIRECT|RC_CLIMB|CLIMB|HOVER|NAV"/>
    </message>
@@ -75,7 +81,28 @@
      <field name="gps" type="uint8"         values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
      <field name="altimeter" type="uint8"   values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
      <field name="comm" type="uint8"        values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
+     <field name="ahrs" type="uint8"        values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
    </message>
+
+  <message name="AHRS_EULER" id="16">
+    <field name="imu_phi"    type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+    <field name="imu_theta"  type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+    <field name="imu_psi"    type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+    <field name="body_phi"   type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+    <field name="body_theta" type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+    <field name="body_psi"   type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+  </message>
+
+  <message name="AHRS_QUAT" id="17">
+    <field name="imu_qi"  type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="imu_qx"  type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="imu_qy"  type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="imu_qz"  type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="body_qi" type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="body_qx" type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="body_qy" type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+    <field name="body_qz" type="int32" alt_unit=""  alt_unit_coef="0.0000305"/>
+  </message>
 
    <!-- Begin custom messages at 25 -->
 
@@ -178,6 +205,17 @@
       <field name="chan8" type="uint16"/>
       -->
    </message>
+
+  <message name="SUPERVISION" id="40">
+    <field name="servo_throttle" type="int32"/>
+    <field name="servo_elevator" type="int32"/>
+    <field name="servo_aileron" type="int32"/>
+    <field name="servo_rudder" type="int32"/>
+    <field name="cmd_pitch" type="int32"/>
+    <field name="cmd_roll" type="int32"/>
+    <field name="cmd_yaw" type="int32"/>
+    <field name="cmd_thrust" type="int32"/>
+  </message>
 
    <!-- Begin periodic messages -->
    <periodic channel="COMM_0">

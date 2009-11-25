@@ -21,13 +21,12 @@
  *
  */
 #include "booz2_hf_float.h"
-#include "booz2_ins.h"
 
+#include "ins.h"
 #include "imu.h"
+#include "ahrs.h"
 
-#include "booz_ahrs.h"
 #include "booz_geometry_mixed.h"
-
 
 struct Int32Vect3 b2ins_accel_bias;
 struct Int32Vect3 b2ins_accel_ltp;
@@ -69,7 +68,7 @@ void b2ins_propagate(void) {
   /* unbias accelerometers */
   VECT3_DIFF(accel_imu, booz_imu.accel, scaled_biases);
   /* convert to LTP */
-  BOOZ_IQUAT_VDIV(b2ins_accel_ltp, booz_ahrs.ltp_to_imu_quat, accel_imu);
+  BOOZ_IQUAT_VDIV(b2ins_accel_ltp, ahrs.ltp_to_imu_quat, accel_imu);
   /* correct for gravity */
   b2ins_accel_ltp.z += BOOZ_ACCEL_I_OF_F(9.81);
   /* propagate position */
@@ -89,42 +88,42 @@ void b2ins_propagate(void) {
 void b2ins_update_gps(void) {
 
   /* FIXME : with Q_int32_XX_8 we overflow for 256m */
-  INT32_VECT3_SCALE_2(b2ins_meas_gps_pos_ned, booz_ins_gps_pos_cm_ned, 
+  INT32_VECT3_SCALE_2(b2ins_meas_gps_pos_ned, ins.gps_pos_cm_ned, 
 		      IPOS_OF_CM_NUM, IPOS_OF_CM_DEN); 
-  INT32_VECT3_SCALE_2(b2ins_meas_gps_speed_ned, booz_ins_gps_speed_cm_s_ned,
+  INT32_VECT3_SCALE_2(b2ins_meas_gps_speed_ned, ins.gps_speed_cm_s_ned,
 		      ISPEED_OF_CM_S_NUM, ISPEED_OF_CM_S_DEN); 
 
 #ifdef UPDATE_FROM_POS
   struct Int64Vect2 scaled_pos_meas;
   VECT2_COPY(scaled_pos_meas, b2ins_meas_gps_pos_ned);
-  VECT2_SMUL(scaled_pos_meas, (1<<(B2INS_POS_LTP_FRAC-IPOS_FRAC)), scaled_pos_meas);
+  VECT2_SMUL(scaled_pos_meas, scaled_pos_meas, (1<<(B2INS_POS_LTP_FRAC-IPOS_FRAC)));
   struct Int64Vect3 pos_residual;
   VECT2_DIFF(pos_residual, scaled_pos_meas, b2ins_pos_ltp); 
   struct Int32Vect2 pos_cor_1;
-  VECT2_SDIV(pos_cor_1, (1<<K_POS), pos_residual);
+  VECT2_SDIV(pos_cor_1, pos_residual, (1<<K_POS));
   VECT2_ADD(b2ins_pos_ltp, pos_cor_1);
   struct Int32Vect2 speed_cor_1;
-  VECT2_SDIV(speed_cor_1, (1<<(K_POS+9)), pos_residual);
+  VECT2_SDIV(speed_cor_1, pos_residual, (1<<(K_POS+9)));
   VECT2_ADD(b2ins_speed_ltp, speed_cor_1);
 #endif /* UPDATE_FROM_POS */
 
 #ifdef UPDATE_FROM_SPEED
   struct Int32Vect2 scaled_speed_meas;
-  VECT2_SMUL(scaled_speed_meas, (1<<(B2INS_SPEED_LTP_FRAC-ISPEED_RES)), b2ins_meas_gps_speed_ned);
+  VECT2_SMUL(scaled_speed_meas, b2ins_meas_gps_speed_ned, (1<<(B2INS_SPEED_LTP_FRAC-ISPEED_RES)));
   struct Int32Vect2 speed_residual;
   VECT2_DIFF(speed_residual, scaled_speed_meas, b2ins_speed_ltp);
   struct Int32Vect2 pos_cor_s;
-  VECT2_SDIV(pos_cor_s, (1<<(K_SPEED-9)), speed_residual);
+  VECT2_SDIV(pos_cor_s, speed_residual, (1<<(K_SPEED-9)));
   VECT2_ADD(b2ins_pos_ltp, pos_cor_s);
   struct Int32Vect2 speed_cor_s;
-  VECT2_SDIV(speed_cor_s, (1<<K_SPEED), speed_residual);
+  VECT2_SDIV(speed_cor_s, speed_residual, (1<<K_SPEED));
   VECT2_ADD(b2ins_speed_ltp, speed_cor_s);
 
   struct Int32Vect3 speed_residual3;
-  VECT2_SDIV(speed_residual3, (1<<9), speed_residual);
+  VECT2_SDIV(speed_residual3, speed_residual, (1<<9));
   speed_residual3.z = 0;
   struct Int32Vect3 bias_cor_s;
-  INT32_QUAT_VMULT( bias_cor_s, booz_ahrs.ltp_to_imu_quat, speed_residual3);
+  INT32_QUAT_VMULT( bias_cor_s, ahrs.ltp_to_imu_quat, speed_residual3);
   //  VECT3_ADD(b2ins_accel_bias, bias_cor_s); 
 
 #endif /* UPDATE_FROM_SPEED */ 

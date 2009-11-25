@@ -25,17 +25,9 @@
 
 #include "std.h"
 
+#include "guidance.h"
 #include "booz2_guidance_v_ref.h"
 #include "booz2_guidance_v_adpt.h"
-
-#define BOOZ2_GUIDANCE_V_MODE_KILL      0
-#define BOOZ2_GUIDANCE_V_MODE_RC_DIRECT 1
-#define BOOZ2_GUIDANCE_V_MODE_RC_CLIMB  2
-#define BOOZ2_GUIDANCE_V_MODE_CLIMB     3
-#define BOOZ2_GUIDANCE_V_MODE_HOVER     4
-#define BOOZ2_GUIDANCE_V_MODE_NAV       5
-
-extern uint8_t booz2_guidance_v_mode;
 
 extern int32_t booz2_guidance_v_z_sp;
 extern int32_t booz2_guidance_v_zd_sp;
