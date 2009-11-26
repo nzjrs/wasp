@@ -46,8 +46,11 @@ ASMSRC = $(ARCHASMSRC)
 # Define programs and commands.
 REMOVE      = rm -f
 
+# Include dirs. Encourage full path includes in c files
+INCLUDES    = -I . -I math -I arch -I arch/$(ARCH)/include
+
 # Compiler flags.
-CFLAGS = -I. -I math -I arch -I arch/$(ARCH)/include
+CFLAGS = $(INCLUDES)
 CFLAGS += -Os
 CFLAGS += -Winline
 CFLAGS += -Wall
@@ -102,6 +105,11 @@ sym: $(OBJDIR)/$(TARGET).sym
 md5: $(OBJDIR)/$(TARGET).elf
 	@echo MD5 $(OBJDIR)/$(TARGET).elf
 	$(Q)md5sum $(OBJDIR)/$(TARGET).elf
+
+# Create cflow callgraph
+cflow: $(SRC)
+	@echo cflow -o $(OBJDIR)/$(TARGET).cflow
+	$(Q)cflow --tree --brief --cpp $(INCLUDES) $(SRC) -o $(OBJDIR)/$(TARGET).cflow 2> /dev/null
 
 # Display size of file.
 ELFSIZE = $(SIZE) -A $(OBJDIR)/$(TARGET).elf
