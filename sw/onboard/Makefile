@@ -41,7 +41,9 @@ SRC =                               \
     spi-flash/at26.c                \
     spi-flash/at26d.c               \
     settings.c
- 
+
+SRC += $(ARCHSRC)
+ASMSRC = $(ARCHASMSRC)
 
 # Define programs and commands.
 REMOVE      = rm -f
