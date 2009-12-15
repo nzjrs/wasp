@@ -1,5 +1,5 @@
 TARGET              ?= autopilot_main
-ARCH                ?= arm7
+ARCH                ?= test
 INCLUDE_BUILD_INFO  ?= 1
 OBJDIR              = bin/$(ARCH)
 Q                   = @
@@ -187,6 +187,7 @@ clean:
 	$(REMOVE) $(AOBJARM)
 	$(REMOVE) $(LST)
 	$(REMOVE) generated/*.h
+	$(REMOVE) $(CLEAN_OBJ)
 
 reallyclean:
 	$(REMOVE) --recursive ./bin/* 
@@ -200,6 +201,8 @@ $(OBJDIR)/.depend:
 	@echo DEPEND $@
 	@test -d $(OBJDIR) || mkdir -p $(OBJDIR)
 	$(Q)$(CC) -MM -MG $(CFLAGS) $(SRC) | sed 's|\([^\.]*\.o\)|$(OBJDIR)/\1|' > $@
+
+include arch/Makefile-targets.$(ARCH)
 
 ifneq ($(MAKECMDGOALS),clean) 
 ifneq ($(MAKECMDGOALS),erase) 

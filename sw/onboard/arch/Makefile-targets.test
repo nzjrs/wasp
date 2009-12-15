@@ -1,0 +1,22 @@
+
+
+define TESTPROG_template
+   $(1)_SRCS += $$(foreach dir, $$($(1)_DIRS),$$(wildcard $$(dir)/*_tc.c))
+endef
+
+$(foreach prog, $(TEST_PROGS), $(eval $(call TESTPROG_template,$(prog))))
+
+check: testprogs
+	$(GTESTER) $(OBJDIR_TEST_PROGS)
+
+testprogs: $(OBJDIR_TEST_PROGS)
+
+$(OBJDIR_TEST_PROGS): % : %.c 
+	@echo $*
+	@echo $($(notdir $*)_SRCS)
+	$(Q)$(CC) $(CFLAGS) `pkg-config --cflags glib-2.0` `pkg-config --libs glib-2.0` -o $@ $($(notdir $*)_SRCS:.c=.o)
+
+$(OBJDIR_TEST_MAINS): %.c : $(TOOLS)/gen-testsuite.py $(%_SRCS)
+	$(Q)$(TOOLS)/gen-testsuite.py $(%_SRCS) > $@ 
+
+

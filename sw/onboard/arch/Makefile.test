@@ -1,0 +1,33 @@
+ARCHSRC =                                \
+    arch/null/null.c
+
+ARCHASMSRC =                             \
+    $(NULL)
+
+# Define programs and commands.
+CC		    = gcc
+LD		    = gcc
+OBJCOPY     = objcopy
+OBJDUMP     = objdump
+SIZE        = size
+NM          = nm
+
+GTESTER     = gtester
+
+# Arch specific flags
+ARCHCFLAGS  = -g
+ARCHASFLAGS = 
+ARCHLDFLAGS = 
+
+# Flags specific to automated testing
+TEST_PROGS = test_math
+
+test_math_DIRS = math/tests/
+test_math_SRCS = 
+
+
+OBJDIR_TEST_PROGS = $(addprefix $(OBJDIR)/,$(TEST_PROGS))
+OBJDIR_TEST_MAINS = $(addsuffix .c,$(OBJDIR_TEST_PROGS))
+
+CLEAN_OBJ = $(OBJDIR_TEST_PROGS) $(OBJDIR_TEST_MAINS)
+
