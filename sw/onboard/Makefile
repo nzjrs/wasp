@@ -173,6 +173,8 @@ $(AOBJARM) : $(OBJDIR)/%.o : %.S
 	$(Q)test -d $(dir $@) || mkdir -p $(dir $@)
 	$(Q)$(CC) -c $(ASFLAGS) $< -o $@
 
+include arch/Makefile-targets.$(ARCH)
+
 clean:
 	$(REMOVE) $(OBJDIR)/$(TARGET).obj
 	$(REMOVE) $(OBJDIR)/$(TARGET).elf
@@ -201,8 +203,6 @@ $(OBJDIR)/.depend:
 	@echo DEPEND $@
 	@test -d $(OBJDIR) || mkdir -p $(OBJDIR)
 	$(Q)$(CC) -MM -MG $(CFLAGS) $(SRC) | sed 's|\([^\.]*\.o\)|$(OBJDIR)/\1|' > $@
-
-include arch/Makefile-targets.$(ARCH)
 
 ifneq ($(MAKECMDGOALS),clean) 
 ifneq ($(MAKECMDGOALS),erase) 

@@ -1,22 +1,34 @@
 
 
+## Defines a number of per-test-program Makefile variables.
+## Some are just intermediates, but nice to have (?)
 define TESTPROG_template
-   $(1)_SRCS += $$(foreach dir, $$($(1)_DIRS),$$(wildcard $$(dir)/*_tc.c))
+  $(1)_SRCX = $$(wildcard $$($(1)_SRCS))
+  $(1)_OBJX = $$(addprefix $$(OBJDIR)/,$$(addsuffix .o,$$(basename $$($(1)_SRCX))))
+  $(1)_AUTOSRC = $$(OBJDIR)/$$(addsuffix .c,$(1))
+  $(1)_BIN     = $$(OBJDIR)/$(1)
+  OBJDIR_TEST_PROGS += $$($(1)_BIN)
+  CLEAN_OBJ += $$($(1)_OBJX) $$($(1)_AUTOSRC) $$($(1)_BIN)
+  $$(OBJDIR)/$(1): $$($(1)_AUTOSRC) $$($(1)_OBJX)
+  $$($(1)_AUTOSRC): $$($(1)_SRCX)
 endef
 
 $(foreach prog, $(TEST_PROGS), $(eval $(call TESTPROG_template,$(prog))))
+## Trouble combining these three statements inthe $(call ... above.
+#$(foreach prog, $(TEST_PROGS), $(eval $(prog)_SRCX = $(wildcard $($(prog)_SRCS))))
+#$(foreach prog, $(TEST_PROGS), $(eval $(prog)_OBJX = $(addprefix $(OBJDIR)/,$(addsuffix .o,$(notdir $(basename $($(prog)_SRCX)))))))
+#$(foreach prog, $(TEST_PROGS), $(eval CLEAN_OBJ += $($(prog)_OBJX)))
 
-check: testprogs
-	$(GTESTER) $(OBJDIR_TEST_PROGS)
+
+test: testprogs
+	$(GTESTER) --verbose $(OBJDIR_TEST_PROGS)
 
 testprogs: $(OBJDIR_TEST_PROGS)
 
-$(OBJDIR_TEST_PROGS): % : %.c 
-	@echo $*
-	@echo $($(notdir $*)_SRCS)
-	$(Q)$(CC) $(CFLAGS) `pkg-config --cflags glib-2.0` `pkg-config --libs glib-2.0` -o $@ $($(notdir $*)_SRCS:.c=.o)
+$(OBJDIR)/$(TEST_PROGS): 
+	$(Q)$(CC) $(CFLAGS) `pkg-config --cflags glib-2.0` `pkg-config --libs glib-2.0` -o $@ $^
 
-$(OBJDIR_TEST_MAINS): %.c : $(TOOLS)/gen-testsuite.py $(%_SRCS)
-	$(Q)$(TOOLS)/gen-testsuite.py $(%_SRCS) > $@ 
+$(OBJDIR_TEST_PROGS:%=%.c): $(TOOLS)/gen-testsuite.py
+	$(Q)$(TOOLS)/gen-testsuite.py $(filter-out $<,$^) > $@ 
 
 
