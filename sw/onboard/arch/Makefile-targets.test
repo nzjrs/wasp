@@ -4,24 +4,21 @@
 ## Some are just intermediates, but nice to have (?)
 define TESTPROG_template
   $(1)_SRCX = $$(wildcard $$($(1)_SRCS))
-  $(1)_OBJX = $$(addprefix $$(OBJDIR)/,$$(addsuffix .o,$$(basename $$($(1)_SRCX))))
-  $(1)_AUTOSRC = $$(OBJDIR)/$$(addsuffix .c,$(1))
+  $(1)_SRCO = $$(addprefix $$(OBJDIR)/,$$(addsuffix _test.c,$$(basename $$($(1)_SRCX))))
+  $(1)_OBJO = $$(addsuffix .o,$$(basename $$($(1)_SRCO)))
+  $(1)_MAINSRC = $$(OBJDIR)/$$(addsuffix .c,$(1))
   $(1)_BIN     = $$(OBJDIR)/$(1)
   OBJDIR_TEST_PROGS += $$($(1)_BIN)
-  CLEAN_OBJ += $$($(1)_OBJX) $$($(1)_AUTOSRC) $$($(1)_BIN)
-  $$(OBJDIR)/$(1): $$($(1)_AUTOSRC) $$($(1)_OBJX)
-  $$($(1)_AUTOSRC): $$($(1)_SRCX)
+  CLEAN_OBJ += $$($(1)_OBJO) $$($(1)_MAINSRC) $$($(1)_BIN) $$($(1)_SRCO)
+  $$(OBJDIR)/$(1): $$($(1)_MAINSRC) $$($(1)_OBJO)
+  $$($(1)_MAINSRC): $$($(1)_SRCO)
 endef
 
 $(foreach prog, $(TEST_PROGS), $(eval $(call TESTPROG_template,$(prog))))
-## Trouble combining these three statements inthe $(call ... above.
-#$(foreach prog, $(TEST_PROGS), $(eval $(prog)_SRCX = $(wildcard $($(prog)_SRCS))))
-#$(foreach prog, $(TEST_PROGS), $(eval $(prog)_OBJX = $(addprefix $(OBJDIR)/,$(addsuffix .o,$(notdir $(basename $($(prog)_SRCX)))))))
-#$(foreach prog, $(TEST_PROGS), $(eval CLEAN_OBJ += $($(prog)_OBJX)))
 
 
 test: testprogs
-	$(GTESTER) --verbose $(OBJDIR_TEST_PROGS)
+	$(Q)$(GTESTER) --verbose $(OBJDIR_TEST_PROGS)
 
 testprogs: $(OBJDIR_TEST_PROGS)
 
@@ -29,6 +26,12 @@ $(OBJDIR)/$(TEST_PROGS):
 	$(Q)$(CC) $(CFLAGS) `pkg-config --cflags glib-2.0` `pkg-config --libs glib-2.0` -o $@ $^
 
 $(OBJDIR_TEST_PROGS:%=%.c): $(TOOLS)/gen-testsuite.py
-	$(Q)$(TOOLS)/gen-testsuite.py $(filter-out $<,$^) > $@ 
+	$(Q)$(TOOLS)/gen-testmain.py $(filter-out $<,$^) > $@
+
+$(OBJDIR)/%_test.c: $(TOOLS)/gen-testsuite.py %.c
+	$(Q)$(TOOLS)/gen-testsuite.py $(filter-out $<,$^) > $@
+
+%_test.o: %_test.c
+	$(CC) -c $(CFLAGS) -o $@  $^
 
 
