@@ -32,7 +32,6 @@
 #include "generated/radio.h"
 
 #include "comm.h"
-#include "messages.h"
 #include "generated/messages.h"
 
 Autopilot_t     autopilot;

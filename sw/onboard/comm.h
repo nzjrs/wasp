@@ -24,29 +24,7 @@
 #define COMM_H
 
 #include "std.h"
-#include "messages.h"
-
-typedef enum {
-    STATE_UNINIT,
-    STATE_GOT_STX,
-    STATE_GOT_LENGTH,
-    STATE_GOT_ACID,
-    STATE_GOT_MSGID,
-    STATE_GOT_PAYLOAD,
-    STATE_GOT_CRC1
-} ParseState_t;
-    
-typedef struct __CommStatus {
-    uint8_t ck_a;
-    uint8_t ck_b;
-    uint8_t msg_received;
-    uint8_t buffer_overrun;
-    uint8_t parse_error;
-    ParseState_t parse_state;
-} CommStatus_t;
-
-typedef bool_t (*CommRXMessageCallback_t)(CommChannel_t chan, CommMessage_t *message);
-typedef bool_t (*CommTXMessageCallback_t)(CommChannel_t chan, uint8_t msgid);
+#include "messages_types.h"
 
 extern CommRXMessageCallback_t  comm_callback_rx[COMM_NB];
 extern CommTXMessageCallback_t  comm_callback_tx[COMM_NB];

@@ -57,4 +57,26 @@ typedef struct __CommMessage {
     uint8_t idx;    /**< State vaiable when filling payload. Not sent */
 } CommMessage_t;
 
+typedef enum {
+    STATE_UNINIT,
+    STATE_GOT_STX,
+    STATE_GOT_LENGTH,
+    STATE_GOT_ACID,
+    STATE_GOT_MSGID,
+    STATE_GOT_PAYLOAD,
+    STATE_GOT_CRC1
+} ParseState_t;
+    
+typedef struct __CommStatus {
+    uint8_t ck_a;
+    uint8_t ck_b;
+    uint8_t msg_received;
+    uint8_t buffer_overrun;
+    uint8_t parse_error;
+    ParseState_t parse_state;
+} CommStatus_t;
+
+typedef bool_t (*CommRXMessageCallback_t)(CommChannel_t chan, CommMessage_t *message);
+typedef bool_t (*CommTXMessageCallback_t)(CommChannel_t chan, uint8_t msgid);
+
 #endif /* MESSAGES_H */

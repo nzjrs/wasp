@@ -2,3 +2,4 @@ radio.h
 build.h
 messages.h
 settings.h
+messages-lib.h
