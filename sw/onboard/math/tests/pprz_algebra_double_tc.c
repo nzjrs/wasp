@@ -4,84 +4,158 @@
 #include "math/tests/test_support.h"
 #include "math/pprz_algebra_double.h"
 
-void math_pprz_algebra_square_tc( void )
+static void math_pprz_algebra_square_tc( void )
 {
 	g_assert_cmpint( 36, ==, SQUARE(6) );
 	g_assert_cmpdelta( 36.0, SQUARE( 6.00 ), EPSILON );
 }
 
+static const double AX = 1.0;
+static const double AY = 1.0;
+
+static const double BX = 2.0;
+static const double BY = 5.0;
 
 typedef struct {
 	struct DoubleVect2 a;
 	struct DoubleVect2 b;
-} math_pprz_algebra_vect2_fixture;
+} math_pprz_algebra_double_vect2_fixture;
 
-void math_pprz_algebra_vect2_fixture_setup( math_pprz_algebra_vect2_fixture *fix,
+static void math_pprz_algebra_double_vect2_fixture_setup( math_pprz_algebra_double_vect2_fixture *fix,
                       		    gconstpointer test_data )
 {
-	fix->a.x = 1.0;
-	fix->a.y = 1.0;
+	g_print("math_pprz_algebra_double_vect2_fixture_setup");
+	fix->a.x = AX;
+	fix->a.y = AY;
 	
-	fix->b.x = 5.0;
-	fix->b.y = 5.0;
+	fix->b.x = BX;
+	fix->b.y = BY;
 }
 
-void math_pprz_algebra_vect2_fixture_teardown( math_pprz_algebra_vect2_fixture *fix,
+static void math_pprz_algebra_double_vect2_fixture_teardown( math_pprz_algebra_double_vect2_fixture *fix,
                                     gconstpointer test_data )
 {
-        ;
+       g_print("math_pprz_algebra_double_vect2_fixture_teardown"); ;
 }
 
-void math_pprz_algebra_vect2_tc( math_pprz_algebra_vect2_fixture *fix, gconstpointer test_data )
+static void math_pprz_algebra_double_vect2_fixture_tc( math_pprz_algebra_double_vect2_fixture *fix, gconstpointer test_data )
+{
+        g_assert_cmpfloat( fix->a.x, ==, AX );
+        g_assert_cmpfloat( fix->a.y, ==, AY );
+        g_assert_cmpfloat( fix->b.x, ==, BX );
+        g_assert_cmpfloat( fix->b.y, ==, BY );
+}
+
+static void math_pprz_algebra_double_vect2_assign_tc( math_pprz_algebra_double_vect2_fixture *fix, gconstpointer test_data )
 {
 	VECT2_ASSIGN( fix->a, 3.0, 4.5 );
 	g_assert_cmpfloat( fix->a.x, ==, 3.0 );
 	g_assert_cmpfloat( fix->a.y, ==, 4.5 );
 }
 
-/*
-T2_ASSIGN(_a, _x, _y) {              \
-    (_a).x = (_x);                              \
-    (_a).y = (_y);                              \
-  }
+static void math_pprz_algebra_double_vect2_copy_tc( math_pprz_algebra_double_vect2_fixture *fix, gconstpointer test_data )
+{
 
-#define VECT2_COPY(_a, _b) {                    \
-    (_a).x = (_b).x;                            \
-    (_a).y = (_b).y;                            \
-  }
+        VECT2_COPY( fix->a, fix->b );
+        g_assert_cmpfloat( fix->a.x, ==, BX );
+        g_assert_cmpfloat( fix->a.y, ==, BY );
+        g_assert_cmpfloat( fix->b.x, ==, BX );
+        g_assert_cmpfloat( fix->b.y, ==, BY );
+}
 
-#define VECT2_ADD(_a, _b) {                     \
-    (_a).x += (_b).x;                           \
-    (_a).y += (_b).y;                           \
-  }
+static void math_pprz_algebra_double_vect2_add_tc( math_pprz_algebra_double_vect2_fixture *fix, gconstpointer test_data )
+{
 
-#define VECT2_SUB(_a, _b) {                     \
-    (_a).x -= (_b).x;                           \
-    (_a).y -= (_b).y;                           \
-  }
+        VECT2_ADD( fix->a, fix->b );
+        g_assert_cmpfloat( fix->a.x, ==, AX+BX );
+        g_assert_cmpfloat( fix->a.y, ==, AY+BY );
+        g_assert_cmpfloat( fix->b.x, ==, BX );
+        g_assert_cmpfloat( fix->b.y, ==, BY );
+}
 
-#define VECT2_SUM(_c, _a, _b) {                 \
-    (_c).x = (_a).x + (_b).x;                   \
-    (_c).y = (_a).y + (_b).y;                   \
-  }
+static void math_pprz_algebra_double_vect2_sub_tc(  math_pprz_algebra_double_vect2_fixture *fix, gconstpointer test_data )
+{
+        VECT2_ADD( fix->a, fix->b );
+	g_assert_cmpdelta( fix->a.x, AX-BX, EPSILON );
+	g_assert_cmpdelta( fix->a.y, AY-BY, EPSILON );
+	g_assert_cmpfloat( fix->b.x, ==, BX );
+	g_assert_cmpfloat( fix->b.y, ==, BY );
+}
 
-#define VECT2_DIFF(_c, _a, _b) {                \
-    (_c).x = (_a).x - (_b).x;                   \
-    (_c).y = (_a).y - (_b).y;                   \
-  }
+static void math_pprz_algebra_double_vect2_sum_tc(  math_pprz_algebra_double_vect2_fixture *fix, gconstpointer test_data )
+{
+	struct DoubleVect2 c;
+	c.x = 0.0;
+	c.y = 0.0;	
 
-#define VECT2_SMUL(_vo, _vi, _s) {              \
-    (_vo).x =  (_vi).x * (_s);                  \
-    (_vo).y =  (_vi).y * (_s);                  \
-  }
+	VECT2_SUM( c, fix->a, fix->b );
+        g_assert_cmpfloat( fix->a.x, ==, AX );
+        g_assert_cmpfloat( fix->a.y, ==, AY );
+        g_assert_cmpfloat( fix->b.x, ==, BX );
+        g_assert_cmpfloat( fix->b.y, ==, BY );
+	g_assert_cmpfloat( c.x, ==, AX+BX );
+	g_assert_cmpfloat( c.y, ==, AY+BY );
+}
 
-#define VECT2_SDIV(_vo, _vi, _s) {              \
-    (_vo).x =  (_vi).x / (_s);                  \
-    (_vo).y =  (_vi).y / (_s);                  \
-  }
+static void math_pprz_algebra_double_vect2_diff_tc(  math_pprz_algebra_double_vect2_fixture *fix, gconstpointer test_data )
+{
+        struct DoubleVect2 c;
+        c.x = 0.0;
+        c.y = 0.0;
 
-#define VECT2_STRIM(_v, _min, _max) {                                   \
-    (_v).x = (_v).x < _min ? _min : (_v).x > _max ? _max : (_v).x;      \
-    (_v).y = (_v).y < _min ? _min : (_v).y > _max ? _max : (_v).y;      \
-  }
-*/
+        VECT2_DIFF( c, fix->a, fix->b );
+        g_assert_cmpfloat( fix->a.x, ==, AX );
+        g_assert_cmpfloat( fix->a.y, ==, AY );
+        g_assert_cmpfloat( fix->b.x, ==, BX );
+        g_assert_cmpfloat( fix->b.y, ==, BY );
+        g_assert_cmpfloat( c.x, ==, AX-BX );
+        g_assert_cmpfloat( c.y, ==, AY-BY );
+}
+
+static void math_pprz_albebra_double_vect2_smul_tc( math_pprz_algebra_double_vect2_fixture *fix, gconstpointer test_data )
+{
+        struct DoubleVect2 c;
+        c.x = 0.0;
+        c.y = 0.0;
+	const double SCALE = 6.5;
+
+	VECT2_SMUL( c, fix->a, SCALE );
+	g_assert_cmpdelta( c.x, fix->a.x*SCALE, EPSILON );
+	g_assert_cmpdelta( c.y, fix->a.y*SCALE, EPSILON );
+
+        g_assert_cmpfloat( fix->a.x, ==, AX );
+        g_assert_cmpfloat( fix->a.y, ==, AY );
+}
+
+
+static void math_pprz_albebra_double_vect2_sdiv_tc( math_pprz_algebra_double_vect2_fixture *fix, gconstpointer test_data )
+{
+        struct DoubleVect2 c;
+        c.x = 0.0;
+        c.y = 0.0;
+        const double SCALE = 6.5;
+
+        VECT2_SDIV( c, fix->a, SCALE );
+        g_assert_cmpdelta( c.x, fix->a.x/SCALE, EPSILON );
+        g_assert_cmpdelta( c.y, fix->a.y/SCALE, EPSILON );
+
+        g_assert_cmpfloat( fix->a.x, ==, AX );
+        g_assert_cmpfloat( fix->a.y, ==, AY );
+}
+
+static void  math_pprz_albebra_double_vect2_strim_tc( void )
+{
+	struct DoubleVect2 c;
+	c.x = 1.0;
+	c.y = 6.0;
+
+	const double MIN = 3.0;
+	const double MAX = 4.0;
+
+	VECT2_STRIM( c, MIN, MAX );
+	g_assert_cmpfloat( c.x, >=, MIN );
+	g_assert_cmpfloat( c.x, <=, MAX );
+	
+	g_assert_cmpfloat( c.y, >=, MIN );
+	g_assert_cmpfloat( c.y, <=, MAX );
+}
