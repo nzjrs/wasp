@@ -21,6 +21,10 @@ class DoxygenTypeSub(supermod.DoxygenType):
         supermod.DoxygenType.__init__(self, version, compounddef)
 
     def rst_nodes(self):
+        """
+        Returns Rst nodes for compounddef child as we're not interested in
+        other data in this xml entity
+        """
 
         # Only interested in the compounddef child node
         return self.compounddef.rst_nodes()
@@ -37,45 +41,6 @@ class compounddefTypeSub(supermod.compounddefType):
     def __init__(self, kind=None, prot=None, id=None, compoundname='', title='', basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None):
         supermod.compounddefType.__init__(self, kind, prot, id, compoundname, title, basecompoundref, derivedcompoundref, includes, includedby, incdepgraph, invincdepgraph, innerdir, innerfile, innerclass, innernamespace, innerpage, innergroup, templateparamlist, sectiondef, briefdescription, detaileddescription, inheritancegraph, collaborationgraph, programlisting, location, listofallmembers)
 
-    section_titles = [
-                ("user-defined", "User Defined"),
-                ("public-type", "Public Type"),
-                ("public-func", "Public Functions"),
-                ("public-attrib", "Public Members"),
-                ("public-slot", "Public Slot"),
-                ("signal", "Signal"),
-                ("dcop-func",  "DCOP Function"),
-                ("property",  "Property"),
-                ("event",  "Event"),
-                ("public-static-func", "Public Static Functons"),
-                ("public-static-attrib", "Public Static Attributes"),
-                ("protected-type",  "Protected Types"),
-                ("protected-func",  "Protected Functions"),
-                ("protected-attrib",  "Protected Attributes"),
-                ("protected-slot",  "Protected Slots"),
-                ("protected-static-func",  "Protected Static Functions"),
-                ("protected-static-attrib",  "Protected Static Attributes"),
-                ("package-type",  "Package Types"),
-                ("private-func", "Private Functions", "Private Functions"),
-                ("package-attrib", "Package Attributes"),
-                ("package-static-func", "Package Static Functions"),
-                ("package-static-attrib", "Package Static Attributes"),
-                ("private-type", "Private Types"),
-                ("private-func", "Private Functions"),
-                ("private-attrib", "Private Members"),
-                ("private-slot",  "Private Slots"),
-                ("private-static-func", "Private Static Functions"),
-                ("private-static-attrib",  "Private Static Attributes"),
-                ("friend",  "Friends"),
-                ("related",  "Related"),
-                ("define",  "Defines"),
-                ("prototype",  "Prototypes"),
-                ("typedef",  "Typedefs"),
-                ("enum",  "Enums"),
-                ("func",  "Functions"),
-                ("var",  "Variables"),
-             ]
-
     def extend_nodelist(self, nodelist, section, title, section_nodelists):
 
         # Add title and contents if found
@@ -90,19 +55,20 @@ class compounddefTypeSub(supermod.compounddefType):
 
         # Get all sub sections
         for sectiondef in self.sectiondef:
-            kind, subnodes = sectiondef.rst_nodes()
+            kind = sectiondef.section_kind()
+            subnodes = sectiondef.rst_nodes()
             section_nodelists[kind] = subnodes
 
         nodelist = []    
 
         if self.briefdescription:
-            nodelist.extend( self.briefdescription.rst_nodes())
+            nodelist.extend( self.briefdescription.rst_nodes() )
 
         if self.detaileddescription:
-            nodelist.extend( self.detaileddescription.rst_nodes())
+            nodelist.extend( self.detaileddescription.rst_nodes() )
 
         # Order the results in an appropriate manner
-        for entry in self.section_titles:
+        for entry in sectiondefTypeSub.section_titles:
             self.extend_nodelist(nodelist, entry[0], entry[1], section_nodelists)
 
         self.extend_nodelist(nodelist, "", "", section_nodelists)
@@ -166,6 +132,7 @@ supermod.refType.subclass = refTypeSub
 # end class refTypeSub
 
 
+
 class refTextTypeSub(supermod.refTextType):
     def __init__(self, refid=None, kindref=None, external=None, valueOf_='', mixedclass_=None, content_=None):
         supermod.refTextType.__init__(self, mixedclass_, content_)
@@ -182,8 +149,17 @@ supermod.refTextType.subclass = refTextTypeSub
 
 class sectiondefTypeSub(supermod.sectiondefType):
 
+
     def __init__(self, kind=None, header='', description=None, memberdef=None):
         supermod.sectiondefType.__init__(self, kind, header, description, memberdef)
+
+    def section_kind(self):
+        """"
+        Returns the section's kind which corresponds to one of the entries in
+        the section_titles class attribute
+        """
+
+        return self.kind
 
     def rst_nodes(self):
 
@@ -196,7 +172,7 @@ class sectiondefTypeSub(supermod.sectiondefType):
         def_list = nodes.definition_list("", *defs)
 
         # Return with information about which section this is
-        return self.kind, [def_list]
+        return [def_list]
 
     def find(self, details):
 
@@ -724,6 +700,7 @@ class docParaTypeSub(supermod.docParaType):
         supermod.docParaType.__init__(self, char)
 
         self.parameterlist = []
+        self.content = []
 
     def rst_nodes(self):
 
@@ -731,26 +708,36 @@ class docParaTypeSub(supermod.docParaType):
         for entry in self.parameterlist:
             nodelist.extend(entry.rst_nodes())
 
-        nodelist.append(nodes.paragraph("", "", nodes.Text(self.valueOf_)))
+        for item in self.content:
+            if hasattr(item, "rst_nodes"):
+                nodes_ = item.rst_nodes()
+                nodelist.extend(nodes_)
+            else:
+                value = item.getValue()
+                nodelist.extend(nodes.Text(value))
 
-        return nodelist
+
+        return [nodes.paragraph("", "", *nodelist)]
 
     def buildChildren(self, child_, nodeName_):
+        supermod.docParaType.buildChildren(self, child_, nodeName_)
 
         if child_.nodeType == Node.TEXT_NODE:
             obj_ = self.mixedclass_(MixedContainer.CategoryText,
                 MixedContainer.TypeNone, '', child_.nodeValue)
-            self.content_.append(obj_)
-        if child_.nodeType == Node.TEXT_NODE:
-            self.valueOf_ += child_.nodeValue
-        elif child_.nodeType == Node.CDATA_SECTION_NODE:
-            self.valueOf_ += '![CDATA['+child_.nodeValue+']]'
+            self.content.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'parameterlist':
+                nodeName_ == "ref":
+            obj_ = supermod.docRefTextType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
+
+
+        if child_.nodeType == Node.ELEMENT_NODE and \
+                nodeName_ == 'parameterlist':
             obj_ = supermod.docParamListType.factory()
             obj_.build(child_)
             self.parameterlist.append(obj_)
-
 
 supermod.docParaType.subclass = docParaTypeSub
 # end class docParaTypeSub
@@ -763,4 +750,5 @@ def parse(inFilename):
     rootObj = supermod.DoxygenType.factory()
     rootObj.build(rootNode)
     return rootObj
+
 
