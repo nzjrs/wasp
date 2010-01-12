@@ -24,9 +24,10 @@ import sys, os
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.todo', 'sphinx.ext.pngmath']
 
-# Add breathe for documenting code with doxygen
+# Add breathe for documenting code with doxygen, and xref for easier 
+# linking to external docs
 sys.path.append( "doc" )
-extensions = [ "breathe" ]
+extensions += ["breathe","xref"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['doc/templates']
@@ -90,12 +91,18 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
-# -- Options for breath doxygen bridge ---------------------------------------------------
-
+# -- Options for breath doxygen bridge -----------------------------------------
 breathe_projects = {
     "onboard":"doc/built/onboard/xml/"
 }
 breathe_default_project = "onboard"
+
+# -- Options for xref documentation --------------------------------------------
+xref_links = {
+    "wasp": ("wasp", "http://github.com/nzjrs/wasp"),
+    "wasp-download": ("download", "http://github.com/nzjrs/wasp/downloads"),
+    "osm-gps-map": ("osm-gps-map", "http://github.com/nzjrs/osm-gps-map")
+    }
 
 # -- Options for HTML output ---------------------------------------------------
 

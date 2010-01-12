@@ -12,7 +12,7 @@ Building the Documentation (Optional)
 - python-sphinx > 0.6 
 - doxygen
 
-If you are using Ubuntu Jaunty, you may install sphinx from Github_. Ubunty Karmic users, or users of other distributions should install sphinx from your package manager.
+If you are using Ubuntu Jaunty, you may :xref:`wasp-download` sphinx from the :xref:`wasp` homepage. Ubunty Karmic users, or users of other distributions should install sphinx from your package manager.
 
 Building the Onboard Software
 -----------------------------
@@ -21,7 +21,7 @@ Building the Onboard Software
 - gcc-arm_3.4.4_i386.deb
 - binutils-arm_2.16.1_i386.deb
 
-These packages may be downloaded from Github_.
+You may :xref:`wasp-download` these packages from the :xref:`wasp` homepage.
 
 Building the Groundstation
 --------------------------
@@ -29,7 +29,7 @@ Building the Groundstation
 - python-gtk
 - python-serial
 
-The groundstation depends on recent features of osm-gps-map_, so you will need to build this from source. Normal PyGtk+ dependencies apply (python-gtk2-dev). Build and install the library as per normal instructions::
+The groundstation depends on recent features of :xref:`osm-gps-map`, so you will need to build this from source. Normal PyGtk+ dependencies apply (python-gtk2-dev). Build and install the library as per normal instructions::
 
     ./autogen; ./configure --prefix=/usr && make && sudo make install
 
@@ -43,7 +43,7 @@ You do not have to install osm-gps-map if you do not wish to. To run the grounds
 
 Build Instructions
 ------------------
-- Check out the code from Github_
+- Check out the code from :xref:`wasp`.
 
 ::
 
@@ -111,6 +111,3 @@ Other commands can also be applied to change what is build, for example
 - make clean
 - make generated
 
-
-.. _Github: http://github.com/nzjrs/wasp
-.. _osm-gps-map: http://github.com/nzjrs/osm-gps-map
