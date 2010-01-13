@@ -51,6 +51,10 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
     PING_TIME = 3
 
+    STATUS_CONNECTED                =   1
+    STATUS_CONNECTED_LINK_OK        =   2
+    STATUS_DISCONNECTED             =   3
+
     def __init__(self, conf, messages, use_test_source):
         config.ConfigurableIface.__init__(self, conf)
 
@@ -118,6 +122,14 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
             self._linkok = ok
             self.emit("source-link-status-change", self._linkok)
         return True
+
+    def get_status(self):
+        connected = self.serial.is_open()
+        if connected:
+            if self._linkok:
+                return self.STATUS_CONNECTED_LINK_OK
+            return self.STATUS_CONNECTED
+        return self.STATUS_DISCONNECTED
 
     def register_interest(self, cb, max_frequency, *message_names, **user_data):
         """
@@ -206,16 +218,18 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         self.emit("source-connected", self.serial.is_open())
 
     def get_messages_per_second(self):
-        try:
-            return 1.0/self._times.average()
-        except ZeroDivisionError:
-            return 0.0
+        if self._linkok:
+            try:
+                return 1.0/self._times.average()
+            except ZeroDivisionError:
+                pass
+        return 0.0
 
     def get_ping_time(self):
-        if self._sendping:
-            return self._pingtime
-        else:
-            return 0.0
+        if self._linkok:
+            if self._sendping:
+                return self._pingtime
+        return 0.0
 
     def update_state_from_config(self):
         port = self.config_get("serial_port", self.DEFAULT_PORT)
