@@ -9,7 +9,19 @@
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <child>
-          <placeholder/>
+          <object class="GtkScrolledWindow" id="settings_sw">
+            <property name="width_request">300</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="hscrollbar_policy">automatic</property>
+            <property name="vscrollbar_policy">automatic</property>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="position">0</property>
+          </packing>
         </child>
         <child>
           <object class="GtkButton" id="setting_edit_button">
@@ -20,8 +32,20 @@
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">end</property>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="show_editable_only_cb">
+            <property name="label" translatable="yes">Show editable only</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>
@@ -50,7 +74,7 @@
                 <child>
                   <object class="GtkImage" id="image1">
                     <property name="visible">True</property>
-                    <property name="stock">gtk-info</property>
+                    <property name="stock">gtk-dialog-info</property>
                     <property name="icon-size">6</property>
                   </object>
                   <packing>

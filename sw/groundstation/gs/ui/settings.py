@@ -2,6 +2,7 @@ import logging
 import gtk
 
 import gs.ui
+import gs.config as config
 import wasp.ui.treeview as treeview
 
 LOG = logging.getLogger("settings")
@@ -122,6 +123,9 @@ class SettingsController(gs.ui.GtkBuilderWidget):
 
     MSGS = {0:"No",1:"Yes"}
 
+    CONFIG_SECTION = "SETTINGS"
+    DEFAULT_SHOW_ONLY_DYNAMIC = True
+
     def __init__(self, source, settingsfile, messagesfile):
         gs.ui.GtkBuilderWidget.__init__(self, gs.ui.get_ui_file("settings.ui"))
 
@@ -144,7 +148,12 @@ class SettingsController(gs.ui.GtkBuilderWidget):
             for s in section.settings:
                 ts.add_setting(s, section=iter_)
 
-        tv = treeview.SettingsTreeView(ts, show_only_dynamic=False, show_all_colums=False)
+        tv = treeview.SettingsTreeView(ts, show_all_colums=False)
+        tv.get_selection().connect(
+                "changed",
+                self._on_selection_changed,
+                tv)
+        self.get_resource("settings_sw").add(tv)
 
         btn = self.get_resource("setting_edit_button")
         btn.connect(
@@ -153,12 +162,11 @@ class SettingsController(gs.ui.GtkBuilderWidget):
                 tv)
         btn.set_sensitive(False)
 
-        tv.get_selection().connect(
-                "changed",
-                self._on_selection_changed,
-                tv)
-
-        self.get_resource("setting_left_vbox").pack_start(tv, True, True)
+        #connect to checkbutton toggled signal
+        self.get_resource("show_editable_only_cb").connect(
+                    "toggled",
+                    lambda btn, tv_: tv_.show_only_dynamic(btn.get_active()),
+                    tv)
 
         #listen for settings messages
         source.register_interest(self._on_setting, 0, "SETTING_UINT8")
@@ -193,5 +201,31 @@ class SettingsController(gs.ui.GtkBuilderWidget):
                 edit_btn.set_sensitive(False)
 
         else:
+            self.get_resource("name_value").set_text("")
+            self.get_resource("value_value").set_text("")
+            self.get_resource("can_set_value").set_text("")
+            self.get_resource("can_get_value").set_text("")
+            self.get_resource("doc_value").set_text("")
+            self.get_resource("setting_info_hbox").set_sensitive(False)
             edit_btn.set_sensitive(False)
+
+    def get_preference_widgets(self):
+        #all following items configuration is saved
+        items = [
+            self.build_entry("source"),
+            self.build_entry("device"),
+            self.build_entry("norm"),
+            self.build_entry("input_channel")
+        ]
+
+        #the gui looks like
+        sg = self.make_sizegroup()
+        frame = self.build_frame(None, [
+            self.build_label("Source", items[0], sg),
+            self.build_label("Device", items[1], sg),
+            self.build_label("Norm", items[2], sg),
+            self.build_label("Input Channel", items[3], sg),
+        ])
+
+        return "Camera", frame, items
 

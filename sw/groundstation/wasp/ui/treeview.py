@@ -205,7 +205,7 @@ class SettingsTreeStore(gtk.TreeStore):
                     -1,
                     False,
                     False,
-                    True,   #say we are dynamic so the treemodelfilter shows us
+                    False,
                     None))
 
     def add_setting(self, setting, section=None):
@@ -219,16 +219,9 @@ class SettingsTreeStore(gtk.TreeStore):
                     setting) )
 
 class SettingsTreeView(gtk.TreeView):
-    def __init__(self, settingtreemodel, show_only_dynamic=False, show_all_colums=True):
-        #optionally filter and display only dynamic settings
-        if show_only_dynamic:
-            self._treemodelfilter = True
-            model = settingtreemodel.filter_new()
-            model.set_visible_column(SettingsTreeStore.DYNAMIC_IDX)
-        else:
-            self._treemodelfilter = False
-            model = settingtreemodel
-        gtk.TreeView.__init__(self, model)
+    def __init__(self, model, show_only_dynamic=False, show_all_colums=True):
+        gtk.TreeView.__init__(self)
+        self._show_only_dynamic = show_only_dynamic
 
         self.insert_column_with_attributes(-1, "Name",
                 gtk.CellRendererText(),
@@ -242,8 +235,33 @@ class SettingsTreeView(gtk.TreeView):
                         gtk.CellRendererText(),
                         text=id_)
 
+        self._filter = None
+        self.set_model(model)
+
+    def _visible_func(self, childmodel, _iter):
+        if not self._show_only_dynamic:
+            return True
+
+        #only show header rows, or rows that are dynamic (editable)
+        depth = childmodel.iter_depth(_iter)
+        if depth == 0:
+            return True
+
+        return childmodel.get_value(_iter, SettingsTreeStore.DYNAMIC_IDX)
+
+    def set_model(self, childmodel):
+        if childmodel:
+            self._filter = childmodel.filter_new()
+            self._filter.set_visible_func(self._visible_func)
+            gtk.TreeView.set_model(self, self._filter)
+
+    def show_only_dynamic(self, show):
+        self._show_only_dynamic = show
+        if self._filter:
+            self._filter.refilter()
+
     def get_selected_setting(self):
-        model, _iter = self.get_selection().get_selected()
+        _filter, _iter = self.get_selection().get_selected()
 
         #make sure something selected
         if not _iter:
@@ -251,12 +269,9 @@ class SettingsTreeView(gtk.TreeView):
 
         #make sure it is not a header row, but iter_depth is a method that
         #only exists on the TreeStore, not the treemodelfilter
-        if self._treemodelfilter:
-            depth = model.get_model().iter_depth(model.convert_iter_to_child_iter(_iter))
-        else:
-            depth = model.iter_depth(_iter)
-        if depth == 0:
+        model = _filter.get_model()
+        if model.iter_depth(_filter.convert_iter_to_child_iter(_iter)) == 0:
             return None
 
-        return model.get_value(_iter, SettingsTreeStore.OBJECT_IDX)
+        return _filter.get_value(_iter, SettingsTreeStore.OBJECT_IDX)
 
