@@ -11,6 +11,8 @@ class ConfigurableIface:
     def __init__(self, config):
         self._config = config
         self._autobind_keys = []
+        self._autobind_update_state_cb = None
+        self._autobind_update_config_cb = None
 
     def config_get(self, key, default):
         return self._config.get(key, default, section=self.CONFIG_SECTION)
@@ -21,7 +23,7 @@ class ConfigurableIface:
     def config_delete_keys_in_section(self):
         self._config.delete_keys_in_section(section=self.CONFIG_SECTION)
 
-    def autobind_config(self, *keys):
+    def autobind_config(self, *keys, **kwargs):
         """
         Autobinds configuration variables of the supplied names to
         instance properties. It saves you having to implement
@@ -36,6 +38,11 @@ class ConfigurableIface:
                 Contains the value of the config called foo
             self.DEFAULT_FOO
                 Must contain the default value of foo
+
+        You can also pass two callbacks to this function, update_state_cb and
+        update_config_cb - these are callbacks that will get called after the
+        default update_state_from_config and update_config_from_state is
+        called. For example, provi
         """
         self._autobind_keys = keys
         for key in self._autobind_keys:
@@ -44,15 +51,39 @@ class ConfigurableIface:
             setattr(self, "_%s" % key, val)
             print "set", key, val
 
+        self._autobind_update_state_cb = kwargs.get("update_state_cb", None)
+        self._autobind_update_config_cb = kwargs.get("update_config_cb", None)
+
     def update_state_from_config(self):
+        """
+        Function that should update the widget state from values stored in
+        the config file. Called at initialization and after every time the user
+        opens the preferences dialog
+        """
         for key in self._autobind_keys:
             default = getattr(self, "DEFAULT_%s" % key.upper())
             setattr(self, "_%s" % key, self.config_get(key, default))
 
+        if self._autobind_update_state_cb:
+            try:
+                self._autobind_update_state_cb()
+            except:
+                LOG.warning("Error calling update_state cb", exc_info=True)
+
     def update_config_from_state(self):
+        """
+        Funtion that should write the widget state to the config file. Called
+        at exit and after every time the user opens the preferences dialog
+        """
         for key in self._autobind_keys:
             val = getattr(self, "_%s" % key)
             self.config_set(key, val)
+
+        if self._autobind_update_config_cb:
+            try:
+                self._autobind_update_config_cb()
+            except:
+                LOG.warning("Error calling update_config cb", exc_info=True)
 
     def get_preference_widgets(self):
         """
