@@ -11,6 +11,7 @@ Documentation
    :maxdepth: 2
 
    sw/doc/index
+   sw/doc/unittest
    hw/doc/index
    sw/doc/onboard
    sw/doc/architecture
