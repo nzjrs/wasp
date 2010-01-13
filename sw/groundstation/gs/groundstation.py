@@ -22,6 +22,7 @@ from gs.ui.log import LogBuffer, LogWindow
 from gs.ui.map import Map
 from gs.ui.settings import SettingsController
 from gs.ui.window import DialogWindow
+from gs.ui.statusicon import StatusIcon
 
 from wasp.messages import MessagesFile
 from wasp.settings import SettingsFile
@@ -73,6 +74,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._home_zoom = self.CONFIG_ZOOM_DEFAULT
 
         self.window = self.get_resource("main_window")
+        self.statusicon = StatusIcon(icon)
 
         self._config = Config(filename=prefsfile)
         ConfigurableIface.__init__(self, self._config)
