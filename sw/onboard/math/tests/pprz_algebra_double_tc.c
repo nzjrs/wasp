@@ -438,7 +438,7 @@ static void math_pprz_algebra_double_eulers_assign_tc(  math_pprz_algebra_double
         const double NEWY = -43.2;
         const double NEWZ = 12e3;
 
-        VECT3_ASSIGN( fix->a, NEWX, NEWY, NEWZ );
+        EULERS_ASSIGN( fix->a, NEWX, NEWY, NEWZ );
 
         G_ASSERT_EULERS_CMPFLOAT( fix->a, ==, NEWX, NEWY, NEWZ );
 
@@ -446,7 +446,7 @@ static void math_pprz_algebra_double_eulers_assign_tc(  math_pprz_algebra_double
 
 static void math_pprz_algebra_double_eulers_copy_tc( math_pprz_algebra_double_eulers_fixture *fix, gconstpointer test_data )
 {
-        VECT3_COPY( fix->a, fix->b );
+        EULERS_COPY( fix->a, fix->b );
 
         G_ASSERT_EULERS_CMPFLOAT( fix->a, ==, BPHI, BTHETA, BPSI );
         G_ASSERT_B_UNCHANGED;
@@ -454,18 +454,19 @@ static void math_pprz_algebra_double_eulers_copy_tc( math_pprz_algebra_double_eu
 
 static void math_pprz_algebra_double_eulers_add_tc( math_pprz_algebra_double_eulers_fixture *fix, gconstpointer test_data )
 {
-        VECT3_ADD( fix->a, fix->b );
-        G_ASSERT_VECT3_CMPFLOAT( fix->a, ==, APHI+BPHI, ATHETA+BTHETA, APSI+BPSI );
+        EULERS_ADD( fix->a, fix->b );
+        G_ASSERT_EULERS_CMPFLOAT( fix->a, ==, APHI+BPHI, ATHETA+BTHETA, APSI+BPSI );
         G_ASSERT_B_UNCHANGED;
 }
 
 static void math_pprz_algebra_double_euler_sub_tc( math_pprz_algebra_double_eulers_fixture *fix, gconstpointer test_data )
 {
-        VECT3_SUB( fix->a, fix->b );
-        G_ASSERT_VECT3_CMPFLOAT( fix->a, ==, APHI-BPHI, ATHETA-BTHETA, APSI-BPSI );
+        EULERS_SUB( fix->a, fix->b );
+        G_ASSERT_EULERS_CMPFLOAT( fix->a, ==, APHI-BPHI, ATHETA-BTHETA, APSI-BPSI );
         G_ASSERT_B_UNCHANGED;
 }
 
+/*
 static void math_pprz_algebra_double_vect3_sum_tc(  math_pprz_algebra_double_vect3_fixture *fix, gconstpointer test_data )
 {
         struct DoubleVect3 c;
@@ -473,9 +474,9 @@ static void math_pprz_algebra_double_vect3_sum_tc(  math_pprz_algebra_double_vec
         c.y = 0.0;
         c.z = 0.0;
 
-        VECT3_SUM( c, fix->a, fix->b );
+        EULERS_SUM( c, fix->a, fix->b );
 
-        G_ASSERT_VECT3_CMPFLOAT( c, ==, AX+BX, AY+BY, AZ+BZ );
+        G_ASSERT_EULERS_CMPFLOAT( c, ==, AX+BX, AY+BY, AZ+BZ );
 
         G_ASSERT_A_UNCHANGED;
         G_ASSERT_B_UNCHANGED;
@@ -488,9 +489,9 @@ static void math_pprz_algebra_double_vect3_diff_tc(  math_pprz_algebra_double_ve
         c.y = 0.0;
         c.z = 0.0;
 
-        VECT3_DIFF( c, fix->a, fix->b );
+        EULERS_DIFF( c, fix->a, fix->b );
 
-        G_ASSERT_VECT3_CMPFLOAT( c, ==, AX-BX, AY-BY, AZ-BZ );
+        G_ASSERT_EULERS_CMPFLOAT( c, ==, AX-BX, AY-BY, AZ-BZ );
 
         G_ASSERT_A_UNCHANGED;
         G_ASSERT_B_UNCHANGED;
@@ -510,6 +511,8 @@ static void math_pprz_algebra_double_vect3_smul_tc( math_pprz_algebra_double_vec
 
         G_ASSERT_A_UNCHANGED;
 }
+*/
+
 
 /*
 #define EULERS_COPY(_a, _b) {                           \
