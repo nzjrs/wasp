@@ -22,6 +22,6 @@ ARCHLDFLAGS =
 # Flags specific to automated testing
 TEST_PROGS = test_math
 
-test_math_SRCS = math/tests/*_tc.c
+test_math_TESTSRCS = math/tests/*_tc.c 
 
 
