@@ -33,13 +33,13 @@ typedef struct __INS {
     bool_t              ltp_initialised;
     struct NedCoor_i    gps_pos_cm_ned;
     struct NedCoor_i    gps_speed_cm_s_ned;
-#if USE_VFF
+
     /* barometer                   */
     int32_t             baro_alt;
     int32_t             qfe;
     bool_t              baro_initialised;
     bool_t              vff_realign; 
-#endif
+
     /* output LTP NED               */
     struct NedCoor_i    ltp_pos;
     struct NedCoor_i    ltp_speed;

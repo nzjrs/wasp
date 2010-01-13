@@ -30,8 +30,9 @@
 #define SPI_HW_H
 
 #include "std.h"
+
 #include "LPC21xx.h"
-#include "config/config.h"
+#include "arm7/config.h"
 
 #define SpiEnable() {		\
     SetBit(SSPCR1, SSE);	\

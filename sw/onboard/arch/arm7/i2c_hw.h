@@ -23,9 +23,10 @@
 #ifndef I2C_HW_H
 #define I2C_HW_H
 
-#include "LPC21xx.h"
 #include "std.h"
-#include "config/config.h"
+
+#include "LPC21xx.h"
+#include "arm7/config.h"
 
 #define I2C_BUF_LEN     16
 #define I2C1_BUF_LEN    16

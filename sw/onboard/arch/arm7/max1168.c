@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+#include "std.h"
+
 #include "arm7/armVIC.h"
 #include "arm7/max1168.h"
 

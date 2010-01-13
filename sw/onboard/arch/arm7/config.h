@@ -137,11 +137,6 @@
 /* GPS */
 #define GPS_LINK                    Uart0
 
-/* Control Etc */
-#define USE_VFF                     1
-#define DT_VFILTER                  (1./512.)
-#define HS_YAW                      1
-
 /* VIC */
 #define TIMER0_VIC_SLOT             1
 #define UART0_VIC_SLOT              5

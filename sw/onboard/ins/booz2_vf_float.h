@@ -25,8 +25,6 @@
 
 #define B2_VFF_STATE_SIZE 3
 
-#include "config/config.h"
-
 extern float b2_vff_z;
 extern float b2_vff_zdot;
 extern float b2_vff_bias;

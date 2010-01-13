@@ -25,8 +25,10 @@
 
 #include "std.h"
 #include "rc.h"
-#include "generated/radio.h"
+
 #include "arm7/sys_time_hw.h"   /* for SYS_TICS_OF_USEC */
+
+#include "generated/radio.h"
 
 #define RC_AVG_PERIOD 8
 #define RC_LOST_TIME 30         /* 500ms with a 60Hz timer */

@@ -24,7 +24,6 @@
 
 #include "led.h"
 #include "imu.h"
-#include "config/config.h"
 
 #include "generated/settings.h"
 

@@ -21,12 +21,11 @@
  *
  */
 #include "std.h"
-
 #include "rc.h"
+
+#include "arm7/config.h"
 #include "arm7/rc_hw.h"
 #include "arm7/led_hw.h"
-
-#include "config/config.h"
 
 SystemStatus_t rc_system_status = STATUS_UNINITIAIZED;
 

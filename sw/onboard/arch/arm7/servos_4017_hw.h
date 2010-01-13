@@ -24,8 +24,9 @@
 #define SERVOS_4017_HW_H
 
 #include "std.h"
+
 #include "LPC21xx.h"
-#include "config/config.h"
+#include "arm7/config.h"
 #include "arm7/led_hw.h"
 #include "arm7/sys_time_hw.h"
 

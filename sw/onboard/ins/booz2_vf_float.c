@@ -21,6 +21,7 @@
  *
  */
 #include "booz2_vf_float.h"
+#include "generated/settings.h"
 
 /*
 
@@ -83,17 +84,17 @@ void b2_vff_init(float init_z, float init_zdot, float init_bias) {
 void b2_vff_propagate(float accel) {
   /* update state */
   b2_vff_zdotdot = accel + 9.81 - b2_vff_bias;
-  b2_vff_z = b2_vff_z + DT_VFILTER * b2_vff_zdot;
-  b2_vff_zdot = b2_vff_zdot + DT_VFILTER * b2_vff_zdotdot; 
+  b2_vff_z = b2_vff_z + CONTROL_DT_VFILTER * b2_vff_zdot;
+  b2_vff_zdot = b2_vff_zdot + CONTROL_DT_VFILTER * b2_vff_zdotdot; 
   /* update covariance */
-  const float FPF00 = b2_vff_P[0][0] + DT_VFILTER * ( b2_vff_P[1][0] + b2_vff_P[0][1] + DT_VFILTER * b2_vff_P[1][1] );  
-  const float FPF01 = b2_vff_P[0][1] + DT_VFILTER * ( b2_vff_P[1][1] - b2_vff_P[0][2] - DT_VFILTER * b2_vff_P[1][2] );
-  const float FPF02 = b2_vff_P[0][2] + DT_VFILTER * ( b2_vff_P[1][2] );
-  const float FPF10 = b2_vff_P[1][0] + DT_VFILTER * (-b2_vff_P[2][0] + b2_vff_P[1][1] - DT_VFILTER * b2_vff_P[2][1] );  
-  const float FPF11 = b2_vff_P[1][1] + DT_VFILTER * (-b2_vff_P[2][1] - b2_vff_P[1][2] + DT_VFILTER * b2_vff_P[2][2] ); 
-  const float FPF12 = b2_vff_P[1][2] + DT_VFILTER * (-b2_vff_P[2][2] );
-  const float FPF20 = b2_vff_P[2][0] + DT_VFILTER * ( b2_vff_P[2][1] );
-  const float FPF21 = b2_vff_P[2][1] + DT_VFILTER * (-b2_vff_P[2][2] );
+  const float FPF00 = b2_vff_P[0][0] + CONTROL_DT_VFILTER * ( b2_vff_P[1][0] + b2_vff_P[0][1] + CONTROL_DT_VFILTER * b2_vff_P[1][1] );  
+  const float FPF01 = b2_vff_P[0][1] + CONTROL_DT_VFILTER * ( b2_vff_P[1][1] - b2_vff_P[0][2] - CONTROL_DT_VFILTER * b2_vff_P[1][2] );
+  const float FPF02 = b2_vff_P[0][2] + CONTROL_DT_VFILTER * ( b2_vff_P[1][2] );
+  const float FPF10 = b2_vff_P[1][0] + CONTROL_DT_VFILTER * (-b2_vff_P[2][0] + b2_vff_P[1][1] - CONTROL_DT_VFILTER * b2_vff_P[2][1] );  
+  const float FPF11 = b2_vff_P[1][1] + CONTROL_DT_VFILTER * (-b2_vff_P[2][1] - b2_vff_P[1][2] + CONTROL_DT_VFILTER * b2_vff_P[2][2] ); 
+  const float FPF12 = b2_vff_P[1][2] + CONTROL_DT_VFILTER * (-b2_vff_P[2][2] );
+  const float FPF20 = b2_vff_P[2][0] + CONTROL_DT_VFILTER * ( b2_vff_P[2][1] );
+  const float FPF21 = b2_vff_P[2][1] + CONTROL_DT_VFILTER * (-b2_vff_P[2][2] );
   const float FPF22 = b2_vff_P[2][2];
  
   b2_vff_P[0][0] = FPF00 + Qzz;

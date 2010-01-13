@@ -24,8 +24,9 @@
 #define BOOZ2_GPS_H
 
 #include "std.h"
-#include "config/config.h"
 #include "pprz_geodetic_int.h"
+
+#include "arm7/config.h"
 
 struct Booz_gps_state {
   struct EcefCoor_i ecef_pos;    /* pos ECEF in cm        */

@@ -28,7 +28,9 @@
  *
  */
 
+#include "std.h"
 #include "led.h"
+
 #include "arm7/led_hw.h"
 
 void led_init ( void ) {

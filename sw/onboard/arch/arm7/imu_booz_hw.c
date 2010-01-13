@@ -21,15 +21,15 @@
  *
  */
 #include "std.h"
-
-#include "config/config.h"
-#include "generated/settings.h"
-
 #include "imu.h"
+
+#include "arm7/config.h"
 #include "arm7/armVIC.h"
 #include "arm7/imu_booz_hw.h"
 #include "arm7/max1168.h"
 #include "arm7/micromag.h"
+
+#include "generated/settings.h"
 
 typedef enum {
     SPI_NONE,

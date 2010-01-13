@@ -21,19 +21,17 @@
  *
  */
 #include "std.h"
-
-#include "config/config.h"
-#include "generated/settings.h"
+#include "sys_time.h"
 
 #include "LPC21xx.h"
+#include "arm7/config.h"
 #include "arm7/armVIC.h"
-
-#include "sys_time.h"
 #include "arm7/sys_time_hw.h"
 #include "arm7/led_hw.h"
-
 #include "arm7/rc_hw.h"             /* ppm_isr */
 #include "arm7/servos_4017_hw.h"    /* servos_4017_isr */
+
+#include "generated/settings.h"
 
 uint8_t  cpu_usage;
 uint16_t cpu_time_sec;

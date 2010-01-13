@@ -24,8 +24,9 @@
 #define LED_HW_H
 
 #include "std.h"
-#include "config/config.h"
+
 #include "LPC21xx.h"
+#include "arm7/config.h"
 
 #define __LED_DIR(i) IO ## i ## DIR
 #define _LED_DIR(i) __LED_DIR(i)

@@ -24,6 +24,7 @@
 #define BUSS_TWI_BLMC_HW_H
 
 #include "std.h"
+
 #include "generated/settings.h"
 
 extern uint8_t buss_twi_blmc_motor_power[MOTOR_NB];

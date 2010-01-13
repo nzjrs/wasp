@@ -21,8 +21,9 @@
  *
  */
 #include "std.h"
-#include "config/config.h"
 #include "gps.h"
+
+#include "arm7/config.h"
 #include "arm7/uart_hw.h"
 #include "arm7/ubx_protocol.h"
 #include "arm7/led_hw.h"

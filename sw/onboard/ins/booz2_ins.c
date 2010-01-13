@@ -25,21 +25,21 @@
 #include "altimeter.h"
 #include "gps.h"
 #include "ahrs.h"
-
+#include "pprz_geodetic_int.h"
 #include "booz_geometry_mixed.h"
 
-#if USE_VFF
+#include "generated/settings.h"
+
+/* FIXME: Conditional includes are soo 1984 */
+#if CONTROL_USE_VFF
 #include "ins/booz2_vf_float.h"
 #endif
-
 #include "ins/booz2_hf_float.h"
-
-#include "pprz_geodetic_int.h"
 
 INS_t   ins;
 
 void ins_init() {
-#if USE_VFF
+#if CONTROL_USE_VFF
   ins.ltp_initialised  = FALSE;
   ins.baro_initialised = FALSE;
   ins.vff_realign = FALSE;
@@ -53,7 +53,7 @@ void ins_init() {
 
 void ins_propagate() {
 
-#if USE_VFF
+#if CONTROL_USE_VFF
   if (altimeter_system_status == STATUS_INITIALIZED && ins.baro_initialised) {
     float accel_float = BOOZ_ACCEL_F_OF_I(booz_imu.accel.z);
     b2_vff_propagate(accel_float);
@@ -74,7 +74,7 @@ void ins_propagate() {
 
 void ins_update_baro() {
 
-#if USE_VFF
+#if CONTROL_USE_VFF
   if (altimeter_system_status == STATUS_INITIALIZED) {
     uint32_t alt = altimeter_get_altitude();
     if (!ins.baro_initialised) {

@@ -21,6 +21,7 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+#include "std.h"
 
 #include "arm7/uart_hw.h"
 #include "arm7/armVIC.h"

@@ -26,11 +26,12 @@
 #define BOOZ2_ANALOG_BARO_H
 
 #include "std.h"
-#include "config/config.h"
+#include "altimeter.h"
+
 #include "LPC21xx.h"
+#include "arm7/config.h"
 #include "arm7/led_hw.h"
 
-#include "altimeter.h"
 #include "generated/settings.h"
 
 #define Booz2AnalogSetDAC(x) {  DACR = x << 6; }

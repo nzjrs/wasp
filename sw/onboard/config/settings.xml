@@ -30,6 +30,10 @@
     <setting name="BARO" value="2"/>
     <setting name="AHRS" value="3"/>
   </section>
+  <section name="CONTROL">
+    <setting name="USE_VFF" value="1"/>
+    <setting name="DT_VFILTER" value="(1./512.)"/>
+  </section>
   <section name="IMU_SENS">
     <setting name="GYRO_P" value="1.01" integer="16"/>
     <setting name="GYRO_Q" value="-1.01" integer="16"/>
