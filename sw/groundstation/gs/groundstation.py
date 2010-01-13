@@ -74,7 +74,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._home_zoom = self.CONFIG_ZOOM_DEFAULT
 
         self.window = self.get_resource("main_window")
-        self.statusicon = StatusIcon(icon)
 
         self._config = Config(filename=prefsfile)
         ConfigurableIface.__init__(self, self._config)
@@ -111,6 +110,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
         self._fp = FlightPlanEditor(self._map)
+        self.statusicon = StatusIcon(icon, self._source)
 
         self.get_resource("main_left_vbox").pack_start(self._info.widget, False, False)
         self.get_resource("main_map_vbox").pack_start(self._msgarea, False, False)

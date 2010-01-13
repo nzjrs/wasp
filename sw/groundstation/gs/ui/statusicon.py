@@ -3,7 +3,7 @@ import gtk
 import gs.ui
 
 class StatusIcon(gtk.StatusIcon):
-    def __init__(self, pixbuf):
+    def __init__(self, pixbuf, source):
         gtk.StatusIcon.__init__(self)
         self.set_visible(True)
 
@@ -12,14 +12,17 @@ class StatusIcon(gtk.StatusIcon):
         self._normalpb = pixbuf
         self._connectedpb = self._composite_pixbuf(pixbuf, gtk.STOCK_YES)
         self._disconnectedpb = self._composite_pixbuf(pixbuf, gtk.STOCK_NO)
-
         self.set_from_pixbuf(self._normalpb)
 
-    def uav_connected(self):
-        self.set_from_pixbuf(self._connectedpb)
+        #watch for changes in link status
+        if source:
+            source.connect("source-link-status-change", self._on_source_link_change)
 
-    def uav_disconnected(self):
-        self.set_from_pixbuf(self._disconnectedpb)
+    def _on_source_link_change(self, source, connected):
+        if connected:
+            self.uav_connected()
+        else:
+            self.uav_disconnected()
 
     def _composite_pixbuf(self, icon, accentName):
         #  _______
@@ -77,8 +80,14 @@ class StatusIcon(gtk.StatusIcon):
 
         return dest
 
+    def uav_connected(self):
+        self.set_from_pixbuf(self._connectedpb)
+
+    def uav_disconnected(self):
+        self.set_from_pixbuf(self._disconnectedpb)
+
 if __name__ == "__main__":
-    s = StatusIcon(gs.ui.get_icon_pixbuf("rocket.svg"))
+    s = StatusIcon(gs.ui.get_icon_pixbuf("rocket.svg"), None)
     s.connect("activate", lambda s_: s_.uav_connected())
     s.connect("popup-menu", lambda s_,b,t: s_.uav_disconnected())
     gtk.main()

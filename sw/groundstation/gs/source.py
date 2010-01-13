@@ -82,11 +82,18 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         gobject.signal_new(
                 'source-connected', UAVSource,
                 gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                (bool,))
+                (bool,))        #True if source connected
+        gobject.signal_new(
+                'source-link-status-change', UAVSource,
+                gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                (bool,))        #True if recieving data
 
         #track how many messages per second
+        self._linkok = False
+        self._linktimeout = datetime.timedelta(seconds=2)
         self._lastt = datetime.datetime.now()
         self._times = utils.MovingAverage(5, float)
+        gobject.timeout_add_seconds(2, self._check_link_status)
 
         #track the ping time
         self._sendping = None
@@ -103,6 +110,13 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
     def _do_ping(self):
         self._sendping = datetime.datetime.now()
         self.send_message(self._pingmsg, ())
+        return True
+
+    def _check_link_status(self):
+        ok = (datetime.datetime.now() - self._lastt) < self._linktimeout
+        if ok != self._linkok:
+            self._linkok = ok
+            self.emit("source-link-status-change", self._linkok)
         return True
 
     def register_interest(self, cb, max_frequency, *message_names, **user_data):
