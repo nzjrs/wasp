@@ -24,8 +24,9 @@
 
 #include "led.h"
 #include "imu.h"
-
 #include "config/config.h"
+
+#include "generated/settings.h"
 
 struct BoozAhrsAligner booz_ahrs_aligner;
 
@@ -60,8 +61,8 @@ void booz_ahrs_aligner_run(void) {
   ref_sensor_samples[samples_idx] = booz_imu.accel.z;
   samples_idx++;
 
-#if AHRS_ALIGNER_LED
-  RunOnceEvery(50, {led_toggle(AHRS_ALIGNER_LED);});
+#if LED_AHRS
+  RunOnceEvery(50, {led_toggle(LED_AHRS);});
 #endif
 
   if (samples_idx >= SAMPLES_NB) {
@@ -96,8 +97,8 @@ void booz_ahrs_aligner_run(void) {
     
     if (booz_ahrs_aligner.low_noise_cnt > LOW_NOISE_TIME) {
       booz_ahrs_aligner.status = BOOZ_AHRS_ALIGNER_LOCKED;
-#if AHRS_ALIGNER_LED
-      led_on(AHRS_ALIGNER_LED);
+#if LED_AHRS
+      led_on(LED_AHRS);
 #endif
     }
   }

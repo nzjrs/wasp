@@ -27,6 +27,7 @@
 #include "comm.h"
 #include "gps.h"
 #include "generated/messages.h"
+#include "generated/settings.h"
 
 static inline void main_init( void );
 static inline void main_periodic_task( void );
@@ -73,8 +74,8 @@ static inline void main_periodic_task( void ) {
 static inline void main_event_task( void ) {
     if (gps_event_task()) {
         if (booz_gps_state.fix == GPS_FIX_3D)
-            led_on(GPS_LED);
+            led_on(LED_GPS);
         else
-            led_toggle(GPS_LED);
+            led_toggle(LED_GPS);
     }
 }

@@ -21,7 +21,9 @@
  *
  */
 #include "std.h"
+
 #include "config/config.h"
+#include "generated/settings.h"
 
 #include "LPC21xx.h"
 #include "arm7/armVIC.h"
@@ -106,8 +108,8 @@ bool_t sys_time_periodic( void ) {
     if (cpu_time_ticks > TIME_TICKS_PER_SEC) {
       cpu_time_ticks -= TIME_TICKS_PER_SEC;
       cpu_time_sec++;
-#ifdef TIME_LED
-      LED_TOGGLE(TIME_LED)
+#ifdef LED_TIME
+      LED_TOGGLE(LED_TIME)
 #endif
     }
     return TRUE;

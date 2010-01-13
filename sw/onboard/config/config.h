@@ -57,14 +57,6 @@
 #define LED_4_BANK      1
 #define LED_4_PIN       31
 
-#define TIME_LED                1
-#define RC_LED                  1
-#define GPS_LED                 4
-#define BOOZ2_ANALOG_BARO_LED   2
-#define AHRS_ALIGNER_LED        3
-
-#define NUM_LEDS                4
-
 /* ADC */
 /* battery: P0.29 AD0.2 */
 #define ANALOG_BATT_PINSEL      PINSEL1
@@ -118,10 +110,6 @@
 #define SERVO_RESET_IOSET       IO0SET
 #define SERVO_RESET_IOCLR       IO0CLR
 
-/* Time */
-#define PERIODIC_TASK_DT        (1./512.)
-#define PERIODIC_TASK_PERIOD    SYS_TICS_OF_SEC( PERIODIC_TASK_DT )
-
 /* Radio Control */
 #define USE_RADIO_CONTROL       1
 
@@ -153,11 +141,6 @@
 #define USE_VFF                     1
 #define DT_VFILTER                  (1./512.)
 #define HS_YAW                      1
-
-#define BOOZ2_FMS_TYPE_NONE         0
-#define BOOZ2_FMS_TYPE_DATALINK     1
-#define BOOZ2_FMS_TYPE_TEST_SIGNAL  2
-#define BOOZ2_FMS_TYPE              BOOZ2_FMS_TYPE_TEST_SIGNAL
 
 /* VIC */
 #define TIMER0_VIC_SLOT             1

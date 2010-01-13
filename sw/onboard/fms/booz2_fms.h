@@ -30,7 +30,11 @@
 #include "guidance.h"
 #include "booz_geometry_int.h"
 
-#include "config/config.h"
+#include "generated/settings.h"
+
+#define BOOZ2_FMS_TYPE_NONE         0
+#define BOOZ2_FMS_TYPE_DATALINK     1
+#define BOOZ2_FMS_TYPE_TEST_SIGNAL  2
 
 struct Booz_fms_imu_info {
   struct Pprz_int16_vect3 gyro;

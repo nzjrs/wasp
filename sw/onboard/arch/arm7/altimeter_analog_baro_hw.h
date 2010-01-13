@@ -27,11 +27,11 @@
 
 #include "std.h"
 #include "config/config.h"
-
 #include "LPC21xx.h"
 #include "arm7/led_hw.h"
 
 #include "altimeter.h"
+#include "generated/settings.h"
 
 #define Booz2AnalogSetDAC(x) {  DACR = x << 6; }
 
@@ -50,12 +50,12 @@ booz2_analog_baro_calibrate(void)
         Booz2AnalogSetDAC(booz2_analog_baro_offset);
 
         altimeter_system_status = STATUS_INITIALIZING;
-	    LED_TOGGLE(BOOZ2_ANALOG_BARO_LED);
+	    LED_TOGGLE(LED_BARO);
     }
 	else
     {
         altimeter_system_status = STATUS_INITIALIZED;
-        LED_ON(BOOZ2_ANALOG_BARO_LED);
+        LED_ON(LED_BARO);
     }
     });
 }

@@ -24,7 +24,6 @@
 #define BOOZ2_INS_H
 
 #include "std.h"
-#include "config/config.h"
 #include "booz_geometry_int.h"
 #include "pprz_geodetic_int.h"
 

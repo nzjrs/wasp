@@ -44,6 +44,9 @@ static inline void main_periodic_task( void );
 static inline void main_event_task( void );
 
 uint32_t t0, t1, diff;
+
+/* FIXME: non arch programs can not include config.h, 
+   so using SERVOS_4017_NB_CHANNELS is not smart */
 Servo_t servos[SERVOS_4017_NB_CHANNELS];
 
 int main( void ) {

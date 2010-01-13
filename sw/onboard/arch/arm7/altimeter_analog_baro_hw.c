@@ -50,9 +50,7 @@ void altimeter_init( void )
     booz2_analog_baro_value = 0;
     booz2_analog_baro_value_filtered = 0;
     booz2_analog_baro_data_available = FALSE;
-#ifdef BOOZ2_ANALOG_BARO_LED
-    LED_OFF(BOOZ2_ANALOG_BARO_LED);
-#endif
+    LED_OFF(LED_BARO);
 }
 
 uint8_t

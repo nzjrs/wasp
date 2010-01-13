@@ -53,6 +53,8 @@
 
 #include "autopilot_main.h"
 
+#include "generated/settings.h"
+
 int main( void ) {
     autopilot_main_init();
     while(1) {
@@ -122,10 +124,10 @@ static inline void autopilot_main_periodic( void ) {
     case 0:
         rc_periodic_task();
         if (rc_status == RC_OK)
-            led_on(RC_LED);
+            led_on(LED_RC);
         else
         {
-            led_off(RC_LED);
+            led_off(LED_RC);
             autopilot_set_mode(AP_MODE_FAILSAFE);
         }
         break;
@@ -164,9 +166,9 @@ static inline void autopilot_main_event( void ) {
 
   if ( gps_event_task() ) {
     if (booz_gps_state.fix == GPS_FIX_3D)
-        led_on(GPS_LED);
+        led_on(LED_GPS);
     else
-        led_toggle(GPS_LED);
+        led_toggle(LED_GPS);
     ins_update_gps();
   }
 

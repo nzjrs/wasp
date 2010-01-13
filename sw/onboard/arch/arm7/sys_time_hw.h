@@ -32,6 +32,7 @@
 
 #include "std.h"
 #include "config/config.h"
+#include "generated/settings.h"
 #include "LPC21xx.h"
 
 /* T0 prescaler, set T0_CLK to 15MHz, T0_CLK = PCLK / T0PCLK_DIV */
@@ -49,12 +50,14 @@
 #error unknown PCLK frequency
 #endif
 
-#define SYS_TICS_OF_SEC(s)   (uint32_t)(s * PCLK / T0_PCLK_DIV + 0.5)
-#define SYS_TICS_OF_USEC(us) SYS_TICS_OF_SEC((us) * 1e-6)
-#define SYS_TICS_OF_NSEC(ns) SYS_TICS_OF_SEC((ns) * 1e-9)
-#define SIGNED_SYS_TICS_OF_SEC(s) (int32_t)(s * PCLK / T0_PCLK_DIV + 0.5)
+#define SYS_TICS_OF_SEC(s)          (uint32_t)(s * PCLK / T0_PCLK_DIV + 0.5)
+#define SYS_TICS_OF_USEC(us)        SYS_TICS_OF_SEC((us) * 1e-6)
+#define SYS_TICS_OF_NSEC(ns)        SYS_TICS_OF_SEC((ns) * 1e-9)
+#define SIGNED_SYS_TICS_OF_SEC(s)   (int32_t)(s * PCLK / T0_PCLK_DIV + 0.5)
 #define SIGNED_SYS_TICS_OF_USEC(us) SIGNED_SYS_TICS_OF_SEC((us) * 1e-6)
 
-#define TIME_TICKS_PER_SEC SYS_TICS_OF_SEC(1)
+#define TIME_TICKS_PER_SEC          SYS_TICS_OF_SEC(1)
+
+#define PERIODIC_TASK_PERIOD        SYS_TICS_OF_SEC( PERIODIC_TASK_DT )
 
 #endif /* SYS_TIME_HW_H */

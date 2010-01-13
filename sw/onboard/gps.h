@@ -24,7 +24,6 @@
 #define GPS_H
 
 #include "std.h"
-#include "config/config.h"
 #include "math/pprz_geodetic_int.h"
 
 typedef enum {
