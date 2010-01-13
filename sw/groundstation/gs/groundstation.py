@@ -110,7 +110,10 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
         self._fp = FlightPlanEditor(self._map)
-        self.statusicon = StatusIcon(icon, self._source)
+        self._statusicon = StatusIcon(icon, self._source)
+
+        #raise the window when the status icon clicked
+        self._statusicon.connect("activate", lambda si, win: win.present(), self.window)
 
         self.get_resource("main_left_vbox").pack_start(self._info.widget, False, False)
         self.get_resource("main_map_vbox").pack_start(self._msgarea, False, False)
