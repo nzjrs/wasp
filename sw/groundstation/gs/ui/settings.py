@@ -139,10 +139,12 @@ class SettingsController(gs.ui.GtkBuilderWidget):
         self.get_resource("setting_right_vbox").pack_start(self._sm, False, True)
 
         ts = treeview.SettingsTreeStore()
-        for s in self._settingsfile.all_settings:
-            ts.add_setting(s)
+        for section in self._settingsfile.all_sections:
+            iter_ = ts.add_section(section)
+            for s in section.settings:
+                ts.add_setting(s, section=iter_)
 
-        tv = treeview.SettingsTreeView(ts, show_only_dynamic=True, show_all_colums=False)
+        tv = treeview.SettingsTreeView(ts, show_only_dynamic=False, show_all_colums=False)
 
         btn = self.get_resource("setting_edit_button")
         btn.connect(

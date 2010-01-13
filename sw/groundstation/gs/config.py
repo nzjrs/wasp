@@ -29,7 +29,9 @@ class ConfigurableIface:
         A default value for the configutaion variable
         must be present as a class property. For example
 
-        autobind_config(foo)
+        autobind_config("foo")
+
+        implies the following;
             self._foo
                 Contains the value of the config called foo
             self.DEFAULT_FOO

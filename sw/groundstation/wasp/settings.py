@@ -269,8 +269,10 @@ class SettingsFile:
                 for s in sect.settings:
                     settings.append(s)
             self.all_settings = settings
+            self.all_sections = self.settings.sections
         except:
             self.settings = None
             self.all_settings = []
+            self.all_sections = []
 
 

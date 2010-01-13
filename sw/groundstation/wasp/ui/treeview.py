@@ -179,7 +179,7 @@ class MessageTreeView(gtk.TreeView):
 
         return message, values
 
-class SettingsTreeStore(gtk.ListStore):
+class SettingsTreeStore(gtk.TreeStore):
 
     NAME_IDX,           \
     ID_IDX,             \
@@ -189,7 +189,7 @@ class SettingsTreeStore(gtk.ListStore):
     OBJECT_IDX =    range(6)
 
     def __init__(self):
-        gtk.ListStore.__init__(self,
+        gtk.TreeStore.__init__(self,
                 str,        #NAME, full setting name
                 int,        #ID, setting ID
                 bool,       #SUPPORTS_GET,
@@ -199,9 +199,18 @@ class SettingsTreeStore(gtk.ListStore):
 
         self._settings = {}
 
-    def add_setting(self, setting):
+    def add_section(self, section):
+        return self.append( None, (
+                    section.name,
+                    -1,
+                    False,
+                    False,
+                    True,   #say we are dynamic so the treemodelfilter shows us
+                    None))
+
+    def add_setting(self, setting, section=None):
         if setting not in self._settings:
-            self._settings[setting] = self.append( (
+            self._settings[setting] = self.append( section, (
                     setting.name,
                     setting.id,
                     setting.get == 1,
@@ -213,9 +222,11 @@ class SettingsTreeView(gtk.TreeView):
     def __init__(self, settingtreemodel, show_only_dynamic=False, show_all_colums=True):
         #optionally filter and display only dynamic settings
         if show_only_dynamic:
+            self._treemodelfilter = True
             model = settingtreemodel.filter_new()
             model.set_visible_column(SettingsTreeStore.DYNAMIC_IDX)
         else:
+            self._treemodelfilter = False
             model = settingtreemodel
         gtk.TreeView.__init__(self, model)
 
@@ -236,6 +247,15 @@ class SettingsTreeView(gtk.TreeView):
 
         #make sure something selected
         if not _iter:
+            return None
+
+        #make sure it is not a header row, but iter_depth is a method that
+        #only exists on the TreeStore, not the treemodelfilter
+        if self._treemodelfilter:
+            depth = model.get_model().iter_depth(model.convert_iter_to_child_iter(_iter))
+        else:
+            depth = model.iter_depth(_iter)
+        if depth == 0:
             return None
 
         return model.get_value(_iter, SettingsTreeStore.OBJECT_IDX)
