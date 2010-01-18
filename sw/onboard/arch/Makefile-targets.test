@@ -45,9 +45,11 @@ $(OBJDIR)/$(TEST_PROGS):
 	$(Q)$(CC) $(CFLAGS) `pkg-config --cflags glib-2.0` `pkg-config --libs glib-2.0` -o $@ $^
 
 $(OBJDIR_TEST_PROGS:%=%.c): $(TOOLS)/gen-testsuite.py
+	$(Q)test -d $(dir $@) || mkdir -p $(dir $@)
 	$(Q)$(TOOLS)/gen-testmain.py $(filter-out $<,$^) > $@
 
 $(OBJDIR)/%_test.c: $(TOOLS)/gen-testsuite.py %.c
+	$(Q)test -d $(dir $@) || mkdir -p $(dir $@)
 	$(Q)$(TOOLS)/gen-testsuite.py $(filter-out $<,$^) > $@
 
 %_test.o: %_test.c
