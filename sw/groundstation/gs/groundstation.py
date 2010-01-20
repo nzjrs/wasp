@@ -6,6 +6,9 @@ import gtk.gdk
 import gobject
 import logging
 
+gobject.threads_init()
+gtk.gdk.threads_init()
+
 from gs.database import Database
 from gs.config import Config, ConfigurableIface, ConfigWindow
 from gs.source import UAVSource
@@ -42,9 +45,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     CONFIG_ZOOM_DEFAULT = 12
 
     def __init__(self, prefsfile, messagesfile, settingsfile, use_test_source):
-        gobject.threads_init()
-        gtk.gdk.threads_init()
-
         #connect our log buffer to the python logging subsystem
         self._logbuffer = LogBuffer()
         handler = logging.StreamHandler(self._logbuffer)
@@ -450,5 +450,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map.props.show_trip_history = widget.get_active()
 
     def main(self):
+        if os.name == "nt": gtk.gdk.threads_enter()
         gtk.main()
+        if os.name == "nt": gtk.gdk.threads_leave()
 

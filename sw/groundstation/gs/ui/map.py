@@ -122,7 +122,9 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
     CONFIG_SECTION = "MAP"
 
     DEFAULT_PROXY = os.environ.get("http_proxy", "")
-    DEFAULT_CACHE = os.environ.get("XDG_CACHE_HOME", os.path.join(os.environ['HOME'], ".cache", "wasp"))
+    DEFAULT_CACHE = os.environ.get("XDG_CACHE_HOME",
+                        os.path.join(os.environ.get('HOME',
+                            os.path.expanduser("~")), ".cache", "wasp"))
     if os.name == "nt":
         DEFAULT_SOURCE = "0"
     else:
