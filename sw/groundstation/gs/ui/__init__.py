@@ -30,6 +30,9 @@ def make_label(text, width=None):
 def get_icon_pixbuf(name=None, stock=None, size=gtk.ICON_SIZE_DIALOG):
     ok = True
     if name:
+        #use png icons on windows
+        if os.name == "nt":
+            name = os.path.splitext(name)[0] + ".png"
         mydir = os.path.dirname(os.path.abspath(__file__))
         filename = os.path.join(mydir, "..", "..", "data", "icons", name)
         try:
