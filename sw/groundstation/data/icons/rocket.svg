@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -13,13 +14,22 @@
    height="48"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.45.1"
+   inkscape:version="0.47pre4 r22446"
    version="1.0"
-   sodipodi:docbase="C:\Documents and Settings\StarkC\Desktop\original inkscape\rocket"
-   sodipodi:docname="blue-rocket.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   sodipodi:docname="rocket.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/john/Programming/wasp.git/sw/groundstation/data/icons/rocket.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 24 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="48 : 24 : 1"
+       inkscape:persp3d-origin="24 : 16 : 1"
+       id="perspective75" />
     <linearGradient
        id="linearGradient32559">
       <stop
@@ -254,7 +264,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="15.645833"
      inkscape:cx="24"
-     inkscape:cy="24"
+     inkscape:cy="23.87217"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      width="48px"
@@ -263,8 +273,10 @@
      inkscape:guide-bbox="true"
      inkscape:window-width="1272"
      inkscape:window-height="953"
-     inkscape:window-x="1280"
-     inkscape:window-y="0" />
+     inkscape:window-x="406"
+     inkscape:window-y="25"
+     showgrid="false"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -273,6 +285,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -299,7 +312,7 @@
       </g>
       <path
          transform="matrix(0.8660254,-0.4999999,0.4999999,0.8660254,-20.819598,8.4388432)"
-         d="M 15.07647 44.537315 A 4.4432688 1.4402319 0 1 1  6.1899328,44.537315 A 4.4432688 1.4402319 0 1 1  15.07647 44.537315 z"
+         d="m 15.07647,44.537315 c 0,0.795418 -1.989319,1.440232 -4.443268,1.440232 -2.45395,0 -4.4432692,-0.644814 -4.4432692,-1.440232 0,-0.795418 1.9893192,-1.440232 4.4432692,-1.440232 2.453949,0 4.443268,0.644814 4.443268,1.440232 z"
          sodipodi:ry="1.4402319"
          sodipodi:rx="4.4432688"
          sodipodi:cy="44.537315"
@@ -327,7 +340,7 @@
       </g>
       <path
          transform="matrix(0.8660254,0.5,-0.5,0.8660254,50.055894,-2.2223731)"
-         d="M 15.07647 44.537315 A 4.4432688 1.4402319 0 1 1  6.1899328,44.537315 A 4.4432688 1.4402319 0 1 1  15.07647 44.537315 z"
+         d="m 15.07647,44.537315 c 0,0.795418 -1.989319,1.440232 -4.443268,1.440232 -2.45395,0 -4.4432692,-0.644814 -4.4432692,-1.440232 0,-0.795418 1.9893192,-1.440232 4.4432692,-1.440232 2.453949,0 4.443268,0.644814 4.443268,1.440232 z"
          sodipodi:ry="1.4402319"
          sodipodi:rx="4.4432688"
          sodipodi:cy="44.537315"
