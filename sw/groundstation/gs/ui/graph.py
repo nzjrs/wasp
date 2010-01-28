@@ -103,7 +103,7 @@ class _GraphHolder(gtk.HBox):
      [    \ ]  | range widgets
     """
 
-    def __init__(self, g, name, adjustable, on_pause, on_print, on_remove):
+    def __init__(self, g, name, adjustable, on_pause, on_print, on_remove, on_fullscreen):
         gtk.HBox.__init__(self, spacing=5)
 
         self.graph = g
@@ -132,9 +132,12 @@ class _GraphHolder(gtk.HBox):
         pr.connect("clicked", on_print, g, name)
         rm = gtk.Button(stock=gtk.STOCK_REMOVE)
         rm.connect("clicked", on_remove, name)
+        fs = gtk.Button(stock=gtk.STOCK_FULLSCREEN)
+        fs.connect("clicked", on_fullscreen, name)
         bbox.pack_start(pa, False, False)
         bbox.pack_start(pr, False, False)
         bbox.pack_start(rm, False, False)
+        bbox.pack_start(fs, False, False)
         bbox.set_layout(gtk.BUTTONBOX_END)
 
         if adjustable:
@@ -177,6 +180,23 @@ class GraphManager(config.ConfigurableIface):
         print_op.connect("draw_page", on_print_page)
         res = print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
 
+    def _on_fs_window_closed(self, widget, event, name, btn):
+        gh = self._graphs[name]
+        gh.hide()
+        gh.reparent(self._box)
+        gh.show_all()
+        btn.set_sensitive(True)
+
+    def _on_fullscreen(self, btn, name):
+        gh = self._graphs[name]
+        w = gtk.Window()
+        w.connect("delete-event", self._on_fs_window_closed, name, btn)
+        w.set_title(name)
+        gh.hide()
+        gh.reparent(w)
+        w.show_all()
+        btn.set_sensitive(False)
+
     def update_state_from_config(self):
         num = self.config_get("num_graphs", 0)
         if num:
@@ -217,7 +237,8 @@ class GraphManager(config.ConfigurableIface):
                     adjustable,
                     self._on_pause,
                     self._on_print,
-                    self._on_remove)
+                    self._on_remove,
+                    self._on_fullscreen)
 
             self._box.pack_start(gh)
             self._graphs[name] = gh
