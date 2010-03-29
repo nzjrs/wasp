@@ -319,7 +319,8 @@ class ConfigWindow:
     def show(self, config):
         #preload the widgets
         self._load_widgets_from_config(config)
-
+        
+        self._dlg.set_default_size(400,-1)
         self._dlg.show_all()
         response = 0
         while response == 0:

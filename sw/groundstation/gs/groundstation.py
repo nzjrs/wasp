@@ -331,6 +331,28 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def on_menu_item_log_activate(self, widget):
         w = LogWindow(self._logbuffer)
+        w.connect("delete-event", gtk.Widget.hide_on_delete)
+        w.set_transient_for(self.window)
+        w.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        w.show_all()
+
+    def on_menu_item_show_plugins_activate(self, widget):
+        def make_model(plugins):
+            m = gtk.ListStore(str, str)
+            for name,ver in plugins:
+                m.append((name,ver))
+            return m
+        loaded, failed = self._plugin_manager.get_plugin_summary()
+
+        ptv = self.get_resource("plugintreeview")
+        ptv.set_model( make_model(loaded) )
+        pftv = self.get_resource("pluginfailedtreeview")
+        pftv.set_model( make_model(failed) )
+
+        w = self.get_resource("pluginwindow")
+        w.connect("delete-event", gtk.Widget.hide_on_delete)
+        w.set_transient_for(self.window)
+        w.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         w.show_all()
 
     def on_menu_item_home_activate(self, widget):
