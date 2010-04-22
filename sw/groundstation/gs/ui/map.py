@@ -10,6 +10,7 @@ import gobject
 try:
     import osmgpsmap
     MAP_AVAILABLE = osmgpsmap.__version__ >= "0.4.0"
+    MAP_OSD_AVAILABLE = osmgpsmap.__version__ > "0.5.0"
 except:
     MAP_AVAILABLE = False
     class DummyMap: pass
@@ -227,6 +228,12 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
                             map_source=int(self._source),
                             proxy_uri=self._proxy,
                             tile_cache=self._cache)
+                #add OSD
+                if MAP_OSD_AVAILABLE:
+                    self._map.add_layer(
+                                osmgpsmap.GpsMapOsd(
+                                    show_zoom=True))
+
                 #minimum size of one tile
                 self._map.set_size_request(-1, 256)
 
