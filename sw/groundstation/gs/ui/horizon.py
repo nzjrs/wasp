@@ -65,7 +65,7 @@ class _HorizonWidget(gtk.DrawingArea, gtk.gtkgl.Widget):
         if source:
             source.register_interest(self._on_ahrs, 10, "AHRS_EULER")
 
-    def _on_ahrs(self, msg, payload):
+    def _on_ahrs(self, msg, header, payload):
         imu_phi, imu_theta, imu_psi, body_phi, body_theta, body_psi = msg.unpack_scaled_values(payload)
 
         #FIXME: we reverse the sign of pitch here

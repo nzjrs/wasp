@@ -85,12 +85,12 @@ class StatusBar(gtk.Statusbar):
         self._pt.set_text("PING: %.1f ms" %  source.get_ping_time())
         return True
 
-    def _on_debug(self, msg, payload):
+    def _on_debug(self, msg, header, payload):
         value, = msg.unpack_values(payload)
         self._debug.set_text("DEBUG: %d" % value)
         self._debug.set_green()
 
-    def _on_gps(self, msg, payload):
+    def _on_gps(self, msg, header, payload):
         fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
 
         if fix:

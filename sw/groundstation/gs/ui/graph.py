@@ -44,7 +44,7 @@ class Graph(rtgraph.HScrollLineGraph):
         self._source = source
         self._source.register_interest(self._on_msg, 0, msg.name)
 
-    def _on_msg(self, msg, payload):
+    def _on_msg(self, msg, header, payload):
         vals = msg.unpack_values(payload)
         for f in self.channels:
             f.update_msg_value(vals)

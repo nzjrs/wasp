@@ -182,7 +182,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             gb = self.get_resource("graph_button")
             gb.connect("clicked", on_gb_clicked, rxtv, self._gm)
 
-    def _on_gps(self, msg, payload):
+    def _on_gps(self, msg, header, payload):
         fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
         if fix:
             self._state["lat"] = lat

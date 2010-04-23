@@ -72,7 +72,7 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
 
         self._win.show_all()
 
-    def _on_ppm(self, msg, payload):
+    def _on_ppm(self, msg, header, payload):
         ppm = msg.unpack_values(payload)
         for i in range(self._nchannels):
             self._initialized[i][1].set_value(ppm[i])

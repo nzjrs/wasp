@@ -173,7 +173,7 @@ class SettingsController(gs.ui.GtkBuilderWidget):
         source.register_interest(self._on_setting, 0, "SETTING_FLOAT")
         source.register_interest(self._on_setting, 0, "SETTING_INT32")
 
-    def _on_setting(self, msg, payload):
+    def _on_setting(self, msg, header, payload):
         id_, type_, val = msg.unpack_values(payload)
         LOG.debug("Got setting: %d %s" % (id_, val))
         self._sm.update_setting_value(id_, val)

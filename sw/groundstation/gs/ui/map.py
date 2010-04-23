@@ -166,7 +166,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
     def _on_map_size_allocate(self, widget, allocation):
         self._alt.update_pixel_x(allocation.width/2)
 
-    def _on_gps(self, msg, payload):
+    def _on_gps(self, msg, header, payload):
         fix,sv,self.lat,self.lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
 
         #convert from mm to m

@@ -27,9 +27,9 @@ class _MessageCb:
             self._dt = 1.0/max_freq
             self._lastt = datetime.datetime.now()
 
-    def call_cb(self, msg, payload, time):
+    def call_cb(self, msg, header, payload, time):
         if self.max_freq <= 0:
-            self.cb(msg, payload, **self.kwargs)
+            self.cb(msg, header, payload, **self.kwargs)
         else:
             self._lastt, enough_time_passed, dt = utils.has_elapsed_time_passed(
                                             then=self._lastt,
@@ -37,7 +37,7 @@ class _MessageCb:
                                             dt=self._dt)
             if enough_time_passed:
                 try:
-                    self.cb(msg, payload, **self.kwargs)
+                    self.cb(msg, header, payload, **self.kwargs)
                 except Exception:
                     LOG.warn("Error calling callback for %s" % msg, exc_info=True)
 
@@ -106,7 +106,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         self.register_interest(self._got_pong, 0, "PONG")
         gobject.timeout_add_seconds(2, self._do_ping)
 
-    def _got_pong(self, msg, payload):
+    def _got_pong(self, msg, header, payload):
         #calculate difference in send and rx in milliseconds
         self._pingtime = utils.calculate_dt_seconds(self._sendping, datetime.datetime.now())
         self._pingtime *= 1000.0
@@ -172,7 +172,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
                 time = datetime.datetime.now()
                 cbs = self._callbacks.get(msg.id, ())
                 for cb in cbs:
-                    cb.call_cb(msg, payload, time)
+                    cb.call_cb(msg, header, payload, time)
 
                 if self._rxts:
                     self._rxts.update_message(msg, payload)

@@ -56,7 +56,7 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         self.get_resource("port_value").set_text(port)
         self.get_resource("speed_value").set_text("%s baud" % speed)
 
-    def _on_status(self, msg, payload):
+    def _on_status(self, msg, header, payload):
         rc, gps, bv, in_flight, motors_on, autopilot_mode, cpu_usage = msg.unpack_values(payload)
         self.get_resource("rc_value").set_text(
                 msg.get_field_by_name("rc").get_printable_value(rc))
@@ -72,16 +72,16 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         self._cpu_pb.set_value(cpu_usage)
         self._batt_pb.set_value(bv/10.0)
 
-    def _on_comm_status(self, msg, payload):
+    def _on_comm_status(self, msg, header, payload):
         overruns, errors = msg.unpack_printable_values(payload, joiner=None)
         self.get_resource("overruns_value").set_text(overruns)
         self.get_resource("errors_value").set_text(errors)
 
-    def _on_time(self, msg, payload):
+    def _on_time(self, msg, header, payload):
         runtime, = msg.unpack_printable_values(payload, joiner=None)
         self.get_resource("runtime_value").set_text(runtime)
 
-    def _on_build_info(self, msg, payload):
+    def _on_build_info(self, msg, header, payload):
         rev, branch, target, dirty, time = msg.unpack_printable_values(payload, joiner=None)
 
         #gtk.Label does not like strings with embedded null
