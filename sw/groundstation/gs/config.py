@@ -42,7 +42,7 @@ class ConfigurableIface:
         You can also pass two callbacks to this function, update_state_cb and
         update_config_cb - these are callbacks that will get called after the
         default update_state_from_config and update_config_from_state is
-        called. For example, provi
+        called.
         """
         self._autobind_keys = keys
         for key in self._autobind_keys:
