@@ -258,7 +258,7 @@ class SettingsFile:
     def __init__(self, **kwargs):
         path = kwargs.get("path")
         if path and not os.path.exists(path):
-            raise Exception("Could not find message file")
+            raise Exception("Could not find settings file")
 
         try:
             x = xmlobject.XMLFile(**kwargs)
