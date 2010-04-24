@@ -301,6 +301,8 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         self._flight_started = datetime.datetime.now()
 
     def show_cache_dialog(self, msgarea):
+        if not MAP_AVAILABLE:
+            return
 
         def update_download_count(msg, msgarea, gpsmap):
             remaining = gpsmap.get_property("tiles-queued")
