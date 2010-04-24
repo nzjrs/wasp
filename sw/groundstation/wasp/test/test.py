@@ -42,6 +42,10 @@ class MessageFileTest(unittest.TestCase):
         self.failUnless( self.mf.get_message_by_name(TEST_NAME) )
         self.failUnless( self.mf.get_message_by_name("FOO") == None )
 
+    def testDictHelper(self):
+        f = self.mf[TEST_NAME][TEST_MSG_FIELD_NAME]
+        self.failUnlessEqual(f.name, TEST_MSG_FIELD_NAME )
+
 class MessageTest(unittest.TestCase):
     def setUp(self):
         mf = get_mf()
@@ -88,10 +92,10 @@ class MessageTest(unittest.TestCase):
 
 class FieldTest(unittest.TestCase):
     def setUp(self):
-        mf = get_mf()
-        self.test = mf.get_message_by_name(TEST_NAME)
-        self.pong = mf.get_message_by_name(PONG_NAME)
-        self.test_coef = mf.get_message_by_name(TEST_COEF_MSG_NAME)
+        self.mf = get_mf()
+        self.test = self.mf.get_message_by_name(TEST_NAME)
+        self.pong = self.mf.get_message_by_name(PONG_NAME)
+        self.test_coef = self.mf.get_message_by_name(TEST_COEF_MSG_NAME)
 
     def testProps(self):
         u8 = self.test.get_field_by_name("a_uint8")
@@ -144,7 +148,6 @@ class FieldTest(unittest.TestCase):
 
         v = u8.interpret_value_from_user_string("LOST")
         self.failUnlessEqual( v, 1 )
-
 
     def testInterpret(self):
         u8 = self.test.get_field_by_name("a_uint8")

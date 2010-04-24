@@ -59,7 +59,7 @@ class DummySerialCommunication(gobject.GObject):
         #STATUS at 0.5hz
         self._bat = wasp.NoisyWalk(
                             start=145, end=85, delta=-5,
-                            value_type=self._messages.get_message_by_name("STATUS").get_field_by_name("vsupply").pytype)
+                            value_type=self._messages["STATUS"]["vsupply"].pytype)
         gobject.timeout_add(int(1000/0.5), self._do_status)
         #PPM at 10hz
         gobject.timeout_add(int(1000/10), self._do_ppm)

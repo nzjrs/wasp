@@ -237,6 +237,12 @@ class PyMessage(Message):
         #cache the struct for performace reasons
         self._struct = struct.Struct(format)
 
+    def __getitem__(self, key):
+        f = self.get_field_by_name(key)
+        if not f:
+            raise KeyError("Could not find field %s" % key)
+        return f
+
     def get_fields(self):
         return self.fields
 
@@ -321,6 +327,12 @@ class MessagesFile:
         
         self._msgs_by_id = {}
         self._msgs_by_name = {}
+
+    def __getitem__(self, key):
+        m = self.get_message_by_name(key)
+        if not m:
+            raise KeyError("Could not find message: %s" % key)
+        return m
 
     def parse(self):
         for m in self._messages:
