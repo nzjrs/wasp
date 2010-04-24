@@ -71,3 +71,12 @@ class NoisyWalk:
                 self.v = v
         return self.type(self.v)
 
+class Noisy:
+    def __init__(self, value, delta, value_type=float):
+        self.v = value
+        self.delta = delta
+        self.type = value_type
+
+    def value(self):
+        return self.type(self.v + (self.delta * random.randrange(0.0,1.0, int=float)))
+
