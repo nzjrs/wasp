@@ -1,4 +1,6 @@
-import random, time, math
+import random
+import time
+import math
 
 def setup_comm_optparse_options(parser, default_messages="/dev/null"):
     """
@@ -42,7 +44,6 @@ class NoisySine:
         self.n1 = self.amp - n
         self.n2 = self.amp + n
         
-
     def value(self):
         t = time.time()
         self.dt += (self.freq * (t - self.t))
@@ -51,3 +52,22 @@ class NoisySine:
         val = (self.offset * math.sin(self.dt)) * self.amp
         noise = random.randrange(self.n1, self.n2, int=self.type)
         return self.type(noise + val)
+
+class NoisyWalk:
+    def __init__(self, start, end, delta, value_type=float):
+        self.v = start
+        self.end = end
+        self.start = start
+        self.delta = delta
+        self.type = value_type
+
+    def value(self):
+        v = self.v + (self.delta * random.randrange(0.0,1.0, int=float))
+        if self.start > self.end:
+            if v > self.end and v < self.start:
+                self.v = v
+        else:
+            if v < self.end and v > self.start:
+                self.v = v
+        return self.type(self.v)
+

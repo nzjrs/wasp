@@ -57,6 +57,9 @@ class DummySerialCommunication(gobject.GObject):
         self._generic_send(int(1000/10), "IMU_MAG_RAW")
         self._generic_send(int(1000/10), "IMU_GYRO_RAW")
         #STATUS at 0.5hz
+        self._bat = wasp.NoisyWalk(
+                            start=145, end=85, delta=-5,
+                            value_type=self._messages.get_message_by_name("STATUS").get_field_by_name("vsupply").pytype)
         gobject.timeout_add(int(1000/0.5), self._do_status)
         #PPM at 10hz
         gobject.timeout_add(int(1000/10), self._do_ppm)
@@ -137,7 +140,7 @@ class DummySerialCommunication(gobject.GObject):
                 msg,
                 msg.get_field_by_name("rc").interpret_value_from_user_string("OK"),
                 msg.get_field_by_name("gps").interpret_value_from_user_string("NO_FIX"),
-                100,
+                self._bat.value(),
                 msg.get_field_by_name("in_flight").interpret_value_from_user_string("ON_GROUND"),
                 msg.get_field_by_name("motors_on").interpret_value_from_user_string("MOTORS_OFF"),
                 msg.get_field_by_name("autopilot_mode").interpret_value_from_user_string("FAILSAFE"),

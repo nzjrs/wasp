@@ -25,6 +25,17 @@ class Field:
         self.ctype = f.type
         self.type, self.length = self._get_field_length(f.type)
 
+        #cache the python type for speed
+        if self.type == "float":
+            self.pytype = float
+        elif self.type == "char":
+            if self.is_array:
+                self.pytype = str
+            else:
+                self.pytype = chr
+        else:
+            self.pytype = int
+
     def _get_field_length(self, _type):
         #check if it is an array
         m = self.ARRAY_LENGTH.match(_type)
@@ -112,17 +123,6 @@ class PyField(Field):
             except AttributeError:
                 self._enum_values = []
 
-        #cache the python type for speed
-        if self.type == "float":
-            self._klass = float
-        elif self.type == "char":
-            if self.is_array:
-                self._klass = str
-            else:
-                self._klass = chr
-        else:
-            self._klass = int
-
         if self.is_array:
             self.format = "%d%s" % (self.num_elements, self.TYPE_TO_STRUCT_MAP[self.type])
         else:
@@ -136,7 +136,7 @@ class PyField(Field):
             #if self.is_array:
             #    self._fstr = "%s"
             #else:
-            #    self._fstr = self.TYPE_TO_PRINT_MAP[self._klass]
+            #    self._fstr = self.TYPE_TO_PRINT_MAP[self.pytype]
 
         try:
             self._fstr += " %s" % node.unit
@@ -150,9 +150,9 @@ class PyField(Field):
 
     def get_default_value(self):
         if self.is_array and self.type != "char":
-            return list( [self._klass() for i in range(self.num_elements)] )
+            return list( [self.pytype() for i in range(self.num_elements)] )
         else:
-            return self._klass()
+            return self.pytype()
 
     def interpret_value_from_user_string(self, string, default=None, sep=","):
         try:
@@ -160,7 +160,7 @@ class PyField(Field):
                 vals = string.split(sep)
                 if len(vals) != self.num_elements:
                     raise ValueError
-                return list( [self._klass(v) for v in vals] )
+                return list( [self.pytype(v) for v in vals] )
             elif self.is_enum:
                 try:
                     #first look if the user suppled a string is an enum value
@@ -168,9 +168,9 @@ class PyField(Field):
                 except ValueError:
                     #if not, assume it is a number, the constructor of the field
                     #will take care of it
-                    return self._klass(string)
+                    return self.pytype(string)
             else:
-                return self._klass(string)
+                return self.pytype(string)
         except ValueError:
             #invalid user input for type
             if default:
