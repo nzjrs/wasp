@@ -144,9 +144,9 @@ class PyField(Field):
             pass
 
         try:
-            self._coef = float(node.alt_unit_coef)
+            self.coef = float(node.alt_unit_coef)
         except:
-            self._coef = 1
+            self.coef = 1
 
     def get_default_value(self):
         if self.is_array and self.type != "char":
@@ -195,7 +195,7 @@ class PyField(Field):
                 except IndexError:
                     return "?%s?" % value
             else:
-                return self._fstr % (self._coef * value)
+                return self._fstr % (self.coef * value)
 
     def get_scaled_value(self, value):
         """
@@ -207,12 +207,12 @@ class PyField(Field):
             if self.type == "char":
                 return value
             else:
-                return [float(val * self._coef) for val in value]
+                return [float(val * self.coef) for val in value]
         else:
             if self.is_enum:
                 return value
             else:
-                return float(value * self._coef)
+                return float(value * self.coef)
 
     def get_value_range(self):
         if self.is_enum:
