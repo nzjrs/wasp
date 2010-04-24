@@ -82,6 +82,17 @@ class PyField(Field):
             "int32" :   "i",
             "float" :   "f"
     }
+    #maps type to range of acceptible values
+    TYPE_TO_RANGE_MAP = {
+            "char"  :   (0,2**8-1),
+            "uint8" :   (0,2**8-1),
+            "int8"  :   (-2**(8-1),2**(8-1)-1),
+            "uint16":   (0,2**16-1),
+            "int16" :   (-2**(16-1),2**(16-1)-1),
+            "uint32":   (0,2**32-1),
+            "int32" :   (-2**(32-1),2**(32-1)-1),
+            "float" :   (-3.4e38,3.4e38)    #not exactly correct
+    }
     #maps type to correct format string
     TYPE_TO_PRINT_MAP = {
             float   :   "%f",
@@ -93,9 +104,11 @@ class PyField(Field):
     def __init__(self, node):
         Field.__init__(self, node)
 
+        self.is_enum = False
         if self.type == "uint8":
             try:
                 self._enum_values = node.values.split("|")
+                self.is_enum = True
             except AttributeError:
                 self._enum_values = []
 
@@ -135,8 +148,6 @@ class PyField(Field):
         except:
             self._coef = 1
 
-        self._isenum = self.type == "uint8" and self._enum_values
-
     def get_default_value(self):
         if self.is_array and self.type != "char":
             return list( [self._klass() for i in range(self.num_elements)] )
@@ -150,6 +161,14 @@ class PyField(Field):
                 if len(vals) != self.num_elements:
                     raise ValueError
                 return list( [self._klass(v) for v in vals] )
+            elif self.is_enum:
+                try:
+                    #first look if the user suppled a string is an enum value
+                    return self._enum_values.index(string)
+                except ValueError:
+                    #if not, assume it is a number, the constructor of the field
+                    #will take care of it
+                    return self._klass(string)
             else:
                 return self._klass(string)
         except ValueError:
@@ -168,7 +187,7 @@ class PyField(Field):
                 return str(value)
         else:
             #Return a single formatted number string
-            if self._isenum:
+            if self.is_enum:
                 #If this is an uint8 enum type then return the
                 #enum value
                 try:
@@ -190,10 +209,16 @@ class PyField(Field):
             else:
                 return [float(val * self._coef) for val in value]
         else:
-            if self._isenum:
+            if self.is_enum:
                 return value
             else:
                 return float(value * self._coef)
+
+    def get_value_range(self):
+        if self.is_enum:
+            return self._enum_values
+        else:
+            return self.TYPE_TO_RANGE_MAP[self.ctype]
 
 class PyMessage(Message):
 

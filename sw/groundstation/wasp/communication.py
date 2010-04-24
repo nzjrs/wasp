@@ -50,13 +50,14 @@ class DummySerialCommunication(gobject.GObject):
         #TIME at 1hz
         self._t = 0
         gobject.timeout_add(int(1000/0.1), self._do_time)
-        #STATUS, COMM_STATUS at 0.5hz
-        self._generic_send(int(1000/0.5), "STATUS")
+        #COMM_STATUS at 0.5hz
         self._generic_send(int(1000/0.5), "COMM_STATUS")
         #IMU at 10hz
         self._generic_send(int(1000/10), "IMU_ACCEL_RAW")
         self._generic_send(int(1000/10), "IMU_MAG_RAW")
         self._generic_send(int(1000/10), "IMU_GYRO_RAW")
+        #STATUS at 0.5hz
+        gobject.timeout_add(int(1000/0.5), self._do_status)
         #PPM at 10hz
         gobject.timeout_add(int(1000/10), self._do_ppm)
         #AHRS at 10hz
@@ -120,6 +121,27 @@ class DummySerialCommunication(gobject.GObject):
         v = 20000
         n = 100
         return self._send(msg, v+random.randint(-n,n), v, v+random.randint(-n,n), v, v+random.randint(-n,n), v)
+
+    def _do_status(self):
+        #   <message name="STATUS" id="8">
+        #     <field name="rc" type="uint8" values="OK|LOST|REALLY_LOST"/>
+        #     <field name="gps" type="uint8" values="NO_FIX|2D_FIX|3D_FIX"/>
+        #     <field name="vsupply" type="uint8" unit="decivolt"/>
+        #     <field name="in_flight" type="uint8" values="ON_GROUND|IN_FLIGHT"/>
+        #     <field name="motors_on" type="uint8" values="MOTORS_OFF|MOTORS_ON"/>
+        #     <field name="autopilot_mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|ATTITUDE_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|ATTITUDE_HOLD|HOVER_DIRECT|HOVER_CLIMB|HOVER_Z_HOLD|NAV|RC_DIRECT"/>
+        #     <field name="cpu_usage" type="uint8" unit="pct"/>
+        #   </message>
+        msg = self._messages.get_message_by_name("STATUS")
+        return self._send(
+                msg,
+                msg.get_field_by_name("rc").interpret_value_from_user_string("OK"),
+                msg.get_field_by_name("gps").interpret_value_from_user_string("NO_FIX"),
+                100,
+                msg.get_field_by_name("in_flight").interpret_value_from_user_string("ON_GROUND"),
+                msg.get_field_by_name("motors_on").interpret_value_from_user_string("MOTORS_OFF"),
+                msg.get_field_by_name("autopilot_mode").interpret_value_from_user_string("FAILSAFE"),
+                30)
 
     def get_fd(self):
         return self._readfd

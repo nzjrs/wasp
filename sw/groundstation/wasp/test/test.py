@@ -102,6 +102,7 @@ class FieldTest(unittest.TestCase):
         self.failUnlessEqual( u8.num_elements, 1 )
         self.failUnlessEqual( u8.element_length, None )
         self.failUnlessEqual( u8.is_array, False )
+        self.failUnlessEqual( u8.is_enum, True )
 
         a = self.test.get_field_by_name("a_array")
         self.failUnlessEqual( a.name, "a_array" )
@@ -111,6 +112,7 @@ class FieldTest(unittest.TestCase):
         self.failUnlessEqual( a.num_elements, 3 )
         self.failUnlessEqual( a.element_length, 1 )
         self.failUnlessEqual( a.is_array, True )
+        self.failUnlessEqual( a.is_enum, False )
 
     def testGet(self):
         u8 = self.test.get_field_by_name("foo")
@@ -129,6 +131,21 @@ class FieldTest(unittest.TestCase):
         a = self.test.get_field_by_name("a_array")
         self.failUnlessEqual( a.get_default_value(), [0,0,0] )
 
+    def testEnum(self):
+        # check the enum parsing...
+        # <field name="a_uint8" type="uint8" values="OK|LOST|REALLY_LOST"/>
+        u8 = self.test.get_field_by_name("a_uint8")
+
+        vals = u8.get_value_range()
+        self.failUnless( "OK" in vals )
+
+        v = u8.interpret_value_from_user_string("OK")
+        self.failUnlessEqual( v, 0 )
+
+        v = u8.interpret_value_from_user_string("LOST")
+        self.failUnlessEqual( v, 1 )
+
+
     def testInterpret(self):
         u8 = self.test.get_field_by_name("a_uint8")
 
@@ -140,7 +157,6 @@ class FieldTest(unittest.TestCase):
 
         v = u8.interpret_value_from_user_string("foo", default=42)
         self.failUnlessEqual( v, 42 )
-
 
         f = self.test.get_field_by_name("a_float")
         v = f.interpret_value_from_user_string(26.9)
