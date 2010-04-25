@@ -254,6 +254,14 @@ class TestTransportFieldTest(unittest.TestCase):
         d = self.test.unpack_values( test_payload )
         self.failUnlessEqual(d, TEST_MESSAGE_VALUES)
 
+class TestSettingsFile(unittest.TestCase):
+    def setUp(self):
+        self.sf = get_sf()
+
+    def testParse(self):
+        self.failUnlessEqual(len(self.sf.all_settings), 8)
+        self.failUnlessEqual(len(self.sf.all_sections), 3)
+
 if __name__ == "__main__":
     import sys
 
@@ -270,7 +278,7 @@ if __name__ == "__main__":
         cov.exclude('def __str__')
         cov.start()
 
-    TESTS = (MessageFileTest, MessageTest, FieldTest, TestTransportFieldTest)
+    TESTS = (MessageFileTest, MessageTest, FieldTest, TestTransportFieldTest, TestSettingsFile)
     r = unittest.TextTestRunner()
     l = unittest.TestLoader()
 
@@ -282,5 +290,4 @@ if __name__ == "__main__":
         cov.html_report(
                 morfs=(wasp,wasp.messages, wasp.transport),
                 directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "html"))
-
 
