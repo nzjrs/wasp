@@ -58,6 +58,8 @@ class InfoBox(gs.ui.GtkBuilderWidget):
 
     def _on_status(self, msg, header, payload):
         rc, gps, bv, in_flight, motors_on, autopilot_mode, cpu_usage = msg.unpack_values(payload)
+        self.get_resource("id_value").set_text(
+                str(header.acid))
         self.get_resource("rc_value").set_text(
                 msg.get_field_by_name("rc").get_printable_value(rc))
         self.get_resource("gps_value").set_text(

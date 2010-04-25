@@ -6,6 +6,7 @@ import serial
 import libserial.SerialSender
 
 import wasp
+import wasp.transport
 
 class SerialCommunication(libserial.SerialSender.SerialSender):
     """
@@ -33,13 +34,13 @@ class DummySerialCommunication(gobject.GObject):
             gobject.TYPE_BOOLEAN]),     #True if successfully connected to the port
         }
 
-    def __init__(self, messages, transport, header):
+    def __init__(self, messages, transport, acid):
         gobject.GObject.__init__(self)
         self._readfd, self._writefd = os.pipe()
 
         self._messages = messages        
         self._transport = transport
-        self._header = header
+        self._header = wasp.transport.TransportHeaderFooter(acid=acid)
 
         self._sendcache = {}
         self._is_open = False
@@ -75,7 +76,6 @@ class DummySerialCommunication(gobject.GObject):
         self._lon = 172.582377
 
     def _do_gps(self):
-
         if random.randint(0,4) == 4:
             self._lat += (random.random()*0.0001)
         if random.randint(0,4) == 4:

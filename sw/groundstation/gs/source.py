@@ -55,7 +55,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
     STATUS_CONNECTED_LINK_OK        =   2
     STATUS_DISCONNECTED             =   3
 
-    def __init__(self, conf, messages, use_test_source):
+    def __init__(self, conf, messages, use_test_source, listen_for_uav_id=0xFF):
         config.ConfigurableIface.__init__(self, conf)
 
         self._port = self.config_get("serial_port", self.DEFAULT_PORT)
@@ -69,11 +69,11 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         self._rm = self._messages_file.get_message_by_name("REQUEST_MESSAGE")
         self._rt = self._messages_file.get_message_by_name("REQUEST_TELEMETRY")
         self._transport = transport.Transport(check_crc=True, debug=DEBUG)
-        self._transport_header = transport.TransportHeaderFooter(acid=0x78)
+        self._groundstation_transport_header = transport.TransportHeaderFooter(acid=0x78)
 
         self._use_test_source = use_test_source
         if use_test_source:
-            self.serial = communication.DummySerialCommunication(messages, self._transport, self._transport_header)
+            self.serial = communication.DummySerialCommunication(messages, self._transport, listen_for_uav_id)
             LOG.info("Test source enabled")
         else:
             self.serial = communication.SerialCommunication(port=self._port, speed=int(self._speed), timeout=1)
@@ -190,7 +190,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
     def send_message(self, msg, values):
         if msg:
             data = self._transport.pack_message_with_values(
-                        self._transport_header, 
+                        self._groundstation_transport_header, 
                         msg,
                         *values)
             self.serial.write(data.tostring())
