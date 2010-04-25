@@ -123,7 +123,6 @@ class SettingsController(gs.ui.GtkBuilderWidget):
 
     MSGS = {0:"No",1:"Yes"}
 
-    CONFIG_SECTION = "SETTINGS"
     DEFAULT_SHOW_ONLY_DYNAMIC = True
 
     def __init__(self, source, settingsfile, messagesfile):
@@ -208,24 +207,4 @@ class SettingsController(gs.ui.GtkBuilderWidget):
             self.get_resource("doc_value").set_text("")
             self.get_resource("setting_info_hbox").set_sensitive(False)
             edit_btn.set_sensitive(False)
-
-    def get_preference_widgets(self):
-        #all following items configuration is saved
-        items = [
-            self.build_entry("source"),
-            self.build_entry("device"),
-            self.build_entry("norm"),
-            self.build_entry("input_channel")
-        ]
-
-        #the gui looks like
-        sg = self.make_sizegroup()
-        frame = self.build_frame(None, [
-            self.build_label("Source", items[0], sg),
-            self.build_label("Device", items[1], sg),
-            self.build_label("Norm", items[2], sg),
-            self.build_label("Input Channel", items[3], sg),
-        ])
-
-        return "Camera", frame, items
 
