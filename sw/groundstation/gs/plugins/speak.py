@@ -1,6 +1,7 @@
 import subprocess
 import logging
 
+import gs.utils
 import gs.plugin as plugin
 import gs.config as config
 
@@ -12,6 +13,9 @@ class Speak(plugin.Plugin, config.ConfigurableIface):
     DEFAULT_ENABLED = "0"
 
     def __init__(self, conf, source, messages_file, groundstation_window):
+        if not gs.utils.program_installed("espeak"):
+            raise plugin.PluginNotSupported("espeak not installed")
+
         config.ConfigurableIface.__init__(self, conf)
         self.autobind_config("enabled")
         self.process = None

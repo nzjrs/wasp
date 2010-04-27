@@ -1,8 +1,11 @@
 import sys
-import os
+import os.path
 import logging
 
 LOG = logging.getLogger('plugin')
+
+class PluginNotSupported(Exception):
+    pass
 
 class Plugin(object):
     PLUGIN_NAME     = ""
@@ -33,6 +36,8 @@ class PluginManager:
                 LOG.debug("Importing %s" % plugin)
                 try:
                     __import__(plugin)
+                except PluginNotSupported, e:
+                    self._plugins_failed.append((plugin, str(e)))
                 except Exception, e:
                     LOG.warn("Error loading plugin: %s" % plugin, exc_info=True)
                     self._plugins_failed.append((plugin, str(e)))
@@ -41,8 +46,11 @@ class PluginManager:
         for klass in Plugin.__subclasses__():
             try:
                 self._plugins.append(klass(*args, **kwargs))
-            except Exception:
+            except PluginNotSupported, e:
+                self._plugins_failed.append((klass.PLUGIN_NAME or klass.__name__, str(e)))
+            except Exception, e:
                 LOG.warn("Error instantiating plugin class: %s" % klass, exc_info=True)
+                self._plugins_failed.append((klass.PLUGIN_NAME or klass.__name__, str(e)))
 
     def get_plugins_implementing_interface(self, interface):
         return [p for p in self._plugins if isinstance(p, interface)]
