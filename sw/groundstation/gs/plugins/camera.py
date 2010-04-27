@@ -9,33 +9,36 @@ import gs.config as config
 LOG = logging.getLogger('camera')
 
 class _Camera(gtk.DrawingArea):
-    def __init__(self, source="v4l2src", device="/dev/video0", norm="", input_channel=""):
+    V4L2_SOURCE = "v4l2src"
+    def __init__(self, source=V4L2_SOURCE, device="/dev/video0", norm="", input_channel=""):
         gtk.DrawingArea.__init__(self)
         self._playing = False
         self._pb = None
 
-        v4lcmds = []
-        if norm:
-            v4lcmds.append(["setnorm", norm])
-        if input_channel:
-            v4lcmds.append(["setinput", input_channel])
-
-        #configure the camera
-        for cmd in v4lcmds:
-            cmd = ['v4lctl', '-c', device] + cmd
-            LOG.debug("Setting video parameter: %s" % " ".join(cmd))
-            try:
-                if subprocess.call(cmd, executable='v4lctl') != 0:
-                    print "Error calling %s" % ' '.join(cmd)
-            except OSError: pass
-
+        if source == self.V4L2_SOURCE:
+            #configure the v4l_source (likely if it is a tv card)
+            v4lcmds = []
+            if norm:
+                v4lcmds.append(["setnorm", norm])
+            if input_channel:
+                v4lcmds.append(["setinput", input_channel])
+            for cmd in v4lcmds:
+                cmd = ['v4lctl', '-c', device] + cmd
+                LOG.debug("Setting video parameter: %s" % " ".join(cmd))
+                try:
+                    if subprocess.call(cmd, executable='v4lctl') != 0:
+                        LOG.warning("Error calling %s" % ' '.join(cmd))
+                except OSError:
+                    LOG.warning("Error calling %s" % ' '.join(cmd), exc_info=True)
 
         #configure the pipeline
         #gst-launch-0.10 v4l2src ! autovideosink"
         # Set up the gstreamer pipeline
         try:
-            pipeline = "%s device=%s ! autovideosink" % (source, device)
+            if source == self.V4L2_SOURCE:
+                source = "%s device=%s" % (source, device)
 
+            pipeline = "%s ! autovideosink" % source
             LOG.debug("Video pipeline: %s" % pipeline)
             self.pipeline = gst.parse_launch (pipeline)
 
@@ -149,16 +152,25 @@ if __name__ == "__main__":
 
     gtk.gdk.threads_init()
 
-    win = gtk.Window()
+    def make_win(cam):
+        win = gtk.Window()
+        win.add(cam)
+        win.connect("destroy", lambda w,c: c.stop(), cam)
+        win.connect("destroy", gtk.main_quit)
+        win.show_all()
+        return win
+
     cam = _Camera(
             device='/dev/video0',
             norm='PAL-N',
             input_channel='Composite1')
-    win.add(cam)
-    win.connect("destroy", lambda w,c: c.stop(), cam)
-    win.connect("destroy", gtk.main_quit)
-    win.show_all()
+    w1 = make_win(cam)
     cam.start()
+
+    test = _Camera(source="videotestsrc")
+    w2 = make_win(test)
+    test.start()
+
     gtk.main()
 
 

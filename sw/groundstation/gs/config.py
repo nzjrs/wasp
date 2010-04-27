@@ -49,7 +49,6 @@ class ConfigurableIface:
             default = getattr(self, "DEFAULT_%s" % key.upper())
             val = self.config_get(key, default)
             setattr(self, "_%s" % key, val)
-            print "set", key, val
 
         self._autobind_update_state_cb = kwargs.get("update_state_cb", None)
         self._autobind_update_config_cb = kwargs.get("update_config_cb", None)
