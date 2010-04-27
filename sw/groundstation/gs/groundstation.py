@@ -356,9 +356,9 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             )
         except KeyError, e:
             msg = self._msgarea.new_from_text_and_icon(
-                            gtk.STOCK_DIALOG_ERROR,
                             "Mark Home Failed",
                             "A GPS location has not been received from the UAV yet",
+                            message_type=gtk.MESSAGE_ERROR,
                             timeout=5)
             msg.show_all()
 
@@ -392,15 +392,14 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         path = self._map.save_kml()
         if path:
             msg = self._msgarea.new_from_text_and_icon(
-                            gtk.STOCK_INFO,
                             "KML Export Successful",
-                            "The file has been saved to %s" % path,
+                            'The file has been saved to <a href="file://%s">%s</a>' % (path, path),
                             timeout=5)
         else:
             msg = self._msgarea.new_from_text_and_icon(
-                            gtk.STOCK_DIALOG_ERROR,
                             "KML Export Failed",
                             "You must mark the home position of the flight first.",
+                            message_type=gtk.MESSAGE_ERROR,
                             timeout=5)
         msg.show_all()
 
