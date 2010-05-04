@@ -261,6 +261,21 @@ class TestSettingsFile(unittest.TestCase):
     def testParse(self):
         self.failUnlessEqual(len(self.sf.all_settings), 8)
         self.failUnlessEqual(len(self.sf.all_sections), 3)
+        self.failUnlessEqual(len(self.sf.settible), 1)
+        self.failUnlessEqual(len(self.sf.gettible), 1)
+
+    def testSettingParse(self):
+        s = self.sf.get_setting_by_name(TEST_SETTING_NAME)
+        self.failUnless( s )
+
+        self.failUnlessEqual(s.name, TEST_SETTING_NAME)
+        self.failUnlessEqual(s.type, TEST_SETTING_TYPE)
+        self.failUnlessEqual(s.value, TEST_SETTING_VALUE)
+
+    def testDictHelper(self):
+        s = self.sf[TEST_SETTING_NAME]
+        self.failUnlessEqual(s.name, TEST_SETTING_NAME)
+
 
 if __name__ == "__main__":
     import sys

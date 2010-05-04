@@ -207,72 +207,62 @@ class _Section:
     def __str__(self):
         return "<Section: %s>" % self.name
 
-class Settings:
-    def __init__(self, x):
-        self.sections = [_Section(s) for s in xmlobject.ensure_list(x.section)]
-
-        self.settible = []
-        self.gettible = []
-        i = 1;
-        for sect in self.sections:
-            for s in sect.settings:
-                if s.set:
-                    self.settible.append(s)
-                if s.get:
-                    self.gettible.append(s)
-                if s.dynamic:
-                    s.set_id(i)
-                    i += 1
-
-    def print_typedefs(self):
-        print "typedef bool_t (*SettingSetterCallback_t)(uint8_t chan, void *data);"
-        print "typedef bool_t (*SettingGetterCallback_t)(uint8_t chan, void *data);"
-        print
-
-    def print_defines(self):
-        min_ = -1
-        max_ = 0
-
-        for sect in self.sections:
-            for s in sect.settings:
-                if s.dynamic:
-                    s.print_id()
-                    s.print_type()
-                    if min_ == -1:
-                        min_ = s.id
-                    max_ = max(s.id, max_)
-
-        print
-        print "#define SETTING_ID_MIN %s" % min_
-        print "#define SETTING_ID_MAX %d" % max_
-        print
-
-    def print_values(self):
-        for sect in self.sections:
-            for s in sect.settings:
-                s.print_value()
-            print
-        print
-
 class SettingsFile:
     def __init__(self, **kwargs):
+        self._debug = kwargs.get("debug", False)
+
         path = kwargs.get("path")
         if path and not os.path.exists(path):
             raise Exception("Could not find settings file")
 
+        self.all_settings = []
+        self.all_sections = []
+        self.settible = []
+        self.gettible = []
+        self._settings_by_name = {}
+        self._settings_by_id = {}
+
         try:
             x = xmlobject.XMLFile(**kwargs)
-            self.settings = Settings(x.root)
+            self.all_sections = [_Section(s) for s in xmlobject.ensure_list(x.root.section)]
 
-            settings = []
-            for sect in self.settings.sections:
+            i = 1
+            for sect in self.all_sections:
                 for s in sect.settings:
-                    settings.append(s)
-            self.all_settings = settings
-            self.all_sections = self.settings.sections
-        except:
-            self.settings = None
-            self.all_settings = []
-            self.all_sections = []
 
+                    self.all_settings.append(s)
+                    self._settings_by_name[s.name] = s
+                    self._settings_by_id[s.id] = s
+
+                    if s.set:
+                        self.settible.append(s)
+                    if s.get:
+                        self.gettible.append(s)
+                    if s.dynamic:
+                        s.set_id(i)
+                        i += 1
+        except:
+            raise Exception("Could not parse settings file")
+
+    def __getitem__(self, key):
+        m = self.get_setting_by_name(key)
+        if not m:
+            raise KeyError("Could not find setting: %s" % key)
+        return m
+
+    def get_setting_by_name(self, name):
+        try:
+            return self._settings_by_name[name]
+        except KeyError:
+            if self._debug:
+                print "ERROR: No setting %s" % name
+            return None
+
+    def get_setting_by_id(self, id):
+        try:
+            return self._settings_by_id[id]
+        except KeyError:
+            if self._debug:
+                print "ERROR: No setting %s" % id
+            return None
 
