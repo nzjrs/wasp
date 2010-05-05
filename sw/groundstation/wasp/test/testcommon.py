@@ -15,13 +15,14 @@ SETTINGS_XML = """<?xml version="1.0"?>
     <setting name="IMU_MAG_Z_SENS" value="-14.675745" integer="16"/>
   </section>
   <section name="TESTSECTION3">
-    <setting name="TESTSETGET" type="uint8" value="156" set="1" get="1"/>
+    <setting name="TESTSETGET" type="uint8" value="156" set="1" get="1" doc="foo"/>
   </section>
 </settings>"""
 
 TEST_SETTING_NAME = "TESTSECTION3_TESTSETGET"
 TEST_SETTING_TYPE = "uint8"
 TEST_SETTING_VALUE = "156"
+TEST_SETTING_DOC = "foo"
 
 XML = """<?xml version="1.0"?>
 <messages>

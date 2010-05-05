@@ -271,11 +271,11 @@ class TestSettingsFile(unittest.TestCase):
         self.failUnlessEqual(s.name, TEST_SETTING_NAME)
         self.failUnlessEqual(s.type, TEST_SETTING_TYPE)
         self.failUnlessEqual(s.value, TEST_SETTING_VALUE)
+        self.failUnlessEqual(s.doc, TEST_SETTING_DOC)
 
     def testDictHelper(self):
         s = self.sf[TEST_SETTING_NAME]
         self.failUnlessEqual(s.name, TEST_SETTING_NAME)
-
 
 if __name__ == "__main__":
     import sys
