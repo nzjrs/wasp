@@ -37,7 +37,7 @@ class TestConfigurable(plugin.Plugin, config.ConfigurableIface):
         e2 = self.build_entry("e2")
         ck1 = self.build_checkbutton("Test_Check")
 
-        sg = self.make_sizegroup()
+        sg = self.build_sizegroup()
 
         items = [c1, ck1, e0, e1, e2]
         items += g1

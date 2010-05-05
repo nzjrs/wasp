@@ -91,7 +91,7 @@ class ConfigurableIface:
         """
         return None, None, []
 
-    def make_sizegroup(self):
+    def build_sizegroup(self):
         return gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
 
     def build_label(self, label, widget, sg=None):

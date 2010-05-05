@@ -271,7 +271,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         items = [ser_port_cb, ser_speed_cb]
 
         #the gui looks like
-        sg = self.make_sizegroup()
+        sg = self.build_sizegroup()
         frame = self.build_frame(None, [
             self.build_label("Serial Port", ser_port_cb, sg),
             self.build_label("Serial Baud", ser_speed_cb, sg),

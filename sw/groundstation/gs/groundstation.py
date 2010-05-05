@@ -252,7 +252,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         items = [ck, e1, e2, e3]
 
-        sg = self.make_sizegroup()
+        sg = self.build_sizegroup()
         frame = self.build_frame(None, [
             ck,
             self.build_label("Home Latitude", e1, sg),

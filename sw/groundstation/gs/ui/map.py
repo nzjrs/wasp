@@ -276,7 +276,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
             source = self.build_combo_with_model("source", *sources)
 
             items = [proxy, cache, source]
-            sg = self.make_sizegroup()
+            sg = self.build_sizegroup()
             frame = self.build_frame(None, [
                     self.build_label("Source", source, sg),
                     self.build_label("Proxy", proxy, sg),
