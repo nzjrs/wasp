@@ -6,13 +6,13 @@ import os.path
 
 import xmlobject
 
-def contfrac(p, q):
+def _contfrac(p, q):
     while q:
         n = p // q
         yield n
         q, p = p - q*n, q
 
-def convergents(cf):
+def _convergents(cf):
     p, q, r, s = 1, 0, 0, 1
     for c in cf:
         p, q, r, s = c*p+r, c*q+s, p, q
@@ -24,14 +24,15 @@ def convert_float_to_rational_fraction_approximation(xi, maxsize=10000):
     approximation, where the size of the fraction numerator or
     denominator cannot exceed maxsize.
 
-    Python 2.6 has this functionality built in, kind of
-    from fractions import Fraction
-    Fraction('3.1415926535897932').limit_denominator(1000)
+    Python 2.6 has this functionality built in, kind of ::
+
+        from fractions import Fraction
+        Fraction('3.1415926535897932').limit_denominator(1000)
     """
     xp,xq = float.as_integer_ratio(xi)
 
     p, q = 0, 0
-    for r, s in convergents(contfrac(xp, xq)):
+    for r, s in _convergents(_contfrac(xp, xq)):
 #        if s > maxsize and q:                              #limit size of denominator
         if q and (abs(s) > maxsize or abs(r) > maxsize):    #limit size of num and den
             break
@@ -39,7 +40,10 @@ def convert_float_to_rational_fraction_approximation(xi, maxsize=10000):
 
     return p,q
 
-class _Setting:
+class Setting:
+    """
+    Represents a single setting defined in *settings.xml*
+    """
 
     #Converted to an enum to fake dynamic typing, python -> c with consistent
     #type identifiers
@@ -195,12 +199,13 @@ class _Setting:
     def __hash__(self):
         return hash(self.name)
 
-class _Section:
+class Section:
+    """ Reprents a setion (group) of settings in *settings.xml* """
     def __init__(self, x):
         self.name = x.name.upper()
 
         try:
-            self.settings = [_Setting(self.name, s) for s in xmlobject.ensure_list(x.setting)]
+            self.settings = [Setting(self.name, s) for s in xmlobject.ensure_list(x.setting)]
         except AttributeError:
             self.settings = []
 
@@ -208,7 +213,20 @@ class _Section:
         return "<Section: %s>" % self.name
 
 class SettingsFile:
+    """
+    A pythonic wrapper for parsing *settings.xml*
+    """
     def __init__(self, **kwargs):
+        """
+        **Keywords:**
+            - debug - should extra information be printed while parsing 
+              *messages.xml*
+            - path - a pathname from which the file can be read
+            - file - an open file object from which the raw xml
+              can be read
+            - raw - the raw xml itself
+            - root - name of root tag, if not reading content
+        """
         self._debug = kwargs.get("debug", False)
 
         path = kwargs.get("path")
@@ -224,7 +242,7 @@ class SettingsFile:
 
         try:
             x = xmlobject.XMLFile(**kwargs)
-            self.all_sections = [_Section(s) for s in xmlobject.ensure_list(x.root.section)]
+            self.all_sections = [Section(s) for s in xmlobject.ensure_list(x.root.section)]
 
             i = 1
             for sect in self.all_sections:

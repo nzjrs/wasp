@@ -11,12 +11,13 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys
+import os.path
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.append(os.path.abspath('.'))
+sys.path.append(os.path.join(os.path.abspath('.'),'sw','groundstation'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -28,6 +29,14 @@ extensions = ['sphinx.ext.todo', 'sphinx.ext.pngmath']
 # linking to external docs
 sys.path.append( "doc" )
 extensions += ["breathe","xref"]
+
+## Automatically document python code
+extensions += ['sphinx.ext.autodoc']
+autoclass_content = "both"
+
+## Crossref to the python documentation
+extensions += ['sphinx.ext.intersphinx']
+intersphinx_mapping = {'http://docs.python.org/dev': None}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['doc/templates']
@@ -43,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Wasp'
-copyright = u'2009, Wasp'
+copyright = u'2010, Wasp'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

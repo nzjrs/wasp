@@ -1,6 +1,38 @@
+"""
+libwasp is a library for interacting with UAVs running the wasp software system.
+This library can be used to create groundstation and other monitoring software
+for interacting with the UAV. The library is coupled with the onboard sofware 
+througn
+
+* *messages.xml* - the defintion of messages sent over the chosen communication
+  channel from the UAV to the groundstation
+* *settings.xml* - a concept of a semi-persistant setting on the UAV. The setting
+  may be read/updated from the groundstation and stored on the UAV
+"""
+
 import random
 import time
 import math
+
+#: dictionary mapping the C type to its length in bytes (e.g char -> 1)
+TYPE_TO_LENGTH_MAP = {
+    "char"      :   1,
+    "uint8"     :   1,
+    "int8"      :   1,
+    "uint16"    :   2,
+    "int16"     :   2,
+    "uint32"    :   4,
+    "int32"     :   4,
+    "float"     :   4,
+}
+
+#: dictionary mapping the C type to correct format string
+TYPE_TO_PRINT_MAP = {
+        float   :   "%f",
+        str     :   "%s",
+        chr     :   "%c",
+        int     :   "%d"
+}
 
 def setup_comm_optparse_options(parser, default_messages="/dev/null"):
     """
@@ -24,7 +56,20 @@ def setup_comm_optparse_options(parser, default_messages="/dev/null"):
                     type="int", default=1,
                     help="serial timeout")
 
-class NoisySine:
+class _Noisy:
+    """
+    An interface for objects providing noisy data (usually for testing)
+    """
+    def value(self):
+        """
+        :returns: the next value
+        """
+        raise NotImplementedError
+
+class NoisySine(_Noisy):
+    """
+    Generates a noisy sinewave
+    """
     def __init__(self, freq=1.0, amplitude=50.0, value_type=float, positive=True, noise_pct=10):
         self.t = time.time()
         self.dt = 0.0
@@ -53,7 +98,10 @@ class NoisySine:
         noise = random.randrange(self.n1, self.n2, int=self.type)
         return self.type(noise + val)
 
-class NoisyWalk:
+class NoisyWalk(_Noisy):
+    """
+    Generates a noisy random walk
+    """
     def __init__(self, start, end, delta, value_type=float):
         self.v = start
         self.end = end
@@ -71,7 +119,7 @@ class NoisyWalk:
                 self.v = v
         return self.type(self.v)
 
-class Noisy:
+class Noisy(_Noisy):
     def __init__(self, value, delta, value_type=float):
         self.v = value
         self.delta = delta

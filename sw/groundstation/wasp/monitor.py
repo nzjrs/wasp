@@ -1,6 +1,16 @@
 import gobject
 
 class GObjectSerialMonitor(gobject.GObject):
+    """
+    A GObject base class that accepts a libserial.SerialSender object 
+    and sets up the appropriate watches on the underlying file descriptor. It
+    also manages the connnection/disconnection logic so the port can be
+    reconfigured once the app is running.
+
+    Derived classes must implement the on_serial_data_available method
+    and then emit the *got-message* signal. This means that users of this 
+    class need only to connect to the "got-message" signal
+    """
 
     __gsignals__ = {
         "got-message" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
@@ -14,6 +24,9 @@ class GObjectSerialMonitor(gobject.GObject):
         self.change_serialsender(serialsender)
 
     def change_serialsender(self, serialsender):
+        """
+        Change the underlying libserial.SerialSender, such as after reconfiguration
+        """
         #remove the old watch
         if self._watch:
             gobject.source_remove(self._watch)
@@ -38,5 +51,9 @@ class GObjectSerialMonitor(gobject.GObject):
 
 
     def on_serial_data_available(self, fd, condition, serial):
+        """
+        Derived types must implement this function. It is called whenever there
+        is data available to be read from the libserial.SerialSender
+        """
         raise NotImplementedError
 

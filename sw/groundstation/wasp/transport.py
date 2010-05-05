@@ -5,7 +5,17 @@ STX = 0x99
 NUM_NON_PAYLOAD_BYTES = 6
 
 class TransportHeaderFooter:
+    """
+    The header/footer of a message 
 
+    **Attributes:**
+        - stx: start byte
+        - length: length in bytes (total length, i.e. including header/footer
+        - acid: aircraft ID of sender/destination
+        - msgid: message ID
+        - ck_a: checksum high byte
+        - ck_b: checksum low byte
+    """
     def __init__(self, stx=STX, length=NUM_NON_PAYLOAD_BYTES, acid=0, msgid=0, ck_a=0, ck_b=0):
         self.stx = stx
         self.length = length
@@ -16,20 +26,24 @@ class TransportHeaderFooter:
 
 class Transport:
     """
-    Class that extracts a paparazzi payload from a string or 
-    sequence of characters from the transport layer
+    Class that extracts a wasp payload from a string or sequence of 
+    characters (data is sent in little endian byte order)
     
-    Data is expected in the following form
+    Data is expected in the following form ::
 
-    There are 6 non payload bytes in a packet
+        |STX|length|AC_ID|MESSAGE_ID|... payload=(length-6) bytes ...|Checksum A|Checksum B|
 
-    Transport
-    |STX|length|AC_ID|MESSAGE_ID|... payload=(length-6) bytes ...|Checksum A|Checksum B|
+    Payload ::
+
+        |... MESSAGE DATA ...|
     
-    Payload
-    |... MESSAGE DATA ...|
-    
-    Data sent in little endian byte order
+    There are 6 non payload bytes in a packet (described in :mod:`TransportHeaderFooter`
+        - STX
+        - length
+        - AC_ID
+        - MESSAGE_ID
+        - Checksum A
+        - Checksum B
     """
 
     STATE_UNINIT,       \
@@ -99,7 +113,7 @@ class Transport:
         Similar to parse_one, but operates on a string, returning 
         multiple payloads if successful
 
-        @returns: A list payloads
+        :returns: A list of payloads strings
         """
         payloads = []
         for c in string:
@@ -114,7 +128,7 @@ class Transport:
         not the data in the transport layer, i.e. it does not return
         STX, the length, or the checksums
 
-        @returns: The payload, or an empty string if insuficcient data
+        :returns: The payload string, or an empty string if insuficcient data
         is available
         """
 
