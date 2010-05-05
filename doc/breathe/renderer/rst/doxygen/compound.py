@@ -246,11 +246,12 @@ class DocRefTextTypeSubRenderer(Renderer):
         nodelist = [
                 self.node_factory.pending_xref(
                     "",
-                    *nodelist,
                     reftype="ref",
                     refid=refid, 
+                    refdoc=None,
                     reftarget=refid,
-                    refcaption=refid
+                    refcaption=refid,
+                    *nodelist
                     )
                 ]
 
