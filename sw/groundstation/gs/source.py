@@ -41,6 +41,13 @@ class _MessageCb:
                 except Exception:
                     LOG.warn("Error calling callback for %s" % msg, exc_info=True)
 
+class _LogCsvCb(_MessageCb):
+    def __init__(self, logfile):
+        pass
+
+    def call_cb(self, msg, header, payload, time):
+        pass
+
 class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
     CONFIG_SECTION = "UAVSOURCE"
@@ -136,7 +143,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         Register interest in receiving a callback when a message with the specified 
         name arrives.
 
-        @cb: Callback to be called. The signature is (msg, payload, **user_data)
+        @cb: Callback to be called. The signature is (msg, header, payload, **user_data)
         @max_frequency: Max frequency to receive callbacks
         @message_names: List of message names to watch for
         """
