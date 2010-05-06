@@ -2,8 +2,22 @@
 Groundstation Software Documentation
 ====================================
 
+.. autosummary::
+
+    wasp.messages.PyField
+    wasp.messages.PyMessage
+    wasp.messages.MessagesFile
+    wasp.settings.Setting
+    wasp.settings.SettingsFile
+    libserial.SerialChooser.SerialChooser
+    libserial.SerialSender.SerialSender
+    gs.plugin.Plugin
+    gs.config.ConfigurableIface
+    gs.source.UAVSource
+
+-----------
 libwasp API
-===========
+-----------
 
 .. automodule:: wasp
    :members:
@@ -28,8 +42,9 @@ libwasp API
    :members:
    :undoc-members:
 
+-------------
 libserial API
-===========
+-------------
 
 .. automodule:: libserial
    :members:
@@ -42,8 +57,9 @@ libserial API
    :members:
    :undoc-members:
 
-Extending the Groundstation (groundstation plugin API)
-======================================================
+--------------------------------------------
+Extending the Groundstation (The Plugin API)
+--------------------------------------------
 
 .. autoclass:: gs.plugin.Plugin
    :members:

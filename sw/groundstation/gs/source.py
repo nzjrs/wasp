@@ -147,7 +147,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         Register interest in receiving a callback when a message with the specified 
         name arrives.
 
-        :param cb: a callback to be called. The signature is (msg, header, payload, **user_data)
+        :param cb: a callback to be called. The signature is (msg, header, payload, \*\*user_data)
         :param max_frequency: the max frequency to receive callbacks
         :param message_names: a list of message names to watch for
         """

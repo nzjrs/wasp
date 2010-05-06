@@ -327,8 +327,8 @@ class PyMessage(Message):
         Assemble the list of field values into a message payload string
 
         :param values: a list of values of the type expected by the appropriate
-        field. For example, if the 3rd field in the message is a *uint8* then
-        the third value should be an Int
+         field. For example, if the 3rd field in the message is a *uint8* then
+         the third value should be an Int
         """
         assert len(values) == self.num_values, "%s != %s" % (len(values), self.num_values)
 

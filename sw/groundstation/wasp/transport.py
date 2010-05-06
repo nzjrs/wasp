@@ -128,8 +128,7 @@ class Transport:
         not the data in the transport layer, i.e. it does not return
         STX, the length, or the checksums
 
-        :returns: The payload string, or an empty string if insuficcient data
-        is available
+        :returns: The payload string, or an empty string if insuficcient data is available
         """
 
         def update_checksum(d):

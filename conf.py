@@ -32,10 +32,10 @@ extensions += ["breathe","xref"]
 
 # Add a helper for making the generated docs more suitable for 
 # hosting on github
-extensions += ["sphinxtogithub"]
+# extensions += ["sphinxtogithub"]
 
 ## Automatically document python code
-extensions += ['sphinx.ext.autodoc']
+extensions += ['sphinx.ext.autodoc', 'sphinx.ext.autosummary']
 autoclass_content = "both"
 
 ## Crossref to the python documentation
