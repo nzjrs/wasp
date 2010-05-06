@@ -45,7 +45,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     CONFIG_LON_DEFAULT = 172.582377
     CONFIG_ZOOM_DEFAULT = 12
 
-    def __init__(self, prefsfile, messagesfile, settingsfile, use_test_source):
+    def __init__(self, prefsfile, messagesfile, settingsfile, use_test_source, disable_plugins):
         #connect our log buffer to the python logging subsystem
         self._logbuffer = LogBuffer()
         handler = logging.StreamHandler(self._logbuffer)
@@ -103,7 +103,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         }
 
         self._plugin_manager = PluginManager()
-        self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
+        if not disable_plugins:
+            self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
 
         self._map = Map(self._config, self._source)
         self._gm = GraphManager(self._config, self._source, self._messagesfile, self.get_resource("graphs_box"), self.window)

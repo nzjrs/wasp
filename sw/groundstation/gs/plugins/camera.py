@@ -100,7 +100,8 @@ class CameraWindow(plugin.Plugin, config.ConfigurableIface):
         config.ConfigurableIface.__init__(self, conf)
 
         #add an entry to the window menu
-        item = gtk.MenuItem("Camera View")
+        item = gtk.ImageMenuItem("Camera View")
+        item.set_image(gtk.image_new_from_stock(gtk.STOCK_MISSING_IMAGE, gtk.ICON_SIZE_MENU))
         item.connect("activate", self._show_window)
         groundstation_window.add_menu_item("Window", item)
 

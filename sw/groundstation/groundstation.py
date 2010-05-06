@@ -36,6 +36,9 @@ if __name__ == "__main__":
     parser.add_option("-t", "--use-test-source",
                     action="store_true", default=False,
                     help="Dont connect to the UAV, use a test source")
+    parser.add_option("-d", "--disable-plugins",
+                    action="store_true", default=False,
+                    help="Disable loading plugins")
 
     options, args = parser.parse_args()
 
@@ -46,6 +49,7 @@ if __name__ == "__main__":
             os.path.abspath(options.preferences),
             os.path.abspath(options.messages),
             os.path.abspath(options.settings),
-            options.use_test_source
+            options.use_test_source,
+            options.disable_plugins
     )
     gs.main()
