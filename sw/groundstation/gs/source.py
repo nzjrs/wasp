@@ -158,14 +158,14 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         self._linktimeout = datetime.timedelta(seconds=2)
         self._lastt = datetime.datetime.now()
         self._times = utils.MovingAverage(5, float)
-        gobject.timeout_add_seconds(2, self._check_link_status)
+        gobject.timeout_add(2000, self._check_link_status)
 
         #track the ping time
         self._sendping = None
         self._pingtime = 0
         self._pingmsg = messages.get_message_by_name("PING")
         self.register_interest(self._got_pong, 0, "PONG")
-        gobject.timeout_add_seconds(2, self._do_ping)
+        gobject.timeout_add(2000, self._do_ping)
 
     def _got_pong(self, msg, header, payload):
         #calculate difference in send and rx in milliseconds

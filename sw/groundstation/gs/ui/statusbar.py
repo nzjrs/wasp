@@ -67,7 +67,7 @@ class StatusBar(gtk.Statusbar):
         source.register_interest(self._on_gps, 0, "GPS_LLH")
         source.register_interest(self._on_debug, 0, "DEBUG")
 
-        gobject.timeout_add_seconds(1, self._check_messages_per_second, source)
+        gobject.timeout_add(1000, self._check_messages_per_second, source)
 
     def _connected_update_icon(self, source, *args):
         status = source.get_status()

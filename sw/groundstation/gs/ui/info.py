@@ -41,7 +41,7 @@ class InfoBox(gs.ui.GtkBuilderWidget):
         source.register_interest(self._on_time, 2, "TIME")
         source.register_interest(self._on_build_info, 2, "BUILD_INFO")
 
-        gobject.timeout_add_seconds(1, self._check_messages_per_second, source)
+        gobject.timeout_add(1000, self._check_messages_per_second, source)
 
     def _check_messages_per_second(self, source):
         self.get_resource("rate_value").set_text("%.1f msgs/s" % source.get_messages_per_second())

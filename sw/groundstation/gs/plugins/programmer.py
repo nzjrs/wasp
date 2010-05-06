@@ -97,7 +97,7 @@ class Programmer(plugin.Plugin, gs.ui.GtkBuilderWidget):
                             shell=True,
                             stdout=None,
                             stderr=None)
-        gobject.timeout_add_seconds(1, self._check_make)
+        gobject.timeout_add(1000, self._check_make)
 
     def _on_program(self, *args):
         if not self._process:

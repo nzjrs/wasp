@@ -241,7 +241,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     def update_state_from_config(self):
         self._c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)
         if self._c == "1" and not self._tried_to_connect:
-            gobject.timeout_add_seconds(2, self._connect)
+            gobject.timeout_add(2000, self._connect)
 
         try:
             self._home_lat = float(self.config_get("home_lat", self.CONFIG_LAT_DEFAULT))

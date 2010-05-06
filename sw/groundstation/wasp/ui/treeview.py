@@ -76,7 +76,7 @@ class MessageTreeView(gtk.TreeView):
                 self._get_dt_value)
 
             #schedule a redraw of the time column every second
-            gobject.timeout_add_seconds(1, self._redraw_dt, messagetreemodel)
+            gobject.timeout_add(1000, self._redraw_dt, messagetreemodel)
 
 
         self.get_selection().set_mode(gtk.SELECTION_SINGLE)
