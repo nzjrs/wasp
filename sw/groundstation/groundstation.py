@@ -45,6 +45,9 @@ if __name__ == "__main__":
     if not os.path.exists(options.messages):
         parser.error("could not find messages.xml")
 
+    if not os.path.exists(options.settings):
+        parser.error("could not find settings.xml")
+
     gs = groundstation.Groundstation(
             os.path.abspath(options.preferences),
             os.path.abspath(options.messages),

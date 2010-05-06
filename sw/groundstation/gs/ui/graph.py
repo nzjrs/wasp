@@ -92,7 +92,7 @@ class _GraphRange(gtk.VBox):
     def _on_max_spinbutton_changed(self, adj, graph):
         pass
 
-class _GraphHolder(gtk.HBox):
+class GraphHolder(gtk.HBox):
     """
     Composite widget holding a rtgraph and controls
 
@@ -124,21 +124,25 @@ class _GraphHolder(gtk.HBox):
         vb = gtk.VBox()
 
         bbox = gtk.VButtonBox()
+        bbox.set_layout(gtk.BUTTONBOX_END)
         vb.pack_start(bbox, True, True)
 
-        pa = gtk.Button(stock=gtk.STOCK_MEDIA_PAUSE)
-        pa.connect("clicked", on_pause, tweak)
-        pr = gtk.Button(stock=gtk.STOCK_PRINT)
-        pr.connect("clicked", on_print, g, name)
-        rm = gtk.Button(stock=gtk.STOCK_REMOVE)
-        rm.connect("clicked", on_remove, name)
-        fs = gtk.Button(stock=gtk.STOCK_FULLSCREEN)
-        fs.connect("clicked", on_fullscreen, name)
-        bbox.pack_start(pa, False, False)
-        bbox.pack_start(pr, False, False)
-        bbox.pack_start(rm, False, False)
-        bbox.pack_start(fs, False, False)
-        bbox.set_layout(gtk.BUTTONBOX_END)
+        if on_pause:
+            pa = gtk.Button(stock=gtk.STOCK_MEDIA_PAUSE)
+            pa.connect("clicked", on_pause, tweak)
+            bbox.pack_start(pa, False, False)
+        if on_print:
+            pr = gtk.Button(stock=gtk.STOCK_PRINT)
+            pr.connect("clicked", on_print, g, name)
+            bbox.pack_start(pr, False, False)
+        if on_remove:
+            rm = gtk.Button(stock=gtk.STOCK_REMOVE)
+            rm.connect("clicked", on_remove, name)
+            bbox.pack_start(rm, False, False)
+        if on_fullscreen:
+            fs = gtk.Button(stock=gtk.STOCK_FULLSCREEN)
+            fs.connect("clicked", on_fullscreen, name)
+            bbox.pack_start(fs, False, False)
 
         if adjustable:
             r = _GraphRange(g)
@@ -231,7 +235,7 @@ class GraphManager(config.ConfigurableIface):
         if name not in self._graphs:
             LOG.info("Adding graph: %s" % name)
 
-            gh = _GraphHolder(
+            gh = GraphHolder(
                     Graph(self._source, msg, field),
                     name,
                     adjustable,
