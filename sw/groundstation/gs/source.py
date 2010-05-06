@@ -1,9 +1,12 @@
+import sqlite3
+import time
 import logging
 import datetime
 import gobject
 
 import libserial
 
+import gs
 import gs.config as config
 import gs.utils as utils
 
@@ -41,12 +44,57 @@ class _MessageCb:
                 except Exception:
                     LOG.warn("Error calling callback for %s" % msg, exc_info=True)
 
-class _LogCsvCb(_MessageCb):
-    def __init__(self, logfile):
+    def quit(self):
         pass
 
-    def call_cb(self, msg, header, payload, time):
-        pass
+class _LogSqliteCb(_MessageCb):
+    def __init__(self, logfile):
+        if not logfile:
+            logfile = gs.user_file_path("flight.sqlite")
+
+        self._con = sqlite3.connect(
+                        logfile,
+                        detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+        #by setting the text_factory as str, sqlite will not get in the way
+        #when storing 8-bit bytestrings (i.e. the raw payload data)
+        self._con.text_factory = str
+        self._cur = self._con.cursor()
+        self._cur.execute("CREATE TABLE data(time timestamp, acid INTEGER, msgid INTEGER, payload BLOB)")
+
+    def call_cb(self, msg, header, payload, msgtime):
+        self._cur.execute("INSERT INTO data(time, acid, msgid, payload) VALUES (?, ?, ?, ?)", (
+                    msgtime,
+                    int(header.acid),
+                    int(header.msgid),
+                    payload))
+
+    def quit(self):
+        if self._con and self._cur:
+            #careful not to close the DB twice
+            self._cur.close()
+            self._con.close()
+            self._con = self._cur = None
+
+class _LogCsvCb(_MessageCb):
+    def __init__(self, logfile, msg):
+        if not logfile:
+            logfile = gs.user_file_path(msg.name + ".csv")
+        self._f = open(logfile, 'w')
+
+        #print the CSV header
+        header = ["time", "acid"] + [f.name for f in msg.fields]
+        self._f.write(", ".join(header)+"\n")
+
+    def call_cb(self, msg, header, payload, msgtime):
+        self._f.write("%f, %s, " % (
+                time.mktime(msgtime.timetuple()) + msgtime.microsecond / 1e6,
+                header.acid))
+        self._f.write(
+                msg.unpack_printable_values(payload, joiner=", "))
+        self._f.write("\n")
+
+    def quit(self):
+        self._f.close()
 
 class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
@@ -133,6 +181,12 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
             self.emit("source-link-status-change", self._linkok)
         return True
 
+    def _save_callback(self, msg, cb):
+        try:
+            self._callbacks[msg.id].append(cb)
+        except KeyError:
+            self._callbacks[msg.id] = [cb]
+
     def get_status(self):
         """ Returns the connection status, :const:`gs.source.UAVSource.STATUS_CONNECTED` etc """
         connected = self.serial.is_open()
@@ -141,6 +195,26 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
                 return self.STATUS_CONNECTED_LINK_OK
             return self.STATUS_CONNECTED
         return self.STATUS_DISCONNECTED
+
+    def register_csv_logger(self, logfilepath, *message_names):
+        #only allowed one CSV per message
+        for m in message_names:
+            msg = self._messages_file.get_message_by_name(m)
+            if not msg:
+                LOG.critical("Unknown message: %s" % m)
+
+            callbackobj = _LogCsvCb(logfilepath, msg)
+            self._save_callback(msg, callbackobj)
+
+    def register_sqlite_logger(self, logfilepath, *message_names):
+        #the sqlite logger can store multiple messages in the same DB
+        callbackobj = _LogSqliteCb(logfilepath)
+        for m in message_names:
+            msg = self._messages_file.get_message_by_name(m)
+            if not msg:
+                LOG.critical("Unknown message: %s" % m)
+
+            self._save_callback(msg, callbackobj)
 
     def register_interest(self, cb, max_frequency, *message_names, **user_data):
         """
@@ -156,11 +230,8 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
             if not msg:
                 LOG.critical("Unknown message: %s" % m)
 
-            cb = _MessageCb(cb, max_frequency, **user_data)
-            try:
-                self._callbacks[msg.id].append(cb)
-            except KeyError:
-                self._callbacks[msg.id] = [cb]
+            callbackobj = _MessageCb(cb, max_frequency, **user_data)
+            self._save_callback(msg, callbackobj)
 
     def unregister_interest(self, cb):
         """
@@ -229,6 +300,9 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
     def quit(self):
         self.disconnect_from_uav()
+        for cbs in self._callbacks.values():
+            for cb in cbs:
+                cb.quit()
 
     def get_connection_parameters(self):
         return self._port, self._speed

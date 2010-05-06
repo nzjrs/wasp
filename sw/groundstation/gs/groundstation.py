@@ -160,6 +160,9 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             nb.page_num(
                 self.get_resource("autopilot_hbox")))
 
+        #self._source.register_csv_logger(None, "STATUS", "GPS_LLH")
+        #self._source.register_sqlite_logger(None, "STATUS", "GPS_LLH")
+
         self.window.show_all()
 
     def _create_telemetry_ui(self):
