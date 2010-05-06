@@ -6,17 +6,7 @@ class GObjectSerialMonitor(gobject.GObject):
     and sets up the appropriate watches on the underlying file descriptor. It
     also manages the connnection/disconnection logic so the port can be
     reconfigured once the app is running.
-
-    Derived classes must implement the on_serial_data_available method
-    and then emit the *got-message* signal. This means that users of this 
-    class need only to connect to the "got-message" signal
     """
-
-    __gsignals__ = {
-        "got-message" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
-            gobject.TYPE_PYOBJECT]),
-        }
-
     def __init__(self, serialsender):
         gobject.GObject.__init__(self)
         self._watch = None
