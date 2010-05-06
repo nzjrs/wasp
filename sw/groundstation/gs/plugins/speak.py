@@ -9,12 +9,13 @@ LOG = logging.getLogger('speak')
 
 class Speak(plugin.Plugin, config.ConfigurableIface):
 
+    EXECUTABLE = "espeak"
     CONFIG_SECTION = "SPEAK"
     DEFAULT_ENABLED = "0"
 
     def __init__(self, conf, source, messages_file, groundstation_window):
-        if not gs.utils.program_installed("espeak"):
-            raise plugin.PluginNotSupported("espeak not installed")
+        if not gs.utils.program_installed(self.EXECUTABLE):
+            raise plugin.PluginNotSupported("%s not installed" % self.EXECUTABLE)
 
         config.ConfigurableIface.__init__(self, conf)
         self.autobind_config("enabled")
@@ -35,7 +36,7 @@ class Speak(plugin.Plugin, config.ConfigurableIface):
                 return
 
         self.process = subprocess.Popen(
-                ["espeak", "\"%s\"" % msg],
+                [self.EXECUTABLE, "\"%s\"" % msg],
                 )
 
     def _source_connected(self, source, *args):
@@ -69,4 +70,4 @@ class Speak(plugin.Plugin, config.ConfigurableIface):
             e,
         ])
 
-        return "Speak", frame, items
+        return "Audio Announcements", frame, items

@@ -11,7 +11,12 @@ import gs.plugin as plugin
 LOG = logging.getLogger('gevis')
 
 class GoogleEarthVis(plugin.Plugin):
+
+    EXECUTABLE = "googleearth"
+
     def __init__(self, conf, source, messages_file, groundstation_window):
+        if not gs.utils.program_installed(self.EXECUTABLE):
+            raise plugin.PluginNotSupported("%s not installed" % self.EXECUTABLE)
 
         pb = gs.ui.get_icon_pixbuf("world.svg",size=gtk.ICON_SIZE_MENU)
         item = gtk.ImageMenuItem("Show Flight in Google Earth")
@@ -58,7 +63,7 @@ class GoogleEarthVis(plugin.Plugin):
         f.write(output)
         f.close()
 
-    def _on_gps(self, msg, payload):
+    def _on_gps(self, msg, header, payload):
         fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
 
         #convert from mm to m
@@ -88,7 +93,7 @@ class GoogleEarthVis(plugin.Plugin):
 
         #start googleearth
         self._process = subprocess.Popen(
-                            "googleearth %s" % kml,
+                            "%s %s" % (self.EXECUTABLE, kml),
                             shell=True,
                             stdout=None,
                             stderr=None)

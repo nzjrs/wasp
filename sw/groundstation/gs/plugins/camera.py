@@ -140,10 +140,10 @@ class CameraWindow(plugin.Plugin, config.ConfigurableIface):
         #the gui looks like
         sg = self.build_sizegroup()
         frame = self.build_frame(None, [
-            self.build_label("Source", items[0], sg),
-            self.build_label("Device", items[1], sg),
-            self.build_label("Norm", items[2], sg),
-            self.build_label("Input Channel", items[3], sg),
+            self.build_label("Source",          items[0], sg),
+            self.build_label("Device",          items[1], sg),
+            self.build_label("Norm",            items[2], sg),
+            self.build_label("Input Channel",   items[3], sg),
         ])
 
         return "Camera", frame, items

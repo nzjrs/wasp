@@ -194,7 +194,7 @@ class ConfigurableIface:
         :param name: the config name
         """
         section = self.CONFIG_SECTION
-        widget = gtk.CheckButton(label=name.replace("_"," "))
+        widget = gtk.CheckButton(label=name.replace("_"," ").title())
         widget.set_data("CONFIG_NAME", name)
         widget.set_data("CONFIG_SECTION", section)
         return widget

@@ -24,7 +24,7 @@ class GpsView(plugin.Plugin):
         self._sky = None
         self._w = None
 
-    def _on_gps_llh(self, msg, payload):
+    def _on_gps_llh(self, msg, header, payload):
         fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
 
         #convert from mm to m

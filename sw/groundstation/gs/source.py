@@ -32,7 +32,10 @@ class _MessageCb:
 
     def call_cb(self, msg, header, payload, time):
         if self.max_freq <= 0:
-            self.cb(msg, header, payload, **self.kwargs)
+            try:
+                self.cb(msg, header, payload, **self.kwargs)
+            except:
+                LOG.warn("Error calling callback for %s" % msg, exc_info=True)
         else:
             self._lastt, enough_time_passed, dt = utils.has_elapsed_time_passed(
                                             then=self._lastt,
