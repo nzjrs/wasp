@@ -35,6 +35,7 @@ from wasp.ui.senders import RequestMessageSender, RequestTelemetrySender
 LOG = logging.getLogger('groundstation')
 
 class Groundstation(GtkBuilderWidget, ConfigurableIface):
+    """ The main groundstation window """
 
     CONFIG_SECTION = "MAIN"
 
@@ -212,6 +213,13 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._source.disconnect_from_uav()
 
     def add_menu_item(self, name, item):
+        """
+        Adds an item to the main window menu. 
+
+        :param name: the name of the menu to add to, e.g. "File". 
+                     If a menu of that name does not exist, one is created
+        :param item: the gtk.MenuItem to add
+        """
         if name in self._menus:
             menu = self._menus[name]
             if not menu:

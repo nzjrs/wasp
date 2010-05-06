@@ -63,7 +63,7 @@ class Message:
     **Attributes:**
         - id: message integer id (from messages.xml)
         - name: message name (upper case) (from messages.xml)
-        - fields: a list of :mod:`Field` object (type according to field_class)
+        - fields: a list of :class:`Field` object (type according to field_class)
         - size: the length of the message (in bytes)
         - num_values: the total number of values in the message (as a
           field can have multiple elements, such as if it is an array)
@@ -279,7 +279,7 @@ class PyMessage(Message):
         return f
 
     def get_fields(self):
-        """ Returns a list of :mod:`PyField` objects """
+        """ Returns a list of :class:`PyField` objects """
         return self.fields
 
     def get_field_by_name(self, name):
@@ -289,6 +289,28 @@ class PyMessage(Message):
             return None
 
     def get_field_values(self, vals):
+        """
+        Returns a list of values for each field in the message. The return
+        type is dependent on the type of the field. If the field is an array
+        type then the returned list will contain a tuple of the field array
+        elements. For example ::
+
+            <message name="TEST_MESSAGE" id="26">
+                <field name="a_uint8" type="uint8" values="OK|LOST|REALLY_LOST"/>
+                <field name="a_int8" type="int8"/>
+                <field name="a_uint16" type="uint16" unit="adc"/>
+                <field name="a_int16" type="int16"/>
+                <field name="a_uint32" type="uint32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
+                <field name="a_int32" type="int32"/>
+                <field name="a_float" type="float"/>
+                <field name="a_array" type="uint8[3]"/>
+            </message>
+
+        will return the following ::
+
+            [1, -1, 1000, -1000, 100000, -100000, 1.5, (1, 2, 3)]
+
+        """
         i = 0
         v = []
         for f in self.fields:
@@ -302,7 +324,7 @@ class PyMessage(Message):
 
     def pack_values(self, *values):
         """
-        Assemble the list of field values into the message
+        Assemble the list of field values into a message payload string
 
         :param values: a list of values of the type expected by the appropriate
         field. For example, if the 3rd field in the message is a *uint8* then
@@ -315,6 +337,27 @@ class PyMessage(Message):
         return ""
 
     def unpack_values(self, string):
+        """
+        Unlike :func:`get_field_values` this function flattens array
+        fields into the returned list. For example ::
+
+            <message name="TEST_MESSAGE" id="26">
+                <field name="a_uint8" type="uint8" values="OK|LOST|REALLY_LOST"/>
+                <field name="a_int8" type="int8"/>
+                <field name="a_uint16" type="uint16" unit="adc"/>
+                <field name="a_int16" type="int16"/>
+                <field name="a_uint32" type="uint32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
+                <field name="a_int32" type="int32"/>
+                <field name="a_float" type="float"/>
+                <field name="a_array" type="uint8[3]"/>
+            </message>
+
+        will return the following ::
+
+            (1,-1, 1000, -1000, 100000, -100000, 1.5, 1, 2, 3)
+
+        :param string: the message paylod string to unpack
+        """
         if self.fields:
             assert type(string) == str
             assert len(string) == self._struct.size, "%s != %s" % (len(string), self._struct.size)
@@ -322,8 +365,15 @@ class PyMessage(Message):
         return ()
 
     def unpack_printable_values(self, string, joiner=" "):
-        if self.fields:
+        """
+        Returns a string, suitable for printing or displaying to the user,
+        of the given message paylod. The string contains values for each
+        field in the message
 
+        :param string: the message payload to unpack
+        :param joiner: the string used between different message fields
+        """
+        if self.fields:
             vals = self.unpack_values(string)
             assert len(vals) == self.num_values
             fvals = self.get_field_values(vals)
@@ -339,18 +389,21 @@ class PyMessage(Message):
             return ""
 
     def unpack_scaled_values(self, string):
+        """
+        As :func:`unpack_values` but returns the values scaled as per the
+        unit coefficient
+        """
         if self.fields:
-
             vals = self.unpack_values(string)
             assert len(vals) == self.num_values
             fvals = self.get_field_values(vals)
             assert len(fvals) == self.num_fields
 
             return [self.fields[i].get_scaled_value(fvals[i]) for i in range(self.num_fields)]
-
         return ()
 
     def get_default_values(self):
+        """ Returns a list of sensible default values for each field """
         return [ f.get_default_value() for f in self.fields ]
 
 class MessagesFile:
@@ -398,7 +451,7 @@ class MessagesFile:
             self._msgs_by_name[m.name] = msg
 
     def get_messages(self):
-        """ Returns a list of :mod:`PyMessage` objects """
+        """ Returns a list of :class:`PyMessage` objects """
         return self._msgs_by_id.values()
 
     def get_message_by_name(self, name):

@@ -45,12 +45,16 @@ libserial API
 Extending the Groundstation (groundstation plugin API)
 ======================================================
 
-.. automodule:: gs.plugin
+.. autoclass:: gs.plugin.Plugin
    :members:
-   :undoc-members:
-   :exclude-members: PluginManager
 
-.. automodule:: gs.config
+.. autoexception:: gs.plugin.PluginNotSupported
+
+.. autoclass:: gs.config.ConfigurableIface
    :members:
-   :undoc-members:
-   :exclude-members: ConfigWindow
+
+.. autoclass:: gs.groundstation.Groundstation
+   :members:
+
+.. autoclass:: gs.source.UAVSource
+   :members:

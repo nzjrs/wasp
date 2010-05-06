@@ -5,11 +5,36 @@ import logging
 LOG = logging.getLogger('plugin')
 
 class PluginNotSupported(Exception):
+    """
+    Plugins may raise this exception if they wish to not be loaded, for example
+    if the required hardware is not present or they are not supported on the
+    current platform.
+    """
     pass
 
 class Plugin(object):
+    """ An interface from which all plugins must derive """
+
+    #: plugins may provide this value if they do not wish 
+    #: to refered to by their class name
     PLUGIN_NAME     = ""
+    #: an optional plugin version string (not currently used for anything)
     PLUGIN_VERSION  = "0.1"
+
+    def __init__(self, conf, source, messages_file, groundstation_window):
+        """ 
+        Plugins are passed the following objects during construction
+
+        :param conf: an object to store configuration
+         data in. If the plugin also derives from :class:`gs.config.ConfigurableIface`
+         this must be passed to that constructor
+        :param source: a :class:`gs.source.UAVSource` object. Plugins typically
+         call the :func:`gs.source.UAVSource.register_interest`
+        :param messages_file: a :class:`wasp.messages.MessagesFile` object
+        :param groundstation_window: a :class:`gs.groundstation.Groundstation` object
+        """
+        # dont call constructor
+        raise NotImplementedError
     
     def plugin_name(self):
         return self.PLUGIN_NAME or self.__class__.__name__

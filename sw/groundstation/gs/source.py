@@ -58,8 +58,11 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
     PING_TIME = 3
 
+    #: the groundstation is (physically) connected to the UAV
     STATUS_CONNECTED                =   1
+    #: the groundstation is connected and receiving data
     STATUS_CONNECTED_LINK_OK        =   2
+    #: the groundstation is disconnected from the UAV
     STATUS_DISCONNECTED             =   3
 
     def __init__(self, conf, messages, use_test_source, listen_for_uav_id=0xFF):
@@ -131,6 +134,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         return True
 
     def get_status(self):
+        """ Returns the connection status, :const:`gs.source.UAVSource.STATUS_CONNECTED` etc """
         connected = self.serial.is_open()
         if connected:
             if self._linkok:
@@ -143,9 +147,9 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         Register interest in receiving a callback when a message with the specified 
         name arrives.
 
-        @cb: Callback to be called. The signature is (msg, header, payload, **user_data)
-        @max_frequency: Max frequency to receive callbacks
-        @message_names: List of message names to watch for
+        :param cb: a callback to be called. The signature is (msg, header, payload, **user_data)
+        :param max_frequency: the max frequency to receive callbacks
+        :param message_names: a list of message names to watch for
         """
         for m in message_names:
             msg = self._messages_file.get_message_by_name(m)
@@ -159,6 +163,9 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
                 self._callbacks[msg.id] = [cb]
 
     def unregister_interest(self, cb):
+        """
+        Unregisters a previously registered (using :func:`gs.source.UAVSource.register_interest`) callback
+        """
         fid = None
         fcb = None
         for msgid in self._callbacks:
@@ -195,6 +202,12 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         return self._rxts
 
     def send_message(self, msg, values):
+        """
+        Sends the supplied message to the UAV
+
+        :param msg: a :class:`wasp.messages.Message` object
+        :param values: a tuple/list of values for the message
+        """
         if msg:
             data = self._transport.pack_message_with_values(
                         self._groundstation_transport_header, 
@@ -203,9 +216,14 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
             self.serial.write(data.tostring())
 
     def request_message(self, message_id):
+        """ Resuests the UAV send us the message with the supplied ID """
         self.send_message(self._rm, (message_id,))
 
     def request_telemetry(self, message_name, frequency):
+        """
+        Requests the UAV send us telementry, i.e. the supplied *message_name*
+        at the supplied *frequency*
+        """
         m = self._messages_file.get_message_by_name(message_name)
         self.send_message(self._rt, (m.id, frequency))
 
