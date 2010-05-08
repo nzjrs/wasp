@@ -590,13 +590,13 @@
     <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-    <property name="page_size">10</property>
+    <property name="page_size">0</property>
   </object>
   <object class="GtkAdjustment" id="adjustment2">
     <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-    <property name="page_size">10</property>
+    <property name="page_size">0</property>
   </object>
   <object class="GtkAdjustment" id="adjustment3">
     <property name="value">1230</property>
@@ -604,7 +604,7 @@
     <property name="upper">2000</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-    <property name="page_size">10</property>
+    <property name="page_size">0</property>
   </object>
   <object class="GtkAdjustment" id="adjustment4">
     <property name="value">1182</property>
@@ -612,7 +612,7 @@
     <property name="upper">1817</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-    <property name="page_size">10</property>
+    <property name="page_size">0</property>
   </object>
   <object class="GtkAccelGroup" id="accelgroup1"/>
   <object class="GtkImage" id="image2">
