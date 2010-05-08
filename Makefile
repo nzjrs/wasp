@@ -48,6 +48,8 @@ uploaddoc_open: doc
 uploaddoc_john: doc
 	-rsync -av doc/built/html/* root@greenbirdsystems.com:/var/www/johnstowers.co.nz/files/wasp/
 
+uploaddoc: uploaddoc_open uploaddoc_john
+
 dist:
 	@git archive --format=tar --prefix=wasp/ HEAD:sw | gzip > $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)-sw.tar.gz
 	@echo Created $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)-sw.tar.gz
