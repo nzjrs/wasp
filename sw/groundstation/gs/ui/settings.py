@@ -91,25 +91,20 @@ class _EditSetting(gtk.Frame):
     def set_value(self, value):
         self._adj.value = value
 
-class _EditSettingsManager(gtk.ScrolledWindow):
+class _EditSettingsManager(gtk.VBox):
     def __init__(self, source, **msgs):
-        gtk.ScrolledWindow.__init__(self)
-        self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-
-        self._vb = gtk.VBox(spacing=10)
+        gtk.VBox.__init__(self, spacing=10)
         self._sg = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
         self._settings = {}
         self._source = source
         self._msgs = msgs
-
-        self.add(self._vb)
 
     def add_setting(self, setting):
         if setting.id not in self._settings:
             es = _EditSetting(setting, self._source, **self._msgs)
             es.set_size(self._sg)
             es.show_all()
-            self._vb.pack_start(es, False, True)
+            self.pack_start(es, False, True)
             self._settings[setting.id] = es
 
     def update_setting_value(self, settingid, value):
