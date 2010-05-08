@@ -2,16 +2,15 @@ import gtk
 
 import gs.utils as utils
 
-gtk.rc_parse_string("""
-    style "plain-progress-bar" {
-        engine "murrine" {
-            animation = FALSE
-            progressbarstyle = 0
-        }
-    }
-    widget "*.PlainProgress" style "plain-progress-bar"
-    """)
-
+#gtk.rc_parse_string("""
+#    style "plain-progress-bar" {
+#        engine "murrine" {
+#            animation = FALSE
+#            progressbarstyle = 0
+#        }
+#    }
+#    widget "*.PlainProgress" style "plain-progress-bar"
+#    """)
 
 class ProgressBar(gtk.HBox):
     def __init__(self, range, average=0):
