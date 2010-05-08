@@ -49,9 +49,7 @@ class PluginManager:
 
         #default plugin dir is ./plugins/
         if not plugin_dirs:
-            plugin_dirs = [os.path.join(
-                            os.path.dirname(os.path.realpath(__file__)),
-                            "plugins")]
+            raise Exception("Must supply plugin dirs")
 
         for d in plugin_dirs:
             LOG.debug("Searching for plugins in %s" % d)

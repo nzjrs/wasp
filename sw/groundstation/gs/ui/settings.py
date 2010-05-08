@@ -126,7 +126,7 @@ class SettingsController(gs.ui.GtkBuilderWidget):
     DEFAULT_SHOW_ONLY_DYNAMIC = True
 
     def __init__(self, source, settingsfile, messagesfile):
-        gs.ui.GtkBuilderWidget.__init__(self, gs.ui.get_ui_file("settings.ui"))
+        gs.ui.GtkBuilderWidget.__init__(self, "settings.ui")
 
         self._source = source
         self._settingsfile = settingsfile

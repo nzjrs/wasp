@@ -13,9 +13,7 @@ import gs.ui
 
 class FlightPlanEditor(gs.ui.GtkBuilderWidget):
     def __init__(self, mainmap):
-        mydir = os.path.dirname(os.path.abspath(__file__))
-        uifile = os.path.join(mydir, "flightplan.ui")
-        gs.ui.GtkBuilderWidget.__init__(self, uifile)
+        gs.ui.GtkBuilderWidget.__init__(self, "flightplan.ui")
 
         self._mainmap = mainmap
         self._map = None

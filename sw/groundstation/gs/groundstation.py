@@ -9,6 +9,7 @@ import logging
 gobject.threads_init()
 gtk.gdk.threads_init()
 
+import gs
 from gs.database import Database
 from gs.config import Config, ConfigurableIface, ConfigWindow
 from gs.source import UAVSource
@@ -45,7 +46,22 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     CONFIG_LON_DEFAULT = 172.582377
     CONFIG_ZOOM_DEFAULT = 12
 
-    def __init__(self, prefsfile, messagesfile, settingsfile, use_test_source, disable_plugins):
+    def __init__(self, options):
+        
+        prefsfile = os.path.abspath(options.preferences)
+        messagesfile = os.path.abspath(options.messages)
+        settingsfile = os.path.abspath(options.settings)
+        plugindir = os.path.abspath(options.plugin_dir)
+        use_test_source = options.use_test_source
+        disable_plugins = options.disable_plugins
+
+        if not os.path.exists(messagesfile):
+            message_dialog("Could not find messages.xml", None, secondary=gs.CONFIG_DIR)
+            sys.exit(1)
+        if not os.path.exists(settingsfile):
+            message_dialog("Could not find settings.xml", None, secondary=gs.CONFIG_DIR)
+            sys.exit(1)
+    
         #connect our log buffer to the python logging subsystem
         self._logbuffer = LogBuffer()
         handler = logging.StreamHandler(self._logbuffer)
@@ -59,9 +75,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         LOG.info("Settings file: %s" % settingsfile)
 
         try:
-            mydir = os.path.dirname(os.path.abspath(__file__))
-            ui = os.path.join(mydir, "groundstation.ui")
-            GtkBuilderWidget.__init__(self, ui)
+            GtkBuilderWidget.__init__(self, "groundstation.ui")
         except Exception:
             LOG.critical("Error loading ui file", exc_info=True)
             sys.exit(1)
@@ -102,7 +116,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                 "Help"      :   None,
         }
 
-        self._plugin_manager = PluginManager()
+        self._plugin_manager = PluginManager(plugindir)
         if not disable_plugins:
             self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
 
@@ -484,7 +498,5 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map.props.show_trip_history = widget.get_active()
 
     def main(self):
-        if os.name == "nt": gtk.gdk.threads_enter()
         gtk.main()
-        if os.name == "nt": gtk.gdk.threads_leave()
 

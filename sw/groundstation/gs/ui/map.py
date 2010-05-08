@@ -133,10 +133,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
     def __init__(self, conf, source):
         config.ConfigurableIface.__init__(self, conf)
-
-        mydir = os.path.dirname(os.path.abspath(__file__))
-        uifile = os.path.join(mydir, "map.ui")
-        gs.ui.GtkBuilderWidget.__init__(self, uifile)
+        gs.ui.GtkBuilderWidget.__init__(self, "map.ui")
 
         self._map = None
         self._pane = gtk.VPaned()

@@ -11,7 +11,7 @@ LOG = logging.getLogger("infobox")
 
 class InfoBox(gs.ui.GtkBuilderWidget):
     def __init__(self, source):
-        gs.ui.GtkBuilderWidget.__init__(self, gs.ui.get_ui_file("info.ui"))
+        gs.ui.GtkBuilderWidget.__init__(self, "info.ui")
 
         self.widget = self.get_resource("info_vbox")
 

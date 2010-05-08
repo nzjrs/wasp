@@ -4,55 +4,36 @@ import os.path
 import logging
 import optparse
 
-sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="[%(name)-20s][%(levelname)-7s] %(message)s (%(filename)s:%(lineno)d)"
-    )
+try:
+    import gs
+except ImportError:
+    #probbably running from the source dir
+    sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+    import gs
 
 import gs.groundstation as groundstation
 
-if __name__ == "__main__":
-    thisdir = os.path.abspath(os.path.dirname(__file__))
-    default_messages = os.path.join(thisdir, "..", "onboard", "config", "messages.xml")
-    default_settings = os.path.join(thisdir, "..", "onboard", "config", "settings.xml")
-
-    confdir = os.environ.get("XDG_CONFIG_HOME", os.path.join(os.environ.get("HOME","."), ".config", "wasp"))
-    if not os.path.exists(confdir):
-        os.makedirs(confdir)
-    prefs = os.path.join(confdir, "groundstation.ini")
-
-    parser = optparse.OptionParser()
-    parser.add_option("-m", "--messages",
-                    default=default_messages,
-                    help="Messages xml file", metavar="FILE")
-    parser.add_option("-s", "--settings",
-                    default=default_settings,
-                    help="Settings xml file", metavar="FILE")
-    parser.add_option("-p", "--preferences",
-                    default=prefs,
-                    help="User preferences file", metavar="FILE")
-    parser.add_option("-t", "--use-test-source",
-                    action="store_true", default=False,
-                    help="Dont connect to the UAV, use a test source")
-    parser.add_option("-d", "--disable-plugins",
-                    action="store_true", default=False,
-                    help="Disable loading plugins")
-
-    options, args = parser.parse_args()
-
-    if not os.path.exists(options.messages):
-        parser.error("could not find messages.xml")
-
-    if not os.path.exists(options.settings):
-        parser.error("could not find settings.xml")
-
-    gs = groundstation.Groundstation(
-            os.path.abspath(options.preferences),
-            os.path.abspath(options.messages),
-            os.path.abspath(options.settings),
-            options.use_test_source,
-            options.disable_plugins
+#when running from py2exe, if anything is printed to stderr then the app
+#shows an annoying dialog when closed
+if gs.IS_WINDOWS:
+    stream = sys.stdout
+else:
+    stream = sys.stderr
+ 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="[%(name)-20s][%(levelname)-7s] %(message)s (%(filename)s:%(lineno)d)",
+    stream=stream
     )
-    gs.main()
+
+if __name__ == "__main__":
+    parser = gs.get_default_command_line_parser()
+    options, args = parser.parse_args()
+    if gs.IS_WINDOWS:
+        import gtk.gdk
+        gtk.gdk.threads_enter()    
+    groundstation.Groundstation(options).main()
+    if gs.IS_WINDOWS:
+        import gtk.gdk
+        gtk.gdk.threads_leave()
+    sys.exit(1)

@@ -2,6 +2,8 @@ import logging
 import os.path
 import gtk
 
+import gs
+
 LOG = logging.getLogger('gs.ui')
 
 def message_dialog(message, parent, dialogtype=gtk.MESSAGE_ERROR, secondary=None):
@@ -31,10 +33,9 @@ def get_icon_pixbuf(name=None, stock=None, size=gtk.ICON_SIZE_DIALOG):
     ok = True
     if name:
         #use png icons on windows
-        if os.name == "nt":
+        if gs.IS_WINDOWS:
             name = os.path.splitext(name)[0] + ".png"
-        mydir = os.path.dirname(os.path.abspath(__file__))
-        filename = os.path.join(mydir, "..", "..", "data", "icons", name)
+        filename = os.path.join(gs.ICON_DIR, name)
         try:
             pb = gtk.gdk.pixbuf_new_from_file_at_size(
                             os.path.abspath(filename),
@@ -71,9 +72,11 @@ def get_ui_file(name):
     return ui
 
 class GtkBuilderWidget:
-    def __init__(self, uifile):
+    def __init__(self, filename, abspath=None):
+        if not abspath:
+            abspath = os.path.join(gs.UI_DIR, filename)
         self._builder = gtk.Builder()
-        self._builder.add_from_file(uifile)
+        self._builder.add_from_file(abspath)
         self._resources = {}
 
     def set_instance_resources(self, *resources):
