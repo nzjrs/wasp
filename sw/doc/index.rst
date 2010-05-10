@@ -66,7 +66,7 @@ Build Instructions
 
 ::
 
-    sudo cp ./sw/bootloader/10-paparazzi.rules /etc/udev/rules.d/
+    sudo cp ./sw/bootloader/10-wasp-uav-bootloader.rules /etc/udev/rules.d/
 
 - Ensure that the user who is going to program the Autopilot is a member of the ``plugdev`` group.
 - Check the groundstation runs
