@@ -8,6 +8,30 @@ import libserial.SerialSender
 import wasp
 import wasp.transport
 
+class Communication(gobject.GObject):
+
+    __gsignals__ = {
+        "message-received" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+            gobject.TYPE_PYOBJECT,      #message
+            gobject.TYPE_PYOBJECT,      #header
+            gobject.TYPE_PYOBJECT]),    #payload
+    }
+
+    def __init__(self, *args, **kwargs):
+        gobject.GObject.__init__(self)
+
+    def send_message(self, msg, values):
+        pass
+
+    def connect_to_uav(self):
+        pass
+
+    def disconnect_from_uav(self):
+        pass
+
+    def is_connected(self):
+        pass
+
 class SerialCommunication(libserial.SerialSender.SerialSender):
     """
     Reads data from the serial port 
