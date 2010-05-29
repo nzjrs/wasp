@@ -1,7 +1,5 @@
 import random
-import os
 import gobject
-import serial
 
 import libserial.SerialSender
 
@@ -15,12 +13,22 @@ class Communication(gobject.GObject):
             gobject.TYPE_PYOBJECT,      #message
             gobject.TYPE_PYOBJECT,      #header
             gobject.TYPE_PYOBJECT]),    #payload
+        "uav-connected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+            gobject.TYPE_BOOLEAN]),     #true if successfully connected to UAV
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, transport, messages_file, *args, **kwargs):
         gobject.GObject.__init__(self)
+        self.transport = transport
+        self.messages_file = messages_file
 
     def send_message(self, msg, values):
+        """
+        Sends the supplied message to the UAV
+
+        :param msg: a :class:`wasp.messages.Message` object
+        :param values: a tuple/list of values for the message
+        """
         pass
 
     def connect_to_uav(self):
@@ -32,47 +40,93 @@ class Communication(gobject.GObject):
     def is_connected(self):
         pass
 
-class SerialCommunication(libserial.SerialSender.SerialSender):
-    """
-    Reads data from the serial port 
-    """
-    def read(self, nbytes=5):
-        if self.is_open():
-            try:
-                return self._serial.read(nbytes)
-            except  serial.SerialTimeoutException:
-                pass
-        return ""
-    
-    def write(self, data):
-        if self.is_open():
-            self._serial.write(data)
+    def configure_connection(self, **kwargs):
+        pass
 
-class DummySerialCommunication(gobject.GObject):
+    def get_connection_parameters(self):
+        return {}
+
+class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
+
+    def __init__(self, transport, messages_file):
+        Communication.__init__(self, transport, messages_file)
+        #this watch is used to monitor the serial file descriptor for data
+        self.watch = None
+        #the header used when sending a message to the UAV
+        self.groundstation_transport_header = transport.TransportHeaderFooter(acid=0x78)
+        #the serial connection details
+        self.port = None
+        self.speed = None
+
+    def on_serial_connected(self, connected):
+        #remove the old watch
+        if self.watch:
+            gobject.source_remove(self.watch)
+
+        if connected:
+            #add new watch
+            self.watch = gobject.io_add_watch(
+                            self.get_fd(), 
+                            gobject.IO_IN | gobject.IO_PRI,
+                            self.on_serial_data_available,
+                            self.get_serial(),
+                            priority=gobject.PRIORITY_HIGH
+            )
+
+        self.emit("uav-connected", connected)
+
+    def on_serial_data_available(self, fd, condition, serial):
+        data = serial.read(1)
+        for header, payload in self.transport.parse_many(data):
+            msg = self.messages_file.get_message_by_id(header.msgid)
+            if msg:
+                self.emit("message-received", msg, header, payload)
+        return True
+
+    def send_message(self, msg, values):
+        if msg:
+            data = self.transport.pack_message_with_values(
+                        self.groundstation_transport_header, 
+                        msg,
+                        *values)
+            self.get_serial().write(data.tostring())
+
+    def connect_to_uav(self):
+        self.serial.connect_to_port(self.port, self.speed)
+
+    def disconnect_from_uav(self):
+        self.serial.disconnect_from_port()
+
+    def is_connected(self):
+        return self.serial.is_open()
+
+    def configure_connection(self, **kwargs):
+        self.port = kwargs.get("serial_port")
+        self.speed = wargs.get("serial_speed")
+
+    def get_connection_parameters(self):
+        return {
+            "serial_port":self.port,
+            "serial_speed":self.speed
+        }
+
+class DummySerialCommunication(Communication):
     """
     For testing groundstation with no UAV
     """
 
-    __gsignals__ = {
-        "serial-connected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
-            gobject.TYPE_BOOLEAN]),     #True if successfully connected to the port
-        }
-
-    def __init__(self, messages, transport, acid):
-        gobject.GObject.__init__(self)
-        self._readfd, self._writefd = os.pipe()
-
-        self._messages = messages        
-        self._transport = transport
-        self._header = wasp.transport.TransportHeaderFooter(acid=acid)
-
+    def __init__(self, transport, messages_file):
+        Communication.__init__(self, transport, messages_file)
+        self._port = None
+        self._speed = None
         self._sendcache = {}
         self._is_open = False
+        self.uav_header = wasp.transport.TransportHeaderFooter(acid=0x9A)
 
         #Write messages to the pipe, so that it is read and processed by
         #the groundstation
         #
-        #TIME at 1hz
+        #TIME at 0.1hz
         self._t = 0
         gobject.timeout_add(int(1000/0.1), self._do_time)
         #COMM_STATUS at 0.5hz
@@ -84,10 +138,10 @@ class DummySerialCommunication(gobject.GObject):
         #STATUS at 0.5hz
         self._bat = wasp.NoisyWalk(
                             start=145, end=85, delta=-5,
-                            value_type=self._messages["STATUS"]["vsupply"].pytype)
+                            value_type=self.messages_file["STATUS"]["vsupply"].pytype)
         self._cpu = wasp.Noisy(
                             value=30, delta=3,
-                            value_type=self._messages["STATUS"]["cpu_usage"].pytype)
+                            value_type=self.messages_file["STATUS"]["cpu_usage"].pytype)
         gobject.timeout_add(int(1000/0.5), self._do_status)
         #PPM at 10hz
         gobject.timeout_add(int(1000/10), self._do_ppm)
@@ -109,7 +163,7 @@ class DummySerialCommunication(gobject.GObject):
         lon = int(self._lon * 1e7)
         alt = self._alt.value() * 1000.0
 
-        msg = self._messages.get_message_by_name("GPS_LLH")
+        msg = self.messages_file.get_message_by_name("GPS_LLH")
         return self._send(msg, 2, 5, lat, lon, alt, 1, 1)
 
     def _do_generic_send(self, msgname):
@@ -118,26 +172,22 @@ class DummySerialCommunication(gobject.GObject):
         return True
 
     def _generic_send(self, freq, msgname):
-        msg = self._messages.get_message_by_name(msgname)
+        msg = self.messages_file.get_message_by_name(msgname)
         if msg:
             self._sendcache[msgname] = (msg, msg.get_default_values())
             gobject.timeout_add(freq, self._do_generic_send, msgname)
 
     def _send(self, msg, *vals):
-        data = self._transport.pack_message_with_values(
-                        self._header,
-                        msg,
-                        *vals)
-        os.write(self._writefd, data.tostring())
+        self.send_message(msg, vals)
         return True
 
     def _do_time(self):
         self._t += 10
-        msg = self._messages.get_message_by_name("TIME")
+        msg = self.messages_file.get_message_by_name("TIME")
         return self._send(msg, self._t)
 
     def _do_ahrs(self):
-        msg = self._messages.get_message_by_name("AHRS_EULER")
+        msg = self.messages_file.get_message_by_name("AHRS_EULER")
         scale = msg.get_field_by_name("imu_phi").coef
 
         #pitch down by 10 degress, right by 30, heading 0
@@ -147,7 +197,7 @@ class DummySerialCommunication(gobject.GObject):
         return self._send(msg, phi, theta, psi, phi, theta, psi)
 
     def _do_ppm(self):
-        msg = self._messages.get_message_by_name("PPM")
+        msg = self.messages_file.get_message_by_name("PPM")
         v = 20000
         n = 100
         return self._send(msg, v+random.randint(-n,n), v, v+random.randint(-n,n), v, v+random.randint(-n,n), v)
@@ -162,7 +212,7 @@ class DummySerialCommunication(gobject.GObject):
         #     <field name="autopilot_mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|ATTITUDE_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|ATTITUDE_HOLD|HOVER_DIRECT|HOVER_CLIMB|HOVER_Z_HOLD|NAV|RC_DIRECT"/>
         #     <field name="cpu_usage" type="uint8" unit="pct"/>
         #   </message>
-        msg = self._messages.get_message_by_name("STATUS")
+        msg = self.messages_file.get_message_by_name("STATUS")
         return self._send(
                 msg,
                 msg.get_field_by_name("rc").interpret_value_from_user_string("OK"),
@@ -173,27 +223,34 @@ class DummySerialCommunication(gobject.GObject):
                 msg.get_field_by_name("autopilot_mode").interpret_value_from_user_string("FAILSAFE"),
                 self._cpu.value())
 
-    def get_fd(self):
-        return self._readfd
+    def send_message(self, msg, values):
+        #pack the message
+        data = self.transport.pack_message_with_values(
+                    self.uav_header, 
+                    msg,
+                    *values)
 
-    def connect_to_port(self):
-        self.emit("serial-connected", True)
+        #then unpack it and re-emit it...
+        for header, payload in self.transport.parse_many(data):
+            msg = self.messages_file.get_message_by_id(header.msgid)
+            self.emit("message-received", msg, header, payload)
+
+    def connect_to_uav(self):
         self._is_open = True
-        return True
 
-    def disconnect_from_port(self):
-        self.emit("serial-connected", False)
+    def disconnect_from_uav(self):
         self._is_open = False
 
-    def is_open(self):
+    def is_connected(self):
         return self._is_open
 
-    def write(self, data):
-        os.write(self._writefd, data)
+    def configure_connection(self, **kwargs):
+        self._port = kwargs.get("serial_port")
+        self._speed = int(kwargs.get("serial_speed"))
 
-    def read(self, nbytes=5):
-        return os.read(self._readfd, nbytes)
-
-
-
+    def get_connection_parameters(self):
+        return {
+            "serial_port":self._port,
+            "serial_speed":self._speed
+        }
 

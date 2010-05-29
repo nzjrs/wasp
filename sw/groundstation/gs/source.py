@@ -14,7 +14,6 @@ import wasp
 import wasp.transport as transport
 import wasp.communication as communication
 import wasp.messages as messages
-import wasp.monitor as monitor
 import wasp.ui.treeview as treeview
 
 DEBUG=False
@@ -99,7 +98,7 @@ class _LogCsvCb(_MessageCb):
     def quit(self):
         self._f.close()
 
-class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
+class UAVSource(config.ConfigurableIface, gobject.GObject):
 
     CONFIG_SECTION = "UAVSOURCE"
 
@@ -116,8 +115,16 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
     #: the groundstation is disconnected from the UAV
     STATUS_DISCONNECTED             =   3
 
+    __gsignals__ = {
+            "source-connected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+                gobject.TYPE_BOOLEAN]),     #True if source connected
+            "source-link-status-change" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+                gobject.TYPE_BOOLEAN]),     #True if recieving data
+    }
+
     def __init__(self, conf, messages, use_test_source, listen_for_uav_id=0xFF):
         config.ConfigurableIface.__init__(self, conf)
+        gobject.GObject.__init__(self)
 
         self._port = self.config_get("serial_port", self.DEFAULT_PORT)
         self._speed = self.config_get("serial_speed", self.DEFAULT_SPEED)
@@ -127,31 +134,25 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         self._callbacks = {}
 
         self._messages_file = messages
+        self._transport = transport.Transport(check_crc=True, debug=DEBUG)
         self._rm = self._messages_file.get_message_by_name("REQUEST_MESSAGE")
         self._rt = self._messages_file.get_message_by_name("REQUEST_TELEMETRY")
-        self._transport = transport.Transport(check_crc=True, debug=DEBUG)
-        self._groundstation_transport_header = transport.TransportHeaderFooter(acid=0x78)
 
-        self._use_test_source = use_test_source
+        #initialise the communication class
+        connection_configuration = {
+            "serial_port":self._port,
+            "serial_speed":self._speed
+        }
         if use_test_source:
-            self.serial = communication.DummySerialCommunication(messages, self._transport, listen_for_uav_id)
-            LOG.info("Test source enabled")
+            comm_klass = communication.DummySerialCommunication
         else:
-            self.serial = communication.SerialCommunication(port=self._port, speed=int(self._speed), timeout=1)
+            comm_klass = communication.SerialCommunication
 
-        monitor.GObjectSerialMonitor.__init__(self, self.serial)
-
-        #because we already initialized the base gobject type uising the
-        #__signals__ defined in monitor.GObjectSerialMonitor, we must
-        #programatically add the source-connected signal
-        gobject.signal_new(
-                'source-connected', UAVSource,
-                gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                (bool,))        #True if source connected
-        gobject.signal_new(
-                'source-link-status-change', UAVSource,
-                gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                (bool,))        #True if recieving data
+        LOG.info("Source: %s" % comm_klass)
+        self.communication = comm_klass(self._transport, self._messages_file)
+        self.communication.configure_connection(**connection_configuration)
+        self.communication.connect("message-received", self.on_message_received)
+        self.communication.connect("uav-connected", self.on_uav_connected)
 
         #track how many messages per second
         self._linkok = False
@@ -192,8 +193,7 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
 
     def get_status(self):
         """ Returns the connection status, :const:`gs.source.UAVSource.STATUS_CONNECTED` etc """
-        connected = self.serial.is_open()
-        if connected:
+        if self.communication.is_connected():
             if self._linkok:
                 return self.STATUS_CONNECTED_LINK_OK
             return self.STATUS_CONNECTED
@@ -252,23 +252,20 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         if fid and fcb:
             self._callbacks[fid].remove(fcb)
 
-    def on_serial_data_available(self, fd, condition, serial):
-        data = serial.read(1)
-        for header, payload in self._transport.parse_many(data):
-            msg = self._messages_file.get_message_by_id(header.msgid)
-            if msg:
-                time = datetime.datetime.now()
-                cbs = self._callbacks.get(msg.id, ())
-                for cb in cbs:
-                    cb.call_cb(msg, header, payload, time)
+    def on_uav_connected(self, communication, connected):
+        self.emit("source-connected", connected)
 
-                if self._rxts:
-                    self._rxts.update_message(msg, payload)
+    def on_message_received(self, communication, msg, header, payload):
+        time = datetime.datetime.now()
+        cbs = self._callbacks.get(msg.id, ())
+        for cb in cbs:
+            cb.call_cb(msg, header, payload, time)
 
-                self._times.add(utils.calculate_dt_seconds(self._lastt, time))
-                self._lastt = time
+        if self._rxts:
+            self._rxts.update_message(msg, payload)
 
-        return True
+        self._times.add(utils.calculate_dt_seconds(self._lastt, time))
+        self._lastt = time
 
     def get_rx_message_treestore(self):
         if self._rxts == None:
@@ -276,18 +273,13 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         return self._rxts
 
     def send_message(self, msg, values):
-        """
-        Sends the supplied message to the UAV
+        self.communication.send_message(msg, values)
 
-        :param msg: a :class:`wasp.messages.Message` object
-        :param values: a tuple/list of values for the message
-        """
-        if msg:
-            data = self._transport.pack_message_with_values(
-                        self._groundstation_transport_header, 
-                        msg,
-                        *values)
-            self.serial.write(data.tostring())
+    def connect_to_uav(self):
+        self.communication.connect_to_uav()
+
+    def disconnect_from_uav(self):
+        self.communication.disconnect_from_uav()
 
     def request_message(self, message_id):
         """ Resuests the UAV send us the message with the supplied ID """
@@ -308,16 +300,8 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
                 cb.quit()
 
     def get_connection_parameters(self):
-        return self._port, self._speed
-
-    def connect_to_uav(self):
-        if self._port and self._speed:
-            self.serial.connect_to_port()
-        self.emit("source-connected", self.serial.is_open())
-
-    def disconnect_from_uav(self):
-        self.serial.disconnect_from_port()
-        self.emit("source-connected", self.serial.is_open())
+        kwargs = self.communication.get_connection_parameters()
+        return kwargs["serial_port"], ["serial_speed"]
 
     def get_messages_per_second(self):
         if self._linkok:
@@ -338,16 +322,9 @@ class UAVSource(monitor.GObjectSerialMonitor, config.ConfigurableIface):
         speed = self.config_get("serial_speed", self.DEFAULT_SPEED)
 
         if port != self._port or speed != self._speed:
-            if not self._use_test_source:
-                if self.serial.is_open():
-                    self.disconnect_from_uav()
-
-                #instatiate the new source, and call change_serialsender
-                #to reconnect to the underlying object signals telling us
-                #when data has arrived
-                LOG.info("Connecting to UAV on new port: %s %s" % (port, speed))
-                self.serial = communication.SerialCommunication(port=port, speed=int(speed), timeout=1)
-                self.change_serialsender(self.serial)
+            self.communication.configure_connection(
+                    serial_port=port,
+                    serial_speed=speed)
 
         self._port = port
         self._speed = speed
