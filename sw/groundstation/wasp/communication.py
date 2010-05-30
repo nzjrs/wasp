@@ -112,7 +112,7 @@ class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
     def get_connection_string(self):
         return "%s@%s" % (self.port, self.speed)
 
-class DummySerialCommunication(Communication):
+class DummyCommunication(Communication):
 
     COMMUNICATION_TYPE = "dummy"
 
@@ -163,11 +163,11 @@ class DummySerialCommunication(Communication):
         alt = self._alt.value() * 1000.0
 
         msg = self.messages_file.get_message_by_name("GPS_LLH")
-        return self._send(msg, 2, 5, lat, lon, alt, 1, 1)
+        return self.send_message(msg, (2, 5, lat, lon, alt, 1, 1))
 
     def _do_generic_send(self, msgname):
         msg, vals = self._sendcache[msgname]
-        self._send(msg, *vals)
+        self.send_message(msg, vals)
         return True
 
     def _generic_send(self, freq, msgname):
@@ -176,14 +176,10 @@ class DummySerialCommunication(Communication):
             self._sendcache[msgname] = (msg, msg.get_default_values())
             gobject.timeout_add(freq, self._do_generic_send, msgname)
 
-    def _send(self, msg, *vals):
-        self.send_message(msg, vals)
-        return True
-
     def _do_time(self):
         self._t += 10
         msg = self.messages_file.get_message_by_name("TIME")
-        return self._send(msg, self._t)
+        return self.send_message(msg, (self._t,))
 
     def _do_ahrs(self):
         msg = self.messages_file.get_message_by_name("AHRS_EULER")
@@ -193,13 +189,13 @@ class DummySerialCommunication(Communication):
         phi = 10.0/scale;
         theta = 30.0/scale
         psi = 0.0
-        return self._send(msg, phi, theta, psi, phi, theta, psi)
+        return self.send_message(msg, (phi, theta, psi, phi, theta, psi))
 
     def _do_ppm(self):
         msg = self.messages_file.get_message_by_name("PPM")
         v = 20000
         n = 100
-        return self._send(msg, v+random.randint(-n,n), v, v+random.randint(-n,n), v, v+random.randint(-n,n), v)
+        return self.send_message(msg, (v+random.randint(-n,n), v, v+random.randint(-n,n), v, v+random.randint(-n,n), v))
 
     def _do_status(self):
         #   <message name="STATUS" id="8">
@@ -212,15 +208,15 @@ class DummySerialCommunication(Communication):
         #     <field name="cpu_usage" type="uint8" unit="pct"/>
         #   </message>
         msg = self.messages_file.get_message_by_name("STATUS")
-        return self._send(
-                msg,
+        return self.send_message(
+                msg,(
                 msg.get_field_by_name("rc").interpret_value_from_user_string("OK"),
                 msg.get_field_by_name("gps").interpret_value_from_user_string("NO_FIX"),
                 self._bat.value(),
                 msg.get_field_by_name("in_flight").interpret_value_from_user_string("ON_GROUND"),
                 msg.get_field_by_name("motors_on").interpret_value_from_user_string("MOTORS_OFF"),
                 msg.get_field_by_name("autopilot_mode").interpret_value_from_user_string("FAILSAFE"),
-                self._cpu.value())
+                self._cpu.value()))
 
     def send_message(self, msg, values):
         #pack the message
@@ -233,6 +229,10 @@ class DummySerialCommunication(Communication):
         for header, payload in self.transport.parse_many(data):
             msg = self.messages_file.get_message_by_id(header.msgid)
             self.emit("message-received", msg, header, payload)
+
+        #because this function is also used within this class from
+        #an idle handler return true to keep getting called
+        return True
 
     def connect_to_uav(self):
         self._is_open = True

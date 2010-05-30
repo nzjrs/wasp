@@ -144,7 +144,7 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
             "serial_speed":self._speed
         }
         if use_test_source:
-            comm_klass = communication.DummySerialCommunication
+            comm_klass = communication.DummyCommunication
         else:
             comm_klass = communication.SerialCommunication
 
