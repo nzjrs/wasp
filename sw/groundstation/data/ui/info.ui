@@ -609,13 +609,73 @@
                   <object class="GtkVBox" id="vbox6">
                     <property name="visible">True</property>
                     <child>
+                      <object class="GtkHBox" id="hbox10">
+                        <property name="visible">True</property>
+                        <child>
+                          <object class="GtkLabel" id="type_lbl">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">Type: </property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="type_value">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkHBox" id="hbox11">
+                        <property name="visible">True</property>
+                        <child>
+                          <object class="GtkLabel" id="config_lbl">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">Configuration: </property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="config_value">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkHBox" id="hbox9">
                         <property name="visible">True</property>
                         <child>
                           <object class="GtkLabel" id="connected_lbl">
                             <property name="visible">True</property>
                             <property name="xalign">0</property>
-                            <property name="label" translatable="yes">Serial Open: </property>
+                            <property name="label" translatable="yes">Open: </property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -625,67 +685,6 @@
                         </child>
                         <child>
                           <object class="GtkLabel" id="connected_value">
-                            <property name="visible">True</property>
-                            <property name="xalign">0</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkHBox" id="hbox10">
-                        <property name="visible">True</property>
-                        <child>
-                          <object class="GtkLabel" id="port_lbl">
-                            <property name="visible">True</property>
-                            <property name="xalign">0</property>
-                            <property name="label" translatable="yes">Serial Port: </property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="port_value">
-                            <property name="visible">True</property>
-                            <property name="xalign">0</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkHBox" id="hbox11">
-                        <property name="visible">True</property>
-                        <child>
-                          <object class="GtkLabel" id="speed_lbl">
-                            <property name="visible">True</property>
-                            <property name="xalign">0</property>
-                            <property name="label" translatable="yes">Serial Speed: </property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="speed_value">
                             <property name="visible">True</property>
                             <property name="xalign">0</property>
                           </object>
@@ -815,32 +814,23 @@
   </object>
   <object class="GtkSizeGroup" id="sizegroup1">
     <widgets>
-      <widget name="time_lbl"/>
-      <widget name="dirty_lbl"/>
-      <widget name="target_lbl"/>
-      <widget name="branch_lbl"/>
       <widget name="rev_lbl"/>
+      <widget name="branch_lbl"/>
+      <widget name="target_lbl"/>
+      <widget name="dirty_lbl"/>
+      <widget name="time_lbl"/>
     </widgets>
   </object>
   <object class="GtkSizeGroup" id="sizegroup2">
     <widgets>
-      <widget name="id_lbl"/>
-      <widget name="runtime_lbl"/>
-      <widget name="rc_lbl"/>
-      <widget name="gps_lbl"/>
-      <widget name="in_flight_lbl"/>
-      <widget name="autopilot_mode_lbl"/>
       <widget name="motors_on_lbl"/>
+      <widget name="autopilot_mode_lbl"/>
+      <widget name="in_flight_lbl"/>
+      <widget name="gps_lbl"/>
+      <widget name="rc_lbl"/>
+      <widget name="runtime_lbl"/>
+      <widget name="id_lbl"/>
     </widgets>
   </object>
-  <object class="GtkSizeGroup" id="sizegroup3">
-    <widgets>
-      <widget name="overruns_lbl"/>
-      <widget name="errors_lbl"/>
-      <widget name="rate_lbl"/>
-      <widget name="speed_lbl"/>
-      <widget name="port_lbl"/>
-      <widget name="connected_lbl"/>
-    </widgets>
-  </object>
+  <object class="GtkSizeGroup" id="sizegroup3"/>
 </interface>

@@ -52,9 +52,10 @@ class InfoBox(gs.ui.GtkBuilderWidget):
             self.get_resource("connected_value").set_text("YES")
         else:
             self.get_resource("connected_value").set_text("NO")
-        port, speed = source.get_connection_parameters()
-        self.get_resource("port_value").set_text(port)
-        self.get_resource("speed_value").set_text("%s baud" % speed)
+
+        comm_type, comm_config = source.get_connection_parameters() 
+        self.get_resource("type_value").set_text(comm_type)
+        self.get_resource("config_value").set_text(comm_config)
 
     def _on_status(self, msg, header, payload):
         rc, gps, bv, in_flight, motors_on, autopilot_mode, cpu_usage = msg.unpack_values(payload)

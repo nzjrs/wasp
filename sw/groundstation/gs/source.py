@@ -273,7 +273,8 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         return self._rxts
 
     def send_message(self, msg, values):
-        self.communication.send_message(msg, values)
+        if self.communication.is_connected():
+            self.communication.send_message(msg, values)
 
     def connect_to_uav(self):
         self.communication.connect_to_uav()
@@ -300,8 +301,11 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
                 cb.quit()
 
     def get_connection_parameters(self):
-        kwargs = self.communication.get_connection_parameters()
-        return kwargs["serial_port"], ["serial_speed"]
+        """
+        Returns a 2-tuple, the name of the connection, and a string describing
+        its configuration
+        """
+        return self.communication.COMMUNICATION_TYPE, self.communication.get_connection_string()
 
     def get_messages_per_second(self):
         if self._linkok:

@@ -8,6 +8,8 @@ import wasp.transport
 
 class Communication(gobject.GObject):
 
+    COMMUNICATION_TYPE = ""
+
     __gsignals__ = {
         "message-received" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
             gobject.TYPE_PYOBJECT,      #message
@@ -43,17 +45,20 @@ class Communication(gobject.GObject):
     def configure_connection(self, **kwargs):
         pass
 
-    def get_connection_parameters(self):
-        return {}
+    def get_connection_string(self):
+        return ""
 
 class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
 
+    COMMUNICATION_TYPE = "serial"
+
     def __init__(self, transport, messages_file):
         Communication.__init__(self, transport, messages_file)
+        libserial.SerialSender.SerialSender.__init__(self)
         #this watch is used to monitor the serial file descriptor for data
         self.watch = None
         #the header used when sending a message to the UAV
-        self.groundstation_transport_header = transport.TransportHeaderFooter(acid=0x78)
+        self.groundstation_transport_header = wasp.transport.TransportHeaderFooter(acid=0x78)
         #the serial connection details
         self.port = None
         self.speed = None
@@ -92,33 +97,27 @@ class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
             self.get_serial().write(data.tostring())
 
     def connect_to_uav(self):
-        self.serial.connect_to_port(self.port, self.speed)
+        self.connect_to_port(self.port, self.speed)
 
     def disconnect_from_uav(self):
-        self.serial.disconnect_from_port()
+        self.disconnect_from_port()
 
     def is_connected(self):
-        return self.serial.is_open()
+        return self.is_open()
 
     def configure_connection(self, **kwargs):
         self.port = kwargs.get("serial_port")
-        self.speed = wargs.get("serial_speed")
+        self.speed = int(kwargs.get("serial_speed"))
 
-    def get_connection_parameters(self):
-        return {
-            "serial_port":self.port,
-            "serial_speed":self.speed
-        }
+    def get_connection_string(self):
+        return "%s@%s" % (self.port, self.speed)
 
 class DummySerialCommunication(Communication):
-    """
-    For testing groundstation with no UAV
-    """
+
+    COMMUNICATION_TYPE = "dummy"
 
     def __init__(self, transport, messages_file):
         Communication.__init__(self, transport, messages_file)
-        self._port = None
-        self._speed = None
         self._sendcache = {}
         self._is_open = False
         self.uav_header = wasp.transport.TransportHeaderFooter(acid=0x9A)
@@ -237,20 +236,12 @@ class DummySerialCommunication(Communication):
 
     def connect_to_uav(self):
         self._is_open = True
+        self.emit("uav-connected", self._is_open)
 
     def disconnect_from_uav(self):
         self._is_open = False
+        self.emit("uav-connected", self._is_open)
 
     def is_connected(self):
         return self._is_open
-
-    def configure_connection(self, **kwargs):
-        self._port = kwargs.get("serial_port")
-        self._speed = int(kwargs.get("serial_speed"))
-
-    def get_connection_parameters(self):
-        return {
-            "serial_port":self._port,
-            "serial_speed":self._speed
-        }
 
