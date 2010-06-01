@@ -1,3 +1,4 @@
+import socket
 import random
 import gobject
 
@@ -5,6 +6,8 @@ import libserial.SerialSender
 
 import wasp
 import wasp.transport
+
+UDP_PORT = 1212
 
 class Communication(gobject.GObject):
 
@@ -48,9 +51,82 @@ class Communication(gobject.GObject):
     def get_connection_string(self):
         return ""
 
+class UdpCommunication(Communication):
+
+    COMMUNICATION_TYPE = "network"
+
+    def __init__(self, transport, messages_file):
+        Communication.__init__(self, transport, messages_file)
+        self.socket = None
+        self.watch = None
+        self.connected = False
+        self.groundstation_transport_header = wasp.transport.TransportHeaderFooter(acid=0x78)
+
+    def send_message(self, msg, values):
+        if self.connected:
+            data = self.transport.pack_message_with_values(
+                        self.groundstation_transport_header, 
+                        msg,
+                        *values)
+            try:
+                self.socket.send(data.tostring())
+            except socket.error, err:
+                print "Could not send: %s" % err
+
+    def on_data_available(self, fd, condition):
+        try:
+            data = self.socket.recv(1024)
+            print "RX"
+            for header, payload in self.transport.parse_many(data):
+                msg = self.messages_file.get_message_by_id(header.msgid)
+                if msg:
+                    print "RX: ", msg
+                    self.emit("message-received", msg, header, payload)
+        except socket.error, err:
+            print "Could not recv: %s" % err
+
+        return True
+
+    def connect_to_uav(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.bind(("127.0.0.1", UDP_PORT))
+            self.watch = gobject.io_add_watch(
+                            s.fileno(), 
+                            gobject.IO_IN | gobject.IO_PRI,
+                            self.on_data_available,
+                            priority=gobject.PRIORITY_HIGH)
+            s.setblocking(0)
+            self.socket = s
+            self.connected = True
+        except socket.error, err:
+            print "Couldn't be a udp server on port %d : %s" % (self.PORT, err)
+
+        print "connected"
+        self.emit("uav-connected", self.connected)
+
+    def disconnect_from_uav(self):
+        if self.connected:
+            gobject.source_remove(self.watch)
+            self.socket.close()
+            self.connected = False
+
+    def is_connected(self):
+        return self.connected
+
+    def configure_connection(self, **kwargs):
+        pass
+
+    def get_connection_string(self):
+        return "%s:%s" % (self.HOST, self.PORT)
+
 class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
 
     COMMUNICATION_TYPE = "serial"
+
+    def __init__(self, transport, messages_file):
+        Communication.__init__(self, transport, messages_file)
+        self.watch = None
 
     def __init__(self, transport, messages_file):
         Communication.__init__(self, transport, messages_file)
@@ -114,7 +190,7 @@ class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
 
 class DummyCommunication(Communication):
 
-    COMMUNICATION_TYPE = "dummy"
+    COMMUNICATION_TYPE = "test"
 
     def __init__(self, transport, messages_file):
         Communication.__init__(self, transport, messages_file)
@@ -244,4 +320,15 @@ class DummyCommunication(Communication):
 
     def is_connected(self):
         return self._is_open
+
+def get_source(name):
+    if name == "serial":
+        return SerialCommunication
+    if name == "test":
+        return DummyCommunication
+    if name == "network":
+        return UdpCommunication
+
+    print "UNKNOWN SOURCE"
+    return DummyCommunication
 

@@ -50,6 +50,16 @@ def user_file_path(filename):
                 os.path.expanduser("~"),
                 "Desktop",
                 filename)
+
+class _SourceOptionParser(optparse.OptionParser):
+    #override parse_args so that -t is the same as --source=test
+    #it is easier to do it this was instead of with a 
+    #optparse callback
+    def parse_args(self):
+        options, args = optparse.OptionParser.parse_args(self)
+        if options.use_test_source:
+            options.source = "test"
+        return options, args
                 
 def get_default_command_line_parser():
     default_messages = os.path.join(CONFIG_DIR, "messages.xml")
@@ -59,7 +69,7 @@ def get_default_command_line_parser():
         os.makedirs(USER_CONFIG_DIR)
     prefs = os.path.join(USER_CONFIG_DIR, "groundstation.ini")
 
-    parser = optparse.OptionParser()
+    parser = _SourceOptionParser()
     parser.add_option("-m", "--messages",
                     default=default_messages,
                     help="Messages xml file", metavar="FILE")
@@ -74,10 +84,13 @@ def get_default_command_line_parser():
                     help="Directory to load plugins from", metavar="DIRECTORY")
     parser.add_option("-t", "--use-test-source",
                     action="store_true", default=False,
-                    help="Dont connect to the UAV, use a test source")
+                    help="Use a test source, equiv to --source=test")
     parser.add_option("-d", "--disable-plugins",
                     action="store_true", default=False,
                     help="Disable loading plugins")
+    parser.add_option("-S", "--source",
+                    default="serial",
+                    help="Source of uav data (serial,test,etc)", metavar="SOURCE")
 
     return parser
 

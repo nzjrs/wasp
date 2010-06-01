@@ -52,7 +52,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         messagesfile = os.path.abspath(options.messages)
         settingsfile = os.path.abspath(options.settings)
         plugindir = os.path.abspath(options.plugin_dir)
-        use_test_source = options.use_test_source
         disable_plugins = options.disable_plugins
 
         if not os.path.exists(messagesfile):
@@ -96,7 +95,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._messagesfile = MessagesFile(path=messagesfile, debug=False)
         self._messagesfile.parse()
 
-        self._source = UAVSource(self._config, self._messagesfile, use_test_source)
+        self._source = UAVSource(self._config, self._messagesfile, options.source)
         self._source.connect("source-connected", self._on_source_connected)
 
         #track the state of a few key variables received from the plane

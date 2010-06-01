@@ -122,7 +122,7 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
                 gobject.TYPE_BOOLEAN]),     #True if recieving data
     }
 
-    def __init__(self, conf, messages, use_test_source, listen_for_uav_id=0xFF):
+    def __init__(self, conf, messages, source_name, listen_for_uav_id=0xFF):
         config.ConfigurableIface.__init__(self, conf)
         gobject.GObject.__init__(self)
 
@@ -143,12 +143,10 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
             "serial_port":self._port,
             "serial_speed":self._speed
         }
-        if use_test_source:
-            comm_klass = communication.DummyCommunication
-        else:
-            comm_klass = communication.SerialCommunication
 
+        comm_klass = communication.get_source(source_name)
         LOG.info("Source: %s" % comm_klass)
+
         self.communication = comm_klass(self._transport, self._messages_file)
         self.communication.configure_connection(**connection_configuration)
         self.communication.connect("message-received", self.on_message_received)
