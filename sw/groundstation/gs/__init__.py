@@ -61,36 +61,46 @@ class _SourceOptionParser(optparse.OptionParser):
             options.source = "test"
         return options, args
                 
-def get_default_command_line_parser():
+def get_default_command_line_parser(include_prefs, include_plugins, include_sources):
     default_messages = os.path.join(CONFIG_DIR, "messages.xml")
     default_settings = os.path.join(CONFIG_DIR, "settings.xml")
 
-    if not os.path.exists(USER_CONFIG_DIR):
-        os.makedirs(USER_CONFIG_DIR)
-    prefs = os.path.join(USER_CONFIG_DIR, "groundstation.ini")
+    if include_prefs:
+        if not os.path.exists(USER_CONFIG_DIR):
+            os.makedirs(USER_CONFIG_DIR)
+        prefs = os.path.join(USER_CONFIG_DIR, "groundstation.ini")
 
-    parser = _SourceOptionParser()
+    if include_sources:
+        parser = _SourceOptionParser()
+    else:
+        parser = optparse.OptionParser()
     parser.add_option("-m", "--messages",
                     default=default_messages,
                     help="Messages xml file", metavar="FILE")
     parser.add_option("-s", "--settings",
                     default=default_settings,
                     help="Settings xml file", metavar="FILE")
-    parser.add_option("-p", "--preferences",
-                    default=prefs,
-                    help="User preferences file", metavar="FILE")
-    parser.add_option("-P", "--plugin-dir",
-                    default=PLUGIN_DIR,
-                    help="Directory to load plugins from", metavar="DIRECTORY")
-    parser.add_option("-t", "--use-test-source",
-                    action="store_true", default=False,
-                    help="Use a test source, equiv to --source=test")
-    parser.add_option("-d", "--disable-plugins",
-                    action="store_true", default=False,
-                    help="Disable loading plugins")
-    parser.add_option("-S", "--source",
-                    default="serial",
-                    help="Source of uav data (serial,test,etc)", metavar="SOURCE")
+    parser.add_option("-d", "--debug",
+                    action="store_true",
+                    help="Print extra debugging information")
+    if include_prefs:
+        parser.add_option("-p", "--preferences",
+                        default=prefs,
+                        help="User preferences file", metavar="FILE")
+    if include_plugins:
+        parser.add_option("-P", "--plugin-dir",
+                        default=PLUGIN_DIR,
+                        help="Directory to load plugins from", metavar="DIRECTORY")
+        parser.add_option("-D", "--disable-plugins",
+                        action="store_true", default=False,
+                        help="Disable loading plugins")
+    if include_sources:
+        parser.add_option("-t", "--use-test-source",
+                        action="store_true", default=False,
+                        help="Use a test source, equiv to --source=test")
+        parser.add_option("-S", "--source",
+                        default="serial",
+                        help="Source of uav data (serial,test,etc)", metavar="SOURCE")
 
     return parser
 

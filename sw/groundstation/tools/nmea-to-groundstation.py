@@ -14,7 +14,6 @@ import wasp.transport as transport
 import libserial.SerialSender as serialsender
 
 TEST_ACID = 65
-DEBUG = False
 
 class Bridge:
     def __init__(self, options):
@@ -22,25 +21,23 @@ class Bridge:
         self.line = ""
         self.watch = None
 
-        self.messages = messages.MessagesFile(path=options.messages, debug=DEBUG)
+        self.messages = messages.MessagesFile(path=options.messages, debug=options.debug)
         self.messages.parse()
         self.msg_vtg = self.messages.get_message_by_name("GPS_VTG")
         self.msg_llh = self.messages.get_message_by_name("GPS_LLH")
         self.msg_gsv = self.messages.get_message_by_name("GPS_GSV")
 
-        self.transport = transport.Transport(check_crc=True, debug=DEBUG)
+        self.transport = transport.Transport(check_crc=True, debug=options.debug)
         self.header = transport.TransportHeaderFooter(acid=TEST_ACID)
 
         self.NMEA = NMEA.NMEA()
 
-        self.serialsender = serialsender.SerialSender(port="/dev/ttyUSB1", speed=9600)
+        self.serialsender = serialsender.SerialSender(port=options.serial_port, speed=int(options.serial_speed))
         self.serialsender.connect("serial-connected", self.on_serial_connected)
         self.serialsender.connect_to_port()
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        host = "127.0.0.1"
-        print "connecting to %s" % host
-        self.sock.connect((host, communication.UDP_PORT))
+        self.sock.connect( (options.groundstation_host, int(options.groundstation_port)) )
 
     def on_serial_connected(self, sender, connected):
         #remove the old watch
@@ -146,7 +143,19 @@ class Bridge:
         return True
 
 if __name__ == "__main__":
-    parser = gs.get_default_command_line_parser()
+    parser = gs.get_default_command_line_parser(False, False, False)
+    parser.add_option("--serial-port",
+                    default="/dev/ttyUSB1", metavar="/dev/ttyUSBn",
+                    help="Serial port of GPS receiver")
+    parser.add_option("--serial-speed",
+                    default="9600", metavar="9600",
+                    help="Serial baud of GPS receiver")
+    parser.add_option("--groundstation-host",
+                    default="127.0.0.1", metavar="IP ADDRESS",
+                    help="IP Address of Groundstation")
+    parser.add_option("--groundstation-port",
+                    default=str(communication.UDP_PORT), metavar="IP PORT",
+                    help="IP Port of Groundstation")
 
     options, args = parser.parse_args()
 

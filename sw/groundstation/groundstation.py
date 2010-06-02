@@ -27,7 +27,7 @@ logging.basicConfig(
     )
 
 if __name__ == "__main__":
-    parser = gs.get_default_command_line_parser()
+    parser = gs.get_default_command_line_parser(True, True, True)
     options, args = parser.parse_args()
     if gs.IS_WINDOWS:
         import gtk.gdk
