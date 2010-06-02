@@ -61,6 +61,7 @@ class UdpCommunication(Communication):
         self.watch = None
         self.connected = False
         self.groundstation_transport_header = wasp.transport.TransportHeaderFooter(acid=0x78)
+        self.host = "127.0.0.1"
 
     def send_message(self, msg, values):
         if self.connected:
@@ -76,11 +77,9 @@ class UdpCommunication(Communication):
     def on_data_available(self, fd, condition):
         try:
             data = self.socket.recv(1024)
-            print "RX"
             for header, payload in self.transport.parse_many(data):
                 msg = self.messages_file.get_message_by_id(header.msgid)
                 if msg:
-                    print "RX: ", msg
                     self.emit("message-received", msg, header, payload)
         except socket.error, err:
             print "Could not recv: %s" % err
@@ -90,7 +89,7 @@ class UdpCommunication(Communication):
     def connect_to_uav(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
-            s.bind(("127.0.0.1", UDP_PORT))
+            s.bind((self.host, UDP_PORT))
             self.watch = gobject.io_add_watch(
                             s.fileno(), 
                             gobject.IO_IN | gobject.IO_PRI,
@@ -118,7 +117,7 @@ class UdpCommunication(Communication):
         pass
 
     def get_connection_string(self):
-        return "%s:%s" % (self.HOST, self.PORT)
+        return "%s:%s" % (self.host, UDP_PORT)
 
 class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
 
@@ -236,7 +235,7 @@ class DummyCommunication(Communication):
 
         lat = int(self._lat * 1e7)
         lon = int(self._lon * 1e7)
-        alt = self._alt.value() * 1000.0
+        alt = int(self._alt.value() * 1000.0)
 
         msg = self.messages_file.get_message_by_name("GPS_LLH")
         return self.send_message(msg, (2, 5, lat, lon, alt, 1, 1))

@@ -18,20 +18,18 @@ class GpsView(plugin.Plugin):
         item.connect("activate", self._show_window)
         groundstation_window.add_menu_item("Window", item)
 
-        #register interest in the GPS_LLH messags
-        source.register_interest(self._on_gps_llh, 0, "GPS_LLH")
+        source.register_interest(self._on_gps_gsv, 0, "GPS_GSV")
 
         self._sky = None
         self._w = None
+        self._sats = {}
 
-    def _on_gps_llh(self, msg, header, payload):
-        fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
-
-        #convert from mm to m
-        hsl = hsl/1000.0
-
-        if fix:
-            pass
+    def _on_gps_gsv(self, msg, header, payload):
+        if self._sky:
+            sv,prn,elevation,azimuth,snr = msg.unpack_values(payload)
+            self._sats[prn] = Sat(prn,elevation,azimuth,snr)
+            #Maybe should cap the redraw rate here...
+            self._sky.redraw(self._sats.values())
 
     def _create_window(self):
         self._w = gtk.Window()
@@ -44,8 +42,18 @@ class GpsView(plugin.Plugin):
             self._create_window()
         self._w.show_all()
 
+# Fake the libgps API, make this Sat class have the same elements as expected
+# by the skyview
+class Sat:
+    def __init__(self,prn,elevation,azimuth,snr):
+        self.PRN = prn
+        self.azimuth = azimuth
+        self.elevation = elevation
+        self.ss = snr
+        self.used = True
+
 # Taken from xgps (of the gpsd project)
-# http://svn.berlios.de/svnroot/repos/gpsd/trunk/xgps
+# http://git.berlios.de/cgi-bin/cgit.cgi/gpsd/tree/xgps
 class SkyView(gtk.DrawingArea):
     "Satellite skyview, encapsulates pygtk's draw-on-expose behavior."
     # See <http://faq.pygtk.org/index.py?req=show&file=faq18.008.htp>

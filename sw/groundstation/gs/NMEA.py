@@ -5,6 +5,9 @@ import string
 import math
 
 class NMEA:
+
+    OK = "OK"
+
     def __init__(self):
         self.prn = range(12)
         self.elevation = range(12)
@@ -25,6 +28,21 @@ class NMEA:
         self.ZCHseen = 0
         self.LATLON = 0
         self.time = None
+        self.last_message = None
+
+        self.vtg_track = 0.0
+        self.vtg_speed = 0.0
+
+        #by default expect NMEA sentances that end with <CR><LF>
+        self.set_footer(True, True)
+
+    def set_footer(self, contains_cr, contains_lf):
+        if contains_cr and contains_lf:
+            self.footer_len = 2
+        elif self.contains_cr or contains_lf:
+            self.footer_len = 1
+        else:
+            self.footer_len = 0
 
     def add_checksum(self,sentence):
         csum = 0
@@ -206,17 +224,33 @@ class NMEA:
             (self.zv[i], self.ZCH) = self.update(self.zv[i], string.atoi(words[2*i+1]), self.ZCH)
         self.ZCHseen = 1;
 
+#VTG - Velocity made good. The gps receiver may use the LC prefix instead of GP if it is emulating Loran output.
+#VTG,054.7,T,034.4,M,005.5,N,010.2,K*48
+#        VTG          Track made good and ground speed
+#        054.7,T      True track made good (degrees)
+#        034.4,M      Magnetic track made good
+#        005.5,N      Ground speed, knots
+#        010.2,K      Ground speed, Kilometers per hour
+#        *48          Checksum
+
+    def processGPVTG(self, words):
+        self.vtg_track = string.atof(words[0])
+        self.vtg_speed = string.atof(words[6])
+
     def handle_line(self, line):
         if line[0] == '$':
-            line = string.split(line[1:-1], '*')
-            if len(line) != 2: return
+            line = string.split(line[1:-2], '*')
+            if len(line) != 2:
+                return "No Checksum"
             if not self.checksum(line[0], line[1]):
                 return "Bad checksum"
             words = string.split(line[0], ',')
             if NMEA.__dict__.has_key('process'+words[0]):
                 NMEA.__dict__['process'+words[0]](self, words[1:])
+                self.last_message = words[0]
+                return NMEA.OK
             else:
-                return "Unknown sentence"
+                return "Unknown sentence: %s" % words[0]
         else:
             return "Not NMEA"
 
@@ -237,14 +271,15 @@ if __name__ == '__main__':
     # Self-testing code goes here.
     nmea = NMEA()
     lines = [
-        "$GPGGA,000033.997,0000.0000,N,00000.0000,E,0,00,50.0,0.0,M,,,,0000*3C\n",
-        "$GPRMC,024932.992,V,4443.7944,N,07456.7103,W,,,270402,,*05\n",
-        "$GPGSA,A,1,,,,,,,,,,,,,50.0,50.0,50.0*05\n",
-        "$GPGSV,3,1,09,14,77,023,,21,67,178,,29,64,307,,30,42,095,*7E\n",
-        "$GPGSV,3,2,09,05,29,057,,11,15,292,,18,08,150,,23,08,143,*7A\n",
-        "$GPGSV,3,3,09,09,05,052,*4B\n",
+        "$GPGGA,000033.997,0000.0000,N,00000.0000,E,0,00,50.0,0.0,M,,,,0000*3C\r\n",
+        "$GPRMC,024932.992,V,4443.7944,N,07456.7103,W,,,270402,,*05\r\n",
+        "$GPGSA,A,1,,,,,,,,,,,,,50.0,50.0,50.0*05\r\n",
+        "$GPGSV,3,1,09,14,77,023,,21,67,178,,29,64,307,,30,42,095,*7E\r\n",
+        "$GPGSV,3,2,09,05,29,057,,11,15,292,,18,08,150,,23,08,143,*7A\r\n",
+        "$GPGSV,3,3,09,09,05,052,*4B\r\n",
+        "$GPGSV,3,1,12,22,78,152,38,14,60,295,38,24,56,359,39,18,46,087,33*78\r\n"
     ]
     for line in lines:
-        nmea.handle_line(line)
+        print nmea.handle_line(line)
     print nmea.__dict__
 
