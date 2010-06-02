@@ -4,6 +4,8 @@ import datetime
 import string
 import math
 
+# Originally from pyGPS
+# NMEA message descriptions from http://www.gpsinformation.org/dale/nmea.htm
 class NMEA:
 
     OK = "OK"
