@@ -119,17 +119,15 @@ class UdpCommunication(Communication):
     def get_connection_string(self):
         return "%s:%s" % (self.host, UDP_PORT)
 
-class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
+class SerialCommunication(Communication):
 
     COMMUNICATION_TYPE = "serial"
 
     def __init__(self, transport, messages_file):
         Communication.__init__(self, transport, messages_file)
-        self.watch = None
 
-    def __init__(self, transport, messages_file):
-        Communication.__init__(self, transport, messages_file)
-        libserial.SerialSender.SerialSender.__init__(self)
+        self.serialsender = libserial.SerialSender.SerialSender()
+        self.serialsender.connect("serial-connected", self.on_serial_connected)
         #this watch is used to monitor the serial file descriptor for data
         self.watch = None
         #the header used when sending a message to the UAV
@@ -138,7 +136,7 @@ class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
         self.port = None
         self.speed = None
 
-    def on_serial_connected(self, connected):
+    def on_serial_connected(self, sender, connected):
         #remove the old watch
         if self.watch:
             gobject.source_remove(self.watch)
@@ -146,16 +144,16 @@ class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
         if connected:
             #add new watch
             self.watch = gobject.io_add_watch(
-                            self.get_fd(), 
+                            self.serialsender.get_fd(), 
                             gobject.IO_IN | gobject.IO_PRI,
                             self.on_serial_data_available,
-                            self.get_serial(),
                             priority=gobject.PRIORITY_HIGH
             )
 
         self.emit("uav-connected", connected)
 
-    def on_serial_data_available(self, fd, condition, serial):
+    def on_serial_data_available(self, fd, condition):
+        serial = self.serialsender.get_serial()
         data = serial.read(1)
         for header, payload in self.transport.parse_many(data):
             msg = self.messages_file.get_message_by_id(header.msgid)
@@ -169,16 +167,17 @@ class SerialCommunication(Communication, libserial.SerialSender.SerialSender):
                         self.groundstation_transport_header, 
                         msg,
                         *values)
-            self.get_serial().write(data.tostring())
+            serial = self.serialsender.get_serial()
+            serial.write(data.tostring())
 
     def connect_to_uav(self):
-        self.connect_to_port(self.port, self.speed)
+        self.serialsender.connect_to_port(self.port, self.speed)
 
     def disconnect_from_uav(self):
-        self.disconnect_from_port()
+        self.serialsender.disconnect_from_port()
 
     def is_connected(self):
-        return self.is_open()
+        return self.serialsender.is_open()
 
     def configure_connection(self, **kwargs):
         self.port = kwargs.get("serial_port")
