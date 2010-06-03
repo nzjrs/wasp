@@ -241,16 +241,19 @@ class NMEA:
 
     def handle_line(self, line):
         if line[0] == '$':
-            line = string.split(line[1:-2], '*')
+            line = string.split(line[1:-self.footer_len], '*')
             if len(line) != 2:
                 return "No Checksum"
             if not self.checksum(line[0], line[1]):
                 return "Bad checksum"
             words = string.split(line[0], ',')
             if NMEA.__dict__.has_key('process'+words[0]):
-                NMEA.__dict__['process'+words[0]](self, words[1:])
-                self.last_message = words[0]
-                return NMEA.OK
+                try:
+                    NMEA.__dict__['process'+words[0]](self, words[1:])
+                    self.last_message = words[0]
+                    return NMEA.OK
+                except Exception, e:
+                    return "Parse Error: %s" % e
             else:
                 return "Unknown sentence: %s" % words[0]
         else:

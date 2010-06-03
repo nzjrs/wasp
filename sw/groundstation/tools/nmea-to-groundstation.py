@@ -54,15 +54,21 @@ class Bridge:
                             priority=gobject.PRIORITY_HIGH
             )
 
+    def send_data(self, data):
+        try:
+            l = self.sock.send(data)
+            if l != len(data):
+                print "Not all data sent: %d != %d" % (l, len(data))
+        except socket.error, e:
+            print "Send error: %s" % e
+
     def send_vtg(self):
         data = self.transport.pack_message_with_values(
                         self.header,
                         self.msg_vtg,
                         self.NMEA.vtg_track,
                         self.NMEA.vtg_speed)
-        l = self.sock.send(data)
-        if l != len(data):
-            raise Exception("Not all data sent: %d != %d" % (l, len(data)))
+        self.send_data(data)
 
 #   <message name="GPS_GSV" id="42">
 #      <field name="sv"  type="uint8"/>
@@ -71,23 +77,18 @@ class Bridge:
 #      <field name="aximuth"  type="uint16"/>
 #      <field name="snr"  type="uint8"/>
 #   </message>
-    def send_sat(self, i):
-        data = self.transport.pack_message_with_values(
-                        self.header,
-                        self.msg_gsv,
-                        self.NMEA.in_view,
-                        self.NMEA.prn[i],
-                        self.NMEA.elevation[i],
-                        self.NMEA.azimuth[i],
-                        self.NMEA.ss[i])
-        l = self.sock.send(data)
-        if l != len(data):
-            raise Exception("Not all data sent: %d != %d" % (l, len(data)))
-
     def send_gsv(self):
         #send all 
         for i in range(0,self.NMEA.in_view):
-            self.send_sat(i)
+            data = self.transport.pack_message_with_values(
+                            self.header,
+                            self.msg_gsv,
+                            self.NMEA.in_view,
+                            self.NMEA.prn[i],
+                            self.NMEA.elevation[i],
+                            self.NMEA.azimuth[i],
+                            self.NMEA.ss[i])
+            self.send_data(data)
 
 #   <message name="GPS_LLH" id="36">
 #      <field name="fix" type="uint8" values="NONE|2D|3D"/>
@@ -114,9 +115,7 @@ class Bridge:
                         alt,
                         1,
                         1)
-        l = self.sock.send(data)
-        if l != len(data):
-            raise Exception("Not all data sent: %d != %d" % (l, len(data)))
+        self.send_data(data)
 
     def on_serial_data_available(self, fd, condition, serial):
         data = serial.read(1)
