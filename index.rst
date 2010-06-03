@@ -10,16 +10,7 @@ the :ref:`introduction`
 
    README
    sw/doc/index
-   sw/doc/unittest
    hw/doc/index
-   hw/doc/servos
-   hw/doc/schematics
-   sw/doc/onboard
-   sw/doc/architecture
-   sw/doc/groundstation
-   sw/doc/autopilot
-   sw/doc/comm-protocol
-   sw/doc/coding-standards
 
 
 
