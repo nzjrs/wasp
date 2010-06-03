@@ -76,6 +76,7 @@ the following sequence of steps.
 LEA-4P
 ------
 .. http://paparazzi.enac.fr/wiki/GPS#Manual_Configuration
+.. http://diydrones.com/profiles/blogs/tutorial-programming-your
 * Right Click on the NMEA Icon and choose disable child
 * Choose UBX->CFG->NAV2(Navigation 2) - set it to use Airborne 4G (tells the Kalman filter to expect significant changes in direction)
 * UBX->CFG->PRT - set USART1 to 38400bps (must match the value in your Airframe file)
