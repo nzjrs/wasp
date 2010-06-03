@@ -83,11 +83,13 @@ class GtkBuilderWidget:
         for r in resources:
             setattr(self, "_%s" % r.lower(), self.get_resource(r))
 
-    def get_resource(self, name):
+    def get_resource(self, name, cache=True):
         if name not in self._resources:
             w = self._builder.get_object(name)
             if not w:
                 raise Exception("Could not find widget: %s" % name)
+            if not cache:
+                return w
             self._resources[name] = w
 
         return self._resources[name]

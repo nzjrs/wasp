@@ -120,9 +120,11 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
                 gobject.TYPE_BOOLEAN]),     #True if source connected
             "source-link-status-change" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
                 gobject.TYPE_BOOLEAN]),     #True if recieving data
+            "uav-detected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+                gobject.TYPE_INT]),         #The ACID of a detected UAV
     }
 
-    def __init__(self, conf, messages, source_name, listen_for_uav_id=0xFF):
+    def __init__(self, conf, messages, source_name, listen_acid=wasp.ACID_ALL):
         config.ConfigurableIface.__init__(self, conf)
         gobject.GObject.__init__(self)
 
@@ -133,8 +135,14 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         #dictionary of msgid : [list, of, _MessageCb objects]
         self._callbacks = {}
 
+        #for tracking UAVs we have seen and are communicating with
+        self._listen_acid = listen_acid
+        self._desination_acid = wasp.ACID_ALL
+        self._seen_acids = {}
+
         self._messages_file = messages
         self._transport = transport.Transport(check_crc=True, debug=DEBUG)
+        self._groundstation_header = wasp.transport.TransportHeaderFooter(acid=wasp.ACID_GROUNDSTATION)
         self._rm = self._messages_file.get_message_by_name("REQUEST_MESSAGE")
         self._rt = self._messages_file.get_message_by_name("REQUEST_TELEMETRY")
 
@@ -147,7 +155,7 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         comm_klass = communication.get_source(source_name)
         LOG.info("Source: %s" % comm_klass)
 
-        self.communication = comm_klass(self._transport, self._messages_file)
+        self.communication = comm_klass(self._transport, self._messages_file, self._groundstation_header)
         self.communication.configure_connection(**connection_configuration)
         self.communication.connect("message-received", self.on_message_received)
         self.communication.connect("uav-connected", self.on_uav_connected)
@@ -188,6 +196,14 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
             self._callbacks[msg.id].append(cb)
         except KeyError:
             self._callbacks[msg.id] = [cb]
+
+    def select_uav(self, acid):
+        """ Sets that we should only listen for messages from UAVs with the given acid """
+        self._listen_acid = acid
+
+    def get_selected_uav(self):
+        """ Returns the UAV that we are listening for messages from """
+        return self._listen_acid
 
     def get_status(self):
         """ Returns the connection status, :const:`gs.source.UAVSource.STATUS_CONNECTED` etc """
@@ -254,16 +270,22 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         self.emit("source-connected", connected)
 
     def on_message_received(self, communication, msg, header, payload):
-        time = datetime.datetime.now()
-        cbs = self._callbacks.get(msg.id, ())
-        for cb in cbs:
-            cb.call_cb(msg, header, payload, time)
+        if self._listen_acid == wasp.ACID_ALL or self._listen_acid == header.acid:
+            time = datetime.datetime.now()
+            cbs = self._callbacks.get(msg.id, ())
+            for cb in cbs:
+                cb.call_cb(msg, header, payload, time)
 
-        if self._rxts:
-            self._rxts.update_message(msg, payload)
+            if self._rxts:
+                self._rxts.update_message(msg, payload)
 
-        self._times.add(utils.calculate_dt_seconds(self._lastt, time))
-        self._lastt = time
+            self._times.add(utils.calculate_dt_seconds(self._lastt, time))
+            self._lastt = time
+
+        if header.acid not in self._seen_acids:
+            self._seen_acids[header.acid] = True
+            self.emit("uav-detected", header.acid)
+
 
     def get_rx_message_treestore(self):
         if self._rxts == None:
@@ -272,6 +294,7 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
 
     def send_message(self, msg, values):
         if self.communication.is_connected():
+            #FIXME: pass the header in here
             self.communication.send_message(msg, values)
 
     def connect_to_uav(self):

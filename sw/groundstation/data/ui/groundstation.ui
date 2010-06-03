@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <interface>
   <requires lib="gtk+" version="2.16"/>
-  <!-- interface-naming-policy toplevel-contextual -->
+  <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="main_window">
     <property name="title" translatable="yes">Groundstation</property>
     <property name="window_position">center</property>
@@ -14,7 +14,6 @@
     <child>
       <object class="GtkVBox" id="window_vbox">
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
         <child>
           <object class="GtkMenuBar" id="main_menubar">
             <property name="visible">True</property>
@@ -62,6 +61,20 @@
                     </child>
                     <child>
                       <object class="GtkSeparatorMenuItem" id="separatormenuitem1">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="menu_item_select_uav">
+                        <property name="label" translatable="yes">Select UAV</property>
+                        <property name="visible">True</property>
+                        <property name="image">image20</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_menu_item_select_uav_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="menuitem4">
                         <property name="visible">True</property>
                       </object>
                     </child>
@@ -402,7 +415,6 @@
                 <child>
                   <object class="GtkVBox" id="main_left_vbox">
                     <property name="visible">True</property>
-                    <property name="orientation">vertical</property>
                     <child>
                       <placeholder/>
                     </child>
@@ -453,7 +465,6 @@
                     <child>
                       <object class="GtkVBox" id="telemetry_left_vbox">
                         <property name="visible">True</property>
-                        <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkLabel" id="label1">
                             <property name="visible">True</property>
@@ -504,7 +515,6 @@
                     <child>
                       <object class="GtkVBox" id="graphs_box">
                         <property name="visible">True</property>
-                        <property name="orientation">vertical</property>
                         <property name="spacing">5</property>
                         <child>
                           <placeholder/>
@@ -590,13 +600,11 @@
     <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-    <property name="page_size">0</property>
   </object>
   <object class="GtkAdjustment" id="adjustment2">
     <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-    <property name="page_size">0</property>
   </object>
   <object class="GtkAdjustment" id="adjustment3">
     <property name="value">1230</property>
@@ -604,7 +612,6 @@
     <property name="upper">2000</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-    <property name="page_size">0</property>
   </object>
   <object class="GtkAdjustment" id="adjustment4">
     <property name="value">1182</property>
@@ -612,7 +619,6 @@
     <property name="upper">1817</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-    <property name="page_size">0</property>
   </object>
   <object class="GtkAccelGroup" id="accelgroup1"/>
   <object class="GtkImage" id="image2">
@@ -708,11 +714,11 @@
     <property name="icon-size">1</property>
   </object>
   <object class="GtkWindow" id="pluginwindow">
+    <property name="title" translatable="yes">Plugins</property>
     <property name="default_width">400</property>
     <child>
       <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
         <property name="spacing">4</property>
         <child>
           <object class="GtkScrolledWindow" id="scrolledwindow1">
@@ -797,5 +803,92 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkImage" id="image20">
+    <property name="visible">True</property>
+    <property name="stock">gtk-select-color</property>
+  </object>
+  <object class="GtkDialog" id="dialog_select_uav">
+    <property name="border_width">5</property>
+    <property name="title" translatable="yes">Select UAV</property>
+    <property name="type_hint">normal</property>
+    <property name="has_separator">False</property>
+    <child internal-child="vbox">
+      <object class="GtkVBox" id="dialog-vbox1">
+        <property name="visible">True</property>
+        <property name="spacing">2</property>
+        <child>
+          <object class="GtkVBox" id="treeview_box">
+            <property name="visible">True</property>
+            <child>
+              <object class="GtkTreeView" id="treeview_select_uav">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <child>
+                  <object class="GtkTreeViewColumn" id="treeviewcolumn10">
+                    <property name="title">UAV ID</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="cellrenderertext1"/>
+                      <attributes>
+                        <attribute name="text">0</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <object class="GtkHButtonBox" id="dialog-action_area1">
+            <property name="visible">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="button2">
+                <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button1">
+                <property name="label">gtk-ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="0">button2</action-widget>
+      <action-widget response="-5">button1</action-widget>
+    </action-widgets>
   </object>
 </interface>

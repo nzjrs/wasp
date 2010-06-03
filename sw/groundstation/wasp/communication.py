@@ -22,10 +22,11 @@ class Communication(gobject.GObject):
             gobject.TYPE_BOOLEAN]),     #true if successfully connected to UAV
     }
 
-    def __init__(self, transport, messages_file, *args, **kwargs):
+    def __init__(self, transport, messages_file, message_header, *args, **kwargs):
         gobject.GObject.__init__(self)
         self.transport = transport
         self.messages_file = messages_file
+        self.message_header = message_header
 
     def send_message(self, msg, values):
         """
@@ -55,18 +56,17 @@ class UdpCommunication(Communication):
 
     COMMUNICATION_TYPE = "network"
 
-    def __init__(self, transport, messages_file):
-        Communication.__init__(self, transport, messages_file)
+    def __init__(self, transport, messages_file, message_header):
+        Communication.__init__(self, transport, messages_file, message_header)
         self.socket = None
         self.watch = None
         self.connected = False
-        self.groundstation_transport_header = wasp.transport.TransportHeaderFooter(acid=0x78)
         self.host = "127.0.0.1"
 
     def send_message(self, msg, values):
         if self.connected:
             data = self.transport.pack_message_with_values(
-                        self.groundstation_transport_header, 
+                        self.message_header,
                         msg,
                         *values)
             try:
@@ -123,15 +123,13 @@ class SerialCommunication(Communication):
 
     COMMUNICATION_TYPE = "serial"
 
-    def __init__(self, transport, messages_file):
-        Communication.__init__(self, transport, messages_file)
+    def __init__(self, transport, messages_file, message_header):
+        Communication.__init__(self, transport, messages_file, message_header)
 
         self.serialsender = libserial.SerialSender.SerialSender()
         self.serialsender.connect("serial-connected", self.on_serial_connected)
         #this watch is used to monitor the serial file descriptor for data
         self.watch = None
-        #the header used when sending a message to the UAV
-        self.groundstation_transport_header = wasp.transport.TransportHeaderFooter(acid=0x78)
         #the serial connection details
         self.port = None
         self.speed = None
@@ -164,7 +162,7 @@ class SerialCommunication(Communication):
     def send_message(self, msg, values):
         if msg:
             data = self.transport.pack_message_with_values(
-                        self.groundstation_transport_header, 
+                        self.message_header,
                         msg,
                         *values)
             serial = self.serialsender.get_serial()
@@ -190,11 +188,11 @@ class DummyCommunication(Communication):
 
     COMMUNICATION_TYPE = "test"
 
-    def __init__(self, transport, messages_file):
-        Communication.__init__(self, transport, messages_file)
+    def __init__(self, transport, messages_file, message_header):
+        Communication.__init__(self, transport, messages_file, message_header)
         self._sendcache = {}
         self._is_open = False
-        self.uav_header = wasp.transport.TransportHeaderFooter(acid=0x9A)
+        self.uav_header = wasp.transport.TransportHeaderFooter(acid=wasp.ACID_TEST)
 
         #Write messages to the pipe, so that it is read and processed by
         #the groundstation

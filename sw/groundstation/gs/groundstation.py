@@ -28,6 +28,7 @@ from gs.ui.settings import SettingsController
 from gs.ui.window import DialogWindow
 from gs.ui.statusicon import StatusIcon
 
+import wasp
 from wasp.messages import MessagesFile
 from wasp.settings import SettingsFile
 from wasp.ui.treeview import MessageTreeView
@@ -97,6 +98,11 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         self._source = UAVSource(self._config, self._messagesfile, options.source)
         self._source.connect("source-connected", self._on_source_connected)
+
+        #track the UAVs we have got data from
+        self._source.connect("uav-detected", self._on_uav_detected)
+        self._uav_detected_model = gtk.ListStore(str,int)
+        self._uav_detected_model.append( ("All UAVs", wasp.ACID_ALL) )
 
         #track the state of a few key variables received from the plane
         self._state = {}
@@ -178,6 +184,9 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         #self._source.register_sqlite_logger(None, "STATUS", "GPS_LLH")
 
         self.window.show_all()
+
+    def _on_uav_detected(self, source, acid):
+        self._uav_detected_model.append( ("0x%X" % acid, acid) )
 
     def _create_telemetry_ui(self):
         def on_gb_clicked(btn, _tv, _gm):
@@ -332,6 +341,21 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                             "You must mark the home position of the flight first.",
                             timeout=5)
         msg.show_all()
+
+    def on_menu_item_select_uav_activate(self, *args):
+        tv = self.get_resource("treeview_select_uav")
+        tv.set_model(self._uav_detected_model)
+        dlg = self.get_resource("dialog_select_uav")
+        dlg.set_transient_for(self.window)
+        dlg.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        resp = dlg.run()
+        dlg.hide()
+
+        if resp == gtk.RESPONSE_OK:
+            model, iter_ = tv.get_selection().get_selected()
+            if iter_:
+                acid = model.get_value(iter_, 1)
+                message_dialog("Select UAV 0x%X Not Implemented" % acid, self.window)
 
     def on_menu_item_refresh_uav_activate(self, *args):
         #request a number of messages from the UAV

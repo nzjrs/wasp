@@ -34,6 +34,10 @@ TYPE_TO_PRINT_MAP = {
         int     :   "%d"
 }
 
+ACID_ALL            = 0xFF
+ACID_TEST           = 0xFE
+ACID_GROUNDSTATION  = 0xFD
+
 def setup_comm_optparse_options(parser, default_messages="/dev/null"):
     """
     Adds a number of communication related command line options to an
