@@ -180,9 +180,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             nb.page_num(
                 self.get_resource("autopilot_hbox")))
 
-        #self._source.register_csv_logger(None, "STATUS", "GPS_LLH")
-        #self._source.register_sqlite_logger(None, "STATUS", "GPS_LLH")
-
         self.window.show_all()
 
     def _on_uav_detected(self, source, acid):
@@ -325,6 +322,32 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                             "A GPS location has not been received from the UAV yet",
                             timeout=5)
             msg.show_all()
+
+    def on_menu_item_log_uav_data_activate(self, *args):
+        sw = self.get_resource("log_message_scrolledwindow")
+        tv = MessageTreeView(
+                self._source.get_rx_message_treestore(),
+                editable=False, show_dt=False, show_value=False)
+        tv.show()
+        sw.add(tv)
+
+        w = self.get_resource("logdatadialog")
+        w.set_transient_for(self.window)
+        w.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        resp = w.run()
+        w.hide()
+
+        if resp == gtk.RESPONSE_OK:
+            csv = self.get_resource("log_csv_radiobutton")
+            fcb = self.get_resource("log_filechooserbutton")
+
+            messages = ("STATUS", "GPS_LLH")
+            if csv.get_active():
+                self._source.register_csv_logger(None, *messages)
+            else:
+                self._source.register_sqlite_logger(None, *messages)
+
+        sw.remove(tv)
 
     def on_menu_item_export_kml_activate(self, *args):
         path = self._map.save_kml()

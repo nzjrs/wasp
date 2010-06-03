@@ -53,22 +53,23 @@ class MessageTreeStore(gtk.TreeStore):
                    vals[i])
 
 class MessageTreeView(gtk.TreeView):
-    def __init__(self, messagetreemodel, editable=True, show_dt=False):
+    def __init__(self, messagetreemodel, editable=True, show_dt=False, show_value=True):
         gtk.TreeView.__init__(self, messagetreemodel)
 
         self.insert_column_with_attributes(-1, "Name",
                 gtk.CellRendererText(),
                 text=MessageTreeStore.NAME_IDX)
 
-        rend = gtk.CellRendererText()
-        rend.connect("edited", self._value_edited_cb, messagetreemodel)
-        if editable:
-            col = gtk.TreeViewColumn("Value", rend, editable=MessageTreeStore.EDITABLE_IDX)
-        else:
-            col = gtk.TreeViewColumn("Value", rend)
-        col.props.expand = True
-        col.set_cell_data_func(rend, self._get_field_value)
-        self.append_column(col)
+        if show_value:
+            rend = gtk.CellRendererText()
+            rend.connect("edited", self._value_edited_cb, messagetreemodel)
+            if editable:
+                col = gtk.TreeViewColumn("Value", rend, editable=MessageTreeStore.EDITABLE_IDX)
+            else:
+                col = gtk.TreeViewColumn("Value", rend)
+            col.props.expand = True
+            col.set_cell_data_func(rend, self._get_field_value)
+            self.append_column(col)
 
         if show_dt:
             self.insert_column_with_data_func(-1, "dt",
