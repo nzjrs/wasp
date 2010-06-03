@@ -119,6 +119,8 @@
 #define PPM_PINSEL_BIT  24
 
 /* UARTS */
+/* UART0 = uBlox GPS    */
+/* UART1 = XBEE         */
 #define USE_UART0 1
 #define USE_UART1 1
 #define UART0_BAUD B38400
