@@ -67,3 +67,14 @@ void actuators_commit( uint8_t bank )
     if ( bank & ACTUATOR_BANK_MOTORS )
         buss_twi_blmc_commit();
 }
+
+uint8_t actuators_get_num( uint8_t bank )
+{
+    if (bank == ACTUATOR_BANK_MOTORS)
+        return buss_twi_blmc_get_num();
+#if USE_SERVOS_4017
+    if (bank == ACTUATOR_BANK_SERVOS)
+        return servos_4017_get_num();
+#endif
+    return 0;
+}

@@ -33,4 +33,6 @@ void buss_twi_blmc_init(void);
 
 void buss_twi_blmc_commit(void);
 
+uint8_t buss_twi_blmc_get_num(void);
+
 #endif /* BUSS_TWI_BLMC_HW_H */

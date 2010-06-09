@@ -38,6 +38,7 @@ extern uint16_t servos_values[SERVOS_4017_NB_CHANNELS];
 extern uint8_t servos_4017_idx;
 
 void servos_4017_init(void);
+uint8_t servos_4017_get_num(void);
 
 static inline void servos_4017_isr(void)
 {

@@ -74,6 +74,7 @@ void imu_adjust_alignment( float phi, float theta, float psi ) {}
 void actuators_init( uint8_t bank ) {}
 void actuators_set( ActuatorID_t id, uint8_t value ) {}
 void actuators_commit( uint8_t bank ) {}
+uint8_t actuators_get_num( uint8_t bank ) { return 0; }
 
 #include "gps.h"
 SystemStatus_t gps_system_status;

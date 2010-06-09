@@ -83,3 +83,8 @@ void buss_twi_blmc_commit(void)
         twi_blmc_nb_err++;
     }
 }
+
+uint8_t buss_twi_blmc_get_num(void)
+{
+    return MOTOR_NB;
+}

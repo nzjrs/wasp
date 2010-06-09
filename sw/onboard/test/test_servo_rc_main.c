@@ -66,7 +66,7 @@ static inline void main_periodic_task( void ) {
         val = 0;
     }
 
-    for (i = 0; i < SERVOS_4017_NB_CHANNELS; i++) 
+    for (i = 0; i < actuators_get_num(ACTUATOR_BANK_SERVOS); i++) 
         actuators_set(ACTUATOR_BANK_SERVOS | i, val);
 
     actuators_commit(ACTUATOR_BANK_SERVOS);
