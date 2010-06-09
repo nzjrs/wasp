@@ -11,6 +11,7 @@ try:
     import osmgpsmap
     MAP_AVAILABLE = osmgpsmap.__version__ >= "0.4.0"
     MAP_OSD_AVAILABLE = osmgpsmap.__version__ > "0.5.0"
+    MAP_NEW_API = osmgpsmap.__version__ > "0.7.1"
 except:
     MAP_AVAILABLE = False
     class DummyMap: pass
