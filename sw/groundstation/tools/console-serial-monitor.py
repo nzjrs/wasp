@@ -4,18 +4,35 @@
 import time
 import os.path
 import optparse
+import gobject
 import wasp
 import wasp.transport as transport
 import wasp.communication as communication
 import wasp.messages as messages
+
+def message_received(msg, header, payload):
+    pass
+
+def send_ping():
+    pass
 
 if __name__ == "__main__":
     thisdir = os.path.abspath(os.path.dirname(__file__))
     default_messages = os.path.join(thisdir, "..", "..", "onboard", "config", "messages.xml")
 
     parser = optparse.OptionParser()
-    wasp.setup_comm_optparse_options(parser, default_messages)
-
+    parser.add_option("-m", "--messages",
+                    default=default_messages,
+                    help="messages xml file", metavar="FILE")
+    parser.add_option("-p", "--port",
+                    default="/dev/ttyUSB0",
+                    help="serial port")
+    parser.add_option("-s", "--speed",
+                    type="int", default=57600,
+                    help="serial port baud rate")
+    parser.add_option("-t", "--timeout",
+                    type="int", default=1,
+                    help="serial timeout")
     parser.add_option("-d", "--debug",
                     action="store_true",
                     help="print extra debugging information")
@@ -32,11 +49,11 @@ if __name__ == "__main__":
     options, args = parser.parse_args()
 
     m = messages.MessagesFile(path=options.messages, debug=options.debug)
-    s = communication.SerialCommunication(port=options.port, speed=options.speed, timeout=options.timeout)
-    t = transport.Transport(check_crc=options.crc, debug=options.debug)
-
-    s.connect_to_port()
     m.parse()
+    t = transport.Transport(check_crc=options.crc, debug=options.debug)
+    s = communication.Serial(t,m,wasp.transport.TransportHeaderFooter(acid=wasp.ACID_GROUNDSTATION))
+    s.configure_connection(port=options.port,speed=options.speed,timeout=options.timeout)
+    s.connect_to_port()
 
     t1 = t2 = time.time()
     while s.is_open():
