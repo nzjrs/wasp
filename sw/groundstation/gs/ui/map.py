@@ -9,9 +9,8 @@ import gobject
 
 try:
     import osmgpsmap
-    MAP_AVAILABLE = osmgpsmap.__version__ >= "0.4.0"
-    MAP_OSD_AVAILABLE = osmgpsmap.__version__ > "0.5.0"
-    MAP_NEW_API = osmgpsmap.__version__ > "0.7.1"
+    MAP_AVAILABLE   = osmgpsmap.__version__ >= "0.5.0"
+    MAP_NEW_API     = osmgpsmap.__version__ >= "0.7.1"
 except:
     MAP_AVAILABLE = False
     class DummyMap: pass
@@ -119,6 +118,35 @@ class AltWidget(custom.GdkWidget):
         self.alt_pixel_x = x
         self.update_altitude(alt)
 
+class _FlightPlanModel(gtk.ListStore):
+    def __init__(self):
+        gtk.ListStore.__init__(self, float, float, float)
+        self.editing = False
+
+    def set_map(self, _map):
+        self.map = _map
+        if MAP_NEW_API:
+            self.maptrack = osmgpsmap.GpsMapTrack()
+            self.map.track_add(self.maptrack)
+
+    def clear(self):
+        gtk.ListStore.clear(self)
+        if MAP_NEW_API:
+            self.map.track_remove(self.maptrack)
+            self.maptrack = osmgpsmap.GpsMapTrack()
+            self.map.track_add(self.maptrack)
+
+    def set_editing(self, e):
+        self.editing = e
+        if MAP_NEW_API:
+            self.maptrack.props.visible = e
+
+    def add(self, lat, lon, alt):
+        self.append( (lat,lon,alt) )
+        if MAP_NEW_API:
+            p = osmgpsmap.point_new_degrees(lat,lon)
+            self.maptrack.add_point(p)
+
 class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
     CONFIG_SECTION = "MAP"
@@ -150,15 +178,36 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         self.lat = None
         self.lon = None
 
-        if MAP_AVAILABLE:
-            source.register_interest(self._on_gps, 2, "GPS_LLH")
-        else:
-            LOG.warning("Map disabled. You need osmgpsmap >= 0.4.0")
+        #the flightplan editor
+        self._flightplan = _FlightPlanModel()
+        self.get_resource("flight_plan_treeview").set_model(self._flightplan)
+        self.get_resource("alt_cellrenderertext").connect("edited", self._cell_edited_cb)
+        self.get_resource("flight_plan_window").connect("delete-event", self._flight_plan_window_closed)
 
-    def _on_map_button_release(self, map_, event):
+        source.register_interest(self._on_gps, 2, "GPS_LLH")
+        if MAP_AVAILABLE:
+            LOG.info("Map enabled (version: %s)" % osmgpsmap.__version__)
+        else:
+            LOG.warning("Map disabled. You need osmgpsmap >= 0.5.0")
+
+    def _on_map_button_press(self, _map, event):
+        #get the click location
+        if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
+            if MAP_NEW_API:
+                lat,lon = self._map.get_event_location(event).get_degrees()
+            else:
+                lat, lon = [math.degrees(i) for i in _map.get_co_ordinates(int(event.x), int(event.y))]
+
+            if self._flightplan.editing:
+                self._flightplan.add(lat,lon,0.0)
+
+    def _on_map_changed(self, _map):
         if self.lat and self.lon:
-            #git the pixel co-ordinates of the current gps point
-            pixel_x, pixel_y = map_.geographic_to_screen(self.lat, self.lon)
+            if MAP_NEW_API:
+                p = osmgpsmap.point_new_degrees(self.lat, self.lon)
+                pixel_x, pixel_y = _map.convert_geographic_to_screen(p)
+            else:
+                pixel_x, pixel_y = _map.geographic_to_screen(self.lat, self.lon)
             self._alt.update_pixel_x(pixel_x)
 
     def _on_map_size_allocate(self, widget, allocation):
@@ -227,8 +276,8 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
                             proxy_uri=self._proxy,
                             tile_cache=self._cache)
                 #add OSD
-                if MAP_OSD_AVAILABLE:
-                    self._map.add_layer(
+                if MAP_NEW_API:
+                    self._map.layer_add(
                                 osmgpsmap.GpsMapOsd(
                                     show_zoom=True))
 
@@ -246,12 +295,15 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
                     except KeyError:
                         break
 
+                self._flightplan.set_map(self._map)
+
                 #generate notify events to keep the groundstation ui in sync
                 self._map.props.auto_center = self._map.props.auto_center
                 self._map.props.show_trip_history = self._map.props.show_trip_history
 
-                self._map.connect_after('button-release-event', self._on_map_button_release)
+                self._map.connect('changed', self._on_map_changed)
                 self._map.connect('size-allocate', self._on_map_size_allocate)
+                self._map.connect_after('button-press-event', self._on_map_button_press)
 
             else:
                 self._map = gtk.Label("Map Disabled")
@@ -297,6 +349,21 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         #reset the track
         self._flight_track = []
         self._flight_started = datetime.datetime.now()
+
+    def _cell_edited_cb(self, cell, path, new_text):
+        self._flightplan[path][2] = float(new_text)
+
+    def _flight_plan_window_closed(self, window, event):
+        window.hide()
+        self._flightplan.set_editing(False)
+        return True
+
+    def edit_flightplan(self):
+        if not MAP_AVAILABLE:
+            return
+
+        self._flightplan.set_editing(True)
+        self.get_resource("flight_plan_window").show_all()
 
     def show_cache_dialog(self, msgarea):
         if not MAP_AVAILABLE:

@@ -250,7 +250,7 @@
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="button6">
-                <property name="label" translatable="yes">gtk-cancel</property>
+                <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -264,7 +264,7 @@
             </child>
             <child>
               <object class="GtkButton" id="button5">
-                <property name="label" translatable="yes">gtk-ok</property>
+                <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -290,12 +290,55 @@
       <action-widget response="-5">button5</action-widget>
     </action-widgets>
   </object>
+  <object class="GtkWindow" id="flight_plan_window">
+    <property name="default_width">250</property>
+    <property name="default_height">250</property>
+    <child>
+      <object class="GtkTreeView" id="flight_plan_treeview">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <child>
+          <object class="GtkTreeViewColumn" id="treeviewcolumn1">
+            <property name="title">Lat</property>
+            <child>
+              <object class="GtkCellRendererText" id="cellrenderertext1"/>
+              <attributes>
+                <attribute name="text">0</attribute>
+              </attributes>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkTreeViewColumn" id="treeviewcolumn2">
+            <property name="title">Lon</property>
+            <child>
+              <object class="GtkCellRendererText" id="cellrenderertext2"/>
+              <attributes>
+                <attribute name="text">1</attribute>
+              </attributes>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkTreeViewColumn" id="treeviewcolumn3">
+            <property name="title">Alt</property>
+            <child>
+              <object class="GtkCellRendererText" id="alt_cellrenderertext"/>
+              <attributes>
+                <attribute name="text">2</attribute>
+              </attributes>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
   <object class="GtkSizeGroup" id="sizegroup1">
     <widgets>
-      <widget name="zoom_end_lbl"/>
-      <widget name="zoom_start_lbl"/>
-      <widget name="pt2_lat_lbl"/>
       <widget name="pt1_lat_lbl"/>
+      <widget name="pt2_lat_lbl"/>
+      <widget name="zoom_start_lbl"/>
+      <widget name="zoom_end_lbl"/>
     </widgets>
   </object>
   <object class="GtkSizeGroup" id="sizegroup2"/>
@@ -303,12 +346,10 @@
     <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">1</property>
-    <property name="page_size">0</property>
   </object>
   <object class="GtkAdjustment" id="adjustment2">
     <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">1</property>
-    <property name="page_size">0</property>
   </object>
 </interface>

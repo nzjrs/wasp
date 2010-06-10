@@ -332,6 +332,15 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkImageMenuItem" id="menu_item_edit_flightplan">
+                        <property name="label" translatable="yes">Edit Flight Plan</property>
+                        <property name="visible">True</property>
+                        <property name="image">image22</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_menu_item_edit_flightplan_activate"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="menuitem3">
                         <property name="visible">True</property>
                       </object>
@@ -351,12 +360,12 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="imagemenuitem1">
+                      <object class="GtkImageMenuItem" id="menu_item_uav_mark_home">
                         <property name="label" translatable="yes">Mark Home</property>
                         <property name="visible">True</property>
                         <property name="image">image16</property>
                         <property name="use_stock">False</property>
-                        <signal name="activate" handler="on_uav_mark_home"/>
+                        <signal name="activate" handler="on_menu_item_uav_mark_home_activate"/>
                       </object>
                     </child>
                   </object>
@@ -561,27 +570,6 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="autopilot_hbox">
-                <property name="visible">True</property>
-                <child>
-                  <placeholder/>
-                </child>
-              </object>
-              <packing>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child type="tab">
-              <object class="GtkLabel" id="label011">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Autopilot</property>
-              </object>
-              <packing>
-                <property name="position">2</property>
-                <property name="tab_fill">False</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkHBox" id="settings_hbox">
                 <property name="visible">True</property>
                 <child>
@@ -589,7 +577,7 @@
                 </child>
               </object>
               <packing>
-                <property name="position">3</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child type="tab">
@@ -598,7 +586,7 @@
                 <property name="label" translatable="yes">Settings</property>
               </object>
               <packing>
-                <property name="position">3</property>
+                <property name="position">2</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>
@@ -715,10 +703,6 @@
     <property name="icon-size">1</property>
   </object>
   <object class="GtkImage" id="image19">
-    <property name="visible">True</property>
-    <property name="stock">gtk-add</property>
-  </object>
-  <object class="GtkImage" id="add_image">
     <property name="visible">True</property>
     <property name="stock">gtk-add</property>
   </object>
@@ -1036,5 +1020,13 @@
       <action-widget response="0">button4</action-widget>
       <action-widget response="-5">button3</action-widget>
     </action-widgets>
+  </object>
+  <object class="GtkImage" id="add_image">
+    <property name="visible">True</property>
+    <property name="stock">gtk-add</property>
+  </object>
+  <object class="GtkImage" id="image22">
+    <property name="visible">True</property>
+    <property name="stock">gtk-find-and-replace</property>
   </object>
 </interface>

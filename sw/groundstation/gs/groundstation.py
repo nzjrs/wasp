@@ -130,7 +130,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
-        self._fp = FlightPlanEditor(self._map)
         self._statusicon = StatusIcon(icon, self._source)
 
         #raise the window when the status icon clicked
@@ -139,7 +138,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("main_left_vbox").pack_start(self._info.widget, False, False)
         self.get_resource("main_map_vbox").pack_start(self._msgarea, False, False)
         self.get_resource("window_vbox").pack_start(self._sb, False, False)
-        self.get_resource("autopilot_hbox").pack_start(self._fp.widget, True, True)
         self.get_resource("settings_hbox").pack_start(self._settings.widget, True, True)
 
         #Lazy initialize the following when first needed
@@ -173,12 +171,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("menu_item_disconnect").set_sensitive(False)
         self.get_resource("menu_item_autopilot_disable").set_sensitive(False)
         self.builder_connect_signals()
-
-        #FIXME: REMOVE THE AUTOPILOT PAGE
-        nb = self.get_resource("main_notebook")
-        nb.remove_page(
-            nb.page_num(
-                self.get_resource("autopilot_hbox")))
 
         self.window.show_all()
 
@@ -301,7 +293,10 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._source.quit()
         gtk.main_quit()
 
-    def on_uav_mark_home(self, *args):
+    def on_menu_item_edit_flightplan_activate(self, *args):
+        self._map.edit_flightplan()
+
+    def on_menu_item_uav_mark_home_activate(self, *args):
         #get lat, lon from state
         try:
             lat = self._state["lat"]
