@@ -61,7 +61,7 @@ class _SourceOptionParser(optparse.OptionParser):
             options.source = "test"
         return options, args
                 
-def get_default_command_line_parser(include_prefs, include_plugins, include_sources):
+def get_default_command_line_parser(include_prefs, include_plugins, include_sources, messages_name="messages.xml", settings_name="settings.xml", preferences_name="groundstation.ini"):
     default_messages = os.path.join(CONFIG_DIR, "messages.xml")
     default_settings = os.path.join(CONFIG_DIR, "settings.xml")
 

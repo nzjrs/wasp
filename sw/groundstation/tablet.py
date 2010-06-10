@@ -3,14 +3,19 @@ import sys
 import os
 import logging
 import optparse
-
 import gtk
+import gobject
+
+gobject.threads_init()
+gtk.gdk.threads_init()
 
 sys.path.insert(0,'/home/user/pythonlibs')
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
+import gs
 from gs.config import Config
 from gs.source import UAVSource
+from gs.ui import message_dialog
 from gs.ui.info import InfoBox
 from gs.ui.graph import Graph, GraphHolder, GraphManager
 from wasp.messages import MessagesFile
@@ -63,9 +68,18 @@ class TabletGraphManager(GraphManager):
         del(self._graphs[name])
 
 class UI:
-    def __init__(self,prefsfile, messagesfile, settingsfile, use_test_source, show_tabs=False):
+    def __init__(self, options, show_tabs=False):
 
-        gtk.gdk.threads_init()
+        prefsfile = os.path.abspath(options.preferences)
+        messagesfile = os.path.abspath(options.messages)
+        settingsfile = os.path.abspath(options.settings)
+
+        if not os.path.exists(messagesfile):
+            message_dialog("Could not find messages.xml", None, secondary=gs.CONFIG_DIR)
+            sys.exit(1)
+        if not os.path.exists(settingsfile):
+            message_dialog("Could not find settings.xml", None, secondary=gs.CONFIG_DIR)
+            sys.exit(1)
 
         LOG.info("Groundstation loading")
         LOG.info("Restored preferences: %s" % prefsfile)
@@ -76,7 +90,7 @@ class UI:
         self._messagesfile.parse()
 
         self._config = Config(filename=prefsfile)
-        self._source = UAVSource(self._config, self._messagesfile, use_test_source)
+        self._source = UAVSource(self._config, self._messagesfile, options.source)
         self._tm = TabletGraphManager(self._config, self._source, self._messagesfile, self)
 
         self._in_fullscreen = False
@@ -120,6 +134,9 @@ class UI:
 
         self._win.show_all()
 
+    def main(self):
+        gtk.main()
+
     def make_status_page(self):
         hb = gtk.HBox()
         info = InfoBox(self._source)
@@ -156,19 +173,6 @@ class UI:
         b = gtk.Button(stock=gtk.STOCK_ADD)
         b.connect("clicked", on_gb_clicked, rxtv, self._tm)
         vb.pack_start(b, expand=False, fill=True)
-
-        #rm = RequestMessageSender(self._messagesfile)
-        #rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
-        #vb.pack_start(rm, expand=False, fill=False)
-
-
-        #sw.add(rxtv)
-
-        #vb = self.get_resource("telemetry_left_vbox")
-
-
-        #gb = self.get_resource("graph_button")
-        #
 
         return vb
 
@@ -221,41 +225,14 @@ class UI:
         self._notebook.set_current_page(0)
 
 if __name__ == "__main__":
-    thisdir = os.path.abspath(os.path.dirname(__file__))
-    default_messages = os.path.join(thisdir, "..", "onboard", "config", "messages.xml")
-    default_settings = os.path.join(thisdir, "..", "onboard", "config", "settings.xml")
-
-    confdir = os.environ.get("XDG_CONFIG_HOME", os.path.join(os.environ.get("HOME","."), ".config", "wasp"))
-    if not os.path.exists(confdir):
-        os.makedirs(confdir)
-    prefs = os.path.join(confdir, "tablet.ini")
-
-    parser = optparse.OptionParser()
-    parser.add_option("-m", "--messages",
-                    default=default_messages,
-                    help="Messages xml file", metavar="FILE")
-    parser.add_option("-s", "--settings",
-                    default=default_settings,
-                    help="Settings xml file", metavar="FILE")
-    parser.add_option("-p", "--preferences",
-                    default=prefs,
-                    help="User preferences file", metavar="FILE")
-    parser.add_option("-t", "--use-test-source",
-                    action="store_true", default=False,
-                    help="Dont connect to the UAV, use a test source")
-
+    parser = gs.get_default_command_line_parser(True, False, True, preferences_name="tablet.ini")
     options, args = parser.parse_args()
+    if gs.IS_WINDOWS:
+        import gtk.gdk
+        gtk.gdk.threads_enter()    
+    UI(options).main()
+    if gs.IS_WINDOWS:
+        import gtk.gdk
+        gtk.gdk.threads_leave()
+    sys.exit(1)
 
-    if not os.path.exists(options.messages):
-        parser.error("could not find messages.xml")
-
-    if not os.path.exists(options.settings):
-        parser.error("could not find settings.xml")
-
-
-    u = UI(
-          options.preferences,
-          options.messages,
-          options.settings,
-          options.use_test_source)
-    gtk.main()
