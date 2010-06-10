@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="449.51788"
+   height="483.86307"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="quad-top.svg"
+   inkscape:export-filename="/home/john/Programming/wasp.git/hw/doc/quad-top.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend"
+       style="overflow:visible">
+      <path
+         id="path3982"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="130.76547"
+     inkscape:cy="278.62051"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1253"
+     inkscape:window-height="867"
+     inkscape:window-x="0"
+     inkscape:window-y="47"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-165.66502,-252.32138)">
+    <rect
+       transform="matrix(0,-1,1,0,0,0)"
+       style="fill:#ff0000"
+       id="rect2824"
+       width="244.45691"
+       height="18.182745"
+       x="-496.77829"
+       y="388.90872" />
+    <rect
+       style="fill:#000000"
+       id="rect2820"
+       width="449.51788"
+       height="18.182745"
+       x="165.66502"
+       y="489.70721" />
+    <rect
+       y="390.92902"
+       x="-736.18445"
+       height="18.182745"
+       width="244.45691"
+       id="rect2822"
+       style="fill:#000000"
+       transform="matrix(0,-1,1,0,0,0)" />
+    <rect
+       style="fill:#808080;stroke:#000000;stroke-width:1"
+       id="rect2828"
+       width="182.83762"
+       height="182.83762"
+       x="-161.26552"
+       y="541.99933"
+       transform="matrix(0.70710678,-0.70710678,0.70710678,0.70710678,0,0)" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="411.92688"
+       y="264.2699"
+       id="text2830"><tspan
+         sodipodi:role="line"
+         id="tspan2832"
+         x="411.92688"
+         y="264.2699"
+         style="font-size:14px">ADR:</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:15.4459095px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="368.83844"
+       y="412.7099"
+       id="text2834"><tspan
+         sodipodi:role="line"
+         id="tspan2836"
+         x="368.83844"
+         y="412.7099">FRONT</tspan></text>
+    <rect
+       transform="matrix(0,-1,1,0,0,0)"
+       y="337.63553"
+       x="-558.86731"
+       height="122.4536"
+       width="122.4536"
+       id="rect4434"
+       style="fill:#808080;stroke:#000000;stroke-width:0.66973954" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.9248817px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-mid:none;marker-end:url(#Arrow1Lend)"
+       d="m 352.3492,542.30591 0,-31.71022"
+       id="path2838" />
+    <path
+       id="path4424"
+       d="m 351.68857,541.64529 31.71023,0"
+       style="fill:none;stroke:#000000;stroke-width:0.9248817px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-mid:none;marker-end:url(#Arrow1Lend)" />
+    <text
+       id="text4426"
+       y="514.22046"
+       x="357.22055"
+       style="font-size:14.28563881px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="514.22046"
+         x="357.22055"
+         id="tspan4428"
+         sodipodi:role="line">X</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14.28563881px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="390.91266"
+       y="547.25195"
+       id="text4430"><tspan
+         sodipodi:role="line"
+         id="tspan4432"
+         x="390.91266"
+         y="547.25195">Y</tspan></text>
+    <text
+       id="text4436"
+       y="523.87909"
+       x="169.49026"
+       style="font-size:10px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         style="font-size:14px"
+         y="523.87909"
+         x="169.49026"
+         id="tspan4438"
+         sodipodi:role="line">ADR: 1-2-3</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="412.93704"
+       y="730.96039"
+       id="text4440"><tspan
+         sodipodi:role="line"
+         id="tspan4442"
+         x="412.93704"
+         y="730.96039"
+         style="font-size:14px">ADR: 2-3</tspan></text>
+    <text
+       id="text4444"
+       y="523.87909"
+       x="548.29749"
+       style="font-size:10px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         style="font-size:14px"
+         y="523.87909"
+         x="548.29749"
+         id="tspan4446"
+         sodipodi:role="line">ADR: 1-2</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:18.08040237px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="474.27783"
+       y="626.59662"
+       id="text4448"><tspan
+         sodipodi:role="line"
+         id="tspan4450"
+         x="474.27783"
+         y="626.59662">(top view)</tspan></text>
+  </g>
+</svg>
