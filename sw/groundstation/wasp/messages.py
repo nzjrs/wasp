@@ -80,6 +80,11 @@ class Message:
         except AttributeError:
             self.fields = []
 
+        try:
+            self.is_command = m.command == "1"
+        except AttributeError:
+            self.is_command = False
+
         self.size = 0
         self.num_values = 0
         for f in self.fields:

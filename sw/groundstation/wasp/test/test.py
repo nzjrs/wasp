@@ -42,6 +42,10 @@ class MessageFileTest(unittest.TestCase):
         self.failUnless( self.mf.get_message_by_name(TEST_NAME) )
         self.failUnless( self.mf.get_message_by_name("FOO") == None )
 
+    def testGetCommandMessage(self):
+        self.failUnlessEqual( self.mf.get_message_by_name(TEST_NAME).is_command, False )
+        self.failUnlessEqual( self.mf.get_message_by_name(COMMAND_NAME).is_command, True )
+
     def testDictHelper(self):
         f = self.mf[TEST_NAME][TEST_MSG_FIELD_NAME]
         self.failUnlessEqual(f.name, TEST_MSG_FIELD_NAME )

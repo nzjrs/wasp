@@ -550,7 +550,6 @@
                     </child>
                   </object>
                   <packing>
-                    <property name="padding">5</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
@@ -587,6 +586,27 @@
               </object>
               <packing>
                 <property name="position">2</property>
+                <property name="tab_fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkHBox" id="command_hbox">
+                <property name="visible">True</property>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child type="tab">
+              <object class="GtkLabel" id="label3">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Command and Control</property>
+              </object>
+              <packing>
+                <property name="position">3</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>

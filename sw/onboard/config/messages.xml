@@ -2,7 +2,7 @@
 <messages>
 
    <!-- IDs < 25 are reserved for standard messages -->
-   <message name="PING" id="1"/>
+   <message name="PING" id="1" command="1"/>
    <message name="PONG" id="2"/>
 
    <message name="ACK" id="3">
@@ -230,7 +230,7 @@
       <field name="snr"  type="uint8"/>
    </message>
 
-   <message name="ALTIMETER_RESET" id="43" />
+   <message name="ALTIMETER_RESET" id="43" command="1"/>
 
    <!-- Begin periodic messages -->
    <periodic channel="COMM_0">

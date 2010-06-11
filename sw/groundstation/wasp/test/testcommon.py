@@ -44,14 +44,16 @@ XML = """<?xml version="1.0"?>
      <field name="a_int8" type="int8" alt_unit_coef="0.5"/>
      <field name="a_float" type="float" alt_unit_coef="0.5"/>
    </message>
+   <message name="ALTIMETER_RESET" id="43" command="1"/>
    <periodic>
       <message name="TEST_MESSAGE" frequency="0.5"/>
    </periodic>
 </messages>"""
-NUM_MESSAGES = 4
+NUM_MESSAGES = 5
 
 PONG_ID = 2
 PONG_NAME = "PONG"
+COMMAND_NAME = "ALTIMETER_RESET"
 TEST_ID = 26
 TEST_NAME = "TEST_MESSAGE"
 TEST_MSG_FIELD_NAME = "a_uint8"

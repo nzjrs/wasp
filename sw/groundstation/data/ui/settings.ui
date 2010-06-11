@@ -7,7 +7,16 @@
     <child>
       <object class="GtkVBox" id="setting_left_vbox">
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel" id="label1">
+            <property name="visible">True</property>
+            <property name="label" translatable="yes">Available Settings</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
         <child>
           <object class="GtkScrolledWindow" id="settings_sw">
             <property name="width_request">300</property>
@@ -20,7 +29,7 @@
             </child>
           </object>
           <packing>
-            <property name="position">0</property>
+            <property name="position">1</property>
           </packing>
         </child>
         <child>
@@ -32,7 +41,7 @@
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
@@ -45,7 +54,7 @@
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="position">2</property>
+            <property name="position">3</property>
           </packing>
         </child>
       </object>
@@ -55,44 +64,38 @@
       </packing>
     </child>
     <child>
-      <object class="GtkAlignment" id="alignment1">
+      <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
-        <property name="xalign">0</property>
-        <property name="yalign">0</property>
-        <property name="top_padding">10</property>
-        <property name="left_padding">10</property>
         <child>
-          <object class="GtkVBox" id="setting_right_vbox">
+          <object class="GtkLabel" id="label3">
             <property name="visible">True</property>
-            <property name="orientation">vertical</property>
-            <property name="spacing">10</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkAlignment" id="alignment1">
+            <property name="visible">True</property>
+            <property name="xalign">0</property>
+            <property name="yalign">0</property>
+            <property name="top_padding">10</property>
+            <property name="left_padding">10</property>
             <child>
-              <object class="GtkHBox" id="setting_info_hbox">
+              <object class="GtkVBox" id="setting_right_vbox">
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="spacing">5</property>
+                <property name="spacing">10</property>
                 <child>
-                  <object class="GtkImage" id="image1">
+                  <object class="GtkHBox" id="setting_info_hbox">
                     <property name="visible">True</property>
-                    <property name="stock">gtk-dialog-info</property>
-                    <property name="icon-size">6</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkVBox" id="vbox2">
-                    <property name="visible">True</property>
-                    <property name="orientation">vertical</property>
+                    <property name="sensitive">False</property>
+                    <property name="spacing">5</property>
                     <child>
-                      <object class="GtkLabel" id="label2">
+                      <object class="GtkImage" id="image1">
                         <property name="visible">True</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">&lt;b&gt;UAV Setting&lt;/b&gt;</property>
-                        <property name="use_markup">True</property>
+                        <property name="stock">gtk-dialog-info</property>
+                        <property name="icon-size">6</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -101,168 +104,189 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkAlignment" id="alignment2">
+                      <object class="GtkVBox" id="vbox2">
                         <property name="visible">True</property>
-                        <property name="xalign">0</property>
-                        <property name="left_padding">10</property>
                         <child>
-                          <object class="GtkVBox" id="vbox4">
+                          <object class="GtkLabel" id="label2">
                             <property name="visible">True</property>
-                            <property name="orientation">vertical</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">&lt;b&gt;UAV Setting&lt;/b&gt;</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkAlignment" id="alignment2">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                            <property name="left_padding">10</property>
                             <child>
-                              <object class="GtkHBox" id="hbox8">
+                              <object class="GtkVBox" id="vbox4">
                                 <property name="visible">True</property>
                                 <child>
-                                  <object class="GtkLabel" id="name_lbl">
+                                  <object class="GtkHBox" id="hbox8">
                                     <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="label" translatable="yes">Name: </property>
+                                    <child>
+                                      <object class="GtkLabel" id="name_lbl">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Name: </property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">False</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="name_value">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
-                                    <property name="fill">False</property>
                                     <property name="position">0</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="name_value">
+                                  <object class="GtkHBox" id="hbox2">
                                     <property name="visible">True</property>
-                                    <property name="xalign">0</property>
+                                    <child>
+                                      <object class="GtkLabel" id="value_lbl">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Default Value: </property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">False</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="value_value">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
                                     <property name="position">1</property>
                                   </packing>
                                 </child>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkHBox" id="hbox2">
-                                <property name="visible">True</property>
                                 <child>
-                                  <object class="GtkLabel" id="value_lbl">
+                                  <object class="GtkHBox" id="hbox3">
                                     <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="label" translatable="yes">Default Value: </property>
+                                    <child>
+                                      <object class="GtkLabel" id="can_set_lbl">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Can Set: </property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">False</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="can_set_value">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="position">0</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="value_value">
+                                  <object class="GtkHBox" id="hbox4">
                                     <property name="visible">True</property>
-                                    <property name="xalign">0</property>
+                                    <child>
+                                      <object class="GtkLabel" id="can_get_lbl">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Can Get: </property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">False</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="can_get_value">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkHBox" id="hbox3">
-                                <property name="visible">True</property>
-                                <child>
-                                  <object class="GtkLabel" id="can_set_lbl">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="label" translatable="yes">Can Set: </property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel" id="can_set_value">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="position">2</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkHBox" id="hbox4">
-                                <property name="visible">True</property>
-                                <child>
-                                  <object class="GtkLabel" id="can_get_lbl">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="label" translatable="yes">Can Get: </property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="position">0</property>
+                                    <property name="position">3</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="can_get_value">
+                                  <object class="GtkHBox" id="hbox1">
                                     <property name="visible">True</property>
-                                    <property name="xalign">0</property>
+                                    <child>
+                                      <object class="GtkLabel" id="doc_lbl">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Description: </property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">False</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="doc_value">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="wrap">True</property>
+                                        <property name="wrap_mode">char</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="position">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkHBox" id="hbox1">
-                                <property name="visible">True</property>
-                                <child>
-                                  <object class="GtkLabel" id="doc_lbl">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="label" translatable="yes">Description: </property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel" id="doc_value">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="wrap">True</property>
-                                    <property name="wrap_mode">char</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="position">1</property>
+                                    <property name="position">4</property>
                                   </packing>
                                 </child>
                               </object>
-                              <packing>
-                                <property name="position">4</property>
-                              </packing>
                             </child>
                           </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="position">1</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
@@ -273,19 +297,18 @@
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="position">1</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
+                <child>
+                  <placeholder/>
+                </child>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
         </child>
       </object>
       <packing>
@@ -295,11 +318,11 @@
   </object>
   <object class="GtkSizeGroup" id="sizegroup1">
     <widgets>
-      <widget name="name_lbl"/>
-      <widget name="value_lbl"/>
-      <widget name="can_set_lbl"/>
-      <widget name="can_get_lbl"/>
       <widget name="doc_lbl"/>
+      <widget name="can_get_lbl"/>
+      <widget name="can_set_lbl"/>
+      <widget name="value_lbl"/>
+      <widget name="name_lbl"/>
     </widgets>
   </object>
 </interface>

@@ -25,6 +25,7 @@ from gs.ui.flightplan import FlightPlanEditor
 from gs.ui.log import LogBuffer, LogWindow
 from gs.ui.map import Map
 from gs.ui.settings import SettingsController
+from gs.ui.command import CommandController
 from gs.ui.window import DialogWindow
 from gs.ui.statusicon import StatusIcon
 
@@ -108,9 +109,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._state = {}
         self._source.register_interest(self._on_gps, 2, "GPS_LLH")
 
-        self._settingsfile = SettingsFile(path=settingsfile)
-        self._settings = SettingsController(self._source, self._settingsfile, self._messagesfile)
-
         #All the menus in the UI. Get them the first time a plugin tries to add a submenu
         #to the UI to save startup time.
         self._menus = {
@@ -138,7 +136,15 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("main_left_vbox").pack_start(self._info.widget, False, False)
         self.get_resource("main_map_vbox").pack_start(self._msgarea, False, False)
         self.get_resource("window_vbox").pack_start(self._sb, False, False)
-        self.get_resource("settings_hbox").pack_start(self._settings.widget, True, True)
+
+        #The settings tab page
+        settingsfile = SettingsFile(path=settingsfile)
+        settingscontroller = SettingsController(self._source, settingsfile, self._messagesfile)
+        self.get_resource("settings_hbox").pack_start(settingscontroller.widget, True, True)
+
+        #The command and control tab page
+        commandcontroller = CommandController(self._source, self._messagesfile)
+        self.get_resource("command_hbox").pack_start(commandcontroller.widget, True, True)
 
         #Lazy initialize the following when first needed
         self._plane_view = None
