@@ -105,7 +105,9 @@ static inline void autopilot_main_init( void ) {
 static inline void autopilot_main_periodic( void ) {
   static uint8_t _cnt = 0;
 
+  /* read analog baro */
   analog_periodic_task();
+  altimeter_periodic_task();
 
   /* read imu */
   imu_periodic_task();

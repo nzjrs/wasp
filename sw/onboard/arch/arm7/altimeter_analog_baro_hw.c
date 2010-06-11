@@ -24,32 +24,41 @@
 
 #include "std.h"
 #include "altimeter.h"
-#include "arm7/altimeter_analog_baro_hw.h"
+#include "analog.h"
+
+#include "arm7/config.h"
+#include "arm7/led_hw.h"
 
 #include "generated/settings.h"
 
-SystemStatus_t altimeter_system_status;
+#define AnalogSetDAC(x) {  DACR = x << 6; }
 
-uint16_t booz2_analog_baro_offset;
-uint16_t booz2_analog_baro_value;
-uint16_t booz2_analog_baro_value_filtered;
-bool_t   booz2_analog_baro_data_available;
+SystemStatus_t altimeter_system_status = STATUS_UNINITIAIZED;
 
-// offset on DAC on P0.25
+uint16_t altimeter_calibration_offset;
+uint16_t altimeter_calibration_raw;
+uint16_t altimeter_calibration_raw_filtered;
+bool_t   analog_baro_data_available;
 
+/* offset on DAC on P0.25 */
 void altimeter_init( void ) 
 {
-    altimeter_system_status = STATUS_UNINITIAIZED;
-
     /* turn on DAC pins */
     PINSEL1 |= 2 << 18;
+    /* start calibration procedure */
+    altimeter_recalibrate();
+}
 
-    booz2_analog_baro_offset = 1023;
-    Booz2AnalogSetDAC(booz2_analog_baro_offset);
+void altimeter_recalibrate( void )
+{
+    altimeter_calibration_offset = 1023;
+    AnalogSetDAC(altimeter_calibration_offset);
 
-    booz2_analog_baro_value = 0;
-    booz2_analog_baro_value_filtered = 0;
-    booz2_analog_baro_data_available = FALSE;
+    altimeter_calibration_raw = 0;
+    altimeter_calibration_raw_filtered = 0;
+    analog_baro_data_available = FALSE;
+
+    altimeter_system_status = STATUS_INITIALIZING;
     LED_OFF(LED_BARO);
 }
 
@@ -57,17 +66,53 @@ uint8_t
 altimeter_event_task(void)
 {
     uint8_t ret = FALSE;
-    if (booz2_analog_baro_data_available) 
+    if (analog_baro_data_available)
     {
       ret = TRUE;
-      booz2_analog_baro_data_available = FALSE;
+      analog_baro_data_available = FALSE;
     }
     return ret;
+}
+
+/* decrease offset until adc reading is over a threshold */
+static inline void
+analog_baro_calibrate(void)
+{
+    RunOnceEvery(60, {
+	if (altimeter_calibration_raw_filtered < 850 && altimeter_calibration_offset >= 1) 
+    {
+        if (altimeter_calibration_raw_filtered == 0)
+            altimeter_calibration_offset -= 15;
+	    else
+	        altimeter_calibration_offset--;
+
+        AnalogSetDAC(altimeter_calibration_offset);
+
+	    LED_TOGGLE(LED_BARO);
+    }
+	else
+    {
+        altimeter_system_status = STATUS_INITIALIZED;
+        LED_ON(LED_BARO);
+    }
+    });
+}
+
+void
+altimeter_periodic_task(void)
+{
+    altimeter_calibration_raw = analog_read_channel(ANALOG_CHANNEL_PRESSURE);
+    altimeter_calibration_raw_filtered = (3*altimeter_calibration_raw_filtered + altimeter_calibration_raw)/4;
+
+    if (altimeter_system_status == STATUS_INITIALIZING)
+        analog_baro_calibrate();
+    else if (altimeter_system_status == STATUS_INITIALIZED)
+        analog_baro_data_available = TRUE;
 }
 
 int32_t
 altimeter_get_altitude(void)
 { 
-    return (booz2_analog_baro_value * INS_BARO_SENS_NUM)/INS_BARO_SENS_DEN;
+    return (altimeter_calibration_raw * INS_BARO_SENS_NUM)/INS_BARO_SENS_DEN;
 }
 

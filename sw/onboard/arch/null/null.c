@@ -46,7 +46,7 @@ void led_off ( uint8_t id) {}
 void led_toggle ( uint8_t id) {}
 
 #include "comm.h"
-SystemStatus_t comm_system_status;
+SystemStatus_t comm_system_status = STATUS_UNINITIAIZED;
 
 void comm_init ( CommChannel_t chan ) {}
 bool_t comm_ch_available ( CommChannel_t chan ) { return FALSE; }
@@ -56,7 +56,7 @@ bool_t comm_check_free_space ( CommChannel_t chan, uint8_t len ) { return TRUE; 
 void comm_overrun ( CommChannel_t chan ) {}
 
 #include "rc.h"
-SystemStatus_t rc_system_status;
+SystemStatus_t rc_system_status = STATUS_UNINITIAIZED;
 
 void rc_init ( void ) {}
 void rc_periodic_task ( void ) {}
@@ -77,7 +77,7 @@ void actuators_commit( uint8_t bank ) {}
 uint8_t actuators_get_num( uint8_t bank ) { return 0; }
 
 #include "gps.h"
-SystemStatus_t gps_system_status;
+SystemStatus_t gps_system_status = STATUS_UNINITIAIZED;
 struct Booz_gps_state booz_gps_state;
 
 void gps_init(void) {}
@@ -92,11 +92,12 @@ bool_t analog_event_task( void ) { return FALSE; }
 void analog_periodic_task( void ) {}
 
 #include "altimeter.h"
-SystemStatus_t altimeter_system_status;
-uint16_t booz2_analog_baro_offset;
-uint16_t booz2_analog_baro_value;
+SystemStatus_t altimeter_system_status = STATUS_UNINITIAIZED;
+uint16_t altimeter_calibration_offset;
+uint16_t altimeter_calibration_raw;
 
 void altimeter_init(void) {}
 void altimeter_periodic_task(void) {}
 uint8_t altimeter_event_task ( void ) { return 0; }
 int32_t altimeter_get_altitude( void ) { return 0; }
+void altimeter_recalibrate( void ) {}

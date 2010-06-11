@@ -53,25 +53,31 @@ static inline void main_init( void ) {
     comm_init(COMM_1);
 
     analog_init();
+    analog_enable_channel(ANALOG_CHANNEL_PRESSURE);
+
     altimeter_init();
 
     int_enable();
 }
 
 static inline void main_periodic_task( void ) {
+    analog_periodic_task();
+    altimeter_periodic_task();
     comm_periodic_task(COMM_1);
+
     RunOnceEvery(250, {
         int32_t alt = altimeter_get_altitude();
         MESSAGE_SEND_ALTIMETER(COMM_1,
             &alt,
             &altimeter_system_status,
-            &booz2_analog_baro_offset,
-            &booz2_analog_baro_value);
+            &altimeter_calibration_offset,
+            &altimeter_calibration_raw);
     });
 }
 
 static inline void main_event_task( void )
 {
+    analog_event_task();
     altimeter_event_task();
     comm_event_task(COMM_1);
 }

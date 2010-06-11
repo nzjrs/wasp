@@ -30,10 +30,6 @@
 
 #include "generated/settings.h"
 
-#if USE_ANALOG_BARO
-#include "arm7/altimeter_analog_baro_hw.h"
-#endif
-
 typedef struct {
     volatile adcRegs_t          *adc_reg;
     volatile uint8_t            selection_mask;
@@ -188,8 +184,6 @@ bool_t analog_event_task( void )
 
 void analog_periodic_task( void )
 {
-#if USE_ANALOG_BARO
-    booz2_analog_baro_isr(adc_values[ANALOG_CHANNEL_PRESSURE]);
-#endif
+
 }
 

@@ -124,8 +124,8 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     chan,
                     &alt,
                     &altimeter_system_status,
-                    &booz2_analog_baro_offset,
-                    &booz2_analog_baro_value);
+                    &altimeter_calibration_offset,
+                    &altimeter_calibration_raw);
             }
             break;
         case MESSAGE_ID_AUTOPILOT:
