@@ -267,3 +267,18 @@ void autopilot_on_rc_event(void)
     booz2_guidance_h_read_rc(autopilot.in_flight);
 
 }
+
+void autopilot_set_motors(bool_t on)
+{
+    /* only turn the motors on/off while on ground */
+    if (!autopilot.in_flight) {
+        if (on) {
+            autopilot_motors_on_counter = BOOZ2_AUTOPILOT_MOTOR_ON_TIME;
+            autopilot.motors_on = TRUE;
+        } else {
+            autopilot_motors_on_counter = 0;
+            autopilot.motors_on = FALSE;
+        }
+    }
+}
+

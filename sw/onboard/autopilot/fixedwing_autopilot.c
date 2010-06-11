@@ -133,3 +133,11 @@ void autopilot_set_actuators(void)
         actuators_set(ACTUATOR_BANK_SERVOS | servo_addr[i], autopilot.motor_commands[i]);
     actuators_commit(ACTUATOR_BANK_SERVOS);
 }
+
+void autopilot_set_motors(bool_t on)
+{
+    if (on)
+        autopilot.commands[COMMAND_THRUST] = autopilot_commands_failsafe[COMMAND_THRUST];
+    else
+        autopilot.commands[COMMAND_THRUST] = 0;
+}

@@ -201,7 +201,7 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
 bool_t 
 comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
 {
-    bool_t ret = FALSE;
+    bool_t ret = TRUE;
 
     switch (message->msgid)
     {
@@ -213,9 +213,15 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
             break;
         case MESSAGE_ID_ALTIMETER_RESET:
             altimeter_recalibrate();
-            ret = TRUE;
+            break;
+        case MESSAGE_ID_MOTORS_START:
+            autopilot_set_motors(TRUE);
+            break;
+        case MESSAGE_ID_MOTORS_STOP:
+            autopilot_set_motors(FALSE);
             break;
         default:
+            ret = FALSE;
             break;
     }
 
