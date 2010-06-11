@@ -211,6 +211,10 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
         case MESSAGE_ID_SETTING_FLOAT:
             ret = settings_handle_message_received(chan, message);
             break;
+        case MESSAGE_ID_ALTIMETER_RESET:
+            altimeter_recalibrate();
+            ret = TRUE;
+            break;
         default:
             break;
     }

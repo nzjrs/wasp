@@ -69,6 +69,7 @@ altimeter_event_task(void)
     if (analog_baro_data_available)
     {
       ret = TRUE;
+      altimeter_system_status = STATUS_ALIVE;
       analog_baro_data_available = FALSE;
     }
     return ret;

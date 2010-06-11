@@ -27,6 +27,7 @@
 #include "sys_time.h"
 #include "led.h"
 #include "comm.h"
+#include "comm_autopilot.h"
 #include "analog.h"
 #include "altimeter.h"
 #include "generated/messages.h"
@@ -50,7 +51,10 @@ static inline void main_init( void ) {
     hw_init();
     sys_time_init();
     led_init();
+
     comm_init(COMM_1);
+    /* add rx callback so we can send ALTIMETER_RESET messages */
+    comm_add_rx_callback(COMM_1, comm_autopilot_message_received);
 
     analog_init();
     analog_enable_channel(ANALOG_CHANNEL_PRESSURE);

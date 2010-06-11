@@ -182,7 +182,7 @@
 
    <message name="ALTIMETER" id="37">
       <field name="altitude" type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
-      <field name="status" type="uint8" values="UNINITIAIZED|INITIALIZING|INITIALIZED"/>
+      <field name="status" type="uint8" values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
       <field name="baro_offset" type="uint16"/>
       <field name="baro_value" type="uint16"/>
    </message>
@@ -229,6 +229,8 @@
       <field name="azimuth"  type="uint16"/>
       <field name="snr"  type="uint8"/>
    </message>
+
+   <message name="ALTIMETER_RESET" id="43" />
 
    <!-- Begin periodic messages -->
    <periodic channel="COMM_0">
