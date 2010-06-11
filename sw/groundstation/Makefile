@@ -11,7 +11,7 @@ clean:
 
 install:
 	@echo "Installing .desktop file in "$(HOME)"/.local/share/applications/"$(DFILE)
-	@cat $(DFILE) | sed -e "s/Exec=/Exec=$(ME)\//g" -e 's/Icon=groundstation/Icon=$(ME)\/gs\/ui\/icons\/rocket.svg/g' > $(HOME)/.local/share/applications/$(DFILE)
+	@cat $(DFILE) | sed -e "s/Exec=/Exec=$(ME)\//g" -e 's/Icon=groundstation/Icon=$(ME)\/data\/icons\/rocket.svg/g' > $(HOME)/.local/share/applications/$(DFILE)
 
 uninstall:
 	@echo "Removing .desktop file from "$(HOME)"/.local/share/applications/"$(DFILE)
