@@ -10,11 +10,18 @@ import wasp.transport as transport
 import wasp.communication as communication
 import wasp.messages as messages
 
-def message_received(msg, header, payload):
-    pass
+def message_received(comm, msg, header, payload, quiet):
+    print msg
+    if not quiet:
+        if msg.size:
+            print "\t", msg.unpack_printable_values(payload, joiner=",")
 
-def send_ping():
-    pass
+def uav_connected(comm, connected):
+    print "Connected: %s" % connected
+
+def send_ping(comm, msg):
+    comm.send_message(msg, ())
+    return True
 
 if __name__ == "__main__":
     thisdir = os.path.abspath(os.path.dirname(__file__))
@@ -51,31 +58,15 @@ if __name__ == "__main__":
     m = messages.MessagesFile(path=options.messages, debug=options.debug)
     m.parse()
     t = transport.Transport(check_crc=options.crc, debug=options.debug)
-    s = communication.Serial(t,m,wasp.transport.TransportHeaderFooter(acid=wasp.ACID_GROUNDSTATION))
-    s.configure_connection(port=options.port,speed=options.speed,timeout=options.timeout)
-    s.connect_to_port()
+    s = communication.SerialCommunication(t,m,wasp.transport.TransportHeaderFooter(acid=wasp.ACID_GROUNDSTATION))
+    s.configure_connection(serial_port=options.port,serial_speed=options.speed,serial_timeout=options.timeout)
 
-    t1 = t2 = time.time()
-    while s.is_open():
-        try:
-            data = s.read()
-            for header, payload in t.parse_many(data):
-                msg = m.get_message_by_id(header.msgid)
+    s.connect("message-received", message_received, options.quiet)
+    s.connect("uav-connected", uav_connected)
 
-                if not options.quiet:
-                    print "%s\n\t" % msg,
-                    print msg.unpack_printable_values(payload, joiner=",")
+    if options.ping > 0:
+        gobject.timeout_add(int(options.ping)*1000, send_ping, s, m.get_message_by_name("PING"))
 
-                t2 = time.time()
-                if options.ping and (t2 - t1) > options.ping:
-                    t1 = t2
-                    p = m.get_message_by_name("PING")
-                    data = t.pack_one(
-                                transport.TransportHeaderFooter(acid=0x78), 
-                                p,
-                                p.pack_values())
-                    s.write(data.tostring())
+    s.connect_to_uav()
+    gobject.MainLoop().run()
 
-        except KeyboardInterrupt:
-            s.disconnect_from_port()
-            break
