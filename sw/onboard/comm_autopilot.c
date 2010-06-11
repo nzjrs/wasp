@@ -220,6 +220,9 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
         case MESSAGE_ID_MOTORS_STOP:
             autopilot_set_motors(FALSE);
             break;
+        case MESSAGE_ID_KILL:
+            autopilot_kill();
+            break;
         default:
             ret = FALSE;
             break;

@@ -84,4 +84,7 @@ autopilot_set_actuators(void);
 void
 autopilot_set_motors(bool_t on);
 
+void
+autopilot_kill(void);
+
 #endif /* AUTOPILOT_H */

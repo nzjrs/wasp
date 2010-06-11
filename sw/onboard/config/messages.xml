@@ -233,6 +233,7 @@
    <message name="ALTIMETER_RESET" id="43" command="1"/>
    <message name="MOTORS_START" id="44" command="1"/>
    <message name="MOTORS_STOP" id="45" command="1"/>
+   <message name="KILL" id="46" command="1"/>
 
    <!-- Begin periodic messages -->
    <periodic channel="COMM_0">

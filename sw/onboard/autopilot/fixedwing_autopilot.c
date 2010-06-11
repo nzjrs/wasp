@@ -102,7 +102,7 @@ void autopilot_on_rc_event(void)
 
 void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
 {
-    if (new_autopilot_mode != autopilot.mode) 
+    if (new_autopilot_mode != autopilot.mode || new_autopilot_mode == AP_MODE_KILL) 
     {
         bool_t ok = TRUE;
         switch (new_autopilot_mode)

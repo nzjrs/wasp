@@ -104,7 +104,7 @@ void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
 {
     bool_t ok = TRUE;
 
-    if (new_autopilot_mode != autopilot.mode) {
+    if (new_autopilot_mode != autopilot.mode || new_autopilot_mode == AP_MODE_KILL) {
         /* horizontal mode */
         switch (new_autopilot_mode) {
             case AP_MODE_FAILSAFE:

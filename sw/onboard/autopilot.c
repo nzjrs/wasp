@@ -36,3 +36,7 @@ AutopilotMode_t autopilot_mode_of_radio(pprz_t rc)
         return AUTOPILOT_MODE_MANUAL;
 }
 
+void autopilot_kill(void)
+{
+    autopilot_set_mode(AP_MODE_KILL);
+}
