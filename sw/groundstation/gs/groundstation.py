@@ -255,6 +255,39 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._menus[name] = menu
         menu.append(item)
 
+    def add_control_widget(self, name, widget):
+        """
+        Adds a widget to the Command and Control page
+
+        :param name: the name, a string describing the control method, 
+                     i.e. 'Joystick'
+        :param widget: a gtk.Widget that gets placed in the Command and
+                       control page of the GUI
+        """
+        #Each control widget is in a frame with a label and nice padding.
+        #to the right lies an unlock button that must be clicked to make the
+        #widget sensitive
+        b = gtk.CheckButton()
+        l = gtk.Label("<b>Enable %s</b>" % name)
+        l.props.use_markup = True
+        h = gtk.HBox()
+        h.pack_start(b, False, False)
+        h.pack_start(l, True, True)
+        f = gtk.Frame()
+        f.props.shadow_type = gtk.SHADOW_NONE
+        f.props.label_widget = h
+        a = gtk.Alignment()
+        a.set_padding(5,0,10,0)
+        f.add(a)
+        b.connect("toggled", lambda b,w: w.set_sensitive(b.get_active()), widget)
+        hb = gtk.HBox(spacing=5)
+        #make widget unsensitive by default
+        widget.set_sensitive(False)
+        hb.pack_start(widget, True, True)
+        a.add(hb)
+        f.show_all()
+        self.get_resource("control_vbox").pack_start(f, False, True)
+
     def update_state_from_config(self):
         self._c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)
         if self._c == "1" and not self._tried_to_connect:
