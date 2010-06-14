@@ -139,12 +139,12 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         #The settings tab page
         settingsfile = SettingsFile(path=settingsfile)
-        settingscontroller = SettingsController(self._source, settingsfile, self._messagesfile)
-        self.get_resource("settings_hbox").pack_start(settingscontroller.widget, True, True)
+        self.settingscontroller = SettingsController(self._source, settingsfile, self._messagesfile)
+        self.get_resource("settings_hbox").pack_start(self.settingscontroller.widget, True, True)
 
         #The command and control tab page
-        commandcontroller = CommandController(self._source, self._messagesfile)
-        self.get_resource("command_hbox").pack_start(commandcontroller.widget, False, True)
+        self.commandcontroller = CommandController(self._source, self._messagesfile)
+        self.get_resource("command_hbox").pack_start(self.commandcontroller.widget, False, True)
 
         #Lazy initialize the following when first needed
         self._plane_view = None
