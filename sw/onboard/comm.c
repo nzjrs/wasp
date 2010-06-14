@@ -315,5 +315,14 @@ comm_add_tx_callback ( CommChannel_t chan, CommTXMessageCallback_t cb)
         comm_callback_tx[chan] = cb;
 }
 
+void
+comm_send_command_ack (CommChannel_t chan, uint8_t msgid)
+{
+    MESSAGE_SEND_ACK (chan, &msgid);
+}
 
-
+void
+comm_send_command_nack (CommChannel_t chan, uint8_t msgid)
+{
+    MESSAGE_SEND_NACK (chan, &msgid);
+}

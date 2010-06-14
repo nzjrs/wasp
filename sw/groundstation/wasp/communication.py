@@ -6,6 +6,7 @@ import libserial.SerialSender
 
 import wasp
 import wasp.transport
+import wasp.fms
 
 UDP_PORT = 1212
 
@@ -299,8 +300,14 @@ class DummyCommunication(Communication):
 
         #then unpack it and re-emit it...
         for header, payload in self.transport.parse_many(data):
-            msg = self.messages_file.get_message_by_id(header.msgid)
-            self.emit("message-received", msg, header, payload)
+            rxmsg = self.messages_file.get_message_by_id(header.msgid)
+            self.emit("message-received", rxmsg, header, payload)
+
+        #if this is a command message, also send ACK
+        if msg.is_command:
+            ackmsg = self.messages_file.get_message_by_name(wasp.fms.COMMAND_ACK)
+            payload = ackmsg.pack_values(msg.id)
+            self.emit("message-received", ackmsg, self.uav_header, payload)
 
         #because this function is also used within this class from
         #an idle handler return true to keep getting called

@@ -81,5 +81,11 @@ comm_parse ( CommChannel_t chan );
 void
 comm_overrun ( CommChannel_t chan );
 
+void
+comm_send_command_ack (CommChannel_t chan, uint8_t msgid);
+
+void
+comm_send_command_nack (CommChannel_t chan, uint8_t msgid);
+
 #endif /* COMM_H */
 

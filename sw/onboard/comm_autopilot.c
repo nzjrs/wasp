@@ -202,6 +202,7 @@ bool_t
 comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
 {
     bool_t ret = TRUE;
+    bool_t need_ack = TRUE;
 
     switch (message->msgid)
     {
@@ -210,6 +211,7 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
         case MESSAGE_ID_SETTING_INT32:
         case MESSAGE_ID_SETTING_FLOAT:
             ret = settings_handle_message_received(chan, message);
+            need_ack = FALSE;
             break;
         case MESSAGE_ID_ALTIMETER_RESET:
             altimeter_recalibrate();
@@ -227,6 +229,10 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
             ret = FALSE;
             break;
     }
+
+    /* commands need to be ACK'd or NACK'd (not implemented...) */
+    if (need_ack)
+        comm_send_command_ack (chan, message->msgid);
 
     return ret;
 }

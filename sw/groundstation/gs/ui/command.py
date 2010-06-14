@@ -4,6 +4,7 @@ import gtk
 import gs.ui
 import gs.config as config
 import wasp.ui.treeview as treeview
+import wasp.fms as fms
 
 LOG = logging.getLogger("settings")
 
@@ -13,6 +14,8 @@ class CommandController(gs.ui.GtkBuilderWidget):
         gs.ui.GtkBuilderWidget.__init__(self, "command.ui")
 
         self._source = source
+        self._command_manager = fms.CommandManager(source.communication)
+
         self.widget = self.get_resource("hbox")
 
         ts = treeview.MessageTreeStore()
@@ -29,9 +32,15 @@ class CommandController(gs.ui.GtkBuilderWidget):
         LOG.debug("Got setting: %d %s" % (id_, val))
         self._sm.update_setting_value(id_, val)
 
+    def _command_ok_response(self):
+        LOG.debug("COMMAND OK")
+
+    def _command_fail_response(self, error_code):
+        LOG.debug("COMMAND FAIL: %s" % error_code)
+
     def _send_command(self, btn):
         msg,vals = self._tv.get_selected_message_and_values()
         if msg:
-            self._source.send_message(msg, vals)
             LOG.info("Sending Command: %s %s" % (msg,vals))
+            self._command_manager.send_command(msg, vals, self._command_ok_response, self._command_fail_response)
 
