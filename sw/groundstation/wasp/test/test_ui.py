@@ -85,6 +85,27 @@ class SimpleMessageSenderTest(unittest.TestCase):
 
         self.failUnless(sent[0])
 
+class MessageSendButtonTest(unittest.TestCase):
+    def setUp(self):
+        self.mf = get_mf()
+        self.btn = gtk.Button("test")
+        self.ms = senders.MessageSendButton(self.mf, PONG_NAME, self.btn)
+
+    def testSend(self):
+        #yuck, fake pass by reference
+        sent = [False, None]
+        def send_message(btn, msg, vals, _sent):
+            _sent[0] = True
+            _sent[1] = msg.id
+
+        self.ms.connect("send-message", send_message, sent)
+        refresh_gui()
+        self.btn.clicked()
+        refresh_gui()
+
+        self.failUnless(sent[0])
+        self.failUnlessEqual(sent[1], PONG_ID)
+
 if __name__ == "__main__":
     unittest.main()
 

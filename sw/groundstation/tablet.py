@@ -21,7 +21,7 @@ from gs.ui.graph import Graph, GraphHolder, GraphManager
 from wasp.messages import MessagesFile
 from wasp.settings import SettingsFile
 from wasp.ui.treeview import MessageTreeView
-from wasp.ui.senders import RequestMessageSender
+from wasp.ui.senders import RequestMessageSender, RequestMessageButton
 
 HILDON_AVAILABLE = False
 try:
@@ -151,8 +151,11 @@ class UI:
         b = gtk.Button(stock=gtk.STOCK_DISCONNECT)
         b.connect("clicked", lambda btn,source: source.disconnect_from_uav(), self._source)
         vb.pack_start(b)
-        hb.pack_start(vb, expand=False, fill=True)
+        mb = RequestMessageButton(self._messagesfile, "BUILD_INFO", gtk.Button(stock=gtk.STOCK_REFRESH))
+        mb.connect("send-message", lambda mb, msg, vals, source: source.send_message(msg, vals), self._source)
+        vb.pack_start(mb)
 
+        hb.pack_start(vb, expand=False, fill=True)
         return hb
 
     def make_telemetry_page(self):
