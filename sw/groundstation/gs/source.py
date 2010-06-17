@@ -143,7 +143,7 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
 
         self._port = self.config_get("serial_port", self.DEFAULT_PORT)
         self._speed = self.config_get("serial_speed", self.DEFAULT_SPEED)
-        self._rxts = None
+        self._rxts = treeview.MessageTreeStore()
 
         #dictionary of msgid : [list, of, MessageCb objects]
         self._callbacks = {}
@@ -299,9 +299,7 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
                 cb.call_cb(msg, header, payload, time)
 
         if self._message_for_selected_uav(acid):
-            if self._rxts:
-                self._rxts.update_message(msg, payload)
-
+            self._rxts.update_message(msg, payload)
             self._times.add(utils.calculate_dt_seconds(self._lastt, time))
             self._lastt = time
 
@@ -311,8 +309,6 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
 
 
     def get_rx_message_treestore(self):
-        if self._rxts == None:
-            self._rxts = treeview.MessageTreeStore()
         return self._rxts
 
     def send_message(self, msg, values):
