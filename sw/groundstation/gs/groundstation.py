@@ -90,6 +90,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._home_zoom = self.CONFIG_ZOOM_DEFAULT
 
         self.window = self.get_resource("main_window")
+        self.window.set_title(gs.NAME)
 
         self._config = Config(filename=prefsfile)
         ConfigurableIface.__init__(self, self._config)
@@ -99,6 +100,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         self._source = UAVSource(self._config, self._messagesfile, options.source)
         self._source.connect("source-connected", self._on_source_connected)
+        self._source.connect("uav-selected", self._on_uav_selected)
 
         #track the UAVs we have got data from
         self._source.connect("uav-detected", self._on_uav_detected)
@@ -182,6 +184,9 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def _on_uav_detected(self, source, acid):
         self._uav_detected_model.append( ("0x%X" % acid, acid) )
+
+    def _on_uav_selected(self, source, acid):
+        self.window.set_title("%s - UAV: 0x%X" % (gs.NAME, acid))
 
     def _create_telemetry_ui(self):
         def on_gb_clicked(btn, _tv, _gm):
@@ -412,7 +417,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             model, iter_ = tv.get_selection().get_selected()
             if iter_:
                 acid = model.get_value(iter_, 1)
-                message_dialog("Select UAV 0x%X Not Implemented" % acid, self.window)
+                self._source.select_uav(acid)
 
     def on_menu_item_refresh_uav_activate(self, *args):
         #request a number of messages from the UAV

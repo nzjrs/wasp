@@ -14,6 +14,7 @@ Groundstation Software Documentation
     gs.plugin.Plugin
     gs.config.ConfigurableIface
     gs.source.UAVSource
+    gs.source.MessageCb
 
 -----------
 libwasp API
@@ -73,4 +74,7 @@ Extending the Groundstation (The Plugin API)
    :members:
 
 .. autoclass:: gs.source.UAVSource
+   :members:
+
+.. autoclass:: gs.source.MessageCb
    :members:

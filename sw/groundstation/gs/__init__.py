@@ -4,6 +4,9 @@ import optparse
 
 _thisdir = os.path.dirname(os.path.abspath(__file__))
 
+NAME = "Wasp Groundstation"
+VERSION = "0.1"
+
 IS_WINDOWS = os.name == "nt"
 if IS_WINDOWS:
     IS_INSTALLED = sys.argv[0].endswith(".exe")

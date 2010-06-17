@@ -19,11 +19,12 @@ import wasp.ui.treeview as treeview
 DEBUG=False
 LOG = logging.getLogger('uavsource')
 
-class _MessageCb:
+class MessageCb:
     def __init__(self, cb, max_freq, **kwargs):
         self.cb = cb
         self.max_freq = max_freq
         self.kwargs = kwargs
+        self.listen_acid = None
 
         if max_freq > 0:
             self._dt = 1.0/max_freq
@@ -46,10 +47,20 @@ class _MessageCb:
                 except Exception:
                     LOG.warn("Error calling callback for %s" % msg, exc_info=True)
 
+    def for_selected_uav(self, acid):
+        return self.listen_acid != None and (self.listen_acid == acid or self.listen_acid == wasp.ACID_ALL)
+
+    def select_uav(self, acid):
+        """
+        Sets that this message should be called for UAVs with the given acid.
+        Overrides any values set in :func:`gs.source.UAVSource.select_uav`
+        """
+        self.listen_acid = acid
+
     def quit(self):
         pass
 
-class _LogSqliteCb(_MessageCb):
+class _LogSqliteCb(MessageCb):
     def __init__(self, logfile):
         if not logfile:
             logfile = gs.user_file_path("flight.sqlite")
@@ -77,7 +88,7 @@ class _LogSqliteCb(_MessageCb):
             self._con.close()
             self._con = self._cur = None
 
-class _LogCsvCb(_MessageCb):
+class _LogCsvCb(MessageCb):
     def __init__(self, logfile, msg):
         if not logfile:
             logfile = gs.user_file_path(msg.name + ".csv")
@@ -122,6 +133,8 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
                 gobject.TYPE_BOOLEAN]),     #True if recieving data
             "uav-detected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
                 gobject.TYPE_INT]),         #The ACID of a detected UAV
+            "uav-selected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+                gobject.TYPE_INT]),         #The ACID of a selected UAV
     }
 
     def __init__(self, conf, messages, source_name, listen_acid=wasp.ACID_ALL):
@@ -132,7 +145,7 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         self._speed = self.config_get("serial_speed", self.DEFAULT_SPEED)
         self._rxts = None
 
-        #dictionary of msgid : [list, of, _MessageCb objects]
+        #dictionary of msgid : [list, of, MessageCb objects]
         self._callbacks = {}
 
         #for tracking UAVs we have seen and are communicating with
@@ -191,15 +204,19 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
             self.emit("source-link-status-change", self._linkok)
         return True
 
-    def _save_callback(self, msg, cb):
+    def _save_callback(self, msg, mcb):
         try:
-            self._callbacks[msg.id].append(cb)
+            self._callbacks[msg.id].append(mcb)
         except KeyError:
-            self._callbacks[msg.id] = [cb]
+            self._callbacks[msg.id] = [mcb]
+
+    def _message_for_selected_uav(self, acid):
+        return self._listen_acid == wasp.ACID_ALL or self._listen_acid == acid 
 
     def select_uav(self, acid):
         """ Sets that we should only listen for messages from UAVs with the given acid """
         self._listen_acid = acid
+        self.emit("uav-selected", acid)
 
     def get_selected_uav(self):
         """ Returns the UAV that we are listening for messages from """
@@ -220,18 +237,18 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
             if not msg:
                 LOG.critical("Unknown message: %s" % m)
 
-            callbackobj = _LogCsvCb(logfilepath, msg)
-            self._save_callback(msg, callbackobj)
+            mcb = _LogCsvCb(logfilepath, msg)
+            self._save_callback(msg, mcb)
 
     def register_sqlite_logger(self, logfilepath, *message_names):
         #the sqlite logger can store multiple messages in the same DB
-        callbackobj = _LogSqliteCb(logfilepath)
+        mcb = _LogSqliteCb(logfilepath)
         for m in message_names:
             msg = self._messages_file.get_message_by_name(m)
             if not msg:
                 LOG.critical("Unknown message: %s" % m)
 
-            self._save_callback(msg, callbackobj)
+            self._save_callback(msg, mcb)
 
     def register_interest(self, cb, max_frequency, *message_names, **user_data):
         """
@@ -241,14 +258,18 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         :param cb: a callback to be called. The signature is (msg, header, payload, \*\*user_data)
         :param max_frequency: the max frequency to receive callbacks
         :param message_names: a list of message names to watch for
+        :returns: a list of :class:`gs.source.MessageCb` objects
         """
+        mcbs = []
         for m in message_names:
             msg = self._messages_file.get_message_by_name(m)
             if not msg:
                 LOG.critical("Unknown message: %s" % m)
 
-            callbackobj = _MessageCb(cb, max_frequency, **user_data)
-            self._save_callback(msg, callbackobj)
+            mcb = MessageCb(cb, max_frequency, **user_data)
+            mcbs.append(mcb)
+            self._save_callback(msg, mcb)
+        return mcbs
 
     def unregister_interest(self, cb):
         """
@@ -270,21 +291,23 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         self.emit("source-connected", connected)
 
     def on_message_received(self, communication, msg, header, payload):
-        if self._listen_acid == wasp.ACID_ALL or self._listen_acid == header.acid:
-            time = datetime.datetime.now()
-            cbs = self._callbacks.get(msg.id, ())
-            for cb in cbs:
+        time = datetime.datetime.now()
+        acid = header.acid
+
+        for cb in self._callbacks.get(msg.id, ()):
+            if self._message_for_selected_uav(acid) or cb.for_selected_uav(acid):
                 cb.call_cb(msg, header, payload, time)
 
+        if self._message_for_selected_uav(acid):
             if self._rxts:
                 self._rxts.update_message(msg, payload)
 
             self._times.add(utils.calculate_dt_seconds(self._lastt, time))
             self._lastt = time
 
-        if header.acid not in self._seen_acids:
-            self._seen_acids[header.acid] = True
-            self.emit("uav-detected", header.acid)
+        if acid not in self._seen_acids:
+            self._seen_acids[acid] = True
+            self.emit("uav-detected", acid)
 
 
     def get_rx_message_treestore(self):
