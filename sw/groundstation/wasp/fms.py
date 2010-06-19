@@ -61,5 +61,20 @@ class CommandManager:
         else:
             self.pending[msg.id] = _Command(msg.id, ok_cb, failed_cb, self._delete_command)
             self.communication.send_message(msg, values)
-        
+
+class ControlManager:
+    def __init__(self, source, messages_file):
+        self.source = source
+        self.enabled = False
+
+    def enable(self):
+        pass
+
+    def send_attitude(self, roll, pitch, yaw, thrust):
+        if self.enabled:
+            pass
+
+    def send_position(self, lat, lon, heading, alt):
+        if self.enabled:
+            pass
 

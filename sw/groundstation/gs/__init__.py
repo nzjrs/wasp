@@ -54,6 +54,17 @@ def user_file_path(filename):
                 "Desktop",
                 filename)
 
+def scale_to_range(val, oldrange, newrange=(0.0,1.0), reverse=False):
+    oldmin = float(oldrange[0])
+    oldmax = float(oldrange[1])
+    newmin = float(newrange[0])
+    newmax = float(newrange[1])
+    val += newmin - oldmin
+    val *= (newmax-newmin)/(oldmax-oldmin)
+    if reverse:
+        return newmin + (newmax - val)
+    return val
+
 class _SourceOptionParser(optparse.OptionParser):
     #override parse_args so that -t is the same as --source=test
     #it is easier to do it this was instead of with a 

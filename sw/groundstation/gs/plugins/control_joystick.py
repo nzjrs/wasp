@@ -19,8 +19,16 @@ import os.path
 import gtk
 import gs.ui
 import gs.plugin as plugin
+import gs.ui.progressbar as progressbar
+
+import wasp.fms as fms
 
 LOG = logging.getLogger('control.joystick')
+
+AXIS_ROLL       = 0
+AXIS_PITCH      = 1
+AXIS_HEADING    = 2
+AXIS_THRUST     = 3
 
 class ControlJoystick(plugin.Plugin):
 
@@ -32,12 +40,52 @@ class ControlJoystick(plugin.Plugin):
             raise plugin.PluginNotSupported("Joystick %s not connected" % self.DEFAULT_DEVICE)
 
         self.joystick = Joystick(device=self.DEFAULT_DEVICE)
+        self.joystick.connect("axis", self._on_joystick_event)
+        self.control = fms.ControlManager(source, messages_file)
+
+        self.axis_channel = {
+                0:AXIS_ROLL,
+                1:AXIS_PITCH,
+                2:AXIS_HEADING,
+                3:AXIS_THRUST
+        }
+        self.axis_reverse = {
+                0:False,
+                1:False,
+                2:False,
+                3:True
+        }
 
         groundstation_window.add_control_widget(
                 "Joystick Control",
-                gtk.Label("disabled"))
+                self._build_ui())
 
         LOG.info("Joystick Control initialized")
+
+    def _build_ui(self):
+        self.progress = [
+            progressbar.ProgressBar(range=(0.0,1.0)),
+            progressbar.ProgressBar(range=(0.0,1.0)),
+            progressbar.ProgressBar(range=(0.0,1.0)),
+            progressbar.ProgressBar(range=(0.0,1.0))
+        ]
+        vb = gtk.VBox()
+        for p in self.progress:
+            p.set_value(0.0)
+            vb.pack_start(p)
+        return vb
+
+    def _on_joystick_event(self, joystick, axis, value, init):
+        try:
+            self.progress[ self.axis_channel[axis] ].set_value( 
+                    gs.scale_to_range(
+                            value,
+                            oldrange=(-32767,32767),
+                            newrange=(0.0,1.0),
+                            reverse=self.axis_reverse[axis]))
+        except KeyError:
+            #ignored axis
+            pass
  
 class Joystick(gobject.GObject): 
     '''The Joystick class is a GObject that sends signals that represent 
@@ -66,8 +114,9 @@ class Joystick(gobject.GObject):
     } 
      
  
-    def __init__(self,dev_num,device=None): 
+    def __init__(self,dev_num=0,device=None,debug=False): 
         gobject.GObject.__init__(self) 
+        self.debug = debug
         #define the device
         if not device:
             device = '/dev/input/js%s' % dev_num 
@@ -97,15 +146,16 @@ class Joystick(gobject.GObject):
             signal = "axis" 
         elif event == self.EVENT_BUTTON: 
             signal = "button" 
-        if signal: 
-            print("%s %s %s %s" % (signal,number,value,init) ) 
+        if signal:
+            if self.debug:
+                print("%s %s %s %s" % (signal,number,value,init) )
             self.emit(signal,number,value,init) 
          
         return True 
          
 if __name__ == "__main__": 
     try: 
-        j = Joystick(0) 
+        j = Joystick(0, debug=True) 
         loop = gobject.MainLoop() 
         loop.run() 
     except Exception,e: 
