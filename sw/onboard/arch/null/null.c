@@ -83,6 +83,14 @@ struct Booz_gps_state booz_gps_state;
 void gps_init(void) {}
 bool_t gps_event_task(void) { return FALSE; }
 
+#include "gpio.h"
+void gpio_init(void) {}
+void gpio_on(uint8_t id) {}
+void gpio_off(uint8_t id) {}
+void gpio_toggle(uint8_t id) {}
+void gpio_periodic_task(void) {}
+bool_t gpio_get(uint8_t id) {return FALSE; }
+
 #include "analog.h"
 void analog_init( void ) {}
 void analog_enable_channel( AnalogChannel_t channel ) {}

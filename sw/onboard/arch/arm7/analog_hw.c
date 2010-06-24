@@ -26,7 +26,6 @@
 #include "arm7/config.h"
 #include "arm7/armVIC.h"
 #include "arm7/sys_time_hw.h"
-#include "arm7/led_hw.h"
 
 #include "generated/settings.h"
 

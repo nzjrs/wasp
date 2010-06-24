@@ -27,7 +27,6 @@
 
 #include "LPC21xx.h"
 #include "arm7/config.h"
-#include "arm7/led_hw.h"
 #include "arm7/sys_time_hw.h"
 
 #define SERVOS_TICS_OF_USEC(s)          SYS_TICS_OF_USEC(s)

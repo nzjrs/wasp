@@ -25,7 +25,6 @@
 
 #include "arm7/config.h"
 #include "arm7/uart_hw.h"
-#include "arm7/led_hw.h"
 #include "lib/ubx_protocol.h"
 
 struct Booz_gps_state booz_gps_state;

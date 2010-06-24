@@ -25,9 +25,10 @@
 #include "std.h"
 #include "altimeter.h"
 #include "analog.h"
+#include "led.h"
 
+#include "LPC21xx.h"
 #include "arm7/config.h"
-#include "arm7/led_hw.h"
 
 #include "generated/settings.h"
 
@@ -59,7 +60,9 @@ void altimeter_recalibrate( void )
     analog_baro_data_available = FALSE;
 
     altimeter_system_status = STATUS_INITIALIZING;
-    LED_OFF(LED_BARO);
+#if LED_BARO
+    led_off(LED_BARO);
+#endif
 }
 
 uint8_t
@@ -80,21 +83,22 @@ static inline void
 analog_baro_calibrate(void)
 {
     RunOnceEvery(60, {
-	if (altimeter_calibration_raw_filtered < 850 && altimeter_calibration_offset >= 1) 
-    {
+    if (altimeter_calibration_raw_filtered < 850 && altimeter_calibration_offset >= 1) {
+
         if (altimeter_calibration_raw_filtered == 0)
             altimeter_calibration_offset -= 15;
-	    else
-	        altimeter_calibration_offset--;
+        else
+            altimeter_calibration_offset--;
 
         AnalogSetDAC(altimeter_calibration_offset);
-
-	    LED_TOGGLE(LED_BARO);
-    }
-	else
-    {
+#if LED_BARO
+        led_toggle(LED_BARO);
+#endif
+    } else {
         altimeter_system_status = STATUS_INITIALIZED;
-        LED_ON(LED_BARO);
+#if LED_BARO
+        led_on(LED_BARO);
+#endif
     }
     });
 }

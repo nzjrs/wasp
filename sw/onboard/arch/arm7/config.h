@@ -48,14 +48,14 @@
 #define PCLK (CCLK / PBSD_VAL) 
 
 /* Onboard LEDs */
-#define LED_1_BANK      1
-#define LED_1_PIN       25
-#define LED_2_BANK      1
-#define LED_2_PIN       24
-#define LED_3_BANK      1
-#define LED_3_PIN       23
-#define LED_4_BANK      1
-#define LED_4_PIN       31
+#define GPIO_1_BANK      1
+#define GPIO_1_PIN       25
+#define GPIO_2_BANK      1
+#define GPIO_2_PIN       24
+#define GPIO_3_BANK      1
+#define GPIO_3_PIN       23
+#define GPIO_4_BANK      1
+#define GPIO_4_PIN       31
 
 /* ADC */
 /* battery: P0.29 AD0.2 */

@@ -25,7 +25,6 @@
 
 #include "arm7/uart_hw.h"
 #include "arm7/armVIC.h"
-#include "arm7/led_hw.h"
 
 #if USE_UART0
 

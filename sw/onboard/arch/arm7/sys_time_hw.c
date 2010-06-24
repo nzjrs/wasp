@@ -20,17 +20,16 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#include "std.h"
 #include "sys_time.h"
 
 #include "LPC21xx.h"
 #include "arm7/config.h"
 #include "arm7/armVIC.h"
 #include "arm7/sys_time_hw.h"
-#include "arm7/led_hw.h"
 #include "arm7/rc_hw.h"             /* ppm_isr */
 #include "arm7/servos_4017_hw.h"    /* servos_4017_isr */
 
+#include "led.h"
 #include "generated/settings.h"
 
 uint8_t  cpu_usage;
@@ -106,8 +105,8 @@ bool_t sys_time_periodic( void ) {
     if (cpu_time_ticks > TIME_TICKS_PER_SEC) {
       cpu_time_ticks -= TIME_TICKS_PER_SEC;
       cpu_time_sec++;
-#ifdef LED_TIME
-      LED_TOGGLE(LED_TIME)
+#if LED_TIME
+      led_toggle(LED_TIME);
 #endif
     }
     return TRUE;

@@ -3,6 +3,7 @@ ARCHSRC =                                \
     arch/arm7/armVIC.c                   \
     arch/arm7/sys_time_hw.c              \
     arch/arm7/led_hw.c                   \
+    arch/arm7/gpio_hw.c                  \
     arch/arm7/rc_hw.c                    \
     arch/arm7/uart_hw.c                  \
     arch/arm7/usb_ser_hw.c               \
