@@ -119,7 +119,7 @@ class UI:
 
         self.add_page(
                 "Status",
-                self.make_status_page())
+                self.make_status_page(show_uav_info=True, show_build=True, show_comm_status=True))
         self.add_page(
                 "Telemetry",
                 self.make_telemetry_page())
@@ -137,11 +137,21 @@ class UI:
     def main(self):
         gtk.main()
 
-    def make_status_page(self):
+    def make_status_page(self, show_uav_info=True, show_build=False, show_comm_status=False):
         hb = gtk.HBox()
 
-        info = InfoBox(self._source, show_images=False, show_build=False, show_comm_status=False)
-        hb.pack_start(info.widget, expand=True, fill=True)
+        if show_uav_info:
+            info = InfoBox(self._source, show_images=False, show_build=False, show_comm_status=False)
+            hb.pack_start(info.widget)
+        if show_build or show_comm_status:
+            vb = gtk.VBox(spacing=5)
+            if show_build:
+                info = InfoBox(self._source, show_images=False, show_uav_status=False, show_build=True, show_comm_status=False)
+                vb.pack_start(info.widget, False, False)
+            if show_comm_status:
+                info = InfoBox(self._source, show_images=False, show_uav_status=False, show_build=False, show_comm_status=True)
+                vb.pack_start(info.widget, False, False)
+            hb.pack_start(vb, False, True)
 
         vb = gtk.VButtonBox()
         vb.set_layout(gtk.BUTTONBOX_START)
