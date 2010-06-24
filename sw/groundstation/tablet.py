@@ -138,11 +138,11 @@ class UI:
         gtk.main()
 
     def make_status_page(self, show_uav_info=True, show_build=False, show_comm_status=False):
-        hb = gtk.HBox(homogeneous=True, spacing=5)
-
+        #hbox for info pages
+        ihb = gtk.HBox(homogeneous=True, spacing=5)
         if show_uav_info:
             info = InfoBox(self._source, show_images=False, show_build=False, show_comm_status=False)
-            hb.pack_start(info.widget)
+            ihb.pack_start(info.widget)
         if show_build or show_comm_status:
             vb = gtk.VBox(spacing=5)
             if show_build:
@@ -151,8 +151,9 @@ class UI:
             if show_comm_status:
                 info = InfoBox(self._source, show_images=False, show_uav_status=False, show_build=False, show_comm_status=True)
                 vb.pack_start(info.widget, False, False)
-            hb.pack_start(vb, False, True)
+            ihb.pack_start(vb, False, True)
 
+        #buttons
         vb = gtk.VButtonBox()
         vb.set_layout(gtk.BUTTONBOX_START)
 
@@ -166,7 +167,11 @@ class UI:
         mb.connect("send-message", lambda mb, msg, vals, source: source.send_message(msg, vals), self._source)
         vb.pack_start(mb)
 
-        hb.pack_start(vb, expand=False, fill=True)
+        #hb contains info and buttons
+        hb = gtk.HBox(spacing=5)
+        hb.pack_start(ihb, True, True)
+        hb.pack_start(vb, False, False)
+
         return hb
 
     def make_telemetry_page(self):
