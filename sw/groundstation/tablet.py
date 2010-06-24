@@ -138,7 +138,7 @@ class UI:
         gtk.main()
 
     def make_status_page(self, show_uav_info=True, show_build=False, show_comm_status=False):
-        hb = gtk.HBox()
+        hb = gtk.HBox(homogeneous=True, spacing=5)
 
         if show_uav_info:
             info = InfoBox(self._source, show_images=False, show_build=False, show_comm_status=False)
