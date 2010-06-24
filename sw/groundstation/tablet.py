@@ -195,7 +195,7 @@ class UI:
 
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-        sw.add(vb)
+        sw.add_with_viewport(vb)
 
         return sw
 
