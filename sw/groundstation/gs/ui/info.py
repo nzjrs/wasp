@@ -11,71 +11,74 @@ LOG = logging.getLogger("infobox")
 
 class InfoBox:
 
-    def __init__(self, source):
+    def __init__(self, source, show_build=True, show_uav_status=True, show_comm_status=True):
         self.widget = gtk.VBox(spacing=10)
 
         #build information
-        vb, (
-        self.rev_value,
-        self.branch_value,
-        self.target_value,
-        self.dirty_value,
-        self.time_value) = self._build_aligned_labels("Revision","Branch","Target","Dirty","Time")
-        self.widget.pack_start(
-            self._build_section(
-                "Build Information",
-                gs.ui.get_icon_image(stock=gtk.STOCK_HOME),
-                vb),
-            True,True)
+        if show_build:
+            vb, (
+            self.rev_value,
+            self.branch_value,
+            self.target_value,
+            self.dirty_value,
+            self.time_value) = self._build_aligned_labels("Revision","Branch","Target","Dirty","Time")
+            self.widget.pack_start(
+                self._build_section(
+                    "Build Information",
+                    gs.ui.get_icon_image(stock=gtk.STOCK_HOME),
+                    vb),
+                True,True)
+
+            source.register_interest(self._on_build_info, 2, "BUILD_INFO")
 
         #UAV status
-        vb, (
-        self.id_value,
-        self.runtime_value,
-        self.rc_value,
-        self.gps_value,
-        self.in_flight_value,
-        self.motors_on_value,
-        self.autopilot_mode_value) = self._build_aligned_labels("ID","Runtime","RC","GPS","In Flight","Autopilot","Motors")
-        self.widget.pack_start(
-            self._build_section(
-                "UAV Status",
-                gs.ui.get_icon_image("dashboard.svg"),
-                vb),
-            True,True)
-        self._batt_pb = progressbar.ProgressBar(range=(8,15), average=5)
-        self._build_progress_bar_holder(vb, "Battery:", self._batt_pb)
-        self._cpu_pb = progressbar.ProgressBar(range=(0,100))
-        self._build_progress_bar_holder(vb, "CPU Usage:", self._cpu_pb)
+        if show_uav_status:
+            vb, (
+            self.id_value,
+            self.runtime_value,
+            self.rc_value,
+            self.gps_value,
+            self.in_flight_value,
+            self.motors_on_value,
+            self.autopilot_mode_value) = self._build_aligned_labels("ID","Runtime","RC","GPS","In Flight","Autopilot","Motors")
+            self.widget.pack_start(
+                self._build_section(
+                    "UAV Status",
+                    gs.ui.get_icon_image("dashboard.svg"),
+                    vb),
+                True,True)
+            self._batt_pb = progressbar.ProgressBar(range=(8,15), average=5)
+            self._build_progress_bar_holder(vb, "Battery:", self._batt_pb)
+            self._cpu_pb = progressbar.ProgressBar(range=(0,100))
+            self._build_progress_bar_holder(vb, "CPU Usage:", self._cpu_pb)
+
+            #make the progress bars the same size
+            sg = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
+            self._batt_pb.set_same_size(sg)
+            self._cpu_pb.set_same_size(sg)
+
+            source.register_interest(self._on_status, 5, "STATUS")
+            source.register_interest(self._on_time, 2, "TIME")
 
         #Communication status
-        vb, (
-        self.type_value,
-        self.config_value,
-        self.connected_value,
-        self.rate_value,
-        self.overruns_value,
-        self.errors_value) = self._build_aligned_labels("Type", "Configuration", "Open", "Rate", "Overruns", "Errors")
-        self.widget.pack_start(
-            self._build_section(
-                "Communication Status",
-                gs.ui.get_icon_image("radio.svg"),
-                vb),
-            True,True)
+        if show_comm_status:
+            vb, (
+            self.type_value,
+            self.config_value,
+            self.connected_value,
+            self.rate_value,
+            self.overruns_value,
+            self.errors_value) = self._build_aligned_labels("Type", "Configuration", "Open", "Rate", "Overruns", "Errors")
+            self.widget.pack_start(
+                self._build_section(
+                    "Communication Status",
+                    gs.ui.get_icon_image("radio.svg"),
+                    vb),
+                True,True)
 
-        #make the progress bars the same size
-        sg = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
-        self._batt_pb.set_same_size(sg)
-        self._cpu_pb.set_same_size(sg)
-
-        source.connect("source-connected", self._on_source_connected)
-
-        source.register_interest(self._on_status, 5, "STATUS")
-        source.register_interest(self._on_comm_status, 5, "COMM_STATUS")
-        source.register_interest(self._on_time, 2, "TIME")
-        source.register_interest(self._on_build_info, 2, "BUILD_INFO")
-
-        gobject.timeout_add(1000, self._check_messages_per_second, source)
+            source.connect("source-connected", self._on_source_connected)
+            source.register_interest(self._on_comm_status, 5, "COMM_STATUS")
+            gobject.timeout_add(1000, self._check_messages_per_second, source)
 
     def _build_progress_bar_holder(self, vb, name, pb):
         vb.pack_start(self._build_label(text=name), False, False)
