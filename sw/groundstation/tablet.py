@@ -177,7 +177,11 @@ class UI:
         b.connect("clicked", on_gb_clicked, rxtv, self._tm)
         vb.pack_start(b, expand=False, fill=True)
 
-        return vb
+        sw = gtk.ScrolledWindow()
+        sw.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        sw.add(vb)
+
+        return sw
 
     def _on_close(self, *args):
         for c in self._configurable:
