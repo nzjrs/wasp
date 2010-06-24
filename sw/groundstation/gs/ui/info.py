@@ -11,8 +11,9 @@ LOG = logging.getLogger("infobox")
 
 class InfoBox:
 
-    def __init__(self, source, show_build=True, show_uav_status=True, show_comm_status=True):
+    def __init__(self, source, show_images=True, show_build=True, show_uav_status=True, show_comm_status=True):
         self.widget = gtk.VBox(spacing=10)
+        image = None
 
         #build information
         if show_build:
@@ -22,11 +23,12 @@ class InfoBox:
             self.target_value,
             self.dirty_value,
             self.time_value) = self._build_aligned_labels("Revision","Branch","Target","Dirty","Time")
+            if show_images: image = gs.ui.get_icon_image(stock=gtk.STOCK_DIALOG_INFO)
             self.widget.pack_start(
                 self._build_section(
                     "Build Information",
-                    gs.ui.get_icon_image(stock=gtk.STOCK_HOME),
-                    vb),
+                    vb,
+                    image),
                 True,True)
 
             source.register_interest(self._on_build_info, 2, "BUILD_INFO")
@@ -41,11 +43,12 @@ class InfoBox:
             self.in_flight_value,
             self.motors_on_value,
             self.autopilot_mode_value) = self._build_aligned_labels("ID","Runtime","RC","GPS","In Flight","Autopilot","Motors")
+            if show_images: image = gs.ui.get_icon_image("dashboard.svg")
             self.widget.pack_start(
                 self._build_section(
                     "UAV Status",
-                    gs.ui.get_icon_image("dashboard.svg"),
-                    vb),
+                    vb,
+                    image),
                 True,True)
             self._batt_pb = progressbar.ProgressBar(range=(8,15), average=5)
             self._build_progress_bar_holder(vb, "Battery:", self._batt_pb)
@@ -69,11 +72,12 @@ class InfoBox:
             self.rate_value,
             self.overruns_value,
             self.errors_value) = self._build_aligned_labels("Type", "Configuration", "Open", "Rate", "Overruns", "Errors")
+            if show_images: image = gs.ui.get_icon_image("radio.svg")
             self.widget.pack_start(
                 self._build_section(
                     "Communication Status",
-                    gs.ui.get_icon_image("radio.svg"),
-                    vb),
+                    vb,
+                    image),
                 True,True)
 
             source.connect("source-connected", self._on_source_connected)
@@ -110,11 +114,12 @@ class InfoBox:
             vb.pack_start(hb, False, True)
         return vb, lbls
 
-    def _build_section(self, name, image, widget):
+    def _build_section(self, name, widget, image=None):
         hb = gtk.HBox(spacing=5)
-        image.set_alignment(0.5,0.0)
-        image.set_padding(5,10)
-        hb.pack_start(image, False, False)
+        if image:
+            image.set_alignment(0.5,0.0)
+            image.set_padding(5,10)
+            hb.pack_start(image, False, False)
         vb = gtk.VBox()
         l = self._build_label(markup="<b>%s</b>" % name)
         vb.pack_start(l, False, False)

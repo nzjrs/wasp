@@ -139,7 +139,8 @@ class UI:
 
     def make_status_page(self):
         hb = gtk.HBox()
-        info = InfoBox(self._source, show_build=False, show_comm_status=False)
+
+        info = InfoBox(self._source, show_images=False, show_build=False, show_comm_status=False)
         hb.pack_start(info.widget, expand=True, fill=True)
 
         vb = gtk.VButtonBox()
