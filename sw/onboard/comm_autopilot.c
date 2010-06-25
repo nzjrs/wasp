@@ -25,6 +25,7 @@
 #include "led.h"
 #include "rc.h"
 #include "gps.h"
+#include "gpio.h"
 #include "imu.h"
 #include "ins.h"
 #include "ahrs.h"
@@ -224,6 +225,12 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
             break;
         case MESSAGE_ID_KILL:
             autopilot_kill();
+            break;
+        case MESSAGE_ID_GPIO_ON:
+            gpio_on( MESSAGE_GPIO_ON_GET_FROM_BUFFER_id(message->payload) );
+            break;
+        case MESSAGE_ID_GPIO_OFF:
+            gpio_off( MESSAGE_GPIO_OFF_GET_FROM_BUFFER_id(message->payload) );
             break;
         default:
             ret = FALSE;
