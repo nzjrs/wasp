@@ -68,7 +68,7 @@ void ins_propagate() {
 #endif
 #ifdef USE_HFF
   if (booz_ahrs.status == BOOZ_AHRS_RUNNING &&
-      booz_gps_state.fix == BOOZ2_GPS_FIX_3D && ins.ltp_initialised )
+      gps_state.fix == BOOZ2_GPS_FIX_3D && ins.ltp_initialised )
     b2ins_propagate();
 #endif
 }
@@ -97,13 +97,13 @@ void ins_update_baro() {
 
 void ins_update_gps(void) {
 
-  if (booz_gps_state.fix == GPS_FIX_3D) {
+  if (gps_state.fix == GPS_FIX_3D) {
     if (!ins.ltp_initialised) {
-      ltp_def_from_ecef_i(&ins.ltp_def, &booz_gps_state.ecef_pos);
+      ltp_def_from_ecef_i(&ins.ltp_def, &gps_state.ecef_pos);
       ins.ltp_initialised = TRUE;
     }
-    ned_of_ecef_point_i(&ins.gps_pos_cm_ned, &ins.ltp_def, &booz_gps_state.ecef_pos);
-    ned_of_ecef_vect_i(&ins.gps_speed_cm_s_ned, &ins.ltp_def, &booz_gps_state.ecef_speed);
+    ned_of_ecef_point_i(&ins.gps_pos_cm_ned, &ins.ltp_def, &gps_state.ecef_pos);
+    ned_of_ecef_vect_i(&ins.gps_speed_cm_s_ned, &ins.ltp_def, &gps_state.ecef_speed);
 #ifdef USE_HFF
     b2ins_update_gps();
     VECT2_SDIV(ins.ltp_pos, (1<<(B2INS_POS_LTP_FRAC-INT32_POS_FRAC)), b2ins_pos_ltp);

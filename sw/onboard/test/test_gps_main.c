@@ -59,13 +59,13 @@ static inline void main_periodic_task( void ) {
 
   RunOnceEvery(250, {
     MESSAGE_SEND_GPS_LLH( COMM_1, 
-        &booz_gps_state.fix,
-        &booz_gps_state.num_sv,
-        &booz_gps_state.booz2_gps_lat,
-        &booz_gps_state.booz2_gps_lon,
-        &booz_gps_state.booz2_gps_hmsl,
-        &booz_gps_state.booz2_gps_hacc,
-        &booz_gps_state.booz2_gps_vacc);
+        &gps_state.fix,
+        &gps_state.num_sv,
+        &gps_state.lat,
+        &gps_state.lon,
+        &gps_state.hmsl,
+        &gps_state.hacc,
+        &gps_state.vacc);
   });
 
 
@@ -73,7 +73,7 @@ static inline void main_periodic_task( void ) {
 
 static inline void main_event_task( void ) {
     if (gps_event_task()) {
-        if (booz_gps_state.fix == GPS_FIX_3D)
+        if (gps_state.fix == GPS_FIX_3D)
             led_on(LED_GPS);
         else
             led_toggle(LED_GPS);

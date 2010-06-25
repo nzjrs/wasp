@@ -34,13 +34,13 @@ typedef enum {
 } UbxGotMsgFlags;
 #define UbxGotAllMsg	(GOT_MSG_NAV_POSLLH | GOT_MSG_NAV_SOL | GOT_MSG_NAV_VELNED)
 
-struct Booz_gps_state booz_gps_state;
-SystemStatus_t gps_system_status = STATUS_UNINITIAIZED;
-UbxGotMsgFlags gps_got_msgs = 0;
+GPS_t           gps_state = {0};
+SystemStatus_t  gps_system_status = STATUS_UNINITIAIZED;
+UbxGotMsgFlags  gps_got_msgs = 0;
 
 /* misc */
-volatile bool_t  booz2_gps_msg_received;
-volatile uint8_t booz2_gps_nb_ovrn;
+volatile bool_t  ubx_gps_msg_received;
+volatile uint8_t ubx_gps_nb_ovrn;
 
 /* UBX parsing */
 #define  UBX_FIX_NONE 0x00
@@ -79,7 +79,7 @@ void gps_init(void)
     ubx_msg_available = FALSE;
     gps_system_status = STATUS_INITIALIZING;
     gps_got_msgs = 0;
-    booz_gps_state.fix = GPS_FIX_NONE;
+    gps_state.fix = GPS_FIX_NONE;
 }
 
 bool_t
@@ -95,38 +95,38 @@ gps_event_task(void)
             if (ubx_id == UBX_NAV_POSLLH_ID) {
                 gps_got_msgs |= GOT_MSG_NAV_POSLLH;
 
-                booz_gps_state.booz2_gps_lon = UBX_NAV_POSLLH_LON(ubx_msg_buf);
-                booz_gps_state.booz2_gps_lat = UBX_NAV_POSLLH_LAT(ubx_msg_buf);
-                booz_gps_state.booz2_gps_hmsl = UBX_NAV_POSLLH_HMSL(ubx_msg_buf);
-                booz_gps_state.booz2_gps_hacc = UBX_NAV_POSLLH_Hacc(ubx_msg_buf);
-                booz_gps_state.booz2_gps_vacc = UBX_NAV_POSLLH_Vacc(ubx_msg_buf);
+                gps_state.lon = UBX_NAV_POSLLH_LON(ubx_msg_buf);
+                gps_state.lat = UBX_NAV_POSLLH_LAT(ubx_msg_buf);
+                gps_state.hmsl = UBX_NAV_POSLLH_HMSL(ubx_msg_buf);
+                gps_state.hacc = UBX_NAV_POSLLH_Hacc(ubx_msg_buf);
+                gps_state.vacc = UBX_NAV_POSLLH_Vacc(ubx_msg_buf);
             }
             else if (ubx_id == UBX_NAV_SOL_ID) {
                 gps_got_msgs |= GOT_MSG_NAV_SOL;
 
                 uint8_t fix = UBX_NAV_SOL_GPSfix(ubx_msg_buf);
                 if ( fix == UBX_FIX_3D)
-                    booz_gps_state.fix = GPS_FIX_3D;
+                    gps_state.fix = GPS_FIX_3D;
                 else if ( fix == UBX_FIX_2D )
-                    booz_gps_state.fix = GPS_FIX_2D;
+                    gps_state.fix = GPS_FIX_2D;
                 else
-                    booz_gps_state.fix = GPS_FIX_NONE;
-                booz_gps_state.ecef_pos.x   = UBX_NAV_SOL_ECEF_X(ubx_msg_buf);
-                booz_gps_state.ecef_pos.y   = UBX_NAV_SOL_ECEF_Y(ubx_msg_buf);
-                booz_gps_state.ecef_pos.z   = UBX_NAV_SOL_ECEF_Z(ubx_msg_buf);
-                booz_gps_state.pacc         = UBX_NAV_SOL_Pacc(ubx_msg_buf);
-                booz_gps_state.ecef_speed.x = UBX_NAV_SOL_ECEFVX(ubx_msg_buf);
-                booz_gps_state.ecef_speed.y = UBX_NAV_SOL_ECEFVY(ubx_msg_buf);
-                booz_gps_state.ecef_speed.z = UBX_NAV_SOL_ECEFVZ(ubx_msg_buf);
-                booz_gps_state.sacc         = UBX_NAV_SOL_Sacc(ubx_msg_buf);
-                booz_gps_state.pdop         = UBX_NAV_SOL_PDOP(ubx_msg_buf);
-                booz_gps_state.num_sv       = UBX_NAV_SOL_numSV(ubx_msg_buf);
+                    gps_state.fix = GPS_FIX_NONE;
+                gps_state.ecef_pos.x   = UBX_NAV_SOL_ECEF_X(ubx_msg_buf);
+                gps_state.ecef_pos.y   = UBX_NAV_SOL_ECEF_Y(ubx_msg_buf);
+                gps_state.ecef_pos.z   = UBX_NAV_SOL_ECEF_Z(ubx_msg_buf);
+                gps_state.pacc         = UBX_NAV_SOL_Pacc(ubx_msg_buf);
+                gps_state.ecef_speed.x = UBX_NAV_SOL_ECEFVX(ubx_msg_buf);
+                gps_state.ecef_speed.y = UBX_NAV_SOL_ECEFVY(ubx_msg_buf);
+                gps_state.ecef_speed.z = UBX_NAV_SOL_ECEFVZ(ubx_msg_buf);
+                gps_state.sacc         = UBX_NAV_SOL_Sacc(ubx_msg_buf);
+                gps_state.pdop         = UBX_NAV_SOL_PDOP(ubx_msg_buf);
+                gps_state.num_sv       = UBX_NAV_SOL_numSV(ubx_msg_buf);
             }
             else if (ubx_id == UBX_NAV_VELNED_ID) {
                 gps_got_msgs |= GOT_MSG_NAV_VELNED;
 
-                booz_gps_state.booz2_gps_vel_n = UBX_NAV_VELNED_VEL_N(ubx_msg_buf);
-                booz_gps_state.booz2_gps_vel_e = UBX_NAV_VELNED_VEL_E(ubx_msg_buf);
+                gps_state.vel_n = UBX_NAV_VELNED_VEL_N(ubx_msg_buf);
+                gps_state.vel_e = UBX_NAV_VELNED_VEL_E(ubx_msg_buf);
             }
         }
 
@@ -157,7 +157,7 @@ static void ubx_parse( uint8_t c ) {
   case GOT_SYNC2:
     if (ubx_msg_available) {
       /* Previous message has not yet been parsed: discard this one */
-      booz2_gps_nb_ovrn++;
+      ubx_gps_nb_ovrn++;
       goto error;
     }
     ubx_class = c;

@@ -32,7 +32,7 @@ typedef enum {
     GPS_FIX_3D,
 } GpsFix_t;
 
-struct Booz_gps_state {
+typedef struct __GPS {
   struct EcefCoor_i ecef_pos;    /* pos ECEF in cm        */
   struct EcefCoor_i ecef_speed;  /* speed ECEF in cm/s    */
   uint32_t pacc;                 /* position accuracy     */
@@ -41,21 +41,18 @@ struct Booz_gps_state {
   uint8_t  num_sv;               /* number of sat in fix  */
   GpsFix_t fix;                  /* status of fix         */
   /* UBX NAV POSLLH */
-  int32_t  booz2_gps_lon;
-  int32_t  booz2_gps_lat;
-  int32_t  booz2_gps_hmsl;       /* height above mean seal level (mm)   */
-  uint32_t booz2_gps_vacc;       /* vertical accuracy (mm)              */
-  uint32_t booz2_gps_hacc;       /* horizontal accuracy (mm)            */
+  int32_t  lon;
+  int32_t  lat;
+  int32_t  hmsl;       /* height above mean seal level (mm)   */
+  uint32_t vacc;       /* vertical accuracy (mm)              */
+  uint32_t hacc;       /* horizontal accuracy (mm)            */
   /* UBX NAV VELNED */
-  int32_t  booz2_gps_vel_n;
-  int32_t  booz2_gps_vel_e;
-};
+  int32_t  vel_n;
+  int32_t  vel_e;
+} GPS_t;
 
-extern 
-struct Booz_gps_state booz_gps_state;
-
-extern
-SystemStatus_t gps_system_status;
+extern GPS_t            gps_state;
+extern SystemStatus_t   gps_system_status;
 
 void 
 gps_init(void);
