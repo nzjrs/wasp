@@ -10,7 +10,7 @@ import wasp.fms
 
 UDP_PORT = 1212
 
-class Communication(gobject.GObject):
+class _Communication(gobject.GObject):
 
     COMMUNICATION_TYPE = ""
 
@@ -53,12 +53,12 @@ class Communication(gobject.GObject):
     def get_connection_string(self):
         return ""
 
-class UdpCommunication(Communication):
+class UdpCommunication(_Communication):
 
     COMMUNICATION_TYPE = "network"
 
     def __init__(self, transport, messages_file, message_header):
-        Communication.__init__(self, transport, messages_file, message_header)
+        _Communication.__init__(self, transport, messages_file, message_header)
         self.socket = None
         self.watch = None
         self.connected = False
@@ -102,14 +102,15 @@ class UdpCommunication(Communication):
         except socket.error, err:
             print "Couldn't be a udp server on port %d : %s" % (self.PORT, err)
 
-        print "connected"
-        self.emit("uav-connected", self.connected)
+        self.emit("uav-connected", self.is_connected())
 
     def disconnect_from_uav(self):
         if self.connected:
             gobject.source_remove(self.watch)
             self.socket.close()
             self.connected = False
+
+        self.emit("uav-connected", self.is_connected())
 
     def is_connected(self):
         return self.connected
@@ -120,12 +121,12 @@ class UdpCommunication(Communication):
     def get_connection_string(self):
         return "%s:%s" % (self.host, UDP_PORT)
 
-class SerialCommunication(Communication):
+class SerialCommunication(_Communication):
 
     COMMUNICATION_TYPE = "serial"
 
     def __init__(self, transport, messages_file, message_header):
-        Communication.__init__(self, transport, messages_file, message_header)
+        _Communication.__init__(self, transport, messages_file, message_header)
 
         self.serialsender = libserial.SerialSender.SerialSender()
         self.serialsender.connect("serial-connected", self.on_serial_connected)
@@ -185,12 +186,12 @@ class SerialCommunication(Communication):
     def get_connection_string(self):
         return "%s@%s" % (self.port, self.speed)
 
-class DummyCommunication(Communication):
+class DummyCommunication(_Communication):
 
     COMMUNICATION_TYPE = "test"
 
     def __init__(self, transport, messages_file, message_header):
-        Communication.__init__(self, transport, messages_file, message_header)
+        _Communication.__init__(self, transport, messages_file, message_header)
         self._is_open = False
         self.uav_header = wasp.transport.TransportHeaderFooter(acid=wasp.ACID_TEST)
         self.dummy_uav = DummyUAV(messages_file, self.send_message)

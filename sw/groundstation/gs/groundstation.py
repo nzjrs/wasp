@@ -57,10 +57,10 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         disable_plugins = options.disable_plugins
 
         if not os.path.exists(messagesfile):
-            message_dialog("Could not find messages.xml", None, secondary=gs.CONFIG_DIR)
+            message_dialog("Could not find messages.xml", None, secondary="%s does not exist." % messagesfile)
             sys.exit(1)
         if not os.path.exists(settingsfile):
-            message_dialog("Could not find settings.xml", None, secondary=gs.CONFIG_DIR)
+            message_dialog("Could not find settings.xml", None, secondary="%s does not exist." % settingsfile)
             sys.exit(1)
     
         #connect our log buffer to the python logging subsystem
