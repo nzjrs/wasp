@@ -136,69 +136,72 @@ gps_event_task(void)
     return FALSE;
 }
 
-static void ubx_parse( uint8_t c ) {
-  if (ubx_state.status < GOT_PAYLOAD) {
-    ubx_state.ck_a += c;
-    ubx_state.ck_b += ubx_state.ck_a;
-  }
-  switch (ubx_state.status) {
-  case UNINIT:
-    if (c == UBX_SYNC1)
-      ubx_state.status++;
-    break;
-  case GOT_SYNC1:
-    if (c != UBX_SYNC2)
-      goto error;
-    ubx_state.ck_a = 0;
-    ubx_state.ck_b = 0;
-    ubx_state.status++;
-    break;
-  case GOT_SYNC2:
-    if (ubx_state.msg_available) {
-      /* Previous message has not yet been parsed: discard this one */
-      ubx_state.nb_ovrn++;
-      goto error;
+static void ubx_parse( uint8_t c )
+{
+    if (ubx_state.status < GOT_PAYLOAD) {
+        ubx_state.ck_a += c;
+        ubx_state.ck_b += ubx_state.ck_a;
     }
-    ubx_state.class = c;
-    ubx_state.status++;
-    break;
-  case GOT_CLASS:
-    ubx_state.id = c;
-    ubx_state.status++;
-    break;    
-  case GOT_ID:
-    ubx_state.len = c;
-    ubx_state.status++;
-    break;
-  case GOT_LEN1:
-    ubx_state.len |= (c<<8);
-    if (ubx_state.len > UBX_MAX_PAYLOAD)
-      goto error;
-    ubx_state.msg_idx = 0;
-    ubx_state.status++;
-    break;
-  case GOT_LEN2:
-    ubx_msg_buf[ubx_state.msg_idx] = c;
-    ubx_state.msg_idx++;
-    if (ubx_state.msg_idx >= ubx_state.len) {
-      ubx_state.status++;
+
+    switch (ubx_state.status)
+    {
+        case UNINIT:
+            if (c == UBX_SYNC1)
+                ubx_state.status++;
+            break;
+        case GOT_SYNC1:
+            if (c != UBX_SYNC2)
+                goto error;
+            ubx_state.ck_a = 0;
+            ubx_state.ck_b = 0;
+            ubx_state.status++;
+            break;
+        case GOT_SYNC2:
+            if (ubx_state.msg_available) {
+                /* Previous message has not yet been parsed: discard this one */
+                ubx_state.nb_ovrn++;
+                goto error;
+            }
+            ubx_state.class = c;
+            ubx_state.status++;
+            break;
+        case GOT_CLASS:
+            ubx_state.id = c;
+            ubx_state.status++;
+            break;
+        case GOT_ID:
+            ubx_state.len = c;
+            ubx_state.status++;
+            break;
+        case GOT_LEN1:
+            ubx_state.len |= (c<<8);
+            if (ubx_state.len > UBX_MAX_PAYLOAD)
+                goto error;
+            ubx_state.msg_idx = 0;
+            ubx_state.status++;
+            break;
+        case GOT_LEN2:
+            ubx_msg_buf[ubx_state.msg_idx] = c;
+            ubx_state.msg_idx++;
+            if (ubx_state.msg_idx >= ubx_state.len) {
+                ubx_state.status++;
+            }
+            break;
+        case GOT_PAYLOAD:
+            if (c != ubx_state.ck_a)
+                goto error;
+            ubx_state.status++;
+            break;
+        case GOT_CHECKSUM1:
+            if (c != ubx_state.ck_b)
+                goto error;
+            ubx_state.msg_available = TRUE;
+            goto restart;
+            break;
     }
-    break;
-  case GOT_PAYLOAD:
-    if (c != ubx_state.ck_a)
-      goto error;
-    ubx_state.status++;
-    break;
-  case GOT_CHECKSUM1:
-    if (c != ubx_state.ck_b)
-      goto error;
-    ubx_state.msg_available = TRUE;
-    goto restart;
-    break;
-  }
-  return;
- error:  
- restart:
-  ubx_state.status = UNINIT;
-  return;
+    return;
+error:
+restart:
+    ubx_state.status = UNINIT;
+    return;
 }
