@@ -39,7 +39,6 @@ typedef struct __UbxParseState {
     uint8_t     msg_idx;
     uint8_t     ck_a;
     uint8_t     ck_b;
-    uint8_t     nb_ovrn;
     bool_t      msg_available;
 } UbxParseState_t;
 
@@ -79,6 +78,9 @@ void gps_init(void)
     gps_system_status = STATUS_INITIALIZING;
     gps_got_msgs = 0;
     gps_state.fix = GPS_FIX_NONE;
+    gps_state.buffer_overrun = 0;
+    gps_state.parse_error = 0;
+    gps_state.parse_ignored = 0;
 }
 
 bool_t
@@ -99,8 +101,7 @@ gps_event_task(void)
                 gps_state.hmsl = UBX_NAV_POSLLH_HMSL(ubx_msg_buf);
                 gps_state.hacc = UBX_NAV_POSLLH_Hacc(ubx_msg_buf);
                 gps_state.vacc = UBX_NAV_POSLLH_Vacc(ubx_msg_buf);
-            }
-            else if (ubx_state.id == UBX_NAV_SOL_ID) {
+            } else if (ubx_state.id == UBX_NAV_SOL_ID) {
                 gps_got_msgs |= GOT_MSG_NAV_SOL;
 
                 uint8_t fix = UBX_NAV_SOL_GPSfix(ubx_msg_buf);
@@ -120,13 +121,16 @@ gps_event_task(void)
                 gps_state.sacc         = UBX_NAV_SOL_Sacc(ubx_msg_buf);
                 gps_state.pdop         = UBX_NAV_SOL_PDOP(ubx_msg_buf);
                 gps_state.num_sv       = UBX_NAV_SOL_numSV(ubx_msg_buf);
-            }
-            else if (ubx_state.id == UBX_NAV_VELNED_ID) {
+            } else if (ubx_state.id == UBX_NAV_VELNED_ID) {
                 gps_got_msgs |= GOT_MSG_NAV_VELNED;
 
                 gps_state.vel_n = UBX_NAV_VELNED_VEL_N(ubx_msg_buf);
                 gps_state.vel_e = UBX_NAV_VELNED_VEL_E(ubx_msg_buf);
+            } else {
+                gps_state.parse_ignored++;
             }
+        } else {
+            gps_state.parse_ignored++;
         }
 
         gps_system_status = (gps_got_msgs == UbxGotAllMsg ? STATUS_ALIVE : STATUS_INITIALIZED);
@@ -150,8 +154,10 @@ static void ubx_parse( uint8_t c )
                 ubx_state.status++;
             break;
         case GOT_SYNC1:
-            if (c != UBX_SYNC2)
+            if (c != UBX_SYNC2) {
+                gps_state.parse_error++;
                 goto error;
+            }
             ubx_state.ck_a = 0;
             ubx_state.ck_b = 0;
             ubx_state.status++;
@@ -159,7 +165,7 @@ static void ubx_parse( uint8_t c )
         case GOT_SYNC2:
             if (ubx_state.msg_available) {
                 /* Previous message has not yet been parsed: discard this one */
-                ubx_state.nb_ovrn++;
+                gps_state.buffer_overrun++;
                 goto error;
             }
             ubx_state.class = c;
@@ -175,8 +181,10 @@ static void ubx_parse( uint8_t c )
             break;
         case GOT_LEN1:
             ubx_state.len |= (c<<8);
-            if (ubx_state.len > UBX_MAX_PAYLOAD)
+            if (ubx_state.len > UBX_MAX_PAYLOAD) {
+                gps_state.parse_error++;
                 goto error;
+            }
             ubx_state.msg_idx = 0;
             ubx_state.status++;
             break;
@@ -188,13 +196,17 @@ static void ubx_parse( uint8_t c )
             }
             break;
         case GOT_PAYLOAD:
-            if (c != ubx_state.ck_a)
+            if (c != ubx_state.ck_a) {
+                gps_state.parse_error++;
                 goto error;
+            }
             ubx_state.status++;
             break;
         case GOT_CHECKSUM1:
-            if (c != ubx_state.ck_b)
+            if (c != ubx_state.ck_b) {
+                gps_state.parse_error++;
                 goto error;
+            }
             ubx_state.msg_available = TRUE;
             goto restart;
             break;

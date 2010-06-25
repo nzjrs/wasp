@@ -56,6 +56,13 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &gps_state.hacc,
                     &gps_state.vacc);
             break;
+        case MESSAGE_ID_GPS_STATUS:
+            MESSAGE_SEND_GPS_STATUS(
+                    chan,
+                    &gps_state.buffer_overrun,
+                    &gps_state.parse_error,
+                    &gps_state.parse_ignored);
+            break;
         case MESSAGE_ID_IMU_GYRO_RAW:
             MESSAGE_SEND_IMU_GYRO_RAW(
                     chan,
