@@ -27,6 +27,22 @@
 #include "arm7/uart_hw.h"
 #include "lib/ubx_protocol.h"
 
+#define  UBX_FIX_NONE 0x00
+#define  UBX_FIX_2D   0x02
+#define  UBX_FIX_3D   0x03
+
+typedef struct __UbxParseState {
+    uint8_t     id;
+    uint8_t     class;
+    uint8_t     status;
+    uint16_t    len;
+    uint8_t     msg_idx;
+    uint8_t     ck_a;
+    uint8_t     ck_b;
+    uint8_t     nb_ovrn;
+    bool_t      msg_available;
+} UbxParseState_t;
+
 typedef enum {
   GOT_MSG_NAV_POSLLH   	= (1 << 0),
   GOT_MSG_NAV_SOL       = (1 << 1),
@@ -34,28 +50,15 @@ typedef enum {
 } UbxGotMsgFlags;
 #define UbxGotAllMsg	(GOT_MSG_NAV_POSLLH | GOT_MSG_NAV_SOL | GOT_MSG_NAV_VELNED)
 
-GPS_t           gps_state = {0};
+static void ubx_parse( uint8_t c );
+
+GPS_t           gps_state;
 SystemStatus_t  gps_system_status = STATUS_UNINITIAIZED;
 UbxGotMsgFlags  gps_got_msgs = 0;
 
-/* misc */
-volatile bool_t  ubx_gps_msg_received;
-volatile uint8_t ubx_gps_nb_ovrn;
-
 /* UBX parsing */
-#define  UBX_FIX_NONE 0x00
-#define  UBX_FIX_2D   0x02
-#define  UBX_FIX_3D   0x03
-
-static bool_t  ubx_msg_available;
-
 #define UBX_MAX_PAYLOAD 255
 static uint8_t ubx_msg_buf[UBX_MAX_PAYLOAD] __attribute__ ((aligned));
-static uint8_t ubx_id;
-static uint8_t ubx_class;
-
-static void ubx_parse( uint8_t c );
-
 #define UNINIT        0
 #define GOT_SYNC1     1
 #define GOT_SYNC2     2
@@ -65,18 +68,14 @@ static void ubx_parse( uint8_t c );
 #define GOT_LEN2      6
 #define GOT_PAYLOAD   7
 #define GOT_CHECKSUM1 8
-
-static uint8_t  ubx_status;
-static uint16_t ubx_len;
-static uint8_t  ubx_msg_idx;
-static uint8_t  ck_a, ck_b;
+static UbxParseState_t ubx_state;
 
 void gps_init(void) 
 {
     uart0_init_tx();
 
-    ubx_status = UNINIT;
-    ubx_msg_available = FALSE;
+    ubx_state.status = UNINIT;
+    ubx_state.msg_available = FALSE;
     gps_system_status = STATUS_INITIALIZING;
     gps_got_msgs = 0;
     gps_state.fix = GPS_FIX_NONE;
@@ -86,13 +85,13 @@ bool_t
 gps_event_task(void) 
 {
     if (Uart0ChAvailable()) {
-        while ( Uart0ChAvailable() && !ubx_msg_available )
+        while ( Uart0ChAvailable() && !ubx_state.msg_available )
             ubx_parse(Uart0Getch());
     }
 
-    if (ubx_msg_available) {
-        if (ubx_class == UBX_NAV_ID) {
-            if (ubx_id == UBX_NAV_POSLLH_ID) {
+    if (ubx_state.msg_available) {
+        if (ubx_state.class == UBX_NAV_ID) {
+            if (ubx_state.id == UBX_NAV_POSLLH_ID) {
                 gps_got_msgs |= GOT_MSG_NAV_POSLLH;
 
                 gps_state.lon = UBX_NAV_POSLLH_LON(ubx_msg_buf);
@@ -101,7 +100,7 @@ gps_event_task(void)
                 gps_state.hacc = UBX_NAV_POSLLH_Hacc(ubx_msg_buf);
                 gps_state.vacc = UBX_NAV_POSLLH_Vacc(ubx_msg_buf);
             }
-            else if (ubx_id == UBX_NAV_SOL_ID) {
+            else if (ubx_state.id == UBX_NAV_SOL_ID) {
                 gps_got_msgs |= GOT_MSG_NAV_SOL;
 
                 uint8_t fix = UBX_NAV_SOL_GPSfix(ubx_msg_buf);
@@ -122,7 +121,7 @@ gps_event_task(void)
                 gps_state.pdop         = UBX_NAV_SOL_PDOP(ubx_msg_buf);
                 gps_state.num_sv       = UBX_NAV_SOL_numSV(ubx_msg_buf);
             }
-            else if (ubx_id == UBX_NAV_VELNED_ID) {
+            else if (ubx_state.id == UBX_NAV_VELNED_ID) {
                 gps_got_msgs |= GOT_MSG_NAV_VELNED;
 
                 gps_state.vel_n = UBX_NAV_VELNED_VEL_N(ubx_msg_buf);
@@ -131,75 +130,75 @@ gps_event_task(void)
         }
 
         gps_system_status = (gps_got_msgs == UbxGotAllMsg ? STATUS_ALIVE : STATUS_INITIALIZED);
-        ubx_msg_available = FALSE;
+        ubx_state.msg_available = FALSE;
         return TRUE;
     }
     return FALSE;
 }
 
 static void ubx_parse( uint8_t c ) {
-  if (ubx_status < GOT_PAYLOAD) {
-    ck_a += c;
-    ck_b += ck_a;
+  if (ubx_state.status < GOT_PAYLOAD) {
+    ubx_state.ck_a += c;
+    ubx_state.ck_b += ubx_state.ck_a;
   }
-  switch (ubx_status) {
+  switch (ubx_state.status) {
   case UNINIT:
     if (c == UBX_SYNC1)
-      ubx_status++;
+      ubx_state.status++;
     break;
   case GOT_SYNC1:
     if (c != UBX_SYNC2)
       goto error;
-    ck_a = 0;
-    ck_b = 0;
-    ubx_status++;
+    ubx_state.ck_a = 0;
+    ubx_state.ck_b = 0;
+    ubx_state.status++;
     break;
   case GOT_SYNC2:
-    if (ubx_msg_available) {
+    if (ubx_state.msg_available) {
       /* Previous message has not yet been parsed: discard this one */
-      ubx_gps_nb_ovrn++;
+      ubx_state.nb_ovrn++;
       goto error;
     }
-    ubx_class = c;
-    ubx_status++;
+    ubx_state.class = c;
+    ubx_state.status++;
     break;
   case GOT_CLASS:
-    ubx_id = c;
-    ubx_status++;
+    ubx_state.id = c;
+    ubx_state.status++;
     break;    
   case GOT_ID:
-    ubx_len = c;
-    ubx_status++;
+    ubx_state.len = c;
+    ubx_state.status++;
     break;
   case GOT_LEN1:
-    ubx_len |= (c<<8);
-    if (ubx_len > UBX_MAX_PAYLOAD)
+    ubx_state.len |= (c<<8);
+    if (ubx_state.len > UBX_MAX_PAYLOAD)
       goto error;
-    ubx_msg_idx = 0;
-    ubx_status++;
+    ubx_state.msg_idx = 0;
+    ubx_state.status++;
     break;
   case GOT_LEN2:
-    ubx_msg_buf[ubx_msg_idx] = c;
-    ubx_msg_idx++;
-    if (ubx_msg_idx >= ubx_len) {
-      ubx_status++;
+    ubx_msg_buf[ubx_state.msg_idx] = c;
+    ubx_state.msg_idx++;
+    if (ubx_state.msg_idx >= ubx_state.len) {
+      ubx_state.status++;
     }
     break;
   case GOT_PAYLOAD:
-    if (c != ck_a)
+    if (c != ubx_state.ck_a)
       goto error;
-    ubx_status++;
+    ubx_state.status++;
     break;
   case GOT_CHECKSUM1:
-    if (c != ck_b)
+    if (c != ubx_state.ck_b)
       goto error;
-    ubx_msg_available = TRUE;
+    ubx_state.msg_available = TRUE;
     goto restart;
     break;
   }
   return;
  error:  
  restart:
-  ubx_status = UNINIT;
+  ubx_state.status = UNINIT;
   return;
 }
