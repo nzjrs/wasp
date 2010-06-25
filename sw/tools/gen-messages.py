@@ -16,10 +16,46 @@ import re
 import os.path
 import sys
 
-class CField(messages.Field):
+class _RefMixin:
+    def get_pointer_to_instance(self):
+        if self.is_array:
+            return ""
+        else:
+            return "&"
+
+    def maybe_pass_by_reference(self):
+        if self.is_array:
+            return "*"
+        else:
+            return ""
+
+    def maybe_return_by_reference(self):
+        if self.is_array:
+            return "**"
+        else:
+            return "*"
+
+class _ChannelField(_RefMixin):
+    name = "chan"
+    is_array = False
+    def get_wasp_type(self):
+        return "CommChannel_t"
+
+class _PayloadField(_RefMixin):
+    name = "payload"
+    is_array = True
+    def get_wasp_type(self):
+        return "uint8_t"
+
+    def maybe_return_by_reference(self):
+        return "*"
+
+class CField(messages.Field, _RefMixin):
 
     def get_wasp_type(self):
         if self.type == "char":
+            return self.type
+        elif self.type == "float":
             return self.type
         else:
             return self.type+"_t"
@@ -68,11 +104,11 @@ class CMessage(messages.Message):
         messages.Message.__init__(self, m, CField)
         self.sizes = ["0"] + [str(f.length) for f in self.fields]
 
-    def print_id(self):
-        print "#define MESSAGE_ID_%s %d" % (self.name, self.id)
+    def print_id(self, outfile):
+        print >> outfile, "#define MESSAGE_ID_%s %d" % (self.name, self.id)
 
-    def print_length(self):
-        print "#define MESSAGE_LENGTH_%s (%s)" % (self.name, "+".join(self.sizes))
+    def print_length(self, outfile):
+        print >> outfile, "#define MESSAGE_LENGTH_%s (%s)" % (self.name, "+".join(self.sizes))
 
 class _Writer(object):
 
@@ -82,41 +118,46 @@ class _Writer(object):
         self.note = note
         self.messages_path = messages_path
 
-    def preamble(self):
+    def preamble(self, outfile):
         pass
 
-    def body(self):
+    def body(self, outfile):
         raise NotImplementedError
 
-    def postamble(self):
+    def postamble(self, outfile):
         pass
 
 class _CWriter(_Writer):
 
-    def preamble(self):
+    def _print_includes(self, outfile):
+        print >> outfile, "#include \"std.h\""
+
+    def preamble(self, outfile):
         gentools.print_header(
             "%s_GENERATED_H" % self.note.upper(),
-            generatedfrom=self.messages_path)
+            generatedfrom=self.messages_path,
+            outfile=outfile)
 
-        print "#include \"std.h\""
-        print
-        print "#define COMM_STX 0x99"
-        print "#define COMM_DEFAULT_ACID 120"
-        print "#define COMM_NUM_NON_PAYLOAD_BYTES 6"
-        print
-        print "#define MESSAGE_ID_NONE 0"
-        for m in self.messages:
-            m.print_id()
-        print
-        for m in self.messages:
-            m.print_length()
-        print
-        print "#define NUM_PERIODIC_MESSAGES %d" % len(self.periodic)
-        print "#define PERIODIC_MESSAGE_INITIALIZER {", ", ".join([p.get_initializer() for p in self.periodic]), "};"
-        print
+        self._print_includes(outfile)
 
-    def postamble(self):
-        gentools.print_footer("%s_GENERATED_H" % self.note.upper())
+        print >> outfile
+        print >> outfile, "#define COMM_STX 0x99"
+        print >> outfile, "#define COMM_DEFAULT_ACID 120"
+        print >> outfile, "#define COMM_NUM_NON_PAYLOAD_BYTES 6"
+        print >> outfile
+        print >> outfile, "#define MESSAGE_ID_NONE 0"
+        for m in self.messages:
+            m.print_id(outfile)
+        print >> outfile
+        for m in self.messages:
+            m.print_length(outfile)
+        print >> outfile
+        print >> outfile, "#define NUM_PERIODIC_MESSAGES %d" % len(self.periodic)
+        print >> outfile, "#define PERIODIC_MESSAGE_INITIALIZER {", ", ".join([p.get_initializer() for p in self.periodic]), "};"
+        print >> outfile
+
+    def postamble(self, outfile):
+        gentools.print_footer("%s_GENERATED_H" % self.note.upper(), outfile=outfile)
 
 class MacroWriter(_CWriter):
 
@@ -126,97 +167,142 @@ class MacroWriter(_CWriter):
     OVERRUN_FN  = "comm_overrun"
     PUT_CH_FN   = "comm_send_message_ch"
 
-    def _print_send_function(self, m):
+    def _print_send_macro(self, m, outfile):
         first_params = ["_chan"]
 
-        print "#define MESSAGE_SEND_%s(" % m.name, 
-        print ", ".join(first_params + [f.name for f in m.fields]), ") \\"
-        print "{ \\"
-        print "\tif (%s(_chan, MESSAGE_LENGTH_%s)) { \\" % (self.CHECK_FN, m.name)
-        print "\t\t%s(_chan, MESSAGE_ID_%s, MESSAGE_LENGTH_%s); \\" % (self.START_FN, m.name, m.name)
+        print >> outfile, "#define MESSAGE_SEND_%s(" % m.name, 
+        print >> outfile, ", ".join(first_params + [f.name for f in m.fields]), ") \\"
+        print >> outfile, "{ \\"
+        print >> outfile, "\tif (%s(_chan, MESSAGE_LENGTH_%s)) { \\" % (self.CHECK_FN, m.name)
+        print >> outfile, "\t\t%s(_chan, MESSAGE_ID_%s, MESSAGE_LENGTH_%s); \\" % (self.START_FN, m.name, m.name)
         for f in m.fields:
             if f.is_array:
                 offset = 0;
                 for i in range(f.num_elements):
-                    print "\t\t_Put%sByAddr(_chan, &(%s[%d])) \\" % (f.type.title(), f.name, i)
+                    print >> outfile, "\t\t_Put%sByAddr(_chan, &(%s[%d])) \\" % (f.type.title(), f.name, i)
                     offset += f.element_length
             else:
-                print "\t\t_Put%sByAddr(_chan, (%s)) \\" % (f.type.title(), f.name)
-        print "\t\t%s(_chan); \\" % self.END_FN
-        print "\t} else \\"
-        print "\t\t%s(_chan); \\" % self.OVERRUN_FN
-        print "}"
-        print
+                print >> outfile, "\t\t_Put%sByAddr(_chan, (%s)) \\" % (f.type.title(), f.name)
+        print >> outfile, "\t\t%s(_chan); \\" % self.END_FN
+        print >> outfile, "\t} else \\"
+        print >> outfile, "\t\t%s(_chan); \\" % self.OVERRUN_FN
+        print >> outfile, "}"
+        print >> outfile
 
-    def _print_accessor(self, m):
+    def _print_accessor_macro(self, m, outfile):
         offset = 0
         for f in m.fields:
-            print "#define MESSAGE_%s_GET_FROM_BUFFER_%s(_payload)" % (m.name, f.name),
+            print >> outfile, "#define MESSAGE_%s_GET_FROM_BUFFER_%s(_payload)" % (m.name, f.name),
             _type = f.get_wasp_type()
             if f.is_array:
                 l = f.length * f.element_length
-                print "(%s *)((uint8_t*)_payload+%d)" % (_type, offset)
+                print >> outfile, "(%s *)((uint8_t*)_payload+%d)" % (_type, offset)
             else:
                 l = f.length
                 if l == 1:
-                    print "(%s)(*((uint8_t*)_payload+%d))" % (_type, offset)
+                    print >> outfile, "(%s)(*((uint8_t*)_payload+%d))" % (_type, offset)
                 elif l == 2:
-                    print "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8)" % (_type, offset, offset)
+                    print >> outfile, "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8)" % (_type, offset, offset)
                 elif l == 4:
                     if _type == "float_t":
-                        print "({ union { uint32_t u; float f; } _f; _f.u = (uint32_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24); _f.f; })" % (offset, offset, offset, offset)
+                        print >> outfile, "({ union { uint32_t u; float f; } _f; _f.u = (uint32_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24); _f.f; })" % (offset, offset, offset, offset)
                     else:
-                        print "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24)" % (_type, offset, offset, offset, offset)
+                        print >> outfile, "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24)" % (_type, offset, offset, offset, offset)
             offset += l
 
 
-    def preamble(self):
-        _CWriter.preamble(self)
-        print "#define _Put1ByteByAddr(_chan, _byte) {     \\"
-        print "\tuint8_t _x = *(_byte);         \\"
-        print "\t%s(_chan, _x);     \\" % self.PUT_CH_FN
-        print "}"
-        print "#define _Put2ByteByAddr(_chan, _byte) { \\"
-        print "\t_Put1ByteByAddr(_chan, _byte);    \\"
-        print "\t_Put1ByteByAddr(_chan, (const uint8_t*)_byte+1);    \\"
-        print "}"
-        print "#define _Put4ByteByAddr(_chan, _byte) { \\"
-        print "\t_Put2ByteByAddr(_chan, _byte);    \\"
-        print "\t_Put2ByteByAddr(_chan, (const uint8_t*)_byte+2);    \\"
-        print "}"
-        print "#define _PutInt8ByAddr(_chan, _x) _Put1ByteByAddr(_chan, _x)"
-        print "#define _PutCharByAddr(_chan, _x) _Put1ByteByAddr(_chan, (const uint8_t*)_x)"
-        print "#define _PutUint8ByAddr(_chan, _x) _Put1ByteByAddr(_chan, (const uint8_t*)_x)"
-        print "#define _PutInt16ByAddr(_chan, _x) _Put2ByteByAddr(_chan, (const uint8_t*)_x)"
-        print "#define _PutUint16ByAddr(_chan, _x) _Put2ByteByAddr(_chan, (const uint8_t*)_x)"
-        print "#define _PutInt32ByAddr(_chan, _x) _Put4ByteByAddr(_chan, (const uint8_t*)_x)"
-        print "#define _PutUint32ByAddr(_chan, _x) _Put4ByteByAddr(_chan, (const uint8_t*)_x)"
-        print "#define _PutFloatByAddr(_chan, _x) _Put4ByteByAddr(_chan, (const uint8_t*)_x)"
-        print
+    def preamble(self, outfile):
+        _CWriter.preamble(self, outfile)
+        print >> outfile, "#define _Put1ByteByAddr(_chan, _byte) {     \\"
+        print >> outfile, "\tuint8_t _x = *(_byte);         \\"
+        print >> outfile, "\t%s(_chan, _x);     \\" % self.PUT_CH_FN
+        print >> outfile, "}"
+        print >> outfile, "#define _Put2ByteByAddr(_chan, _byte) { \\"
+        print >> outfile, "\t_Put1ByteByAddr(_chan, _byte);    \\"
+        print >> outfile, "\t_Put1ByteByAddr(_chan, (const uint8_t*)_byte+1);    \\"
+        print >> outfile, "}"
+        print >> outfile, "#define _Put4ByteByAddr(_chan, _byte) { \\"
+        print >> outfile, "\t_Put2ByteByAddr(_chan, _byte);    \\"
+        print >> outfile, "\t_Put2ByteByAddr(_chan, (const uint8_t*)_byte+2);    \\"
+        print >> outfile, "}"
+        print >> outfile, "#define _PutInt8ByAddr(_chan, _x) _Put1ByteByAddr(_chan, _x)"
+        print >> outfile, "#define _PutCharByAddr(_chan, _x) _Put1ByteByAddr(_chan, (const uint8_t*)_x)"
+        print >> outfile, "#define _PutUint8ByAddr(_chan, _x) _Put1ByteByAddr(_chan, (const uint8_t*)_x)"
+        print >> outfile, "#define _PutInt16ByAddr(_chan, _x) _Put2ByteByAddr(_chan, (const uint8_t*)_x)"
+        print >> outfile, "#define _PutUint16ByAddr(_chan, _x) _Put2ByteByAddr(_chan, (const uint8_t*)_x)"
+        print >> outfile, "#define _PutInt32ByAddr(_chan, _x) _Put4ByteByAddr(_chan, (const uint8_t*)_x)"
+        print >> outfile, "#define _PutUint32ByAddr(_chan, _x) _Put4ByteByAddr(_chan, (const uint8_t*)_x)"
+        print >> outfile, "#define _PutFloatByAddr(_chan, _x) _Put4ByteByAddr(_chan, (const uint8_t*)_x)"
+        print >> outfile
 
-    def body(self):
+    def body(self, outfile):
         for m in self.messages:
-            self._print_send_function(m)
-        print
+            self._print_send_macro(m, outfile)
+        print >> outfile
         for m in self.messages:
-            self._print_accessor(m)
+            self._print_accessor_macro(m, outfile)
 
-class FunctionWriter(_CWriter):
+class InlineFunctionWriter(MacroWriter):
 
-    def _print_pack_function(self, m):
-        name = m.name.lower()
-        print "static inline void message_send_%s(" % name,
-        print ", ".join(["%s %s" % (f.get_wasp_type(), f.name) for f in m.fields]), ")"
-        print "{"
-        print "}"
+    def _print_includes(self, outfile):
+        print >> outfile, "#include \"std.h\""
+        print >> outfile, "#include \"messages_types.h\""
+        print >> outfile, "#include \"comm.h\""
 
-    def preamble(self):
-        _CWriter.preamble(self)
-        print "static inline void message_start(uint8_t id, uint8_t len)\n{\n}"
-
-    def body(self):
+    def _print_message_name_table(self, outfile):
+        msgids = ["NULL"]*256
         for m in self.messages:
-            self._print_pack_function(m)
+            msgids[m.id] = '"%s"' % m.name
+        print >> outfile, "const char *message_name_map[] = {"
+        print >> outfile, ", ".join(msgids)
+        print >> outfile, "};"
+
+    def _print_send_function(self, m, outfile):
+        allfields = [_ChannelField()] + m.fields
+        print >> outfile, "static inline void\nmessage_send_%s(" % m.name.lower(),
+        print >> outfile, ", ".join(["%s%s %s" % (f.get_wasp_type(), f.maybe_pass_by_reference(), f.name) for f in allfields]), ")"
+        print >> outfile, "{"
+        print >> outfile, "\t\t%s(chan, MESSAGE_ID_%s, MESSAGE_LENGTH_%s);" % (self.START_FN, m.name, m.name)
+        for f in m.fields:
+            if f.is_array:
+                offset = 0;
+                for i in range(f.num_elements):
+                    print >> outfile, "\t\t_Put%sByAddr(chan, &(%s[%d]));" % (f.type.title(), f.name, i)
+                    offset += f.element_length
+            else:
+                print >> outfile, "\t\t_Put%sByAddr(chan, (&%s));" % (f.type.title(), f.name)
+        print >> outfile, "\t\t%s(chan);" % self.END_FN
+        print >> outfile, "}"
+        print >> outfile
+
+    def _print_unpack_function(self, m, outfile):
+        allfields = [_PayloadField()] + m.fields
+        print >> outfile, "static inline void\nmessage_unpack_%s(" % m.name.lower(),
+        print >> outfile, ", ".join(["%s%s %s" % (f.get_wasp_type(), f.maybe_return_by_reference(), f.name) for f in allfields]), ")"
+        print >> outfile, "{"
+        for f in m.fields:
+            print >> outfile, "\t*%s = MESSAGE_%s_GET_FROM_BUFFER_%s(payload);" % (f.name, m.name.upper(), f.name)
+        print >> outfile, "}"
+        print >> outfile
+
+    def preamble(self, outfile):
+        MacroWriter.preamble(self, outfile)
+        self._print_message_name_table(outfile)
+
+    def body(self, outfile):
+        print >> outfile
+        for m in self.messages:
+            self._print_accessor_macro(m, outfile)
+        print >> outfile
+        for m in self.messages:
+            self._print_send_function(m, outfile)
+        print >> outfile
+        for m in self.messages:
+            self._print_unpack_function(m, outfile)
+        print >> outfile
+
+    def postamble(self, outfile):
+        MacroWriter.postamble(self, outfile)
 
 class RSTWriter(_Writer):
 
@@ -225,11 +311,11 @@ class RSTWriter(_Writer):
     TABLE_HEADER = '='*TABLE_COL_W
     HEADING_LEVELS = ('=','-','^','"')
 
-    def _write_header(self, name, level=0):
-        print name
-        print self.HEADING_LEVELS[level]*len(name)
+    def _write_header(self, name, outfile, level=0):
+        print >> outfile, name
+        print >> outfile, self.HEADING_LEVELS[level]*len(name)
         
-    def _write_table(self, m, indent=None):
+    def _write_table(self, m, outfile, indent=None):
         def _print_field(name, _type, center=False, gap=" "):
             if center:
                 f = string.center
@@ -237,8 +323,8 @@ class RSTWriter(_Writer):
                 f = string.ljust
 
             if indent:
-                print indent,
-            print "%s%s%s" % ( f(name,self.TABLE_COL_W), gap*self.TABLE_GAP_W, f(_type, self.TABLE_COL_W))
+                print >> outfile, indent,
+            print >> outfile, "%s%s%s" % ( f(name,self.TABLE_COL_W), gap*self.TABLE_GAP_W, f(_type, self.TABLE_COL_W))
 
         def _print_header():
             _print_field(self.TABLE_HEADER, self.TABLE_HEADER, center=True)
@@ -248,8 +334,8 @@ class RSTWriter(_Writer):
             title_ul = "-"*self.TABLE_COL_W
 
             if indent:
-                print indent,
-            print string.center(name, title_w)
+                print >> outfile, indent,
+            print >> outfile, string.center(name, title_w)
             _print_field(title_ul, title_ul, gap="-")
 
         _print_header()
@@ -262,31 +348,30 @@ class RSTWriter(_Writer):
         
         _print_header()
 
-    def preamble(self):
-        self._write_header("Messages")
-        print
-        self._write_header("Message Definitions", level=2)
-        print
+    def preamble(self, outfile):
+        self._write_header("Messages", outfile)
+        print >> outfile
+        self._write_header("Message Definitions", outfile, level=2)
+        print >> outfile
 
-    def body(self):
+    def body(self, outfile):
         for m in self.messages:
-
-            print " * **%s**" % m.name
-            print 
-            print "   *ID:* %s" % m.id
-            print
-            print "   *Payload Length:* %s" % m.size
-            print
-            self._write_table(m, indent="  ")
-            print
+            print >> outfile, " * **%s**" % m.name
+            print >> outfile
+            print >> outfile, "   *ID:* %s" % m.id
+            print >> outfile 
+            print >> outfile, "   *Payload Length:* %s" % m.size
+            print >> outfile
+            self._write_table(m, outfile, indent="  ")
+            print >> outfile
 
         
 
 if __name__ == "__main__":
     OUTPUT_MODES = {
-        "macro"     :   MacroWriter,
-        "function"  :   FunctionWriter,
-        "rst"          :   RSTWriter,
+        "macro"         :   MacroWriter,
+        "inlinefunction":   InlineFunctionWriter,
+        "rst"           :   RSTWriter,
     }
     OUTPUT_MODES_DEFAULT = "macro"
     OUTPUT_MODES_LIST = ", ".join(OUTPUT_MODES)
@@ -298,6 +383,9 @@ if __name__ == "__main__":
     parser.add_option("-f", "--format",
                     default=OUTPUT_MODES_DEFAULT,
                     help="output format: %s [default: %s]" % (OUTPUT_MODES_LIST, OUTPUT_MODES_DEFAULT))
+    parser.add_option("-o", "--output",
+                    default="",
+                    help="output file [default: stdout]", metavar="FILE")
 
     options, args = parser.parse_args()
 
@@ -357,10 +445,17 @@ if __name__ == "__main__":
         import traceback
         parser.error("invalid xml\n%s" % traceback.format_exc())
 
+    if options.output:
+        f = open(options.output, 'w')
+    else:
+        f = sys.stdout
+
     writer = klass(messages, periodic, "messages", messages_path)
-    writer.preamble()
-    writer.body()
-    writer.postamble()
+    writer.preamble(outfile=f)
+    writer.body(outfile=f)
+    writer.postamble(outfile=f)
+
+    f.close()
 
 
 

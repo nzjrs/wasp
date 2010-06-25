@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+#include "std.h"
+
 #include "arm7/sys_time_hw.h"
 #include "arm7/servos_4017_hw.h"
 
@@ -61,4 +63,8 @@ void servos_4017_init ( void )
 
 }
 
+uint8_t servos_4017_get_num(void)
+{
+    return SERVOS_4017_NB_CHANNELS;
+}
 

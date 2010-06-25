@@ -1,22 +1,16 @@
-======================
-Wasp UAV Documentation
-======================
+========
+Wasp UAV
+========
 
-Welcome!  This is the Wasp UAV documentation.
-
-Documentation
-=================
+This is the :xref:`wasp` UAV documentation. May I suggest you start by reading
+the :ref:`introduction`
 
 .. toctree::
    :maxdepth: 2
 
+   README
    sw/doc/index
    hw/doc/index
-   sw/doc/onboard
-   sw/doc/sim
-..   sw/doc/autopilot
-..   sw/doc/comm-protocol
-..   sw/doc/coding-standards
 
 
 

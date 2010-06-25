@@ -44,7 +44,7 @@ class Graph(rtgraph.HScrollLineGraph):
         self._source = source
         self._source.register_interest(self._on_msg, 0, msg.name)
 
-    def _on_msg(self, msg, payload):
+    def _on_msg(self, msg, header, payload):
         vals = msg.unpack_values(payload)
         for f in self.channels:
             f.update_msg_value(vals)
@@ -92,7 +92,7 @@ class _GraphRange(gtk.VBox):
     def _on_max_spinbutton_changed(self, adj, graph):
         pass
 
-class _GraphHolder(gtk.HBox):
+class GraphHolder(gtk.HBox):
     """
     Composite widget holding a rtgraph and controls
 
@@ -103,7 +103,7 @@ class _GraphHolder(gtk.HBox):
      [    \ ]  | range widgets
     """
 
-    def __init__(self, g, name, adjustable, on_pause, on_print, on_remove):
+    def __init__(self, g, name, adjustable, on_pause, on_print, on_remove, on_fullscreen):
         gtk.HBox.__init__(self, spacing=5)
 
         self.graph = g
@@ -124,18 +124,25 @@ class _GraphHolder(gtk.HBox):
         vb = gtk.VBox()
 
         bbox = gtk.VButtonBox()
+        bbox.set_layout(gtk.BUTTONBOX_END)
         vb.pack_start(bbox, True, True)
 
-        pa = gtk.Button(stock=gtk.STOCK_MEDIA_PAUSE)
-        pa.connect("clicked", on_pause, tweak)
-        pr = gtk.Button(stock=gtk.STOCK_PRINT)
-        pr.connect("clicked", on_print, g, name)
-        rm = gtk.Button(stock=gtk.STOCK_REMOVE)
-        rm.connect("clicked", on_remove, name)
-        bbox.pack_start(pa, False, False)
-        bbox.pack_start(pr, False, False)
-        bbox.pack_start(rm, False, False)
-        bbox.set_layout(gtk.BUTTONBOX_END)
+        if on_pause:
+            pa = gtk.Button(stock=gtk.STOCK_MEDIA_PAUSE)
+            pa.connect("clicked", on_pause, tweak)
+            bbox.pack_start(pa, False, False)
+        if on_print:
+            pr = gtk.Button(stock=gtk.STOCK_PRINT)
+            pr.connect("clicked", on_print, g, name)
+            bbox.pack_start(pr, False, False)
+        if on_remove:
+            rm = gtk.Button(stock=gtk.STOCK_REMOVE)
+            rm.connect("clicked", on_remove, name)
+            bbox.pack_start(rm, False, False)
+        if on_fullscreen:
+            fs = gtk.Button(stock=gtk.STOCK_FULLSCREEN)
+            fs.connect("clicked", on_fullscreen, name)
+            bbox.pack_start(fs, False, False)
 
         if adjustable:
             r = _GraphRange(g)
@@ -177,6 +184,23 @@ class GraphManager(config.ConfigurableIface):
         print_op.connect("draw_page", on_print_page)
         res = print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
 
+    def _on_fs_window_closed(self, widget, event, name, btn):
+        gh = self._graphs[name]
+        gh.hide()
+        gh.reparent(self._box)
+        gh.show_all()
+        btn.set_sensitive(True)
+
+    def _on_fullscreen(self, btn, name):
+        gh = self._graphs[name]
+        w = gtk.Window()
+        w.connect("delete-event", self._on_fs_window_closed, name, btn)
+        w.set_title(name)
+        gh.hide()
+        gh.reparent(w)
+        w.show_all()
+        btn.set_sensitive(False)
+
     def update_state_from_config(self):
         num = self.config_get("num_graphs", 0)
         if num:
@@ -211,13 +235,14 @@ class GraphManager(config.ConfigurableIface):
         if name not in self._graphs:
             LOG.info("Adding graph: %s" % name)
 
-            gh = _GraphHolder(
+            gh = GraphHolder(
                     Graph(self._source, msg, field),
                     name,
                     adjustable,
                     self._on_pause,
                     self._on_print,
-                    self._on_remove)
+                    self._on_remove,
+                    self._on_fullscreen)
 
             self._box.pack_start(gh)
             self._graphs[name] = gh

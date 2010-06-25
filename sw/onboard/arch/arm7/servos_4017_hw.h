@@ -24,9 +24,9 @@
 #define SERVOS_4017_HW_H
 
 #include "std.h"
+
 #include "LPC21xx.h"
-#include "config/config.h"
-#include "arm7/led_hw.h"
+#include "arm7/config.h"
 #include "arm7/sys_time_hw.h"
 
 #define SERVOS_TICS_OF_USEC(s)          SYS_TICS_OF_USEC(s)
@@ -37,6 +37,7 @@ extern uint16_t servos_values[SERVOS_4017_NB_CHANNELS];
 extern uint8_t servos_4017_idx;
 
 void servos_4017_init(void);
+uint8_t servos_4017_get_num(void);
 
 static inline void servos_4017_isr(void)
 {

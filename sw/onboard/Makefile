@@ -1,9 +1,10 @@
-TARGET          ?= autopilot_main
-ARCH            ?= jsbsim
-OBJDIR          = bin/$(ARCH)
-Q               = @
-TOOLS           = ../tools
-RADIO           = config/radio/T6EXAP.xml
+TARGET              ?= autopilot_main
+ARCH                ?= jsbsim
+INCLUDE_BUILD_INFO  ?= 1
+OBJDIR              = bin/$(ARCH)
+Q                   = @
+TOOLS               = ../tools
+RADIO               = config/radio/T6EXAP.xml
 # Be very careful if you change these, by default the groundstation 
 # looks for config/{messages,settings}.xml
 MESSAGES        = config/messages.xml
@@ -14,17 +15,17 @@ include arch/Makefile.$(ARCH)
 
 SRC =                               \
     $(TARGET).c                     \
-    math/booz_trig_int.c            \
+    math/pprz_trig_int.c            \
     math/pprz_geodetic_int.c        \
     math/pprz_geodetic_float.c      \
     math/pid_int.c                  \
+    lib/debug.c                     \
     rc.c                            \
     autopilot.c                     \
     ins/booz2_ins.c                 \
     ins/booz2_hf_float.c            \
     ins/booz2_vf_float.c            \
     fms/booz2_fms.c                 \
-    fms/booz2_fms_datalink.c        \
     fms/booz2_fms_test_signal.c     \
     ahrs/booz_ahrs_aligner.c                \
     ahrs/booz2_filter_attitude_cmpl_euler.c \
@@ -43,14 +44,25 @@ ASMSRC = $(ARCHASMSRC)
 # Define programs and commands.
 REMOVE      = rm -f
 
+# Include dirs. Encourage full path includes in c files
+INCLUDES    = -I . -I math -I arch -I arch/$(ARCH)/include
+
 # Compiler flags.
-CFLAGS = -I. -I math -I arch -I arch/$(ARCH)/include
+CFLAGS = $(INCLUDES)
 CFLAGS += -Os
 CFLAGS += -Winline
-CFLAGS += -Wall -Wcast-qual -Wimplicit -Wcast-align
-CFLAGS += -Wpointer-arith -Wswitch
-CFLAGS += -Wredundant-decls -Wreturn-type -Wshadow -Wunused
+CFLAGS += -Wall
+CFLAGS += -Wcast-qual
+CFLAGS += -Wimplicit
+CFLAGS += -Wcast-align
+CFLAGS += -Wpointer-arith
+CFLAGS += -Wswitch
+CFLAGS += -Wredundant-decls
+CFLAGS += -Wreturn-type
+CFLAGS += -Wshadow
+CFLAGS += -Wunused
 CFLAGS += -Wa,-adhlns=$(OBJDIR)/$(notdir $(subst $(suffix $<),.lst,$<))
+# FIXME: Some of these need to be commented out for the build to succeed
 #CFLAGS += -Wstrict-prototypes
 CFLAGS += -Wmissing-declarations
 #CFLAGS += -Wmissing-prototypes
@@ -59,8 +71,6 @@ CFLAGS += -Wmissing-declarations
 CFLAGS += -fshort-enums
 CFLAGS += -ffunction-sections
 CFLAGS += -DARCH=$(ARCH)
-
-INCLUDE_BUILD_INFO ?= 1
 CFLAGS += -DINCLUDE_BUILD_INFO=$(INCLUDE_BUILD_INFO)
 
 # Linker flags.
@@ -94,6 +104,11 @@ sym: $(OBJDIR)/$(TARGET).sym
 md5: $(OBJDIR)/$(TARGET).elf
 	@echo MD5 $(OBJDIR)/$(TARGET).elf
 	$(Q)md5sum $(OBJDIR)/$(TARGET).elf
+
+# Create cflow callgraph
+cflow: $(SRC)
+	@echo cflow -o $(OBJDIR)/$(TARGET).cflow
+	$(Q)cflow --tree --brief --cpp $(INCLUDES) $(SRC) -o $(OBJDIR)/$(TARGET).cflow 2> /dev/null
 
 # Display size of file.
 ELFSIZE = $(SIZE) -A $(OBJDIR)/$(TARGET).elf
@@ -157,6 +172,8 @@ $(AOBJARM) : $(OBJDIR)/%.o : %.S
 	$(Q)test -d $(dir $@) || mkdir -p $(dir $@)
 	$(Q)$(CC) -c $(ASFLAGS) $< -o $@
 
+include arch/Makefile-targets.$(ARCH)
+
 clean:
 	$(REMOVE) $(OBJDIR)/$(TARGET).obj
 	$(REMOVE) $(OBJDIR)/$(TARGET).elf
@@ -171,6 +188,7 @@ clean:
 	$(REMOVE) $(AOBJARM)
 	$(REMOVE) $(LST)
 	$(REMOVE) generated/*.h
+	$(REMOVE) $(CLEAN_OBJ)
 
 reallyclean:
 	$(REMOVE) --recursive ./bin/* 

@@ -9,136 +9,71 @@ import gobject
 
 try:
     import osmgpsmap
-    MAP_AVAILABLE = osmgpsmap.__version__ >= "0.4.0"
+    MAP_AVAILABLE   = osmgpsmap.__version__ >= "0.5.0"
+    MAP_NEW_API     = osmgpsmap.__version__ >= "0.7.1"
 except:
     MAP_AVAILABLE = False
-    class DummyMap: pass
 
 import gs.ui
-import gs.ui.custom as custom
+import gs.ui.altwidget as altwidget
 import gs.config as config
 import gs.geo as geo
 import gs.geo.kml as kml
 
 LOG = logging.getLogger('map')
 
-class AltWidget(custom.GdkWidget):
-
-    DEFAULT_HEIGHT = 60
-    VISIBLE_STEPS = 5
-    ALT_STEPS = 20
-    ALT_RANGE = 100
-
+class _FlightPlanModel(gtk.ListStore):
     def __init__(self):
-        custom.GdkWidget.__init__(self)
-        self.set_size_request(-1, self.DEFAULT_HEIGHT)
+        gtk.ListStore.__init__(self, float, float, float)
+        self.editing = False
 
-        #altitude in M
-        self.min_alt = -10.
-        self.max_alt = 90.
-        self.alt = 0.
-        self.alt_pixel_x = None
+    def _add_maptrack(self):
+        self.maptrack = osmgpsmap.GpsMapTrack()
+        self.maptrack.props.color = gtk.gdk.Color(0.0,0.0,1.0)
+        self.map.track_add(self.maptrack)
 
-    def setup_gcs(self, drawable):
-        self.linegc = drawable.new_gc()
-        self.linegc.set_line_attributes(1, gtk.gdk.LINE_SOLID,
-                                    gtk.gdk.CAP_BUTT, gtk.gdk.JOIN_MITER)
+    def set_map(self, _map):
+        self.map = _map
+        if MAP_NEW_API:
+            self._add_maptrack()
 
-        self.redgc = drawable.new_gc(
-                        foreground=self.get_color(drawable, r=1.0, g=0.0, b=0.0),
-                        fill=gtk.gdk.SOLID,
-                        line_width=1)
+    def clear(self):
+        gtk.ListStore.clear(self)
+        if MAP_NEW_API:
+            self.map.track_remove(self.maptrack)
+            self._add_maptrack()
 
-        self.pc = self.get_pango_context()
+    def set_editing(self, e):
+        self.editing = e
+        if MAP_NEW_API:
+            self.maptrack.props.visible = e
 
-    def do_draw(self, drawable):
-        steps = gs.linspace(0, self.height, self.VISIBLE_STEPS)
-        stepvals = gs.linspace(self.min_alt, self.max_alt, self.VISIBLE_STEPS)
-
-        stepvals.reverse()
-        for i in range(len(steps)):
-            y = int(steps[i])
-            val = stepvals[i]
-
-            #do not draw top or bottom lines
-            if y != 0 and y != self.height:
-                drawable.draw_line(self.linegc,0, y, self.width, y)
-
-            #draw the label, skipping the top one
-            if y != 0:
-                layout = pango.Layout(self.pc)
-                layout.set_text("%.0f m" % val)
-                w,h = layout.get_pixel_size()
-                drawable.draw_layout(self.linegc, 1,y-h, layout)
-
-        #draw the altitude marker
-        if self.alt_pixel_x != None:
-            alt = (self.alt - self.min_alt) / (self.max_alt - self.min_alt)
-            alt_pixel_y = self.height - int(alt * self.height)
-
-            w = 10
-            drawable.draw_arc(self.redgc, True, self.alt_pixel_x-w/2, alt_pixel_y-w/2, w, w, 0, 360*64)
-            drawable.draw_line(self.redgc, self.alt_pixel_x, alt_pixel_y, self.alt_pixel_x, self.height)
-
-            #debug
-            if False:
-                print "ALT: %.1f <= %.1f <= %.1f" % (self.min_alt, self.alt, self.max_alt)
-                print "DRAW: alt %f = %dpx (h=%d, top@0)" % (self.alt, alt_pixel_y, self.height)
-
-                drawable.draw_line(self.redgc, 0, alt_pixel_y, self.width, alt_pixel_y)
-
-                layout = pango.Layout(self.pc)
-                layout.set_text("%2.1f" % self.alt)
-                w,h = layout.get_pixel_size()
-                drawable.draw_layout(self.redgc, 32, 10, layout)
-
-    def update_altitude(self, alt):
-
-        alt = float(alt)
-
-        #adjust range in steps while snapping to 10
-        step = self.ALT_STEPS
-        total_range = self.ALT_RANGE
-        if alt < self.min_alt:
-            self.min_alt = alt - step - (alt % 10)
-            self.max_alt = self.min_alt + total_range
-        if alt > self.max_alt:
-            self.max_alt = alt + step - (alt % 10)
-            self.min_alt = self.max_alt - total_range
-
-        self.alt = alt
-        self.queue_draw()
-
-    def update_pixel_x(self, x):
-        self.alt_pixel_x = x
-        self.queue_draw()
-
-    def update_pixel_x_and_altitude(self, x, alt):
-        self.alt_pixel_x = x
-        self.update_altitude(alt)
+    def add(self, lat, lon, alt):
+        self.append( (lat,lon,alt) )
+        if MAP_NEW_API:
+            p = osmgpsmap.point_new_degrees(lat,lon)
+            self.maptrack.add_point(p)
 
 class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
     CONFIG_SECTION = "MAP"
 
     DEFAULT_PROXY = os.environ.get("http_proxy", "")
-    DEFAULT_CACHE = os.environ.get("XDG_CACHE_HOME", os.path.join(os.environ['HOME'], ".cache", "wasp"))
-    if os.name == "nt":
-        DEFAULT_SOURCE = "0"
+    if MAP_AVAILABLE:
+        DEFAULT_SOURCE = osmgpsmap.SOURCE_OPENSTREETMAP
+        DEFAULT_CACHE = osmgpsmap.get_default_cache_directory()
     else:
-        DEFAULT_SOURCE = "1"
+        DEFAULT_SOURCE = 0
+        DEFAULT_CACHE = "/tmp/"
 
     def __init__(self, conf, source):
         config.ConfigurableIface.__init__(self, conf)
-
-        mydir = os.path.dirname(os.path.abspath(__file__))
-        uifile = os.path.join(mydir, "map.ui")
-        gs.ui.GtkBuilderWidget.__init__(self, uifile)
+        gs.ui.GtkBuilderWidget.__init__(self, "map.ui")
 
         self._map = None
         self._pane = gtk.VPaned()
         self._lbl = None
-        self._alt = AltWidget()
+        self._alt = altwidget.AltWidget()
         self._cbs = {}
         self._kwargs = {}
 
@@ -149,21 +84,42 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         self.lat = None
         self.lon = None
 
-        if MAP_AVAILABLE:
-            source.register_interest(self._on_gps, 2, "GPS_LLH")
-        else:
-            LOG.warning("Map disabled. You need osmgpsmap >= 0.4.0")
+        #the flightplan editor
+        self._flightplan = _FlightPlanModel()
+        self.get_resource("flight_plan_treeview").set_model(self._flightplan)
+        self.get_resource("alt_cellrenderertext").connect("edited", self._cell_edited_cb)
+        self.get_resource("flight_plan_window").connect("delete-event", self._flight_plan_window_closed)
 
-    def _on_map_button_release(self, map_, event):
+        source.register_interest(self._on_gps, 2, "GPS_LLH")
+        if MAP_AVAILABLE:
+            LOG.info("Map enabled (version: %s)" % osmgpsmap.__version__)
+        else:
+            LOG.warning("Map disabled. You need osmgpsmap >= 0.5.0")
+
+    def _on_map_button_press(self, _map, event):
+        #get the click location
+        if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
+            if MAP_NEW_API:
+                lat,lon = self._map.get_event_location(event).get_degrees()
+            else:
+                lat, lon = [math.degrees(i) for i in _map.get_co_ordinates(int(event.x), int(event.y))]
+
+            if self._flightplan.editing:
+                self._flightplan.add(lat,lon,0.0)
+
+    def _on_map_changed(self, _map):
         if self.lat and self.lon:
-            #git the pixel co-ordinates of the current gps point
-            pixel_x, pixel_y = map_.geographic_to_screen(self.lat, self.lon)
+            if MAP_NEW_API:
+                p = osmgpsmap.point_new_degrees(self.lat, self.lon)
+                pixel_x, pixel_y = _map.convert_geographic_to_screen(p)
+            else:
+                pixel_x, pixel_y = _map.geographic_to_screen(self.lat, self.lon)
             self._alt.update_pixel_x(pixel_x)
 
     def _on_map_size_allocate(self, widget, allocation):
         self._alt.update_pixel_x(allocation.width/2)
 
-    def _on_gps(self, msg, payload):
+    def _on_gps(self, msg, header, payload):
         fix,sv,self.lat,self.lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
 
         #convert from mm to m
@@ -171,9 +127,13 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
         if fix:
             if MAP_AVAILABLE:
-                self._map.draw_gps(self.lat, self.lon, 0)
-
-                px, py = self._map.geographic_to_screen(self.lat, self.lon)
+                heading = osmgpsmap.INVALID
+                if MAP_NEW_API:
+                    self._map.gps_add(self.lat, self.lon, heading)
+                    px, py = self._map.convert_geographic_to_screen(osmgpsmap.point_new_degrees(self.lat, self.lon))
+                else:
+                    self._map.draw_gps(self.lat, self.lon, heading)
+                    px, py = self._map.geographic_to_screen(self.lat, self.lon)
                 self._alt.update_pixel_x_and_altitude(px, hsl)
             else:
                 self._alt.update_altitude(hsl)
@@ -206,25 +166,31 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         self._cbs[signal] = (func, args)
 
     def update_state_from_config(self):
-        self._cache = self.config_get("cache", self.DEFAULT_CACHE)
+        self._cachebase = self.config_get("cache", self.DEFAULT_CACHE)
         self._proxy = self.config_get("proxy", self.DEFAULT_PROXY)
         self._source = self.config_get("source", self.DEFAULT_SOURCE)
 
         #convert "" -> None
         if self._proxy == "":
             self._proxy = None
-        if self._cache == "":
-            self._cache = None
+        if self._cachebase == "":
+            self._cachebase = None
         else:
-            if not os.path.isdir(self._cache):
-                os.makedirs(self._cache)
+            if not os.path.isdir(self._cachebase):
+                os.makedirs(self._cachebase)
 
         if not self._map:
             if MAP_AVAILABLE:
                 self._map = osmgpsmap.GpsMap(
                             map_source=int(self._source),
                             proxy_uri=self._proxy,
-                            tile_cache=self._cache)
+                            tile_cache_base=self._cachebase)
+                #add OSD
+                if MAP_NEW_API:
+                    self._map.layer_add(
+                                osmgpsmap.GpsMapOsd(
+                                    show_zoom=True))
+
                 #minimum size of one tile
                 self._map.set_size_request(-1, 256)
 
@@ -239,12 +205,15 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
                     except KeyError:
                         break
 
+                self._flightplan.set_map(self._map)
+
                 #generate notify events to keep the groundstation ui in sync
                 self._map.props.auto_center = self._map.props.auto_center
                 self._map.props.show_trip_history = self._map.props.show_trip_history
 
-                self._map.connect_after('button-release-event', self._on_map_button_release)
+                self._map.connect('changed', self._on_map_changed)
                 self._map.connect('size-allocate', self._on_map_size_allocate)
+                self._map.connect_after('button-press-event', self._on_map_button_press)
 
             else:
                 self._map = gtk.Label("Map Disabled")
@@ -254,7 +223,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
             self._pane.set_position(1000)
 
     def update_config_from_state(self):
-        self.config_set("cache", self._cache)
+        self.config_set("cache", self._cachebase)
         self.config_set("proxy", self._proxy)
         self.config_set("source", self._source)
 
@@ -263,15 +232,15 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         cache = self.build_entry("cache")
 
         if MAP_AVAILABLE:
-            sg = self.make_sizegroup()
-            sources = [(osmgpsmap.source_get_friendly_name(i),str(i)) for i in range(10)]
-            source = self.build_combo_with_model("source", *sources, sg=sg)
+            sources = [(osmgpsmap.source_get_friendly_name(i),str(i)) for i in range(255) if osmgpsmap.source_get_repo_uri(i)]
+            source = self.build_combo_with_model("source", *sources)
 
             items = [proxy, cache, source]
+            sg = self.build_sizegroup()
             frame = self.build_frame(None, [
-                    self.build_label("Source", source),
-                    self.build_label("Proxy", proxy),
-                    self.build_label("Cache", cache)
+                    self.build_label("Source", source, sg=sg),
+                    self.build_label("Proxy", proxy, sg=sg),
+                    self.build_label("Cache", cache, sg=sg)
                 ])
         else:
             frame = None
@@ -280,18 +249,43 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
         return "Map", frame, items
 
     def centre(self):
+        if not MAP_AVAILABLE:
+            return
+
         self._map.set_zoom(self._map.props.max_zoom)
 
     def mark_home(self, lat, lon):
-        self._map.add_image(
-                    lat,lon,
-                    gs.ui.get_icon_pixbuf(stock=gtk.STOCK_HOME, size=gtk.ICON_SIZE_MENU))
+        if not MAP_AVAILABLE:
+            return
+
+        pb = gs.ui.get_icon_pixbuf(stock=gtk.STOCK_HOME, size=gtk.ICON_SIZE_MENU)
+        if MAP_NEW_API:
+            self._map.image_add(lat,lon,pb)
+        else:
+            self._map.add_image(lat,lon,pb)
 
         #reset the track
         self._flight_track = []
         self._flight_started = datetime.datetime.now()
 
+    def _cell_edited_cb(self, cell, path, new_text):
+        self._flightplan[path][2] = float(new_text)
+
+    def _flight_plan_window_closed(self, window, event):
+        window.hide()
+        self._flightplan.set_editing(False)
+        return True
+
+    def edit_flightplan(self):
+        if not MAP_AVAILABLE:
+            return
+
+        self._flightplan.set_editing(True)
+        self.get_resource("flight_plan_window").show_all()
+
     def show_cache_dialog(self, msgarea):
+        if not MAP_AVAILABLE:
+            return
 
         def update_download_count(msg, msgarea, gpsmap):
             remaining = gpsmap.get_property("tiles-queued")

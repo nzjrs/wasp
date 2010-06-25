@@ -17,6 +17,23 @@
     <setting name="BODY_TO_IMU_THETA" type="float" value="1.50" min="-5.0" max="5.0" step="0.05" set="1" get="1"/>
     <setting name="BODY_TO_IMU_PSI" type="float" value="0.0" min="-5.0" max="5.0" step="0.05" set="1" get="1"/>
   </section>
+  <section name="BOOZ2_FMS">
+    <setting name="TYPE" value="BOOZ2_FMS_TYPE_TEST_SIGNAL"/>
+  </section>
+  <section name="PERIODIC">
+    <setting name="TASK_DT" value="(1./512.)" doc="the periodic task time (seconds), the main loop runs at 1/TASK_DT"/>
+  </section>
+  <section name="LED">
+    <setting name="TIME" value="1"/>
+    <setting name="RC" value="1"/>
+    <setting name="GPS" value="4"/>
+    <setting name="BARO" value="2"/>
+    <setting name="AHRS" value="3"/>
+  </section>
+  <section name="CONTROL">
+    <setting name="USE_VFF" value="1"/>
+    <setting name="DT_VFILTER" value="(1./512.)"/>
+  </section>
   <section name="IMU_SENS">
     <setting name="GYRO_P" value="1.01" integer="16"/>
     <setting name="GYRO_Q" value="-1.01" integer="16"/>
@@ -112,10 +129,10 @@
     <setting name="ATTITUDE_PSI_IGAIN" value="-75"/>
   </section>
   <section name="BOOZ2_GUIDANCE">
-    <setting name="V_MIN_ERR_Z" value="BOOZ_POS_I_OF_F(-10.)"/>
-    <setting name="V_MAX_ERR_Z" value="BOOZ_POS_I_OF_F( 10.)"/>
-    <setting name="V_MIN_ERR_ZD" value="BOOZ_SPEED_I_OF_F(-10.)"/>
-    <setting name="V_MAX_ERR_ZD" value="BOOZ_SPEED_I_OF_F( 10.)"/>
+    <setting name="V_MIN_ERR_Z" value="POS_BFP_OF_REAL(-10.)"/>
+    <setting name="V_MAX_ERR_Z" value="POS_BFP_OF_REAL( 10.)"/>
+    <setting name="V_MIN_ERR_ZD" value="SPEED_BFP_OF_REAL(-10.)"/>
+    <setting name="V_MAX_ERR_ZD" value="SPEED_BFP_OF_REAL( 10.)"/>
     <setting name="V_HOVER_KP" value="-300"/>
     <setting name="V_HOVER_KD" value="-400"/>
     <setting name="V_RC_CLIMB_COEF" value="163"/>

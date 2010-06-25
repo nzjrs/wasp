@@ -182,7 +182,7 @@
 
    <message name="ALTIMETER" id="37">
       <field name="altitude" type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
-      <field name="status" type="uint8" values="UNINITIAIZED|INITIALIZING|INITIALIZED"/>
+      <field name="status" type="uint8" values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
       <field name="baro_offset" type="uint16"/>
       <field name="baro_value" type="uint16"/>
    </message>
@@ -216,6 +216,31 @@
     <field name="cmd_yaw" type="int32"/>
     <field name="cmd_thrust" type="int32"/>
   </message>
+
+   <message name="GPS_VTG" id="41">
+      <field name="track"  type="float" unit="deg"/>
+      <field name="speed"  type="float" unit="km/h"/>
+   </message>
+
+   <message name="GPS_GSV" id="42">
+      <field name="sv"  type="uint8"/>
+      <field name="prn"  type="uint8"/>
+      <field name="elevation"  type="uint16"/>
+      <field name="azimuth"  type="uint16"/>
+      <field name="snr"  type="uint8"/>
+   </message>
+
+   <message name="ALTIMETER_RESET" id="43" command="1"/>
+   <message name="MOTORS_START" id="44" command="1"/>
+   <message name="MOTORS_STOP" id="45" command="1"/>
+   <message name="KILL" id="46" command="1"/>
+   <message name="GPIO_ON" id="47" command="1">
+      <field name="id"  type="uint8"/>
+   </message>
+   <message name="GPIO_OFF" id="48" command="1">
+      <field name="id"  type="uint8"/>
+   </message>
+
 
    <!-- Begin periodic messages -->
    <periodic channel="COMM_0">

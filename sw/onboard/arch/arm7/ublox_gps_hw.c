@@ -21,11 +21,11 @@
  *
  */
 #include "std.h"
-#include "config/config.h"
 #include "gps.h"
+
+#include "arm7/config.h"
 #include "arm7/uart_hw.h"
-#include "arm7/ubx_protocol.h"
-#include "arm7/led_hw.h"
+#include "lib/ubx_protocol.h"
 
 struct Booz_gps_state booz_gps_state;
 SystemStatus_t gps_system_status = STATUS_UNINITIAIZED;

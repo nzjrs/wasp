@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,11 +14,11 @@
    height="48"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docname="dashboard-v2.svg"
+   inkscape:version="0.47pre4 r22446"
+   sodipodi:docname="dashboard.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
-   inkscape:export-filename="C:\Documents and Settings\StarkC\Desktop\original inkscape\dashboard\dashboard-v2.png"
+   inkscape:export-filename="/home/john/Programming/wasp.git/sw/groundstation/data/icons/dashboard.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -232,7 +233,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1"
      inkscape:cx="24"
-     inkscape:cy="19.120712"
+     inkscape:cy="17.120712"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -240,11 +241,12 @@
      inkscape:snap-nodes="false"
      inkscape:window-width="644"
      inkscape:window-height="654"
-     inkscape:window-x="1603"
+     inkscape:window-x="1034"
      inkscape:window-y="78"
      inkscape:showpageshadow="false"
      showguides="true"
-     inkscape:guide-bbox="true" />
+     inkscape:guide-bbox="true"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -253,6 +255,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -424,7 +427,7 @@
            sodipodi:cy="5.3367219"
            sodipodi:rx="1.3722999"
            sodipodi:ry="1.3722999"
-           d="M 5.3672173,5.3367219 A 1.3722999,1.3722999 0 1 1 2.6226175,5.3367219 A 1.3722999,1.3722999 0 1 1 5.3672173,5.3367219 z"
+           d="m 5.3672173,5.3367219 c 0,0.7579003 -0.6143996,1.3722999 -1.3722999,1.3722999 -0.7579003,0 -1.3722999,-0.6143996 -1.3722999,-1.3722999 0,-0.7579003 0.6143996,-1.3722999 1.3722999,-1.3722999 0.7579003,0 1.3722999,0.6143996 1.3722999,1.3722999 z"
            transform="matrix(0.3643518,0,0,0.3643518,1.5444446,43.055556)" />
         <path
            sodipodi:type="arc"
@@ -434,7 +437,7 @@
            sodipodi:cy="5.3367219"
            sodipodi:rx="1.3722999"
            sodipodi:ry="1.3722999"
-           d="M 5.3672173,5.3367219 A 1.3722999,1.3722999 0 1 1 2.6226175,5.3367219 A 1.3722999,1.3722999 0 1 1 5.3672173,5.3367219 z"
+           d="m 5.3672173,5.3367219 c 0,0.7579003 -0.6143996,1.3722999 -1.3722999,1.3722999 -0.7579003,0 -1.3722999,-0.6143996 -1.3722999,-1.3722999 0,-0.7579003 0.6143996,-1.3722999 1.3722999,-1.3722999 0.7579003,0 1.3722999,0.6143996 1.3722999,1.3722999 z"
            transform="matrix(0.3643518,0,0,0.3643518,1.5444446,46.055556)" />
         <path
            sodipodi:type="arc"
@@ -444,7 +447,7 @@
            sodipodi:cy="5.3367219"
            sodipodi:rx="1.3722999"
            sodipodi:ry="1.3722999"
-           d="M 5.3672173,5.3367219 A 1.3722999,1.3722999 0 1 1 2.6226175,5.3367219 A 1.3722999,1.3722999 0 1 1 5.3672173,5.3367219 z"
+           d="m 5.3672173,5.3367219 c 0,0.7579003 -0.6143996,1.3722999 -1.3722999,1.3722999 -0.7579003,0 -1.3722999,-0.6143996 -1.3722999,-1.3722999 0,-0.7579003 0.6143996,-1.3722999 1.3722999,-1.3722999 0.7579003,0 1.3722999,0.6143996 1.3722999,1.3722999 z"
            transform="matrix(0.3643518,0,0,0.3643518,-1.4555554,43.055556)" />
         <path
            sodipodi:type="arc"
@@ -454,7 +457,7 @@
            sodipodi:cy="5.3367219"
            sodipodi:rx="1.3722999"
            sodipodi:ry="1.3722999"
-           d="M 5.3672173,5.3367219 A 1.3722999,1.3722999 0 1 1 2.6226175,5.3367219 A 1.3722999,1.3722999 0 1 1 5.3672173,5.3367219 z"
+           d="m 5.3672173,5.3367219 c 0,0.7579003 -0.6143996,1.3722999 -1.3722999,1.3722999 -0.7579003,0 -1.3722999,-0.6143996 -1.3722999,-1.3722999 0,-0.7579003 0.6143996,-1.3722999 1.3722999,-1.3722999 0.7579003,0 1.3722999,0.6143996 1.3722999,1.3722999 z"
            transform="matrix(0.3643518,0,0,0.3643518,-1.4555554,46.055556)" />
         <path
            sodipodi:type="arc"
@@ -464,7 +467,7 @@
            sodipodi:cy="5.3367219"
            sodipodi:rx="1.3722999"
            sodipodi:ry="1.3722999"
-           d="M 5.3672173,5.3367219 A 1.3722999,1.3722999 0 1 1 2.6226175,5.3367219 A 1.3722999,1.3722999 0 1 1 5.3672173,5.3367219 z"
+           d="m 5.3672173,5.3367219 c 0,0.7579003 -0.6143996,1.3722999 -1.3722999,1.3722999 -0.7579003,0 -1.3722999,-0.6143996 -1.3722999,-1.3722999 0,-0.7579003 0.6143996,-1.3722999 1.3722999,-1.3722999 0.7579003,0 1.3722999,0.6143996 1.3722999,1.3722999 z"
            transform="matrix(0.3643518,0,0,0.3643518,4.4444599e-2,44.555556)" />
       </g>
       <path

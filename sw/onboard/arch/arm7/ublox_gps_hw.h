@@ -24,8 +24,9 @@
 #define BOOZ2_GPS_H
 
 #include "std.h"
-#include "config/config.h"
 #include "pprz_geodetic_int.h"
+
+#include "arm7/config.h"
 
 struct Booz_gps_state {
   struct EcefCoor_i ecef_pos;    /* pos ECEF in cm        */
@@ -54,36 +55,8 @@ extern uint32_t booz2_gps_vacc;
 extern int32_t  booz2_gps_vel_n;
 extern int32_t  booz2_gps_vel_e;
 
-#include "ubx_protocol.h"
-
-#define Booz2GpsEvent(_sol_available_callback) {			\
-    if (GpsBuffer()) {							\
-      ReadGpsBuffer();							\
-    }									\
-    if (ubx_msg_available) {						\
-      booz2_gps_read_ubx_message();					\
-      if (ubx_class == UBX_NAV_ID && ubx_id == UBX_NAV_VELNED_ID) {	\
-	_sol_available_callback();					\
-      }									\
-      ubx_msg_available = FALSE;					\
-    }									\
-  }
-
 void booz2_gps_init(void);
 void booz2_gps_read_ubx_message(void);
-
-
-#define __GpsLink(dev, _x) dev##_x
-#define _GpsLink(dev, _x)  __GpsLink(dev, _x)
-#define GpsLink(_x) _GpsLink(GPS_LINK, _x)
-
-#define GpsBuffer() GpsLink(ChAvailable())
-#define ReadGpsBuffer() {				\
-    while (GpsLink(ChAvailable())&&!ubx_msg_available)	\
-      ubx_parse(GpsLink(Getch()));			\
-  }
-
-/* UBX parsing - copied from gps_ubx.c */
 
 extern bool_t  ubx_msg_available;
 extern uint8_t ubx_msg_buf[];

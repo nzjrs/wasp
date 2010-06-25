@@ -9,90 +9,182 @@ import gs.ui.progressbar as progressbar
 
 LOG = logging.getLogger("infobox")
 
-class InfoBox(gs.ui.GtkBuilderWidget):
-    def __init__(self, source):
-        gs.ui.GtkBuilderWidget.__init__(self, gs.ui.get_ui_file("info.ui"))
+class InfoBox:
 
-        self.widget = self.get_resource("info_vbox")
+    def __init__(self, source, show_images=True, show_build=True, show_uav_status=True, show_comm_status=True):
+        self.widget = gtk.VBox(spacing=10)
+        image = None
 
-        #change the status icon
-        self.get_resource("status_image").set_from_pixbuf(
-                gs.ui.get_icon_pixbuf("dashboard.svg"))
+        #build information
+        if show_build:
+            vb, (
+            self.rev_value,
+            self.branch_value,
+            self.target_value,
+            self.dirty_value,
+            self.time_value) = self._build_aligned_labels("Revision","Branch","Target","Dirty","Time")
+            if show_images: image = gs.ui.get_icon_image(stock=gtk.STOCK_DIALOG_INFO)
+            self.widget.pack_start(
+                self._build_section(
+                    "Build Information",
+                    vb,
+                    image),
+                True,True)
 
-        #change the comm icon
-        self.get_resource("comm_image").set_from_pixbuf(
-                gs.ui.get_icon_pixbuf("radio.svg"))
+            source.register_interest(self._on_build_info, 2, "BUILD_INFO")
 
-        self._batt_pb = progressbar.ProgressBar(range=(8,15), average=5)
-        self.get_resource("batt_hbox").pack_start(self._batt_pb, False)
+        #UAV status
+        if show_uav_status:
+            vb, (
+            self.id_value,
+            self.runtime_value,
+            self.rc_value,
+            self.gps_value,
+            self.in_flight_value,
+            self.motors_on_value,
+            self.autopilot_mode_value) = self._build_aligned_labels("ID","Runtime","RC","GPS","In Flight","Autopilot","Motors")
+            if show_images: image = gs.ui.get_icon_image("dashboard.svg")
+            self.widget.pack_start(
+                self._build_section(
+                    "UAV Status",
+                    vb,
+                    image),
+                True,True)
+            self._batt_pb = progressbar.ProgressBar(range=(8,15), average=5)
+            self._build_progress_bar_holder(vb, "Battery:", self._batt_pb)
+            self._cpu_pb = progressbar.ProgressBar(range=(0,100))
+            self._build_progress_bar_holder(vb, "CPU Usage:", self._cpu_pb)
 
-        self._cpu_pb = progressbar.ProgressBar(range=(0,100))
-        self.get_resource("cpu_hbox").pack_start(self._cpu_pb, False)
+            #make the progress bars the same size
+            sg = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
+            self._batt_pb.set_same_size(sg)
+            self._cpu_pb.set_same_size(sg)
 
-        #make the progress bars the same size
+            source.register_interest(self._on_status, 5, "STATUS")
+            source.register_interest(self._on_time, 2, "TIME")
+
+        #Communication status
+        if show_comm_status:
+            vb, (
+            self.type_value,
+            self.config_value,
+            self.connected_value,
+            self.rate_value,
+            self.overruns_value,
+            self.errors_value) = self._build_aligned_labels("Type", "Configuration", "Open", "Rate", "Overruns", "Errors")
+            if show_images: image = gs.ui.get_icon_image("radio.svg")
+            self.widget.pack_start(
+                self._build_section(
+                    "Communication Status",
+                    vb,
+                    image),
+                True,True)
+
+            source.connect("source-connected", self._on_source_connected)
+            source.register_interest(self._on_comm_status, 5, "COMM_STATUS")
+            gobject.timeout_add(1000, self._check_messages_per_second, source)
+
+    def _build_progress_bar_holder(self, vb, name, pb):
+        vb.pack_start(self._build_label(text=name), False, False)
+        h = gtk.HBox()
+        h.pack_start(pb,False,True)
+        vb.pack_start(h, False, False)
+
+    def _build_label(self, text=None, markup=None):
+        l = gtk.Label()
+        l.set_alignment(0.0,0.5)
+        if text:
+            l.set_text(text)
+        if markup:
+            l.set_markup(markup)
+        return l
+
+    def _build_aligned_labels(self, *names):
         sg = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
-        self._batt_pb.set_same_size(sg)
-        self._cpu_pb.set_same_size(sg)
+        vb = gtk.VBox()
+        lbls = []
+        for name in names:
+            hb = gtk.HBox()
+            n = self._build_label(text="%s: " % name)
+            sg.add_widget(n)
+            hb.pack_start(n, False, False)
+            lbl = self._build_label()
+            lbls.append(lbl)
+            hb.pack_start(lbl, False, False)
+            vb.pack_start(hb, False, True)
+        return vb, lbls
 
-        source.connect("source-connected", self._on_source_connected)
-
-        source.register_interest(self._on_status, 5, "STATUS")
-        source.register_interest(self._on_comm_status, 5, "COMM_STATUS")
-        source.register_interest(self._on_time, 2, "TIME")
-        source.register_interest(self._on_build_info, 2, "BUILD_INFO")
-
-        gobject.timeout_add_seconds(1, self._check_messages_per_second, source)
+    def _build_section(self, name, widget, image=None):
+        hb = gtk.HBox(spacing=5)
+        if image:
+            image.set_alignment(0.5,0.0)
+            image.set_padding(5,10)
+            hb.pack_start(image, False, False)
+        vb = gtk.VBox()
+        l = self._build_label(markup="<b>%s</b>" % name)
+        vb.pack_start(l, False, False)
+        a = gtk.Alignment(0.0,0.5,1.0,1.0)
+        a.set_padding(0,0,10,0)
+        a.add(widget)
+        vb.pack_start(a, False, True)
+        hb.pack_start(vb, True, True)
+        return hb
 
     def _check_messages_per_second(self, source):
-        self.get_resource("rate_value").set_text("%.1f msgs/s" % source.get_messages_per_second())
+        self.rate_value.set_text("%.1f msgs/s" % source.get_messages_per_second())
         return True
 
     def _on_source_connected(self, source, connected):
         if connected:
-            self.get_resource("connected_value").set_text("YES")
+            self.connected_value.set_text("YES")
         else:
-            self.get_resource("connected_value").set_text("NO")
-        port, speed = source.get_connection_parameters()
-        self.get_resource("port_value").set_text(port)
-        self.get_resource("speed_value").set_text("%s baud" % speed)
+            self.connected_value.set_text("NO")
 
-    def _on_status(self, msg, payload):
+        comm_type, comm_config = source.get_connection_parameters() 
+        self.type_value.set_text(comm_type)
+        self.config_value.set_text(comm_config)
+
+    def _on_status(self, msg, header, payload):
         rc, gps, bv, in_flight, motors_on, autopilot_mode, cpu_usage = msg.unpack_values(payload)
-        self.get_resource("rc_value").set_text(
+        self.id_value.set_text(
+                str(header.acid))
+        self.rc_value.set_text(
                 msg.get_field_by_name("rc").get_printable_value(rc))
-        self.get_resource("gps_value").set_text(
+        self.gps_value.set_text(
                 msg.get_field_by_name("gps").get_printable_value(gps))
-        self.get_resource("in_flight_value").set_text(
+        self.in_flight_value.set_text(
                 msg.get_field_by_name("in_flight").get_printable_value(in_flight))
-        self.get_resource("motors_on_value").set_text(
+        self.motors_on_value.set_text(
                 msg.get_field_by_name("motors_on").get_printable_value(motors_on))
-        self.get_resource("autopilot_mode_value").set_text(
+        self.autopilot_mode_value.set_text(
                 msg.get_field_by_name("autopilot_mode").get_printable_value(autopilot_mode))
 
         self._cpu_pb.set_value(cpu_usage)
         self._batt_pb.set_value(bv/10.0)
 
-    def _on_comm_status(self, msg, payload):
+    def _on_comm_status(self, msg, header, payload):
         overruns, errors = msg.unpack_printable_values(payload, joiner=None)
-        self.get_resource("overruns_value").set_text(overruns)
-        self.get_resource("errors_value").set_text(errors)
+        self.overruns_value.set_text(overruns)
+        self.errors_value.set_text(errors)
 
-    def _on_time(self, msg, payload):
+    def _on_time(self, msg, header, payload):
         runtime, = msg.unpack_printable_values(payload, joiner=None)
-        self.get_resource("runtime_value").set_text(runtime)
+        self.runtime_value.set_text(runtime)
 
-    def _on_build_info(self, msg, payload):
+    def _on_build_info(self, msg, header, payload):
         rev, branch, target, dirty, time = msg.unpack_printable_values(payload, joiner=None)
 
         #gtk.Label does not like strings with embedded null
         def denull(s):
             return s.replace("\x00","")
 
-        self.get_resource("rev_value").set_text(denull(rev))
-        self.get_resource("branch_value").set_text(denull(branch))
-        self.get_resource("target_value").set_text(denull(target))
-        self.get_resource("dirty_value").set_text(dirty)
+        self.rev_value.set_text(denull(rev))
+        self.branch_value.set_text(denull(branch))
+        self.target_value.set_text(denull(target))
+        self.dirty_value.set_text(dirty)
 
         t = datetime.datetime.fromtimestamp(int(time))
-        self.get_resource("time_value").set_text(t.strftime("%d/%m/%Y %H:%M:%S"))
+        self.time_value.set_text(t.strftime("%d/%m/%Y %H:%M:%S"))
+
+
 

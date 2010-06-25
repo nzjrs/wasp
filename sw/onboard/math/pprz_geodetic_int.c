@@ -21,11 +21,7 @@
  *
  */
 #include "pprz_geodetic_int.h"
-
-
 #include "pprz_algebra_int.h"
-#include "booz_geometry_int.h"
-#include "booz_geometry_mixed.h"
 
 #define CM_OF_M(_m)  ((_m)*1e2)
 #define M_OF_CM(_cm) ((_cm)/1e2)
@@ -42,15 +38,15 @@ void ltp_def_from_ecef_i(struct LtpDef_i* def, struct EcefCoor_i* ecef) {
   /* store the rotation matrix                    */
 
 #if 1
-  int32_t sin_lat = rint(BOOZ_INT_OF_FLOAT(sinf(RAD_OF_EM7RAD((float)def->lla.lat)), HIGH_RES_TRIG_FRAC));
-  int32_t cos_lat = rint(BOOZ_INT_OF_FLOAT(cosf(RAD_OF_EM7RAD((float)def->lla.lat)), HIGH_RES_TRIG_FRAC)); 
-  int32_t sin_lon = rint(BOOZ_INT_OF_FLOAT(sinf(RAD_OF_EM7RAD((float)def->lla.lon)), HIGH_RES_TRIG_FRAC));
-  int32_t cos_lon = rint(BOOZ_INT_OF_FLOAT(cosf(RAD_OF_EM7RAD((float)def->lla.lon)), HIGH_RES_TRIG_FRAC)); 
+  int32_t sin_lat = rint(BFP_OF_REAL(sinf(RAD_OF_EM7RAD((float)def->lla.lat)), HIGH_RES_TRIG_FRAC));
+  int32_t cos_lat = rint(BFP_OF_REAL(cosf(RAD_OF_EM7RAD((float)def->lla.lat)), HIGH_RES_TRIG_FRAC)); 
+  int32_t sin_lon = rint(BFP_OF_REAL(sinf(RAD_OF_EM7RAD((float)def->lla.lon)), HIGH_RES_TRIG_FRAC));
+  int32_t cos_lon = rint(BFP_OF_REAL(cosf(RAD_OF_EM7RAD((float)def->lla.lon)), HIGH_RES_TRIG_FRAC)); 
 #else
-  int32_t sin_lat = rint(BOOZ_INT_OF_FLOAT(sin(RAD_OF_EM7RAD((double)def->lla.lat)), HIGH_RES_TRIG_FRAC));
-  int32_t cos_lat = rint(BOOZ_INT_OF_FLOAT(cos(RAD_OF_EM7RAD((double)def->lla.lat)), HIGH_RES_TRIG_FRAC)); 
-  int32_t sin_lon = rint(BOOZ_INT_OF_FLOAT(sin(RAD_OF_EM7RAD((double)def->lla.lon)), HIGH_RES_TRIG_FRAC));
-  int32_t cos_lon = rint(BOOZ_INT_OF_FLOAT(cos(RAD_OF_EM7RAD((double)def->lla.lon)), HIGH_RES_TRIG_FRAC)); 
+  int32_t sin_lat = rint(BFP_OF_REAL(sin(RAD_OF_EM7RAD((double)def->lla.lat)), HIGH_RES_TRIG_FRAC));
+  int32_t cos_lat = rint(BFP_OF_REAL(cos(RAD_OF_EM7RAD((double)def->lla.lat)), HIGH_RES_TRIG_FRAC)); 
+  int32_t sin_lon = rint(BFP_OF_REAL(sin(RAD_OF_EM7RAD((double)def->lla.lon)), HIGH_RES_TRIG_FRAC));
+  int32_t cos_lon = rint(BFP_OF_REAL(cos(RAD_OF_EM7RAD((double)def->lla.lon)), HIGH_RES_TRIG_FRAC)); 
 #endif
 
 

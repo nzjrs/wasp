@@ -25,7 +25,6 @@
 #if BOOZ2_FMS_TYPE == BOOZ2_FMS_TYPE_TEST_SIGNAL
 
 #include "ins.h"
-#include "booz_geometry_mixed.h"
 
 #define BOOZ2_FMS_TEST_SIGNAL_DEFAULT_PERIOD    300;
 #define BOOZ2_FMS_TEST_SIGNAL_DEFAULT_AMPLITUDE 20;
@@ -56,10 +55,10 @@ void booz_fms_impl_periodic(void) {
     
   case BOOZ_FMS_TEST_SIGNAL_MODE_ATTITUDE: {
     if (booz_fms_test_signal_counter < booz_fms_test_signal_period) {
-      PPRZ_INT32_EULER_ASSIGN(booz_fms_input.h_sp.attitude, booz_fms_test_signal_amplitude, 0, 0);
+      ; //PPRZ_INT32_EULER_ASSIGN(booz_fms_input.h_sp.attitude, booz_fms_test_signal_amplitude, 0, 0);
     }
     else {
-      PPRZ_INT32_EULER_ASSIGN(booz_fms_input.h_sp.attitude, -booz_fms_test_signal_amplitude, 0, 0);
+      ; //PPRZ_INT32_EULER_ASSIGN(booz_fms_input.h_sp.attitude, -booz_fms_test_signal_amplitude, 0, 0);
     }
   }
     break;

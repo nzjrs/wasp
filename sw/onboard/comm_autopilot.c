@@ -25,6 +25,7 @@
 #include "led.h"
 #include "rc.h"
 #include "gps.h"
+#include "gpio.h"
 #include "imu.h"
 #include "ins.h"
 #include "ahrs.h"
@@ -124,8 +125,8 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     chan,
                     &alt,
                     &altimeter_system_status,
-                    &booz2_analog_baro_offset,
-                    &booz2_analog_baro_value);
+                    &altimeter_calibration_offset,
+                    &altimeter_calibration_raw);
             }
             break;
         case MESSAGE_ID_AUTOPILOT:
@@ -201,7 +202,8 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
 bool_t 
 comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
 {
-    bool_t ret = FALSE;
+    bool_t ret = TRUE;
+    bool_t need_ack = TRUE;
 
     switch (message->msgid)
     {
@@ -210,10 +212,34 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
         case MESSAGE_ID_SETTING_INT32:
         case MESSAGE_ID_SETTING_FLOAT:
             ret = settings_handle_message_received(chan, message);
+            need_ack = FALSE;
+            break;
+        case MESSAGE_ID_ALTIMETER_RESET:
+            altimeter_recalibrate();
+            break;
+        case MESSAGE_ID_MOTORS_START:
+            autopilot_set_motors(TRUE);
+            break;
+        case MESSAGE_ID_MOTORS_STOP:
+            autopilot_set_motors(FALSE);
+            break;
+        case MESSAGE_ID_KILL:
+            autopilot_kill();
+            break;
+        case MESSAGE_ID_GPIO_ON:
+            gpio_on( MESSAGE_GPIO_ON_GET_FROM_BUFFER_id(message->payload) );
+            break;
+        case MESSAGE_ID_GPIO_OFF:
+            gpio_off( MESSAGE_GPIO_OFF_GET_FROM_BUFFER_id(message->payload) );
             break;
         default:
+            ret = FALSE;
             break;
     }
+
+    /* commands need to be ACK'd or NACK'd (not implemented...) */
+    if (need_ack)
+        comm_send_command_ack (chan, message->msgid);
 
     return ret;
 }

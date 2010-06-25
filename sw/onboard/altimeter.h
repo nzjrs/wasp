@@ -27,10 +27,8 @@
 
 extern SystemStatus_t altimeter_system_status;
 
-extern uint16_t booz2_analog_baro_offset;
-extern uint16_t booz2_analog_baro_value;
-extern uint16_t booz2_analog_baro_value_filtered;
-extern bool_t   booz2_analog_baro_data_available;
+extern uint16_t altimeter_calibration_offset;
+extern uint16_t altimeter_calibration_raw;
 
 void
 altimeter_init(void);
@@ -43,5 +41,8 @@ altimeter_event_task ( void );
 
 int32_t
 altimeter_get_altitude( void );
+
+void
+altimeter_recalibrate( void );
 
 #endif /* ALTIMETER_H */

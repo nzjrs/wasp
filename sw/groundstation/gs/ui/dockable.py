@@ -43,6 +43,5 @@ class DockableNotebookPageMixin:
                     container_hide = False
             if container_hide:
                 self._parent_notebook.hide()
-		
 	
 		

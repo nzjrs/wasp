@@ -22,12 +22,12 @@
  *
  */
 
-#include <inttypes.h>
-#include "config/config.h"
-#include "arm7/armVIC.h"
-#include "LPC21xx.h"
-
+#include "std.h"
 #include "init.h"
+
+#include "LPC21xx.h"
+#include "arm7/config.h"
+#include "arm7/armVIC.h"
 
 /* declare functions and values from crt0.S & the linker control file */
 extern void reset(void);

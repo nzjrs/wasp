@@ -29,6 +29,7 @@
 #include "comm.h"
 #include "rc.h"
 #include "generated/messages.h"
+#include "generated/settings.h"
 
 static inline void main_init( void );
 static inline void main_periodic_task( void );
@@ -62,9 +63,9 @@ static inline void main_periodic_task( void ) {
 
     rc_periodic_task();
     if (rc_status == RC_OK)
-        led_on(RC_LED);
+        led_on(LED_RC);
     else
-        led_off(RC_LED);
+        led_off(LED_RC);
 
     RunOnceEvery(250, {
         MESSAGE_SEND_PPM(COMM_1, ppm_pulses);

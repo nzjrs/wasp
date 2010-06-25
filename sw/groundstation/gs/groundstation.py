@@ -6,6 +6,10 @@ import gtk.gdk
 import gobject
 import logging
 
+gobject.threads_init()
+gtk.gdk.threads_init()
+
+import gs
 from gs.database import Database
 from gs.config import Config, ConfigurableIface, ConfigWindow
 from gs.source import UAVSource
@@ -21,8 +25,11 @@ from gs.ui.flightplan import FlightPlanEditor
 from gs.ui.log import LogBuffer, LogWindow
 from gs.ui.map import Map
 from gs.ui.settings import SettingsController
+from gs.ui.command import CommandController
 from gs.ui.window import DialogWindow
+from gs.ui.statusicon import StatusIcon
 
+import wasp
 from wasp.messages import MessagesFile
 from wasp.settings import SettingsFile
 from wasp.ui.treeview import MessageTreeView
@@ -31,6 +38,7 @@ from wasp.ui.senders import RequestMessageSender, RequestTelemetrySender
 LOG = logging.getLogger('groundstation')
 
 class Groundstation(GtkBuilderWidget, ConfigurableIface):
+    """ The main groundstation window """
 
     CONFIG_SECTION = "MAIN"
 
@@ -40,9 +48,21 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     CONFIG_LON_DEFAULT = 172.582377
     CONFIG_ZOOM_DEFAULT = 12
 
-    def __init__(self, prefsfile, messagesfile, settingsfile, source_name, **source_opts):
-        gtk.gdk.threads_init()
+    def __init__(self, options):
+        
+        prefsfile = os.path.abspath(options.preferences)
+        messagesfile = os.path.abspath(options.messages)
+        settingsfile = os.path.abspath(options.settings)
+        plugindir = os.path.abspath(options.plugin_dir)
+        disable_plugins = options.disable_plugins
 
+        if not os.path.exists(messagesfile):
+            message_dialog("Could not find messages.xml", None, secondary=gs.CONFIG_DIR)
+            sys.exit(1)
+        if not os.path.exists(settingsfile):
+            message_dialog("Could not find settings.xml", None, secondary=gs.CONFIG_DIR)
+            sys.exit(1)
+    
         #connect our log buffer to the python logging subsystem
         self._logbuffer = LogBuffer()
         handler = logging.StreamHandler(self._logbuffer)
@@ -56,9 +76,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         LOG.info("Settings file: %s" % settingsfile)
 
         try:
-            mydir = os.path.dirname(os.path.abspath(__file__))
-            ui = os.path.join(mydir, "groundstation.ui")
-            GtkBuilderWidget.__init__(self, ui)
+            GtkBuilderWidget.__init__(self, "groundstation.ui")
         except Exception:
             LOG.critical("Error loading ui file", exc_info=True)
             sys.exit(1)
@@ -72,6 +90,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._home_zoom = self.CONFIG_ZOOM_DEFAULT
 
         self.window = self.get_resource("main_window")
+        self.window.set_title(gs.NAME)
 
         self._config = Config(filename=prefsfile)
         ConfigurableIface.__init__(self, self._config)
@@ -79,15 +98,18 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._messagesfile = MessagesFile(path=messagesfile, debug=False)
         self._messagesfile.parse()
 
-        self._source = UAVSource(self._config, self._messagesfile, source_name, **source_opts)
+        self._source = UAVSource(self._config, self._messagesfile, options.source)
         self._source.connect("source-connected", self._on_source_connected)
+        self._source.connect("uav-selected", self._on_uav_selected)
+
+        #track the UAVs we have got data from
+        self._source.connect("uav-detected", self._on_uav_detected)
+        self._uav_detected_model = gtk.ListStore(str,int)
+        self._uav_detected_model.append( ("All UAVs", wasp.ACID_ALL) )
 
         #track the state of a few key variables received from the plane
         self._state = {}
         self._source.register_interest(self._on_gps, 2, "GPS_LLH")
-
-        self._settingsfile = SettingsFile(path=settingsfile)
-        self._settings = SettingsController(self._source, self._settingsfile, self._messagesfile)
 
         #All the menus in the UI. Get them the first time a plugin tries to add a submenu
         #to the UI to save startup time.
@@ -99,26 +121,36 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                 "Help"      :   None,
         }
 
-        self._plugin_manager = PluginManager()
-        self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
+        self._plugin_manager = PluginManager(plugindir)
+        if not disable_plugins:
+            self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
 
         self._map = Map(self._config, self._source)
         self._gm = GraphManager(self._config, self._source, self._messagesfile, self.get_resource("graphs_box"), self.window)
         self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
-        self._fp = FlightPlanEditor(self._map)
+        self._statusicon = StatusIcon(icon, self._source)
+
+        #raise the window when the status icon clicked
+        self._statusicon.connect("activate", lambda si, win: win.present(), self.window)
 
         self.get_resource("main_left_vbox").pack_start(self._info.widget, False, False)
         self.get_resource("main_map_vbox").pack_start(self._msgarea, False, False)
         self.get_resource("window_vbox").pack_start(self._sb, False, False)
-        self.get_resource("autopilot_hbox").pack_start(self._fp.widget, True, True)
-        self.get_resource("settings_hbox").pack_start(self._settings.widget, True, True)
+
+        #The settings tab page
+        settingsfile = SettingsFile(path=settingsfile)
+        self.settingscontroller = SettingsController(self._source, settingsfile, self._messagesfile)
+        self.get_resource("settings_hbox").pack_start(self.settingscontroller.widget, True, True)
+
+        #The command and control tab page
+        self.commandcontroller = CommandController(self._source, self._messagesfile)
+        self.get_resource("command_hbox").pack_start(self.commandcontroller.widget, False, True)
 
         #Lazy initialize the following when first needed
         self._plane_view = None
         self._horizon_view = None
-        self._camera_window = None
         self._prefs_window = None
 
         #create the map
@@ -148,13 +180,13 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("menu_item_autopilot_disable").set_sensitive(False)
         self.builder_connect_signals()
 
-        #FIXME: REMOVE THE AUTOPILOT PAGE
-        nb = self.get_resource("main_notebook")
-        nb.remove_page(
-            nb.page_num(
-                self.get_resource("autopilot_hbox")))
-
         self.window.show_all()
+
+    def _on_uav_detected(self, source, acid):
+        self._uav_detected_model.append( ("0x%X" % acid, acid) )
+
+    def _on_uav_selected(self, source, acid):
+        self.window.set_title("%s - UAV: 0x%X" % (gs.NAME, acid))
 
     def _create_telemetry_ui(self):
         def on_gb_clicked(btn, _tv, _gm):
@@ -177,7 +209,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             gb = self.get_resource("graph_button")
             gb.connect("clicked", on_gb_clicked, rxtv, self._gm)
 
-    def _on_gps(self, msg, payload):
+    def _on_gps(self, msg, header, payload):
         fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
         if fix:
             self._state["lat"] = lat
@@ -207,6 +239,13 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._source.disconnect_from_uav()
 
     def add_menu_item(self, name, item):
+        """
+        Adds an item to the main window menu. 
+
+        :param name: the name of the menu to add to, e.g. "File". 
+                     If a menu of that name does not exist, one is created
+        :param item: the gtk.MenuItem to add
+        """
         if name in self._menus:
             menu = self._menus[name]
             if not menu:
@@ -221,10 +260,43 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._menus[name] = menu
         menu.append(item)
 
+    def add_control_widget(self, name, widget):
+        """
+        Adds a widget to the Command and Control page
+
+        :param name: the name, a string describing the control method, 
+                     i.e. 'Joystick'
+        :param widget: a gtk.Widget that gets placed in the Command and
+                       control page of the GUI
+        """
+        #Each control widget is in a frame with a label and nice padding.
+        #to the right lies an unlock button that must be clicked to make the
+        #widget sensitive
+        b = gtk.CheckButton()
+        l = gtk.Label("<b>Enable %s</b>" % name)
+        l.props.use_markup = True
+        h = gtk.HBox()
+        h.pack_start(b, False, False)
+        h.pack_start(l, True, True)
+        f = gtk.Frame()
+        f.props.shadow_type = gtk.SHADOW_NONE
+        f.props.label_widget = h
+        a = gtk.Alignment()
+        a.set_padding(5,0,10,0)
+        f.add(a)
+        b.connect("toggled", lambda b,w: w.set_sensitive(b.get_active()), widget)
+        hb = gtk.HBox(spacing=5)
+        #make widget unsensitive by default
+        widget.set_sensitive(False)
+        hb.pack_start(widget, True, True)
+        a.add(hb)
+        f.show_all()
+        self.get_resource("control_vbox").pack_start(f, False, True)
+
     def update_state_from_config(self):
         self._c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)
         if self._c == "1" and not self._tried_to_connect:
-            gobject.timeout_add_seconds(2, self._connect)
+            gobject.timeout_add(2000, self._connect)
 
         try:
             self._home_lat = float(self.config_get("home_lat", self.CONFIG_LAT_DEFAULT))
@@ -247,7 +319,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         items = [ck, e1, e2, e3]
 
-        sg = self.make_sizegroup()
+        sg = self.build_sizegroup()
         frame = self.build_frame(None, [
             ck,
             self.build_label("Home Latitude", e1, sg=sg),
@@ -265,7 +337,10 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._source.quit()
         gtk.main_quit()
 
-    def on_uav_mark_home(self, *args):
+    def on_menu_item_edit_flightplan_activate(self, *args):
+        self._map.edit_flightplan()
+
+    def on_menu_item_uav_mark_home_activate(self, *args):
         #get lat, lon from state
         try:
             lat = self._state["lat"]
@@ -287,6 +362,32 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                             timeout=5)
             msg.show_all()
 
+    def on_menu_item_log_uav_data_activate(self, *args):
+        sw = self.get_resource("log_message_scrolledwindow")
+        tv = MessageTreeView(
+                self._source.get_rx_message_treestore(),
+                editable=False, show_dt=False, show_value=False)
+        tv.show()
+        sw.add(tv)
+
+        w = self.get_resource("logdatadialog")
+        w.set_transient_for(self.window)
+        w.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        resp = w.run()
+        w.hide()
+
+        if resp == gtk.RESPONSE_OK:
+            csv = self.get_resource("log_csv_radiobutton")
+            fcb = self.get_resource("log_filechooserbutton")
+
+            messages = ("STATUS", "GPS_LLH")
+            if csv.get_active():
+                self._source.register_csv_logger(None, *messages)
+            else:
+                self._source.register_sqlite_logger(None, *messages)
+
+        sw.remove(tv)
+
     def on_menu_item_export_kml_activate(self, *args):
         path = self._map.save_kml()
         if path:
@@ -302,6 +403,21 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                             "You must mark the home position of the flight first.",
                             timeout=5)
         msg.show_all()
+
+    def on_menu_item_select_uav_activate(self, *args):
+        tv = self.get_resource("treeview_select_uav")
+        tv.set_model(self._uav_detected_model)
+        dlg = self.get_resource("dialog_select_uav")
+        dlg.set_transient_for(self.window)
+        dlg.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        resp = dlg.run()
+        dlg.hide()
+
+        if resp == gtk.RESPONSE_OK:
+            model, iter_ = tv.get_selection().get_selected()
+            if iter_:
+                acid = model.get_value(iter_, 1)
+                self._source.select_uav(acid)
 
     def on_menu_item_refresh_uav_activate(self, *args):
         #request a number of messages from the UAV
@@ -326,6 +442,28 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def on_menu_item_log_activate(self, widget):
         w = LogWindow(self._logbuffer)
+        w.connect("delete-event", gtk.Widget.hide_on_delete)
+        w.set_transient_for(self.window)
+        w.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        w.show_all()
+
+    def on_menu_item_show_plugins_activate(self, widget):
+        def make_model(plugins):
+            m = gtk.ListStore(str, str)
+            for name,ver in plugins:
+                m.append((name,ver))
+            return m
+        loaded, failed = self._plugin_manager.get_plugin_summary()
+
+        ptv = self.get_resource("plugintreeview")
+        ptv.set_model( make_model(loaded) )
+        pftv = self.get_resource("pluginfailedtreeview")
+        pftv.set_model( make_model(failed) )
+
+        w = self.get_resource("pluginwindow")
+        w.connect("delete-event", gtk.Widget.hide_on_delete)
+        w.set_transient_for(self.window)
+        w.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         w.show_all()
 
     def on_menu_item_home_activate(self, widget):
@@ -426,19 +564,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         self._horizon_view.show_all()
 
-    def on_menu_item_camera_view_activate(self, widget):
-        if self._camera_window == None:
-            try:
-                from gs.ui.camera import CameraWindow
-                self._camera_window = CameraWindow(self._config)
-            except:
-                LOG.warning("Could not initialize camera window", exc_info=True)
-                return
-
-        self._configurable.append(self._camera_window)
-        self._camera_window.start()
-        self._camera_window.show()
-
     def on_menu_item_clear_path_activate(self, widget):
         self._map.clear_gps()
 
@@ -458,7 +583,5 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map.props.show_trip_history = widget.get_active()
 
     def main(self):
-        gtk.gdk.threads_enter()
         gtk.main()
-        gtk.gdk.threads_leave()
 

@@ -22,13 +22,12 @@
  */
 #include "std.h"
 
-#include "config/config.h"
-
 #include "init.h"
 #include "sys_time.h"
 #include "led.h"
 #include "rc.h"
 #include "actuators.h"
+#include "generated/settings.h"
 
 static inline void main_init( void );
 static inline void main_periodic_task( void );
@@ -58,16 +57,16 @@ static inline void main_periodic_task( void ) {
 
     rc_periodic_task();
     if (rc_status == RC_OK) {
-        led_on(RC_LED);
+        led_on(LED_RC);
         /* throttle values are in type pprz_t, it ranges from 0->9600
            so we need to scale this to 0->255 */
         val = (uint8_t)(((uint32_t)rc_values[RADIO_THROTTLE]*UINT8_MAX)/MAX_PPRZ);
     } else {
-        led_off(RC_LED);
+        led_off(LED_RC);
         val = 0;
     }
 
-    for (i = 0; i < SERVOS_4017_NB_CHANNELS; i++) 
+    for (i = 0; i < actuators_get_num(ACTUATOR_BANK_SERVOS); i++) 
         actuators_set(ACTUATOR_BANK_SERVOS | i, val);
 
     actuators_commit(ACTUATOR_BANK_SERVOS);

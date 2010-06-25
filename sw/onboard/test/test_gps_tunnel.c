@@ -26,6 +26,7 @@
 #include "led.h"
 #include "comm.h"
 #include "generated/messages.h"
+#include "generated/settings.h"
 
 /* FIXME: BREAKS ABSTRACTION */
 #include "arm7/uart_hw.h"
@@ -55,7 +56,7 @@ static inline void main_init( void ) {
  
 static inline void main_periodic_task( void ) {
     RunOnceEvery(100, {
-        led_toggle(GPS_LED);
+        led_toggle(LED_GPS);
     });
  
 }

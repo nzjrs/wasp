@@ -2,6 +2,7 @@ import logging
 import gtk
 
 import gs.ui
+import gs.config as config
 import wasp.ui.treeview as treeview
 
 LOG = logging.getLogger("settings")
@@ -90,25 +91,20 @@ class _EditSetting(gtk.Frame):
     def set_value(self, value):
         self._adj.value = value
 
-class _EditSettingsManager(gtk.ScrolledWindow):
+class _EditSettingsManager(gtk.VBox):
     def __init__(self, source, **msgs):
-        gtk.ScrolledWindow.__init__(self)
-        self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-
-        self._vb = gtk.VBox(spacing=10)
+        gtk.VBox.__init__(self, spacing=10)
         self._sg = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
         self._settings = {}
         self._source = source
         self._msgs = msgs
-
-        self.add(self._vb)
 
     def add_setting(self, setting):
         if setting.id not in self._settings:
             es = _EditSetting(setting, self._source, **self._msgs)
             es.set_size(self._sg)
             es.show_all()
-            self._vb.pack_start(es, False, True)
+            self.pack_start(es, False, True)
             self._settings[setting.id] = es
 
     def update_setting_value(self, settingid, value):
@@ -122,8 +118,10 @@ class SettingsController(gs.ui.GtkBuilderWidget):
 
     MSGS = {0:"No",1:"Yes"}
 
+    DEFAULT_SHOW_ONLY_DYNAMIC = True
+
     def __init__(self, source, settingsfile, messagesfile):
-        gs.ui.GtkBuilderWidget.__init__(self, gs.ui.get_ui_file("settings.ui"))
+        gs.ui.GtkBuilderWidget.__init__(self, "settings.ui")
 
         self._source = source
         self._settingsfile = settingsfile
@@ -139,10 +137,17 @@ class SettingsController(gs.ui.GtkBuilderWidget):
         self.get_resource("setting_right_vbox").pack_start(self._sm, False, True)
 
         ts = treeview.SettingsTreeStore()
-        for s in self._settingsfile.all_settings:
-            ts.add_setting(s)
+        for section in self._settingsfile.all_sections:
+            iter_ = ts.add_section(section)
+            for s in section.settings:
+                ts.add_setting(s, section=iter_)
 
-        tv = treeview.SettingsTreeView(ts, show_only_dynamic=True, show_all_colums=False)
+        tv = treeview.SettingsTreeView(ts, show_all_colums=False)
+        tv.get_selection().connect(
+                "changed",
+                self._on_selection_changed,
+                tv)
+        self.get_resource("settings_sw").add(tv)
 
         btn = self.get_resource("setting_edit_button")
         btn.connect(
@@ -151,19 +156,18 @@ class SettingsController(gs.ui.GtkBuilderWidget):
                 tv)
         btn.set_sensitive(False)
 
-        tv.get_selection().connect(
-                "changed",
-                self._on_selection_changed,
-                tv)
-
-        self.get_resource("setting_left_vbox").pack_start(tv, True, True)
+        #connect to checkbutton toggled signal
+        self.get_resource("show_editable_only_cb").connect(
+                    "toggled",
+                    lambda btn, tv_: tv_.show_only_dynamic(btn.get_active()),
+                    tv)
 
         #listen for settings messages
         source.register_interest(self._on_setting, 0, "SETTING_UINT8")
         source.register_interest(self._on_setting, 0, "SETTING_FLOAT")
         source.register_interest(self._on_setting, 0, "SETTING_INT32")
 
-    def _on_setting(self, msg, payload):
+    def _on_setting(self, msg, header, payload):
         id_, type_, val = msg.unpack_values(payload)
         LOG.debug("Got setting: %d %s" % (id_, val))
         self._sm.update_setting_value(id_, val)
@@ -191,5 +195,11 @@ class SettingsController(gs.ui.GtkBuilderWidget):
                 edit_btn.set_sensitive(False)
 
         else:
+            self.get_resource("name_value").set_text("")
+            self.get_resource("value_value").set_text("")
+            self.get_resource("can_set_value").set_text("")
+            self.get_resource("can_get_value").set_text("")
+            self.get_resource("doc_value").set_text("")
+            self.get_resource("setting_info_hbox").set_sensitive(False)
             edit_btn.set_sensitive(False)
 

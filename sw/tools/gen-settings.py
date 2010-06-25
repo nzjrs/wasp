@@ -16,6 +16,38 @@ import re
 import os.path
 import sys
 
+class SettingsWriter(settings.SettingsFile):
+
+    def print_typedefs(self):
+        print "typedef bool_t (*SettingSetterCallback_t)(uint8_t chan, void *data);"
+        print "typedef bool_t (*SettingGetterCallback_t)(uint8_t chan, void *data);"
+        print
+
+    def print_defines(self):
+        min_ = -1
+        max_ = 0
+
+        for sect in self.all_sections:
+            for s in sect.settings:
+                if s.dynamic:
+                    s.print_id()
+                    s.print_type()
+                    if min_ == -1:
+                        min_ = s.id
+                    max_ = max(s.id, max_)
+
+        print
+        print "#define SETTING_ID_MIN %s" % min_
+        print "#define SETTING_ID_MAX %d" % max_
+        print
+
+    def print_values(self):
+        for sect in self.all_sections:
+            for s in sect.settings:
+                s.print_value()
+            print
+        print
+
 if __name__ == "__main__":
     H = "SETTINGS_GENERATED_H"
 
@@ -30,9 +62,7 @@ if __name__ == "__main__":
 
     try:
         settings_path = os.path.abspath(options.settings)
-        x = xmlobject.XMLFile(path=settings_path)
-
-        settings = settings.Settings(x.root)
+        settings = SettingsWriter(path=settings_path)
 
     except:
         import traceback

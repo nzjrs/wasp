@@ -22,17 +22,14 @@
  */
 #include "std.h"
 
-#include "config/config.h"
-
 #include "init.h"
 #include "sys_time.h"
 #include "led.h"
 #include "rc.h"
 
-#include "generated/messages.h"
 #include "comm.h"
-
 #include "actuators.h"
+#include "generated/messages.h"
 
 typedef struct {
     uint8_t val;
@@ -44,7 +41,7 @@ static inline void main_periodic_task( void );
 static inline void main_event_task( void );
 
 uint32_t t0, t1, diff;
-Servo_t servos[SERVOS_4017_NB_CHANNELS];
+Servo_t servos[ACTUATOR_MAX];
 
 int main( void ) {
     main_init();
@@ -56,10 +53,8 @@ int main( void ) {
     return 0;
 }
 
-#define SERVO_SEPERATION    (0xFF/SERVOS_4017_NB_CHANNELS)
-
 static inline void main_init( void ) {
-    uint8_t i,j;
+    uint8_t i,j, num_servos, seperation;
 
     hw_init();
     sys_time_init();
@@ -67,9 +62,10 @@ static inline void main_init( void ) {
     actuators_init(ACTUATOR_BANK_SERVOS);
     int_enable();
 
-    /* Initialise all servos to values which are
-       evenly spaced through the full range */
-    for (i = 0, j = 0; i < SERVOS_4017_NB_CHANNELS; i++, j += SERVO_SEPERATION) {
+    /* Initialise all servos to values which are evenly spaced through the full range */
+    num_servos = actuators_get_num(ACTUATOR_BANK_SERVOS);
+    seperation = 0xFF / num_servos;
+    for (i = 0, j = 0; i < num_servos; i++, j += seperation) {
         servos[i].val = j;
         /* starting moving in the forward direction */
         servos[i].dval = 1;
@@ -93,7 +89,7 @@ static inline void main_periodic_task( void ) {
     if (++cnt == SERVO_SPEED) 
     {
         /* Move all servos forward or backward by dval */
-        for (i = 0; i < SERVOS_4017_NB_CHANNELS; i++) 
+        for (i = 0; i < actuators_get_num(ACTUATOR_BANK_SERVOS); i++) 
         {
             Servo_t *servo = &servos[i];
 

@@ -24,8 +24,6 @@
 #define RC_H
 
 #include "std.h"
-#include "config/config.h"
-
 #include "generated/radio.h"
 
 typedef enum {

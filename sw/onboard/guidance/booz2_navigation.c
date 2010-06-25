@@ -24,10 +24,10 @@
 
 #include "ins.h"
 #include "booz2_navigation.h"
+#include "math/pprz_algebra_int.h"
 
 #include "config/flight_plan.h"
 
-#include "pprz_algebra_int.h"
 
 const uint8_t nb_waypoint = NB_WAYPOINT;
 struct EnuCoor_i waypoints[NB_WAYPOINT] = WAYPOINTS_INT32;

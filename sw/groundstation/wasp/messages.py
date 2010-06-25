@@ -4,26 +4,39 @@ import re
 import os.path
 import struct
 
+import wasp
 import xmlobject
 
 class Field:
+    """
+    **Attributes:**
+        - name: field name
+        - ctype: string representing the C type of the field, 
+          i.e. uint8[ARRAY_LEN]
+        - type: string representing the C type of a single 
+          instance of the field, i.e. uint8
+        - length: the number of bytes to store the field, 
+          i.e. sizeof(uint8) * ARRAY_LEN
+        - pytype: the python type used to store the field value
+    """
 
     ARRAY_LENGTH = re.compile("^([a-z0-9]+)\[(\d{1,2})\]$")
-    TYPE_LENGTH = {
-        "char"      :   1,
-        "uint8"     :   1,
-        "int8"      :   1,
-        "uint16"    :   2,
-        "int16"     :   2,
-        "uint32"    :   4,
-        "int32"     :   4,
-        "float"     :   4,
-    }
 
     def __init__(self, f):
         self.name = f.name
         self.ctype = f.type
         self.type, self.length = self._get_field_length(f.type)
+
+        #cache the python type for speed
+        if self.type == "float":
+            self.pytype = float
+        elif self.type == "char":
+            if self.is_array:
+                self.pytype = str
+            else:
+                self.pytype = chr
+        else:
+            self.pytype = int
 
     def _get_field_length(self, _type):
         #check if it is an array
@@ -31,11 +44,11 @@ class Field:
         if m:
             _type, _len = m.groups()
             self.num_elements = int(_len)
-            _len = self.TYPE_LENGTH[_type] * self.num_elements
-            self.element_length = self.TYPE_LENGTH[_type]
+            _len = wasp.TYPE_TO_LENGTH_MAP[_type] * self.num_elements
+            self.element_length = wasp.TYPE_TO_LENGTH_MAP[_type]
             self.is_array = True
         else:
-            _len = self.TYPE_LENGTH[_type]
+            _len = wasp.TYPE_TO_LENGTH_MAP[_type]
             self.num_elements = 1
             self.element_length = None
             self.is_array = False
@@ -46,7 +59,16 @@ class Field:
         return "<Field: %s (%s)>" % (self.name, self.ctype)
 
 class Message:
-
+    """
+    **Attributes:**
+        - id: message integer id (from messages.xml)
+        - name: message name (upper case) (from messages.xml)
+        - fields: a list of :class:`Field` object (type according to field_class)
+        - size: the length of the message (in bytes)
+        - num_values: the total number of values in the message (as a
+          field can have multiple elements, such as if it is an array)
+        - num_fields: the number of fields in the message
+    """
     def __init__(self, m, field_klass):
         self.name = m.name.upper()
         if int(m.id) <= 255 and int(m.id) > 0:
@@ -57,6 +79,11 @@ class Message:
             self.fields = [field_klass(f) for f in xmlobject.ensure_list(m.field)]
         except AttributeError:
             self.fields = []
+
+        try:
+            self.is_command = m.command == "1"
+        except AttributeError:
+            self.is_command = False
 
         self.size = 0
         self.num_values = 0
@@ -70,8 +97,16 @@ class Message:
         return "<Message: %s (%s)>" % (self.name, self.id)
 
 class PyField(Field):
+    """
+    A pythonic object representing a field in a message
 
-    #maps user defined names to python struct compatible ids
+    **Attributes:**
+        - is_enum: True if the Field is an enum
+        - struct_format: the :mod:`struct` format string for this type
+        - coef: the unit coefficient for this type (from messages.xml)
+    """
+
+    #: maps user defined names to python struct compatible ids
     TYPE_TO_STRUCT_MAP = {
             "char"  :   "B",    #treat char as uint8 internally, only modify how they are displayed
             "uint8" :   "B",
@@ -82,39 +117,34 @@ class PyField(Field):
             "int32" :   "i",
             "float" :   "f"
     }
-    #maps type to correct format string
-    TYPE_TO_PRINT_MAP = {
-            float   :   "%f",
-            str     :   "%s",
-            chr     :   "%c",
-            int     :   "%d"
+    #: maps type to range of acceptible values
+    TYPE_TO_RANGE_MAP = {
+            "char"  :   (0,2**8-1),
+            "uint8" :   (0,2**8-1),
+            "int8"  :   (-2**(8-1),2**(8-1)-1),
+            "uint16":   (0,2**16-1),
+            "int16" :   (-2**(16-1),2**(16-1)-1),
+            "uint32":   (0,2**32-1),
+            "int32" :   (-2**(32-1),2**(32-1)-1),
+            "float" :   (-3.4e38,3.4e38)    #not exactly correct
     }
 
     def __init__(self, node):
         Field.__init__(self, node)
 
+        self.is_enum = False
         if self.type == "uint8":
             try:
                 self._enum_values = node.values.split("|")
+                self.is_enum = True
             except AttributeError:
                 self._enum_values = []
 
-        #cache the python type for speed
-        if self.type == "float":
-            self._klass = float
-        elif self.type == "char":
-            if self.is_array:
-                self._klass = str
-            else:
-                self._klass = chr
-        else:
-            self._klass = int
-
         if self.is_array:
-            self.format = "%d%s" % (self.num_elements, self.TYPE_TO_STRUCT_MAP[self.type])
+            self.struct_format = "%d%s" % (self.num_elements, self.TYPE_TO_STRUCT_MAP[self.type])
         else:
-            self.format = self.TYPE_TO_STRUCT_MAP[self.type]
-        self._size = struct.calcsize(self.format)
+            self.struct_format = self.TYPE_TO_STRUCT_MAP[self.type]
+        self._size = struct.calcsize(self.struct_format)
     
         try:
             self._fstr = node.format
@@ -123,7 +153,7 @@ class PyField(Field):
             #if self.is_array:
             #    self._fstr = "%s"
             #else:
-            #    self._fstr = self.TYPE_TO_PRINT_MAP[self._klass]
+            #    self._fstr = wasp.TYPE_TO_PRINT_MAP[self.pytype]
 
         try:
             self._fstr += " %s" % node.unit
@@ -131,27 +161,46 @@ class PyField(Field):
             pass
 
         try:
-            self._coef = float(node.alt_unit_coef)
+            self.coef = float(node.alt_unit_coef)
         except:
-            self._coef = 1
-
-        self._isenum = self.type == "uint8" and self._enum_values
+            self.coef = 1
 
     def get_default_value(self):
+        """ Returns a sensible default value for the type """
         if self.is_array and self.type != "char":
-            return list( [self._klass() for i in range(self.num_elements)] )
+            return list( [self.pytype() for i in range(self.num_elements)] )
         else:
-            return self._klass()
+            return self.pytype()
 
     def interpret_value_from_user_string(self, string, default=None, sep=","):
+        """
+        Tries to interpret the supplied string as best according to the type
+        of the field. For example, the following are legal
+            - "foo bar": if field is char[]
+            - 5: if field is an integer type
+            - 3.4: if field is a float
+            - 1,2,3: if field is an array of integers
+            - ENUM_VALUE: if field is an enum
+
+        In case of failure, the default value (or the value passed in the 
+        default argument) is returned
+        """
         try:
             if self.is_array and self.type != "char":
                 vals = string.split(sep)
                 if len(vals) != self.num_elements:
                     raise ValueError
-                return list( [self._klass(v) for v in vals] )
+                return list( [self.pytype(v) for v in vals] )
+            elif self.is_enum:
+                try:
+                    #first look if the user suppled a string is an enum value
+                    return self._enum_values.index(string)
+                except ValueError:
+                    #if not, assume it is a number, the constructor of the field
+                    #will take care of it
+                    return self.pytype(string)
             else:
-                return self._klass(string)
+                return self.pytype(string)
         except ValueError:
             #invalid user input for type
             if default:
@@ -160,6 +209,7 @@ class PyField(Field):
                 return self.get_default_value()
 
     def get_printable_value(self, value):
+        """ Returns a printable string in a human readable format """
         if self.is_array:
             if self.type == "char":
                 return "".join([chr(c) for c in value])
@@ -168,7 +218,7 @@ class PyField(Field):
                 return str(value)
         else:
             #Return a single formatted number string
-            if self._isenum:
+            if self.is_enum:
                 #If this is an uint8 enum type then return the
                 #enum value
                 try:
@@ -176,7 +226,7 @@ class PyField(Field):
                 except IndexError:
                     return "?%s?" % value
             else:
-                return self._fstr % (self._coef * value)
+                return self._fstr % (self.coef * value)
 
     def get_scaled_value(self, value):
         """
@@ -188,14 +238,29 @@ class PyField(Field):
             if self.type == "char":
                 return value
             else:
-                return [float(val * self._coef) for val in value]
+                return [float(val * self.coef) for val in value]
         else:
-            if self._isenum:
+            if self.is_enum:
                 return value
             else:
-                return float(value * self._coef)
+                return float(value * self.coef)
+
+    def get_value_range(self):
+        """
+        Returns the legal values this type is allowed to hold. If the type is
+        and enum this returns a n-tuple of all allowed enum values. Otherwise
+        this returns a 2-tuple of the minimum and maximum values this
+        field can hold
+        """
+        if self.is_enum:
+            return self._enum_values
+        else:
+            return self.TYPE_TO_RANGE_MAP[self.ctype]
 
 class PyMessage(Message):
+    """
+    Represents a message to/from the UAV
+    """
 
     #Messages are packed in the payload in little endian format
     MESSAGE_ENDIANESS = "<"
@@ -206,13 +271,20 @@ class PyMessage(Message):
         
         format = self.MESSAGE_ENDIANESS
         for f in self.fields:
-            format += f.format
+            format += f.struct_format
             self._fields_by_name[f.name] = f
 
         #cache the struct for performace reasons
         self._struct = struct.Struct(format)
 
+    def __getitem__(self, key):
+        f = self.get_field_by_name(key)
+        if not f:
+            raise KeyError("Could not find field %s" % key)
+        return f
+
     def get_fields(self):
+        """ Returns a list of :class:`PyField` objects """
         return self.fields
 
     def get_field_by_name(self, name):
@@ -222,6 +294,28 @@ class PyMessage(Message):
             return None
 
     def get_field_values(self, vals):
+        """
+        Returns a list of values for each field in the message. The return
+        type is dependent on the type of the field. If the field is an array
+        type then the returned list will contain a tuple of the field array
+        elements. For example ::
+
+            <message name="TEST_MESSAGE" id="26">
+                <field name="a_uint8" type="uint8" values="OK|LOST|REALLY_LOST"/>
+                <field name="a_int8" type="int8"/>
+                <field name="a_uint16" type="uint16" unit="adc"/>
+                <field name="a_int16" type="int16"/>
+                <field name="a_uint32" type="uint32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
+                <field name="a_int32" type="int32"/>
+                <field name="a_float" type="float"/>
+                <field name="a_array" type="uint8[3]"/>
+            </message>
+
+        will return the following ::
+
+            [1, -1, 1000, -1000, 100000, -100000, 1.5, (1, 2, 3)]
+
+        """
         i = 0
         v = []
         for f in self.fields:
@@ -234,6 +328,13 @@ class PyMessage(Message):
         return v
 
     def pack_values(self, *values):
+        """
+        Assemble the list of field values into a message payload string
+
+        :param values: a list of values of the type expected by the appropriate
+         field. For example, if the 3rd field in the message is a *uint8* then
+         the third value should be an Int
+        """
         assert len(values) == self.num_values, "%s != %s" % (len(values), self.num_values)
 
         if self.fields:
@@ -241,6 +342,27 @@ class PyMessage(Message):
         return ""
 
     def unpack_values(self, string):
+        """
+        Unlike :func:`get_field_values` this function flattens array
+        fields into the returned list. For example ::
+
+            <message name="TEST_MESSAGE" id="26">
+                <field name="a_uint8" type="uint8" values="OK|LOST|REALLY_LOST"/>
+                <field name="a_int8" type="int8"/>
+                <field name="a_uint16" type="uint16" unit="adc"/>
+                <field name="a_int16" type="int16"/>
+                <field name="a_uint32" type="uint32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
+                <field name="a_int32" type="int32"/>
+                <field name="a_float" type="float"/>
+                <field name="a_array" type="uint8[3]"/>
+            </message>
+
+        will return the following ::
+
+            (1,-1, 1000, -1000, 100000, -100000, 1.5, 1, 2, 3)
+
+        :param string: the message paylod string to unpack
+        """
         if self.fields:
             assert type(string) == str
             assert len(string) == self._struct.size, "%s != %s" % (len(string), self._struct.size)
@@ -248,8 +370,15 @@ class PyMessage(Message):
         return ()
 
     def unpack_printable_values(self, string, joiner=" "):
-        if self.fields:
+        """
+        Returns a string, suitable for printing or displaying to the user,
+        of the given message paylod. The string contains values for each
+        field in the message
 
+        :param string: the message payload to unpack
+        :param joiner: the string used between different message fields
+        """
+        if self.fields:
             vals = self.unpack_values(string)
             assert len(vals) == self.num_values
             fvals = self.get_field_values(vals)
@@ -265,22 +394,38 @@ class PyMessage(Message):
             return ""
 
     def unpack_scaled_values(self, string):
+        """
+        As :func:`unpack_values` but returns the values scaled as per the
+        unit coefficient
+        """
         if self.fields:
-
             vals = self.unpack_values(string)
             assert len(vals) == self.num_values
             fvals = self.get_field_values(vals)
             assert len(fvals) == self.num_fields
 
             return [self.fields[i].get_scaled_value(fvals[i]) for i in range(self.num_fields)]
-
         return ()
 
     def get_default_values(self):
+        """ Returns a list of sensible default values for each field """
         return [ f.get_default_value() for f in self.fields ]
 
 class MessagesFile:
+    """
+    A pythonic wrapper for parsing *messages.xml*
+    """
     def __init__(self, **kwargs):
+        """
+        **Keywords:**
+            - debug - should extra information be printed while parsing 
+              *messages.xml*
+            - path - a pathname from which the file can be read
+            - file - an open file object from which the raw xml
+              can be read
+            - raw - the raw xml itself
+            - root - name of root tag, if not reading content
+        """
         self._debug = kwargs.get("debug", False)
         
         path = kwargs.get("path")
@@ -297,13 +442,21 @@ class MessagesFile:
         self._msgs_by_id = {}
         self._msgs_by_name = {}
 
+    def __getitem__(self, key):
+        m = self.get_message_by_name(key)
+        if not m:
+            raise KeyError("Could not find message: %s" % key)
+        return m
+
     def parse(self):
+        """ Parses the xml file """
         for m in self._messages:
             msg = PyMessage(m.name, m.id, m)
             self._msgs_by_id[int(m.id)] = msg
             self._msgs_by_name[m.name] = msg
 
     def get_messages(self):
+        """ Returns a list of :class:`PyMessage` objects """
         return self._msgs_by_id.values()
 
     def get_message_by_name(self, name):

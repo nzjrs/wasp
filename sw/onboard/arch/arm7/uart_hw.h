@@ -26,8 +26,9 @@
 #define UART_HW_H
 
 #include "std.h"
+
 #include "LPC21xx.h"
-#include "config/config.h"
+#include "arm7/config.h"
 
 #define UART0_RX_BUFFER_SIZE 128        // UART0 receive buffer size
 #define UART0_TX_BUFFER_SIZE 128        // UART0 transmit buffer size

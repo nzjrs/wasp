@@ -53,22 +53,23 @@ class MessageTreeStore(gtk.TreeStore):
                    vals[i])
 
 class MessageTreeView(gtk.TreeView):
-    def __init__(self, messagetreemodel, editable=True, show_dt=False):
+    def __init__(self, messagetreemodel, editable=True, show_dt=False, show_value=True):
         gtk.TreeView.__init__(self, messagetreemodel)
 
         self.insert_column_with_attributes(-1, "Name",
                 gtk.CellRendererText(),
                 text=MessageTreeStore.NAME_IDX)
 
-        rend = gtk.CellRendererText()
-        rend.connect("edited", self._value_edited_cb, messagetreemodel)
-        if editable:
-            col = gtk.TreeViewColumn("Value", rend, editable=MessageTreeStore.EDITABLE_IDX)
-        else:
-            col = gtk.TreeViewColumn("Value", rend)
-        col.props.expand = True
-        col.set_cell_data_func(rend, self._get_field_value)
-        self.append_column(col)
+        if show_value:
+            rend = gtk.CellRendererText()
+            rend.connect("edited", self._value_edited_cb, messagetreemodel)
+            if editable:
+                col = gtk.TreeViewColumn("Value", rend, editable=MessageTreeStore.EDITABLE_IDX)
+            else:
+                col = gtk.TreeViewColumn("Value", rend)
+            col.props.expand = True
+            col.set_cell_data_func(rend, self._get_field_value)
+            self.append_column(col)
 
         if show_dt:
             self.insert_column_with_data_func(-1, "dt",
@@ -76,7 +77,7 @@ class MessageTreeView(gtk.TreeView):
                 self._get_dt_value)
 
             #schedule a redraw of the time column every second
-            gobject.timeout_add_seconds(1, self._redraw_dt, messagetreemodel)
+            gobject.timeout_add(1000, self._redraw_dt, messagetreemodel)
 
 
         self.get_selection().set_mode(gtk.SELECTION_SINGLE)
@@ -179,7 +180,7 @@ class MessageTreeView(gtk.TreeView):
 
         return message, values
 
-class SettingsTreeStore(gtk.ListStore):
+class SettingsTreeStore(gtk.TreeStore):
 
     NAME_IDX,           \
     ID_IDX,             \
@@ -189,7 +190,7 @@ class SettingsTreeStore(gtk.ListStore):
     OBJECT_IDX =    range(6)
 
     def __init__(self):
-        gtk.ListStore.__init__(self,
+        gtk.TreeStore.__init__(self,
                 str,        #NAME, full setting name
                 int,        #ID, setting ID
                 bool,       #SUPPORTS_GET,
@@ -199,9 +200,18 @@ class SettingsTreeStore(gtk.ListStore):
 
         self._settings = {}
 
-    def add_setting(self, setting):
+    def add_section(self, section):
+        return self.append( None, (
+                    section.name,
+                    -1,
+                    False,
+                    False,
+                    False,
+                    None))
+
+    def add_setting(self, setting, section=None):
         if setting not in self._settings:
-            self._settings[setting] = self.append( (
+            self._settings[setting] = self.append( section, (
                     setting.name,
                     setting.id,
                     setting.get == 1,
@@ -210,14 +220,9 @@ class SettingsTreeStore(gtk.ListStore):
                     setting) )
 
 class SettingsTreeView(gtk.TreeView):
-    def __init__(self, settingtreemodel, show_only_dynamic=False, show_all_colums=True):
-        #optionally filter and display only dynamic settings
-        if show_only_dynamic:
-            model = settingtreemodel.filter_new()
-            model.set_visible_column(SettingsTreeStore.DYNAMIC_IDX)
-        else:
-            model = settingtreemodel
-        gtk.TreeView.__init__(self, model)
+    def __init__(self, model, show_only_dynamic=False, show_all_colums=True):
+        gtk.TreeView.__init__(self)
+        self._show_only_dynamic = show_only_dynamic
 
         self.insert_column_with_attributes(-1, "Name",
                 gtk.CellRendererText(),
@@ -231,12 +236,43 @@ class SettingsTreeView(gtk.TreeView):
                         gtk.CellRendererText(),
                         text=id_)
 
+        self._filter = None
+        self.set_model(model)
+
+    def _visible_func(self, childmodel, _iter):
+        if not self._show_only_dynamic:
+            return True
+
+        #only show header rows, or rows that are dynamic (editable)
+        depth = childmodel.iter_depth(_iter)
+        if depth == 0:
+            return True
+
+        return childmodel.get_value(_iter, SettingsTreeStore.DYNAMIC_IDX)
+
+    def set_model(self, childmodel):
+        if childmodel:
+            self._filter = childmodel.filter_new()
+            self._filter.set_visible_func(self._visible_func)
+            gtk.TreeView.set_model(self, self._filter)
+
+    def show_only_dynamic(self, show):
+        self._show_only_dynamic = show
+        if self._filter:
+            self._filter.refilter()
+
     def get_selected_setting(self):
-        model, _iter = self.get_selection().get_selected()
+        _filter, _iter = self.get_selection().get_selected()
 
         #make sure something selected
         if not _iter:
             return None
 
-        return model.get_value(_iter, SettingsTreeStore.OBJECT_IDX)
+        #make sure it is not a header row, but iter_depth is a method that
+        #only exists on the TreeStore, not the treemodelfilter
+        model = _filter.get_model()
+        if model.iter_depth(_filter.convert_iter_to_child_iter(_iter)) == 0:
+            return None
+
+        return _filter.get_value(_iter, SettingsTreeStore.OBJECT_IDX)
 

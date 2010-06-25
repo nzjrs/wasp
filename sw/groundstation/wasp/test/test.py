@@ -42,6 +42,14 @@ class MessageFileTest(unittest.TestCase):
         self.failUnless( self.mf.get_message_by_name(TEST_NAME) )
         self.failUnless( self.mf.get_message_by_name("FOO") == None )
 
+    def testGetCommandMessage(self):
+        self.failUnlessEqual( self.mf.get_message_by_name(TEST_NAME).is_command, False )
+        self.failUnlessEqual( self.mf.get_message_by_name(COMMAND_NAME).is_command, True )
+
+    def testDictHelper(self):
+        f = self.mf[TEST_NAME][TEST_MSG_FIELD_NAME]
+        self.failUnlessEqual(f.name, TEST_MSG_FIELD_NAME )
+
 class MessageTest(unittest.TestCase):
     def setUp(self):
         mf = get_mf()
@@ -88,10 +96,10 @@ class MessageTest(unittest.TestCase):
 
 class FieldTest(unittest.TestCase):
     def setUp(self):
-        mf = get_mf()
-        self.test = mf.get_message_by_name(TEST_NAME)
-        self.pong = mf.get_message_by_name(PONG_NAME)
-        self.test_coef = mf.get_message_by_name(TEST_COEF_MSG_NAME)
+        self.mf = get_mf()
+        self.test = self.mf.get_message_by_name(TEST_NAME)
+        self.pong = self.mf.get_message_by_name(PONG_NAME)
+        self.test_coef = self.mf.get_message_by_name(TEST_COEF_MSG_NAME)
 
     def testProps(self):
         u8 = self.test.get_field_by_name("a_uint8")
@@ -102,6 +110,7 @@ class FieldTest(unittest.TestCase):
         self.failUnlessEqual( u8.num_elements, 1 )
         self.failUnlessEqual( u8.element_length, None )
         self.failUnlessEqual( u8.is_array, False )
+        self.failUnlessEqual( u8.is_enum, True )
 
         a = self.test.get_field_by_name("a_array")
         self.failUnlessEqual( a.name, "a_array" )
@@ -111,6 +120,7 @@ class FieldTest(unittest.TestCase):
         self.failUnlessEqual( a.num_elements, 3 )
         self.failUnlessEqual( a.element_length, 1 )
         self.failUnlessEqual( a.is_array, True )
+        self.failUnlessEqual( a.is_enum, False )
 
     def testGet(self):
         u8 = self.test.get_field_by_name("foo")
@@ -129,6 +139,20 @@ class FieldTest(unittest.TestCase):
         a = self.test.get_field_by_name("a_array")
         self.failUnlessEqual( a.get_default_value(), [0,0,0] )
 
+    def testEnum(self):
+        # check the enum parsing...
+        # <field name="a_uint8" type="uint8" values="OK|LOST|REALLY_LOST"/>
+        u8 = self.test.get_field_by_name("a_uint8")
+
+        vals = u8.get_value_range()
+        self.failUnless( "OK" in vals )
+
+        v = u8.interpret_value_from_user_string("OK")
+        self.failUnlessEqual( v, 0 )
+
+        v = u8.interpret_value_from_user_string("LOST")
+        self.failUnlessEqual( v, 1 )
+
     def testInterpret(self):
         u8 = self.test.get_field_by_name("a_uint8")
 
@@ -140,7 +164,6 @@ class FieldTest(unittest.TestCase):
 
         v = u8.interpret_value_from_user_string("foo", default=42)
         self.failUnlessEqual( v, 42 )
-
 
         f = self.test.get_field_by_name("a_float")
         v = f.interpret_value_from_user_string(26.9)
@@ -235,6 +258,29 @@ class TestTransportFieldTest(unittest.TestCase):
         d = self.test.unpack_values( test_payload )
         self.failUnlessEqual(d, TEST_MESSAGE_VALUES)
 
+class TestSettingsFile(unittest.TestCase):
+    def setUp(self):
+        self.sf = get_sf()
+
+    def testParse(self):
+        self.failUnlessEqual(len(self.sf.all_settings), 8)
+        self.failUnlessEqual(len(self.sf.all_sections), 3)
+        self.failUnlessEqual(len(self.sf.settible), 1)
+        self.failUnlessEqual(len(self.sf.gettible), 1)
+
+    def testSettingParse(self):
+        s = self.sf.get_setting_by_name(TEST_SETTING_NAME)
+        self.failUnless( s )
+
+        self.failUnlessEqual(s.name, TEST_SETTING_NAME)
+        self.failUnlessEqual(s.type, TEST_SETTING_TYPE)
+        self.failUnlessEqual(s.value, TEST_SETTING_VALUE)
+        self.failUnlessEqual(s.doc, TEST_SETTING_DOC)
+
+    def testDictHelper(self):
+        s = self.sf[TEST_SETTING_NAME]
+        self.failUnlessEqual(s.name, TEST_SETTING_NAME)
+
 if __name__ == "__main__":
     import sys
 
@@ -251,7 +297,7 @@ if __name__ == "__main__":
         cov.exclude('def __str__')
         cov.start()
 
-    TESTS = (MessageFileTest, MessageTest, FieldTest, TestTransportFieldTest)
+    TESTS = (MessageFileTest, MessageTest, FieldTest, TestTransportFieldTest, TestSettingsFile)
     r = unittest.TextTestRunner()
     l = unittest.TestLoader()
 
@@ -263,5 +309,4 @@ if __name__ == "__main__":
         cov.html_report(
                 morfs=(wasp,wasp.messages, wasp.transport),
                 directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "html"))
-
 

@@ -20,8 +20,7 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#include "config/config.h"
-
+#include "arm7/config.h"
 #include "arm7/i2c_hw.h"
 #include "arm7/buss_twi_blmc_hw.h"
 
@@ -83,4 +82,9 @@ void buss_twi_blmc_commit(void)
     {
         twi_blmc_nb_err++;
     }
+}
+
+uint8_t buss_twi_blmc_get_num(void)
+{
+    return MOTOR_NB;
 }

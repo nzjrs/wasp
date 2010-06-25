@@ -22,112 +22,28 @@
  *
  */
 
-/** \file led.h
- *  \brief arch independant LED (Light Emitting Diodes) API
- *
- *
- */
-
+#include "std.h"
 #include "led.h"
-#include "arm7/led_hw.h"
+#include "gpio.h"
 
-void led_init ( void ) {
-#ifdef LED_1_BANK
-  LED_INIT(1);
-  LED_OFF(1);
-#endif /* LED_1_BANK */
-
-#ifdef LED_2_BANK
-  LED_INIT(2);
-  LED_OFF(2);
-#endif /* LED_2_BANK */
-
-#ifdef LED_3_BANK
-  LED_INIT(3);
-  LED_OFF(3);
-#endif /* LED_3_BANK */
-
-#ifdef LED_4_BANK
-  LED_INIT(4);
-  LED_OFF(4);
-#endif /* LED_4_BANK */
-
-#ifdef LED_5_BANK
-  LED_INIT(5);
-  LED_OFF(5);
-#endif /* LED_5_BANK */
-
-#ifdef LED_6_BANK
-  LED_INIT(6);
-  LED_OFF(6);
-#endif /* LED_6_BANK */
-
-#ifdef LED_7_BANK
-  LED_INIT(7);
-  LED_OFF(7);
-#endif /* LED_7_BANK */
-
-#ifdef LED_8_BANK
-  LED_INIT(8);
-  LED_OFF(8);
-#endif /* LED_8_BANK */
+void led_init ( void )
+{
+    gpio_init();
 }
 
-void led_on( uint8_t id) {
-  switch (id) {
-    case 1:
-      LED_ON(1);
-      break;
-    case 2:
-      LED_ON(2);
-      break;
-    case 3:
-      LED_ON(3);
-      break;
-    case 4:
-      LED_ON(4);
-      break;
-    default:
-      break;
-  }
+void led_on( uint8_t id)
+{
+    gpio_on(id);
 }
 
-void led_off( uint8_t id) {
-  switch (id) {
-    case 1:
-      LED_OFF(1);
-      break;
-    case 2:
-      LED_OFF(2);
-      break;
-    case 3:
-      LED_OFF(3);
-      break;
-    case 4:
-      LED_OFF(4);
-      break;
-    default:
-      break;
-  }
+void led_off( uint8_t id)
+{
+    gpio_off(id);
 }
 
-void led_toggle( uint8_t id) {
-  switch (id) {
-    case 1:
-      LED_TOGGLE(1);
-      break;
-    case 2:
-      LED_TOGGLE(2);
-      break;
-    case 3:
-      LED_TOGGLE(3);
-      break;
-    case 4:
-      LED_TOGGLE(4);
-      break;
-    default:
-      break;
-  }
+void led_toggle( uint8_t id)
+{
+    gpio_toggle(id);
 }
 
 

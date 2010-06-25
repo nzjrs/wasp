@@ -24,8 +24,8 @@
 
 #include "imu.h"
 #include "ahrs.h"
-#include "booz_geometry_mixed.h"
 #include "booz_ahrs_aligner.h"
+#include "math/pprz_trig_int.h"
 
 #include "generated/settings.h"
 
@@ -50,10 +50,10 @@ int32_t booz2_face_reinj_1;
 #define ACC_AMP 226
 
 #define SAMPLES_NB 256
-//static struct booz_ivect lp_gyro_samples[SAMPLES_NB];
-//static struct booz_ivect lp_gyro_sum;
-static struct booz_ivect lp_accel_samples[SAMPLES_NB];
-static struct booz_ivect lp_accel_sum;
+//static struct Int32Vect3 lp_gyro_samples[SAMPLES_NB];
+//static struct Int32Vect3 lp_gyro_sum;
+static struct Int32Vect3 lp_accel_samples[SAMPLES_NB];
+static struct Int32Vect3 lp_accel_sum;
 static uint8_t samples_idx;
 
 
@@ -70,7 +70,6 @@ void ahrs_init(void) {
   INT_RATES_ZERO(ahrs.body_rate);
   INT_RATES_ZERO(ahrs.imu_rate);
   INT_RATES_ZERO(booz2_face_gyro_bias);
-  //  booz2_face_reinj_1 = 1024;
   booz2_face_reinj_1 = BOOZ2_FACE_REINJ_1;
   samples_idx = 0;
 }
@@ -89,9 +88,8 @@ void ahrs_align(void) {
 
 
 #define F_UPDATE 512
-
-#define PI_INTEG_EULER         (PI_INT * F_UPDATE)
-#define TWO_PI_INTEG_EULER (TWO_PI_INT * F_UPDATE)
+#define PI_INTEG_EULER     (INT32_ANGLE_PI * F_UPDATE)
+#define TWO_PI_INTEG_EULER (INT32_ANGLE_2_PI * F_UPDATE)
 #define INTEG_EULER_NORMALIZE(_a) {				\
     while (_a >  PI_INTEG_EULER)  _a -= TWO_PI_INTEG_EULER;	\
     while (_a < -PI_INTEG_EULER)  _a += TWO_PI_INTEG_EULER;	\
@@ -101,16 +99,16 @@ void ahrs_align(void) {
 #define PSI_OF_MAG(_psi, _mag, _phi_est, _theta_est) {			\
 									\
     int32_t sphi;							\
-    BOOZ_ISIN(sphi, _phi_est);						\
+    PPRZ_ITRIG_SIN(sphi, _phi_est);						\
     int32_t cphi;							\
-    BOOZ_ICOS(cphi, _phi_est);						\
+    PPRZ_ITRIG_COS(cphi, _phi_est);						\
     int32_t stheta;							\
-    BOOZ_ISIN(stheta, _theta_est);					\
+    PPRZ_ITRIG_SIN(stheta, _theta_est);					\
     int32_t ctheta;							\
-    BOOZ_ICOS(ctheta, _theta_est);					\
+    PPRZ_ITRIG_COS(ctheta, _theta_est);					\
 									\
-    int32_t sphi_stheta = BOOZ_IMULT(sphi, stheta, ITRIG_RES );		\
-    int32_t cphi_stheta = BOOZ_IMULT(cphi, stheta, ITRIG_RES );		\
+    int32_t sphi_stheta = (sphi*stheta)>>INT32_TRIG_FRAC;		\
+    int32_t cphi_stheta = (cphi*stheta)>>INT32_TRIG_FRAC;		\
     const int32_t mn =							\
       ctheta      * _mag.x+						\
       sphi_stheta * _mag.y+						\
@@ -120,7 +118,7 @@ void ahrs_align(void) {
       cphi        * _mag.y+						\
       -sphi       * _mag.z;						\
     float m_psi = -atan2(me, mn);					\
-    _psi = ((m_psi)*(float)(1<<(IANGLE_RES))*F_UPDATE);		\
+    _psi = ((m_psi)*(float)(1<<(INT32_ANGLE_FRAC))*F_UPDATE);		\
     									\
   }
 

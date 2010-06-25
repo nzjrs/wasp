@@ -24,7 +24,7 @@
 #define BOOZ_AHRS_H
 
 #include "std.h"
-#include "pprz_algebra_int.h"
+#include "math/pprz_algebra_int.h"
 
 typedef struct __AHRS {
   struct Int32Eulers ltp_to_body_euler;

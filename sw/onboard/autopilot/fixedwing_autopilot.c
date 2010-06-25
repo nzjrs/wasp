@@ -32,7 +32,6 @@
 #include "generated/radio.h"
 
 #include "comm.h"
-#include "messages.h"
 #include "generated/messages.h"
 
 Autopilot_t     autopilot;
@@ -103,7 +102,7 @@ void autopilot_on_rc_event(void)
 
 void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
 {
-    if (new_autopilot_mode != autopilot.mode) 
+    if (new_autopilot_mode != autopilot.mode || new_autopilot_mode == AP_MODE_KILL) 
     {
         bool_t ok = TRUE;
         switch (new_autopilot_mode)
@@ -133,4 +132,12 @@ void autopilot_set_actuators(void)
     for (i = 0; i < SERVO_NB; i++)
         actuators_set(ACTUATOR_BANK_SERVOS | servo_addr[i], autopilot.motor_commands[i]);
     actuators_commit(ACTUATOR_BANK_SERVOS);
+}
+
+void autopilot_set_motors(bool_t on)
+{
+    if (on)
+        autopilot.commands[COMMAND_THRUST] = autopilot_commands_failsafe[COMMAND_THRUST];
+    else
+        autopilot.commands[COMMAND_THRUST] = 0;
 }

@@ -21,6 +21,13 @@
  * Boston, MA 02111-1307, USA. 
  */
 
+/** \file pprz_trig_int.h
+ *  \brief Lookup-table based integer trig functions.
+ *
+ * If PPRZ_TRIG_CONST is set to to "const" the lookup table is stored
+ * in flash, otherwise it's stored in heap.
+ */
+
 #ifndef PPRZ_TRIG_INT_H
 #define PPRZ_TRIG_INT_H
 

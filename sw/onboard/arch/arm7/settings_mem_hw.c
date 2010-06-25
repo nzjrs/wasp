@@ -20,6 +20,7 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+#include "std.h"
 #include "settings.h"
 
 static uint8_t settings_init_ok;

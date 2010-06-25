@@ -4,17 +4,42 @@
 import time
 import os.path
 import optparse
+import gobject
 import wasp
 import wasp.transport as transport
 import wasp.communication as communication
 import wasp.messages as messages
+
+def message_received(comm, msg, header, payload, quiet):
+    print msg
+    if not quiet:
+        if msg.size:
+            print "\t", msg.unpack_printable_values(payload, joiner=",")
+
+def uav_connected(comm, connected):
+    print "Connected: %s" % connected
+
+def send_ping(comm, msg):
+    comm.send_message(msg, ())
+    return True
 
 if __name__ == "__main__":
     thisdir = os.path.abspath(os.path.dirname(__file__))
     default_messages = os.path.join(thisdir, "..", "..", "onboard", "config", "messages.xml")
 
     parser = optparse.OptionParser()
-    communication.setup_optparse_options(parser, default_messages)
+    parser.add_option("-m", "--messages",
+                    default=default_messages,
+                    help="messages xml file", metavar="FILE")
+    parser.add_option("-p", "--port",
+                    default="/dev/ttyUSB0",
+                    help="serial port")
+    parser.add_option("-s", "--speed",
+                    type="int", default=57600,
+                    help="serial port baud rate")
+    parser.add_option("-t", "--timeout",
+                    type="int", default=1,
+                    help="serial timeout")
     parser.add_option("-d", "--debug",
                     action="store_true",
                     help="print extra debugging information")
@@ -30,37 +55,18 @@ if __name__ == "__main__":
 
     options, args = parser.parse_args()
 
-    if options.source_name != "serial":
-        parser.error("only serial source supported")
-
-    m = messages.MessagesFile(path=options.messages_file, debug=options.debug)
-    s = communication.communication_factory_from_commandline(options)
-    t = transport.Transport(check_crc=options.crc, debug=options.debug)
-
-    s.connect_to_port()
+    m = messages.MessagesFile(path=options.messages, debug=options.debug)
     m.parse()
+    t = transport.Transport(check_crc=options.crc, debug=options.debug)
+    s = communication.SerialCommunication(t,m,wasp.transport.TransportHeaderFooter(acid=wasp.ACID_GROUNDSTATION))
+    s.configure_connection(serial_port=options.port,serial_speed=options.speed,serial_timeout=options.timeout)
 
-    t1 = t2 = time.time()
-    while s.is_open():
-        try:
-            data = s.read()
-            for header, payload in t.parse_many(data):
-                msg = m.get_message_by_id(header.msgid)
+    s.connect("message-received", message_received, options.quiet)
+    s.connect("uav-connected", uav_connected)
 
-                if not options.quiet:
-                    print "%s\n\t" % msg,
-                    print msg.unpack_printable_values(payload, joiner=",")
+    if options.ping > 0:
+        gobject.timeout_add(int(options.ping)*1000, send_ping, s, m.get_message_by_name("PING"))
 
-                t2 = time.time()
-                if options.ping and (t2 - t1) > options.ping:
-                    t1 = t2
-                    p = m.get_message_by_name("PING")
-                    data = t.pack_one(
-                                transport.TransportHeaderFooter(acid=0x78), 
-                                p,
-                                p.pack_values())
-                    s.write(data.tostring())
+    s.connect_to_uav()
+    gobject.MainLoop().run()
 
-        except KeyboardInterrupt:
-            s.disconnect_from_port()
-            break

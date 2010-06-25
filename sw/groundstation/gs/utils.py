@@ -1,3 +1,5 @@
+import os.path
+
 def calculate_dt_seconds(then, now):
     d = now - then
     return d.seconds + d.microseconds / 1000000.0
@@ -8,6 +10,18 @@ def has_elapsed_time_passed(then, now, dt):
         return now, True, ds
     else:
         return then, False, ds
+
+def program_installed(app):
+    """
+    Check if the given app is installed in the users PATH
+    """
+    path = os.environ['PATH']
+    paths = path.split(os.pathsep)
+    for dir in paths:
+        if os.path.isdir(dir):
+            if os.path.isfile(os.path.join(dir,app)):
+                return True
+    return False
 
 class MovingAverage:
     def __init__(self, length, contains=float):

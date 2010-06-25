@@ -15,9 +15,14 @@ SETTINGS_XML = """<?xml version="1.0"?>
     <setting name="IMU_MAG_Z_SENS" value="-14.675745" integer="16"/>
   </section>
   <section name="TESTSECTION3">
-    <setting name="TESTSETGET" type="uint8" value="456" set="1" get="1"/>
+    <setting name="TESTSETGET" type="uint8" value="156" set="1" get="1" doc="foo"/>
   </section>
 </settings>"""
+
+TEST_SETTING_NAME = "TESTSECTION3_TESTSETGET"
+TEST_SETTING_TYPE = "uint8"
+TEST_SETTING_VALUE = "156"
+TEST_SETTING_DOC = "foo"
 
 XML = """<?xml version="1.0"?>
 <messages>
@@ -39,16 +44,19 @@ XML = """<?xml version="1.0"?>
      <field name="a_int8" type="int8" alt_unit_coef="0.5"/>
      <field name="a_float" type="float" alt_unit_coef="0.5"/>
    </message>
+   <message name="ALTIMETER_RESET" id="43" command="1"/>
    <periodic>
       <message name="TEST_MESSAGE" frequency="0.5"/>
    </periodic>
 </messages>"""
-NUM_MESSAGES = 4
+NUM_MESSAGES = 5
 
 PONG_ID = 2
 PONG_NAME = "PONG"
+COMMAND_NAME = "ALTIMETER_RESET"
 TEST_ID = 26
 TEST_NAME = "TEST_MESSAGE"
+TEST_MSG_FIELD_NAME = "a_uint8"
 TEST_COEF_MSG_ID = 9
 TEST_COEF_MSG_NAME = "TEST_COEF"
 

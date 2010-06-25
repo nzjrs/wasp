@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,11 +14,22 @@
    height="48px"
    id="svg7487"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docname="drawing.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:version="0.47pre4 r22446"
+   sodipodi:docname="status.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.1"
+   inkscape:export-filename="/home/john/Programming/wasp.git/sw/groundstation/data/icons/status.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs7489">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 24 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="48 : 24 : 1"
+       inkscape:persp3d-origin="24 : 16 : 1"
+       id="perspective61" />
     <linearGradient
        inkscape:collect="always"
        id="linearGradient2223">
@@ -195,15 +207,16 @@
      inkscape:pageshadow="2"
      inkscape:zoom="7"
      inkscape:cx="24"
-     inkscape:cy="24"
+     inkscape:cy="23.714286"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
      inkscape:window-width="641"
      inkscape:window-height="690"
-     inkscape:window-x="0"
-     inkscape:window-y="331" />
+     inkscape:window-x="547"
+     inkscape:window-y="207"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7492">
     <rdf:RDF>
@@ -212,6 +225,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

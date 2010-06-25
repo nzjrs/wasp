@@ -4,6 +4,7 @@ import gtk
 import gs.ui
 import gs.ui.indicators as indicators
 import gs.geo as geo
+import gs.source as source
 
 class StatusBar(gtk.Statusbar):
     def __init__(self, source):
@@ -14,7 +15,8 @@ class StatusBar(gtk.Statusbar):
         #connected indicator
         self._c = indicators.ColorLabelBox("C:",
                                 red_message="Communication not connected",
-                                green_message="Communication connected")
+                                yellow_message="Communication connected, not receiving data",
+                                green_message="Communication connected, receiving data")
         hb.pack_start(self._c)
         #status indicator
         #self._s = indicators.ColorLabelBox("S:",
@@ -59,32 +61,36 @@ class StatusBar(gtk.Statusbar):
         self.pack_start(hb, False, False)
         self.reorder_child(hb, 0)
 
-        source.connect("source-connected", self._on_source_connected)
+        source.connect("source-connected", self._connected_update_icon)
+        source.connect("source-link-status-change", self._connected_update_icon)
 
         source.register_interest(self._on_gps, 0, "GPS_LLH")
         source.register_interest(self._on_debug, 0, "DEBUG")
 
-        gobject.timeout_add_seconds(1, self._check_messages_per_second, source)
+        gobject.timeout_add(1000, self._check_messages_per_second, source)
 
-    def _on_source_connected(self, source, connected):
-        if connected:
+    def _connected_update_icon(self, source, *args):
+        status = source.get_status()
+        if status == source.STATUS_CONNECTED:
+            self._c.set_yellow()
+        elif status == source.STATUS_CONNECTED_LINK_OK:
             self._c.set_green()
-            self._c.set_tooltip_text("")
-        else:
+        elif status == source.STATUS_DISCONNECTED:
             self._c.set_red()
-            self._c.set_tooltip_text("Communication disconnected")
+        else:
+            LOG.critical("Unknown source status: %s" % status)
 
     def _check_messages_per_second(self, source):
         self._ms.set_text("MSG/S: %.1f" % source.get_messages_per_second())
         self._pt.set_text("PING: %.1f ms" %  source.get_ping_time())
         return True
 
-    def _on_debug(self, msg, payload):
+    def _on_debug(self, msg, header, payload):
         value, = msg.unpack_values(payload)
         self._debug.set_text("DEBUG: %d" % value)
         self._debug.set_green()
 
-    def _on_gps(self, msg, payload):
+    def _on_gps(self, msg, header, payload):
         fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
 
         if fix:
