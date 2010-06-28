@@ -23,6 +23,7 @@
 #ifndef _WASP_H_
 #define _WASP_H_
 
-#include "private/messages-lib.h"
+#include "comm.h"
+#include "messages.h"
 
 #endif /* _WASP_H_ */

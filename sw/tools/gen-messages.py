@@ -112,10 +112,10 @@ class CMessage(messages.Message):
 
 class _Writer(object):
 
-    def __init__(self, messages, periodic, note, messages_file):
+    def __init__(self, messages, periodic, filename, messages_file):
         self.messages = messages
         self.periodic = periodic
-        self.note = note
+        self.filename = filename
         self.messages_path = messages_path
 
     def preamble(self, outfile):
@@ -129,37 +129,26 @@ class _Writer(object):
 
 class _CWriter(_Writer):
 
-    def _print_includes(self, outfile):
+    def _get_include_guard(self):
+        return "%s_GENERATED_H" % os.path.splitext(self.filename)[0].upper()
+
+    def _print_std_include(self, outfile):
         print >> outfile, "#include \"std.h\""
+        print >> outfile
 
     def preamble(self, outfile):
         gentools.print_header(
-            "%s_GENERATED_H" % self.note.upper(),
+            self._get_include_guard(),
             generatedfrom=self.messages_path,
             outfile=outfile)
-
-        self._print_includes(outfile)
-
-        print >> outfile
-        print >> outfile, "#define COMM_STX 0x99"
-        print >> outfile, "#define COMM_DEFAULT_ACID 120"
-        print >> outfile, "#define COMM_NUM_NON_PAYLOAD_BYTES 6"
-        print >> outfile
-        print >> outfile, "#define MESSAGE_ID_NONE 0"
-        for m in self.messages:
-            m.print_id(outfile)
-        print >> outfile
-        for m in self.messages:
-            m.print_length(outfile)
-        print >> outfile
-        print >> outfile, "#define NUM_PERIODIC_MESSAGES %d" % len(self.periodic)
-        print >> outfile, "#define PERIODIC_MESSAGE_INITIALIZER {", ", ".join([p.get_initializer() for p in self.periodic]), "};"
         print >> outfile
 
     def postamble(self, outfile):
-        gentools.print_footer("%s_GENERATED_H" % self.note.upper(), outfile=outfile)
+        gentools.print_footer(
+            self._get_include_guard(),
+            outfile=outfile)
 
-class MacroWriter(_CWriter):
+class _MacroWriter(_CWriter):
 
     CHECK_FN    = "comm_check_free_space"
     START_FN    = "comm_start_message"
@@ -210,9 +199,29 @@ class MacroWriter(_CWriter):
                         print >> outfile, "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24)" % (_type, offset, offset, offset, offset)
             offset += l
 
+    def _print_comm_defines(self, outfile):
+        print >> outfile, "#define COMM_STX 0x99"
+        print >> outfile, "#define COMM_DEFAULT_ACID 120"
+        print >> outfile, "#define COMM_NUM_NON_PAYLOAD_BYTES 6"
+        print >> outfile
 
-    def preamble(self, outfile):
-        _CWriter.preamble(self, outfile)
+    def _print_message_ids(self, outfile):
+        print >> outfile, "#define MESSAGE_ID_NONE 0"
+        for m in self.messages:
+            m.print_id(outfile)
+        print >> outfile
+
+    def _print_message_lengths(self, outfile):
+        for m in self.messages:
+            m.print_length(outfile)
+        print >> outfile
+
+    def _print_periodic_messages(self, outfile):
+        print >> outfile, "#define NUM_PERIODIC_MESSAGES %d" % len(self.periodic)
+        print >> outfile, "#define PERIODIC_MESSAGE_INITIALIZER {", ", ".join([p.get_initializer() for p in self.periodic]), "};"
+        print >> outfile
+
+    def _print_byte_macros(self, outfile):
         print >> outfile, "#define _Put1ByteByAddr(_chan, _byte) {     \\"
         print >> outfile, "\tuint8_t _x = *(_byte);         \\"
         print >> outfile, "\t%s(_chan, _x);     \\" % self.PUT_CH_FN
@@ -235,6 +244,17 @@ class MacroWriter(_CWriter):
         print >> outfile, "#define _PutFloatByAddr(_chan, _x) _Put4ByteByAddr(_chan, (const uint8_t*)_x)"
         print >> outfile
 
+class MacroWriter(_MacroWriter):
+
+    def preamble(self, outfile):
+        _CWriter.preamble(self, outfile)
+        self._print_std_include(outfile)
+        self._print_comm_defines(outfile)
+        self._print_message_ids(outfile)
+        self._print_message_lengths(outfile)
+        self._print_periodic_messages(outfile)
+        self._print_byte_macros(outfile)
+
     def body(self, outfile):
         for m in self.messages:
             self._print_send_macro(m, outfile)
@@ -242,12 +262,17 @@ class MacroWriter(_CWriter):
         for m in self.messages:
             self._print_accessor_macro(m, outfile)
 
-class InlineFunctionWriter(MacroWriter):
+class _FunctionWriter(_MacroWriter):
 
-    def _print_includes(self, outfile):
-        print >> outfile, "#include \"std.h\""
-        print >> outfile, "#include \"messages_types.h\""
-        print >> outfile, "#include \"comm.h\""
+    def _print_message_name_function(self, outfile, function_body, function_type):
+        print >> outfile, "%s const char *\nmessage_get_name (uint8_t id)" % function_type,
+        if function_body:
+            print >> outfile, "\n{"
+            print >> outfile, "\treturn message_name_map[id];"
+            print >> outfile, "}"
+        else:
+            print >> outfile, ";"
+        print >> outfile
 
     def _print_message_name_table(self, outfile):
         msgids = ["NULL"]*256
@@ -256,53 +281,119 @@ class InlineFunctionWriter(MacroWriter):
         print >> outfile, "const char *message_name_map[] = {"
         print >> outfile, ", ".join(msgids)
         print >> outfile, "};"
+        print >> outfile
 
-    def _print_send_function(self, m, outfile):
+    def _print_send_function(self, m, outfile, function_body, function_type):
         allfields = [_ChannelField()] + m.fields
-        print >> outfile, "static inline void\nmessage_send_%s(" % m.name.lower(),
-        print >> outfile, ", ".join(["%s%s %s" % (f.get_wasp_type(), f.maybe_pass_by_reference(), f.name) for f in allfields]), ")"
-        print >> outfile, "{"
-        print >> outfile, "\t\t%s(chan, MESSAGE_ID_%s, MESSAGE_LENGTH_%s);" % (self.START_FN, m.name, m.name)
-        for f in m.fields:
-            if f.is_array:
-                offset = 0;
-                for i in range(f.num_elements):
-                    print >> outfile, "\t\t_Put%sByAddr(chan, &(%s[%d]));" % (f.type.title(), f.name, i)
-                    offset += f.element_length
-            else:
-                print >> outfile, "\t\t_Put%sByAddr(chan, (&%s));" % (f.type.title(), f.name)
-        print >> outfile, "\t\t%s(chan);" % self.END_FN
-        print >> outfile, "}"
+        print >> outfile, "%s void\nmessage_send_%s(" % (function_type, m.name.lower()),
+        print >> outfile, ", ".join(["%s%s %s" % (f.get_wasp_type(), f.maybe_pass_by_reference(), f.name) for f in allfields]), ")",
+        if function_body:
+            print >> outfile, "\n{"
+            print >> outfile, "\t\t%s(chan, MESSAGE_ID_%s, MESSAGE_LENGTH_%s);" % (self.START_FN, m.name, m.name)
+            for f in m.fields:
+                if f.is_array:
+                    offset = 0;
+                    for i in range(f.num_elements):
+                        print >> outfile, "\t\t_Put%sByAddr(chan, &(%s[%d]));" % (f.type.title(), f.name, i)
+                        offset += f.element_length
+                else:
+                    print >> outfile, "\t\t_Put%sByAddr(chan, (&%s));" % (f.type.title(), f.name)
+            print >> outfile, "\t\t%s(chan);" % self.END_FN
+            print >> outfile, "}"
+        else:
+            print >> outfile, ";"
         print >> outfile
 
-    def _print_unpack_function(self, m, outfile):
+    def _print_unpack_function(self, m, outfile, function_body, function_type):
         allfields = [_PayloadField()] + m.fields
-        print >> outfile, "static inline void\nmessage_unpack_%s(" % m.name.lower(),
-        print >> outfile, ", ".join(["%s%s %s" % (f.get_wasp_type(), f.maybe_return_by_reference(), f.name) for f in allfields]), ")"
-        print >> outfile, "{"
-        for f in m.fields:
-            print >> outfile, "\t*%s = MESSAGE_%s_GET_FROM_BUFFER_%s(payload);" % (f.name, m.name.upper(), f.name)
-        print >> outfile, "}"
+        print >> outfile, "%s void\nmessage_unpack_%s(" % (function_type,m.name.lower()),
+        print >> outfile, ", ".join(["%s%s %s" % (f.get_wasp_type(), f.maybe_return_by_reference(), f.name) for f in allfields]), ")",
+        if function_body:
+            print >> outfile, "\n{"
+            for f in m.fields:
+                print >> outfile, "\t*%s = MESSAGE_%s_GET_FROM_BUFFER_%s(payload);" % (f.name, m.name.upper(), f.name)
+            print >> outfile, "}"
+        else:
+            print >> outfile, ";"
         print >> outfile
+
+class FunctionWriter(_FunctionWriter):
 
     def preamble(self, outfile):
-        MacroWriter.preamble(self, outfile)
+        self._print_std_include(outfile)
+        print >> outfile, "#include \"%s.h\"" % os.path.splitext(self.filename)[0]
+        print >> outfile, "#include \"comm.h\""
+        print >> outfile
+        self._print_message_lengths(outfile)
+        self._print_periodic_messages(outfile)
+        self._print_byte_macros(outfile)
+        self._print_message_name_table(outfile)
+        print >> outfile
+
+    def body(self, outfile):
+        for m in self.messages:
+            self._print_accessor_macro(m, outfile)
+        print >> outfile
+        self._print_message_name_function(outfile, True, "")
+        print >> outfile
+        for m in self.messages:
+            self._print_send_function(m, outfile, True, "")
+        print >> outfile
+        for m in self.messages:
+            self._print_unpack_function(m, outfile, True, "")
+        print >> outfile
+
+    def postamble(self, outfile):
+        pass
+
+class FunctionWriterInline(_FunctionWriter):
+
+    def preamble(self, outfile):
+        _CWriter.preamble(self, outfile)
+        self._print_std_include(outfile)
+        print >> outfile, "#include \"messages_types.h\""
+        print >> outfile, "#include \"comm.h\""
+        print >> outfile
+        self._print_comm_defines(outfile)
+        self._print_message_ids(outfile)
+        self._print_message_lengths(outfile)
+        self._print_periodic_messages(outfile)
+        self._print_byte_macros(outfile)
+
         self._print_message_name_table(outfile)
 
     def body(self, outfile):
+        self._print_message_name_function(outfile, True, "static inline")
         print >> outfile
         for m in self.messages:
             self._print_accessor_macro(m, outfile)
         print >> outfile
         for m in self.messages:
-            self._print_send_function(m, outfile)
+            self._print_send_function(m, outfile, True, "static inline")
         print >> outfile
         for m in self.messages:
-            self._print_unpack_function(m, outfile)
+            self._print_unpack_function(m, outfile, True, "static inline")
         print >> outfile
 
-    def postamble(self, outfile):
-        MacroWriter.postamble(self, outfile)
+class FunctionWriterHeader(_FunctionWriter):
+
+    def preamble(self, outfile):
+        _CWriter.preamble(self, outfile)
+        self._print_std_include(outfile)
+        print >> outfile, "#include \"messages_types.h\""
+        print >> outfile
+        self._print_comm_defines(outfile)
+        self._print_message_ids(outfile)
+
+    def body(self, outfile):
+        self._print_message_name_function(outfile, False, "")
+        print >> outfile
+        for m in self.messages:
+            self._print_send_function(m, outfile, False, "")
+        print >> outfile
+        for m in self.messages:
+            self._print_unpack_function(m, outfile, False, "")
+        print >> outfile
 
 class RSTWriter(_Writer):
 
@@ -370,7 +461,9 @@ class RSTWriter(_Writer):
 if __name__ == "__main__":
     OUTPUT_MODES = {
         "macro"         :   MacroWriter,
-        "inlinefunction":   InlineFunctionWriter,
+        "function"      :   FunctionWriter,
+        "inlinefunction":   FunctionWriterInline,
+        "header"        :   FunctionWriterHeader,
         "rst"           :   RSTWriter,
     }
     OUTPUT_MODES_DEFAULT = "macro"
@@ -447,10 +540,12 @@ if __name__ == "__main__":
 
     if options.output:
         f = open(options.output, 'w')
+        filename = os.path.basename(options.output)
     else:
         f = sys.stdout
+        filename = "messages"
 
-    writer = klass(messages, periodic, "messages", messages_path)
+    writer = klass(messages, periodic, filename, messages_path)
     writer.preamble(outfile=f)
     writer.body(outfile=f)
     writer.postamble(outfile=f)
