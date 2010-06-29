@@ -21,7 +21,6 @@ from gs.ui.tree import DBWidget
 from gs.ui.msgarea import MsgAreaController
 from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
-from gs.ui.flightplan import FlightPlanEditor
 from gs.ui.log import LogBuffer, LogWindow
 from gs.ui.map import Map
 from gs.ui.settings import SettingsController
