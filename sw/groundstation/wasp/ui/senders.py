@@ -114,8 +114,13 @@ class RequestTelemetrySender(RequestMessageSender):
         self.pack_start(hb, expand=False, fill=True)
         self.reorder_child(hb, 1)
 
+    def add_message_file(self, messagefile):
+        RequestMessageSender.add_message_file(self, messagefile)
+        if messagefile:
+            self._rt = messagefile.get_message_by_name( MESSAGE_NAME_REQUEST_TELEMETRY )
+
     def request_send_message(self, msg):
-        self.emit("send-message", self._rm, (msg.id, self._sb.get_value()))
+        self.emit("send-message", self._rt, (msg.id, float(self._sb.get_value())))
 
 class _SettingsSender(gtk.HBox):
 

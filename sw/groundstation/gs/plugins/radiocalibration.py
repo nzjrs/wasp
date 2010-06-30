@@ -46,7 +46,7 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
         self._win = self.get_resource("mainwindow")
         self._win.set_icon(pb)
         self._win.set_title("Calibrate Radio")
-        self._win.connect("delete-event", gtk.Widget.hide_on_delete)
+        self._win.connect("delete-event", self._hide_window)
         self.get_resource("close_button").connect("clicked", self._on_close)
         self.get_resource("save_button").connect("clicked", self._on_save)
         self.get_resource("open_button").connect("clicked", self._on_open)
@@ -69,13 +69,17 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
 
                 self._initialized.append((cb, pb))
 
-            #request PPM messages
-            self._source.request_telemetry("PPM", 5)
-
             #register interest in the PPM messags
             self._source.register_interest(self._on_ppm, 0, "PPM")
 
+        #request PPM messages
+        self._source.request_telemetry("PPM", 5.0)
         self._win.show_all()
+
+    def _hide_window(self, *args):
+        self._source.stop_telemetry("PPM")
+        self._win.hide()
+        return True
 
     def _on_ppm(self, msg, header, payload):
         ppm = msg.unpack_values(payload)

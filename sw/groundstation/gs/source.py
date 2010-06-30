@@ -331,8 +331,17 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         Requests the UAV send us telementry, i.e. the supplied *message_name*
         at the supplied *frequency*
         """
+        frequency = float(frequency)
+        LOG.info("Requesting telemetry: %s @ %.1fHz" % (message_name, frequency))
         m = self._messages_file.get_message_by_name(message_name)
         self.send_message(self._rt, (m.id, frequency))
+
+    def stop_telemetry(self, message_name):
+        """
+        Tells the UAV to stop sending us telemetry of the supplied *message_name*
+        """
+        LOG.info("Stopping telemetry %s" % message_name)
+        self.request_telemetry(message_name, 0.0);
 
     def quit(self):
         self.disconnect_from_uav()

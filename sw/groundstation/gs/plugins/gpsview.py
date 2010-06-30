@@ -36,19 +36,24 @@ class GpsView(plugin.Plugin):
 
     def _create_window(self):
         self._w = gtk.Window()
-        self._w.connect("delete-event", gtk.Widget.hide_on_delete)
+        self._w.connect("delete-event", self._hide_window)
         self._sky = SkyView()
         self._w.add(self._sky)
 
     def _show_window(self, *args):
         if not self._w:
             self._create_window()
-            self._source.request_telemetry("GPS_GSV", 1)
             #when we rx a GPS_GSV message, we actually get a few in quick succession
             #so cap the redraw at 10Hz
             gobject.timeout_add(1000/10, self._do_redraw)
 
+        self._source.request_telemetry("GPS_GSV", 1.0)
         self._w.show_all()
+
+    def _hide_window(self, *args):
+        self._source.stop_telemetry("GPS_GSV")
+        self._w.hide()
+        return True
 
 # Fake the libgps API, make this Sat class have the same elements as expected
 # by the skyview

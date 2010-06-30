@@ -291,6 +291,11 @@ comm_install_new_periodic_task ( CommChannel_t chan, CommMessage_t *msg )
     {
         p = &periodic_messages[i];
         if (p->msgid == MESSAGE_ID_NONE || p->msgid == msgid) {
+            /* sending a freq == 0 removes the handler */
+            if (freq == 0) {
+                p->msgid = MESSAGE_ID_NONE;
+                return TRUE;
+            }
             p->target = 60.0/freq;
             p->cnt = 0;
             p->msgid = msgid;
