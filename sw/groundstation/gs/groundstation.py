@@ -193,13 +193,23 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             msg = _tv.get_selected_message()
             _gm.add_graph(msg, field)
 
+        def on_send_msg_clicked(btn, _tv, _source):
+            msg,vals = _tv.get_selected_message_and_values()
+            if msg:
+                LOG.info("Sending Msg: %s %s" % (msg,vals))
+                _source.send_message(msg, vals)
+
         rxts = self._source.get_rx_message_treestore()
         if rxts:
             sw = self.get_resource("telemetry_sw")
-            rxtv = MessageTreeView(rxts, editable=False, show_dt=True)
+            rxtv = MessageTreeView(rxts, editable=wasp.IS_TESTING, show_dt=not wasp.IS_TESTING)
             sw.add(rxtv)
 
             vb = self.get_resource("telemetry_left_vbox")
+            if wasp.IS_TESTING:
+                b = gtk.Button("Send Selected")
+                b.connect("clicked", on_send_msg_clicked, rxtv, self._source)
+                vb.pack_start(b, False, False)
 
             rm = RequestMessageSender(self._messagesfile)
             rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
