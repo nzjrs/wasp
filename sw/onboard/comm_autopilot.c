@@ -66,9 +66,9 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
         case MESSAGE_ID_GPS_GSV:
             {
 #if RECORD_NUM_SAT_INFO
-            uint8_t i;
-            for (i = 0; i < gps_state.num_sat_info; i++) {
-                GPSSatellite_t *sat = &gps_state.sat_info[i];
+            static uint8_t selected_sat_info = 0;
+            if (selected_sat_info < gps_state.num_sat_info) {
+                GPSSatellite_t *sat = &gps_state.sat_info[selected_sat_info];
                 MESSAGE_SEND_GPS_GSV(
                     chan,
                     &gps_state.num_sat_info,
@@ -76,7 +76,9 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &sat->elevation,
                     &sat->azimuth,
                     &sat->signal_strength);
-            }
+                selected_sat_info += 1;
+            } else
+                selected_sat_info = 0;
 #endif
             }
             break;

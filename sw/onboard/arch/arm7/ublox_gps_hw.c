@@ -82,6 +82,9 @@ void gps_init(void)
     gps_state.buffer_overrun = 0;
     gps_state.parse_error = 0;
     gps_state.parse_ignored = 0;
+#if RECORD_NUM_SAT_INFO
+    gps_state.num_sat_info = 0;
+#endif
 }
 
 bool_t
