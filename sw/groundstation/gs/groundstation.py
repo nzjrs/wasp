@@ -16,23 +16,21 @@ from gs.source import UAVSource
 from gs.plugin import PluginManager
 
 from gs.ui import GtkBuilderWidget, get_icon_pixbuf, message_dialog
-from gs.ui.graph import Graph, GraphManager
 from gs.ui.tree import DBWidget
 from gs.ui.msgarea import MsgAreaController
 from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
 from gs.ui.log import LogBuffer, LogWindow
 from gs.ui.map import Map
+from gs.ui.telemetry import TelemetryController
 from gs.ui.settings import SettingsController
 from gs.ui.command import CommandController
-from gs.ui.window import DialogWindow
 from gs.ui.statusicon import StatusIcon
 
 import wasp
 from wasp.messages import MessagesFile
 from wasp.settings import SettingsFile
 from wasp.ui.treeview import MessageTreeView
-from wasp.ui.senders import RequestMessageSender, RequestTelemetrySender
 
 LOG = logging.getLogger('groundstation')
 
@@ -125,7 +123,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
 
         self._map = Map(self._config, self._source)
-        self._gm = GraphManager(self._config, self._source, self._messagesfile, self.get_resource("graphs_box"), self.window)
         self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
         self._info = InfoBox(self._source)
@@ -137,6 +134,10 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("main_left_vbox").pack_start(self._info.widget, False, False)
         self.get_resource("main_map_vbox").pack_start(self._msgarea, False, False)
         self.get_resource("window_vbox").pack_start(self._sb, False, False)
+
+        #The telemetry tab page
+        self.telemetrycontroller = TelemetryController(self._config, self._source, self._messagesfile, self.window)
+        self.get_resource("telemetry_hbox").pack_start(self.telemetrycontroller.widget, True, True)
 
         #The settings tab page
         settingsfile = SettingsFile(path=settingsfile)
@@ -157,16 +158,13 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map.connect("notify::auto-center", self.on_map_autocenter_property_change)
         self._map.connect("notify::show-trip-history", self.on_map_show_trip_history_property_change)
     
-        #Create other notebook tabs
-        self._create_telemetry_ui()
-
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface
         self._configurable = [
             self,
             self._source,
             self._map,
-            self._gm,
+            self.telemetrycontroller.graphmanager,
         ]
         #Add those plugins that can also be configured
         self._configurable += self._plugin_manager.get_plugins_implementing_interface(ConfigurableIface)
@@ -186,37 +184,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     def _on_uav_selected(self, source, acid):
         self.window.set_title("%s - UAV: 0x%X" % (gs.NAME, acid))
-
-    def _create_telemetry_ui(self):
-        def on_gb_clicked(btn, _tv, _gm):
-            field = _tv.get_selected_field()
-            msg = _tv.get_selected_message()
-            _gm.add_graph(msg, field)
-
-        def on_send_msg_clicked(btn, _tv, _source):
-            msg,vals = _tv.get_selected_message_and_values()
-            if msg:
-                LOG.info("Sending Msg: %s %s" % (msg,vals))
-                _source.send_message(msg, vals)
-
-        rxts = self._source.get_rx_message_treestore()
-        if rxts:
-            sw = self.get_resource("telemetry_sw")
-            rxtv = MessageTreeView(rxts, editable=wasp.IS_TESTING, show_dt=not wasp.IS_TESTING)
-            sw.add(rxtv)
-
-            vb = self.get_resource("telemetry_left_vbox")
-            if wasp.IS_TESTING:
-                b = gtk.Button("Send Selected")
-                b.connect("clicked", on_send_msg_clicked, rxtv, self._source)
-                vb.pack_start(b, False, False)
-
-            rm = RequestMessageSender(self._messagesfile)
-            rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
-            vb.pack_start(rm, False, False)
-
-            gb = self.get_resource("graph_button")
-            gb.connect("clicked", on_gb_clicked, rxtv, self._gm)
 
     def _on_gps(self, msg, header, payload):
         fix,sv,lat,lon,hsl,hacc,vacc = msg.unpack_scaled_values(payload)
@@ -463,15 +430,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         return False
 
     def on_menu_item_request_telemetry_activate(self, *args):
-        dlg = DialogWindow(
-                "Requrest Telemetry",
-                parent=self.window)
-
-        rm = RequestTelemetrySender(self._messagesfile)
-        rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
-        dlg.vbox.pack_start(rm, False, False)
-
-        dlg.show_all()
+        self.telemetrycontroller.request_telemetry()
 
     def on_menu_item_log_activate(self, widget):
         w = LogWindow(self._logbuffer)
