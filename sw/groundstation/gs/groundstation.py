@@ -237,27 +237,52 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     def _disconnect(self):
         self._source.disconnect_from_uav()
 
-    def add_menu_item(self, name, item):
-        """
-        Adds an item to the main window menu. 
+    def _add_submenu(self, name, parent_menu):
+        """ adds a submenu of name to parent_menu """
+        if name not in self._menus:
+            #add a new menu
+            menuitem = gtk.MenuItem(name)
+            parent_menu.append(menuitem)
+            menu = gtk.Menu()
+            menuitem.set_submenu(menu)
+            self._menus[name] = menu
+        return self._menus[name]
 
-        :param name: the name of the menu to add to, e.g. "File". 
-                     If a menu of that name does not exist, one is created
-        :param item: the gtk.MenuItem to add
-        """
+    def _get_toplevel_menu(self, name):
+        """ gets, or creates a toplevel menu of name """
         if name in self._menus:
             menu = self._menus[name]
             if not menu:
                 menu = self.get_resource("%s_menu" % name.lower())
         else:
-            #add a new menu
-            menuitem = gtk.MenuItem(name)
-            self.get_resource("main_menubar").append(menuitem)
-            menu = gtk.Menu()
-            menuitem.set_submenu(menu)
+            menu = self._add_submenu(name, self.get_resource("main_menubar"))
 
-        self._menus[name] = menu
-        menu.append(item)
+        return menu
+
+    def add_menu_item(self, name, *item):
+        """
+        Adds an item to the main window menubar. 
+
+        :param name: the name of the top-level menu to add to, e.g. "File". 
+                     If a menu of that name does not exist, one is created
+        :param item: One or more gtk.MenuItem to add
+        """
+        menu = self._get_toplevel_menu(name)
+        for i in item:
+            menu.append(i)
+
+    def add_submenu_item(self, name, submenu_name, *item):
+        """
+        Adds a submenu and item to the main window menubar.
+
+        :param name: the name of the top-level menu to add to, e.g. "File". 
+                     If a menu of that name does not exist, one is created
+        :param submenu_name: the name of the submenu to hold the item
+        :param item: One or more gtk.MenuItem to add
+        """
+        menu = self._add_submenu(submenu_name, self._get_toplevel_menu(name))
+        for i in item:
+            menu.append(i)
 
     def add_control_widget(self, name, widget):
         """
