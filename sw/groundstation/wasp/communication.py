@@ -278,8 +278,8 @@ class DummyUAV:
             #GPS at 4 Hz
             gobject.timeout_add(int(1000/4), self._do_gps)
             self._alt = wasp.NoisySine(freq=0.5, value_type=int)
-            self._lat = kwargs.get("start_gps_lat", -43.520451)
-            self._lon = kwargs.get("start_gps_lon", 172.582377)
+            self._lat = kwargs.get("start_gps_lat", wasp.HOME_LAT)
+            self._lon = kwargs.get("start_gps_lon", wasp.HOME_LON)
 
     def _do_gps(self):
         if random.randint(0,4) == 4:

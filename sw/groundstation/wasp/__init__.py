@@ -10,9 +10,13 @@ througn
   may be read/updated from the groundstation and stored on the UAV
 """
 
+import os
 import random
 import time
 import math
+
+HOME_LAT = float(os.environ.get("WASP_HOME_LAT", -43.520451))
+HOME_LON = float(os.environ.get("WASP_HOME_LON", 172.582377))
 
 #: dictionary mapping the C type to its length in bytes (e.g char -> 1)
 TYPE_TO_LENGTH_MAP = {

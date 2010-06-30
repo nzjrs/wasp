@@ -12,8 +12,9 @@ class TestConfigurable(plugin.Plugin, config.ConfigurableIface):
         config.ConfigurableIface.__init__(self, conf)
         self.ck = "0"
 
-#        groundstation_window.add_menu_item("Foo", gtk.MenuItem("test1"))
-#        groundstation_window.add_menu_item("File", gtk.MenuItem("test2"))
+        #groundstation_window.add_menu_item("Foo", gtk.MenuItem("foo1"), gtk.MenuItem("foo2"))
+        #groundstation_window.add_submenu_item("Foo", "Bar", gtk.MenuItem("bar1"), gtk.MenuItem("bar2"))
+        #groundstation_window.add_menu_item("File", gtk.MenuItem("baz1"))
 
     def update_state_from_config(self):
         self.ck = self.config_get("Test_Check","0")

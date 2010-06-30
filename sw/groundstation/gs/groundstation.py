@@ -43,8 +43,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     CONFIG_CONNECT_NAME = "Connect_to_UAV_automatically"
     CONFIG_CONNECT_DEFAULT = "1"
-    CONFIG_LAT_DEFAULT = -43.520451
-    CONFIG_LON_DEFAULT = 172.582377
+    CONFIG_LAT_DEFAULT = wasp.HOME_LAT
+    CONFIG_LON_DEFAULT = wasp.HOME_LON
     CONFIG_ZOOM_DEFAULT = 12
 
     def __init__(self, options):
