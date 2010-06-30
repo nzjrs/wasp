@@ -134,7 +134,7 @@ generated/radio.h: $(RADIO) $(TOOLS)/gen-radio.py
 
 generated/messages.h: $(MESSAGES) $(TOOLS)/gen-messages.py
 	@echo GENERATE $@
-	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-messages.py --messages=$< > $@
+	$(Q)PYTHONPATH=../groundstation/ $(TOOLS)/gen-messages.py --messages=$< --output=$@
 
 generated/settings.h: $(SETTINGS) $(TOOLS)/gen-settings.py
 	@echo GENERATE $@
