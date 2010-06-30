@@ -247,6 +247,10 @@
      <field name="ignored" type="uint8"></field>
    </message>
 
+   <message name="DEBUG_FLOAT" id="50">
+     <field name="value" type="float"/>
+   </message>
+
    <!-- Begin periodic messages -->
    <periodic channel="COMM_0">
       <message name="COMM_STATUS" frequency="0.25"/>
