@@ -295,7 +295,7 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
             if remaining > 0:
                 return True
             else:
-                msgarea.clear()
+                msgarea.remove(msg)
                 return False
 
         dlg = self.get_resource("cache_maps_dialog")
@@ -338,9 +338,9 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
                         int(zoom_stop.get_value()))
             
             msg = msgarea.new_from_text_and_icon(
-                                gtk.STOCK_CONNECT,
                                 "Caching Map Tiles",
-                                "Calculating...")
+                                secondary="Calculating...",
+                                message_type=gtk.MESSAGE_INFO)
             msg.show_all()
             gobject.timeout_add(500, update_download_count, msg, msgarea, self._map)
 
