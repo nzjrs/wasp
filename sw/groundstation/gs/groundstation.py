@@ -548,9 +548,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         dlg.run()
         dlg.destroy()
         
-    def on_menu_item_dock_all_activate(self, widget):
-        message_dialog("Not Implemented", self.window)
-        
     def db_chooser_callback(self, widget):
         filename = widget.get_filename()
         if filename:

@@ -102,17 +102,6 @@
                   <object class="GtkMenu" id="window_menu">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="menu_item_dock_all">
-                        <property name="label">Dock All</property>
-                        <property name="visible">True</property>
-                        <property name="image">image2</property>
-                        <property name="use_stock">False</property>
-                        <property name="accel_group">accelgroup1</property>
-                        <property name="always_show_image">True</property>
-                        <signal name="activate" handler="on_menu_item_dock_all_activate"/>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkImageMenuItem" id="menu_item_plane_view">
                         <property name="label">Plane View</property>
                         <property name="visible">True</property>
@@ -672,11 +661,6 @@
     <property name="page_increment">10</property>
   </object>
   <object class="GtkAccelGroup" id="accelgroup1"/>
-  <object class="GtkImage" id="image2">
-    <property name="visible">True</property>
-    <property name="stock">gtk-unindent</property>
-    <property name="icon-size">1</property>
-  </object>
   <object class="GtkImage" id="image3">
     <property name="visible">True</property>
     <property name="stock">gtk-missing-image</property>
