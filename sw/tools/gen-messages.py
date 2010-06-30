@@ -118,6 +118,9 @@ class _Writer(object):
         self.filename = filename
         self.messages_path = messages_path
 
+    def _get_filename(self):
+        return os.path.splitext(self.filename)[0]
+
     def preamble(self, outfile):
         pass
 
@@ -130,7 +133,7 @@ class _Writer(object):
 class _CWriter(_Writer):
 
     def _get_include_guard(self):
-        return "%s_GENERATED_H" % os.path.splitext(self.filename)[0].upper()
+        return "%s_GENERATED_H" % self._get_filename().upper()
 
     def _print_std_include(self, outfile):
         print >> outfile, "#include \"std.h\""
@@ -321,7 +324,7 @@ class FunctionWriter(_FunctionWriter):
 
     def preamble(self, outfile):
         self._print_std_include(outfile)
-        print >> outfile, "#include \"%s.h\"" % os.path.splitext(self.filename)[0]
+        print >> outfile, "#include \"%s.h\"" % self._get_filename()
         print >> outfile, "#include \"comm.h\""
         print >> outfile
         self._print_message_lengths(outfile)
@@ -440,7 +443,7 @@ class RSTWriter(_Writer):
         _print_header()
 
     def preamble(self, outfile):
-        self._write_header("Messages", outfile)
+        self._write_header(self._get_filename().replace("-"," ").title(), outfile)
         print >> outfile
         self._write_header("Message Definitions", outfile, level=2)
         print >> outfile

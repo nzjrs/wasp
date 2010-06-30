@@ -1,8 +1,9 @@
-==============================
-Onboard Software Documentation
-==============================
+Onboard Software
+================
 
-API Documentation
-=================
-.. doxygenindex::
-   :project: onboard
+.. toctree::
+   :maxdepth: 1
+
+   unittest
+   onboard-api
+   onboard-coding-standards

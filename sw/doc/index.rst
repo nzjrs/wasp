@@ -5,10 +5,6 @@ Software
    :maxdepth: 2
 
    setup
-   unittest
-   onboard
    architecture
+   onboard
    groundstation
-   comm-protocol
-   coding-standards
-

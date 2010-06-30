@@ -32,6 +32,6 @@ The groundstation has a powerful and easy to use API for writing
 plugins to extend its functionality. Please see the following;
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    groundstation-api
