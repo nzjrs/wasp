@@ -196,7 +196,7 @@ class _MacroWriter(_CWriter):
                 elif l == 2:
                     print >> outfile, "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8)" % (_type, offset, offset)
                 elif l == 4:
-                    if _type == "float_t":
+                    if _type == "float":
                         print >> outfile, "({ union { uint32_t u; float f; } _f; _f.u = (uint32_t)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24); _f.f; })" % (offset, offset, offset, offset)
                     else:
                         print >> outfile, "(%s)(*((uint8_t*)_payload+%d)|*((uint8_t*)_payload+%d+1)<<8|((uint32_t)*((uint8_t*)_payload+%d+2))<<16|((uint32_t)*((uint8_t*)_payload+%d+3))<<24)" % (_type, offset, offset, offset, offset)
