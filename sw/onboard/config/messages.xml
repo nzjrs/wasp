@@ -241,8 +241,7 @@
       <field name="id"  type="uint8"/>
    </message>
 
-
-   <message name="GPS_STATUS" id="47">
+   <message name="GPS_STATUS" id="49">
      <field name="overrun" type="uint8"></field>
      <field name="error" type="uint8"></field>
      <field name="ignored" type="uint8"></field>

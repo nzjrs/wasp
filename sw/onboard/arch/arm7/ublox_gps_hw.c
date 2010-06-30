@@ -43,11 +43,12 @@ typedef struct __UbxParseState {
 } UbxParseState_t;
 
 typedef enum {
-  GOT_MSG_NAV_POSLLH   	= (1 << 0),
-  GOT_MSG_NAV_SOL       = (1 << 1),
-  GOT_MSG_NAV_VELNED    = (1 << 2)
+    GOT_MSG_GPS_POS                 = (1 << 0), /* Any position message, e.g. POSLLH_OR_POSUTM */
+    GOT_MSG_GPS_SOL                 = (1 << 1), /* Nav solution message */
+    GOT_MSG_GPS_VEL                 = (1 << 2), /* Any velocity message */
+    GOT_MSG_GPS_STATUS              = (1 << 3), /* Any status message   */
 } UbxGotMsgFlags;
-#define UbxGotAllMsg	(GOT_MSG_NAV_POSLLH | GOT_MSG_NAV_SOL | GOT_MSG_NAV_VELNED)
+#define UbxGotAllMsg	(GOT_MSG_GPS_POS | GOT_MSG_GPS_SOL | GOT_MSG_GPS_VEL | GOT_MSG_GPS_STATUS)
 
 static void ubx_parse( uint8_t c );
 
@@ -93,41 +94,58 @@ gps_event_task(void)
 
     if (ubx_state.msg_available) {
         if (ubx_state.class == UBX_NAV_ID) {
-            if (ubx_state.id == UBX_NAV_POSLLH_ID) {
-                gps_got_msgs |= GOT_MSG_NAV_POSLLH;
+            switch (ubx_state.id) {
+                case UBX_NAV_POSLLH_ID:
+                    gps_got_msgs |= GOT_MSG_GPS_POS;
 
-                gps_state.lon = UBX_NAV_POSLLH_LON(ubx_msg_buf);
-                gps_state.lat = UBX_NAV_POSLLH_LAT(ubx_msg_buf);
-                gps_state.hmsl = UBX_NAV_POSLLH_HMSL(ubx_msg_buf);
-                gps_state.hacc = UBX_NAV_POSLLH_Hacc(ubx_msg_buf);
-                gps_state.vacc = UBX_NAV_POSLLH_Vacc(ubx_msg_buf);
-            } else if (ubx_state.id == UBX_NAV_SOL_ID) {
-                gps_got_msgs |= GOT_MSG_NAV_SOL;
+                    gps_state.lon = UBX_NAV_POSLLH_LON(ubx_msg_buf);
+                    gps_state.lat = UBX_NAV_POSLLH_LAT(ubx_msg_buf);
+                    gps_state.hmsl = UBX_NAV_POSLLH_HMSL(ubx_msg_buf);
+                    gps_state.hacc = UBX_NAV_POSLLH_Hacc(ubx_msg_buf);
+                    gps_state.vacc = UBX_NAV_POSLLH_Vacc(ubx_msg_buf);
+                    break;
+                case UBX_NAV_POSUTM_ID:
+                    gps_got_msgs |= GOT_MSG_GPS_POS;
 
-                uint8_t fix = UBX_NAV_SOL_GPSfix(ubx_msg_buf);
-                if ( fix == UBX_FIX_3D)
-                    gps_state.fix = GPS_FIX_3D;
-                else if ( fix == UBX_FIX_2D )
-                    gps_state.fix = GPS_FIX_2D;
-                else
-                    gps_state.fix = GPS_FIX_NONE;
-                gps_state.ecef_pos.x   = UBX_NAV_SOL_ECEF_X(ubx_msg_buf);
-                gps_state.ecef_pos.y   = UBX_NAV_SOL_ECEF_Y(ubx_msg_buf);
-                gps_state.ecef_pos.z   = UBX_NAV_SOL_ECEF_Z(ubx_msg_buf);
-                gps_state.pacc         = UBX_NAV_SOL_Pacc(ubx_msg_buf);
-                gps_state.ecef_speed.x = UBX_NAV_SOL_ECEFVX(ubx_msg_buf);
-                gps_state.ecef_speed.y = UBX_NAV_SOL_ECEFVY(ubx_msg_buf);
-                gps_state.ecef_speed.z = UBX_NAV_SOL_ECEFVZ(ubx_msg_buf);
-                gps_state.sacc         = UBX_NAV_SOL_Sacc(ubx_msg_buf);
-                gps_state.pdop         = UBX_NAV_SOL_PDOP(ubx_msg_buf);
-                gps_state.num_sv       = UBX_NAV_SOL_numSV(ubx_msg_buf);
-            } else if (ubx_state.id == UBX_NAV_VELNED_ID) {
-                gps_got_msgs |= GOT_MSG_NAV_VELNED;
+                    /* FIXME: Fill state from UTM */
+                    break;
+                case UBX_NAV_SOL_ID:
+                    gps_got_msgs |= GOT_MSG_GPS_SOL;
 
-                gps_state.vel_n = UBX_NAV_VELNED_VEL_N(ubx_msg_buf);
-                gps_state.vel_e = UBX_NAV_VELNED_VEL_E(ubx_msg_buf);
-            } else {
-                gps_state.parse_ignored++;
+                    uint8_t fix = UBX_NAV_SOL_GPSfix(ubx_msg_buf);
+                    if ( fix == UBX_FIX_3D)
+                        gps_state.fix = GPS_FIX_3D;
+                    else if ( fix == UBX_FIX_2D )
+                        gps_state.fix = GPS_FIX_2D;
+                    else
+                        gps_state.fix = GPS_FIX_NONE;
+                    gps_state.ecef_pos.x   = UBX_NAV_SOL_ECEF_X(ubx_msg_buf);
+                    gps_state.ecef_pos.y   = UBX_NAV_SOL_ECEF_Y(ubx_msg_buf);
+                    gps_state.ecef_pos.z   = UBX_NAV_SOL_ECEF_Z(ubx_msg_buf);
+                    gps_state.pacc         = UBX_NAV_SOL_Pacc(ubx_msg_buf);
+                    gps_state.ecef_speed.x = UBX_NAV_SOL_ECEFVX(ubx_msg_buf);
+                    gps_state.ecef_speed.y = UBX_NAV_SOL_ECEFVY(ubx_msg_buf);
+                    gps_state.ecef_speed.z = UBX_NAV_SOL_ECEFVZ(ubx_msg_buf);
+                    gps_state.sacc         = UBX_NAV_SOL_Sacc(ubx_msg_buf);
+                    gps_state.pdop         = UBX_NAV_SOL_PDOP(ubx_msg_buf);
+                    gps_state.num_sv       = UBX_NAV_SOL_numSV(ubx_msg_buf);
+                    break;
+                case UBX_NAV_VELNED_ID:
+                    gps_got_msgs |= GOT_MSG_GPS_VEL;
+
+                    gps_state.vel_n = UBX_NAV_VELNED_VEL_N(ubx_msg_buf);
+                    gps_state.vel_e = UBX_NAV_VELNED_VEL_E(ubx_msg_buf);
+                    break;
+                case UBX_NAV_SVINFO_ID:
+                    /* FIXME: Store... */
+                    break;
+                case UBX_NAV_STATUS_ID:
+                    /* FIXME: Maybe use fix from here? */
+                    gps_got_msgs |= GOT_MSG_GPS_STATUS;
+                    break;
+                default:
+                    gps_state.parse_ignored++;
+                    break;
             }
         } else {
             gps_state.parse_ignored++;
