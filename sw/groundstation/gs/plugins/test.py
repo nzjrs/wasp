@@ -1,6 +1,7 @@
 import gtk
 import logging
 
+import wasp
 import gs.plugin as plugin
 import gs.config as config
 
@@ -10,11 +11,13 @@ class TestConfigurable(plugin.Plugin, config.ConfigurableIface):
     CONFIG_SECTION = "TEST"
     def __init__(self, conf, source, messages_file, groundstation_window):
         config.ConfigurableIface.__init__(self, conf)
-        self.ck = "0"
+        if not wasp.IS_TESTING:
+            raise plugin.PluginNotSupported("Only enabled when WASP_IS_TESTING")
 
-        #groundstation_window.add_menu_item("Foo", gtk.MenuItem("foo1"), gtk.MenuItem("foo2"))
-        #groundstation_window.add_submenu_item("Foo", "Bar", gtk.MenuItem("bar1"), gtk.MenuItem("bar2"))
-        #groundstation_window.add_menu_item("File", gtk.MenuItem("baz1"))
+        self.ck = "0"
+        groundstation_window.add_menu_item("Foo", gtk.MenuItem("foo1"), gtk.MenuItem("foo2"))
+        groundstation_window.add_submenu_item("Foo", "Bar", gtk.MenuItem("bar1"), gtk.MenuItem("bar2"))
+        groundstation_window.add_menu_item("File", gtk.MenuItem("baz1"))
 
     def update_state_from_config(self):
         self.ck = self.config_get("Test_Check","0")

@@ -24,6 +24,7 @@ display
 
 :WASP_HOME_LAT:     The default latitude for the test data source
 :WASP_HOME_LON:     The default longitude for the test data source
+:WASP_IS_TESTING:   Sets additional debug/testing conditions in the groundstation
 
 Extending the Groundstation
 ---------------------------

@@ -15,8 +15,9 @@ import random
 import time
 import math
 
-HOME_LAT = float(os.environ.get("WASP_HOME_LAT", -43.520451))
-HOME_LON = float(os.environ.get("WASP_HOME_LON", 172.582377))
+HOME_LAT    = float(os.environ.get("WASP_HOME_LAT", -43.520451))
+HOME_LON    = float(os.environ.get("WASP_HOME_LON", 172.582377))
+IS_TESTING  = os.environ.get("WASP_IS_TESTING")
 
 #: dictionary mapping the C type to its length in bytes (e.g char -> 1)
 TYPE_TO_LENGTH_MAP = {
