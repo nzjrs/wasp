@@ -63,6 +63,23 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &gps_state.parse_error,
                     &gps_state.parse_ignored);
             break;
+        case MESSAGE_ID_GPS_GSV:
+            {
+#if RECORD_NUM_SAT_INFO
+            uint8_t i;
+            for (i = 0; i < gps_state.num_sat_info; i++) {
+                GPSSatellite_t *sat = &gps_state.sat_info[i];
+                MESSAGE_SEND_GPS_GSV(
+                    chan,
+                    &gps_state.num_sat_info,
+                    &sat->sat_id,
+                    &sat->elevation,
+                    &sat->azimuth,
+                    &sat->signal_strength);
+            }
+#endif
+            }
+            break;
         case MESSAGE_ID_IMU_GYRO_RAW:
             MESSAGE_SEND_IMU_GYRO_RAW(
                     chan,

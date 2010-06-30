@@ -26,11 +26,20 @@
 #include "std.h"
 #include "math/pprz_geodetic_int.h"
 
+#define RECORD_NUM_SAT_INFO 10
+
 typedef enum {
     GPS_FIX_NONE,
     GPS_FIX_2D,
     GPS_FIX_3D,
 } GpsFix_t;
+
+typedef struct __GPSSat {
+    uint8_t     sat_id;
+    int8_t      elevation;
+    int16_t     azimuth;
+    uint8_t     signal_strength;
+} GPSSatellite_t;
 
 typedef struct __GPS {
     struct EcefCoor_i ecef_pos;     /* pos ECEF in cm        */
@@ -53,6 +62,12 @@ typedef struct __GPS {
     uint8_t buffer_overrun;
     uint8_t parse_error;
     uint8_t parse_ignored;
+
+#if RECORD_NUM_SAT_INFO
+    uint8_t num_sat_info;
+    GPSSatellite_t  sat_info[RECORD_NUM_SAT_INFO];
+#endif
+
 } GPS_t;
 
 extern GPS_t            gps_state;

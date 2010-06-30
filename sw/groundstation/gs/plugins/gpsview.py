@@ -1,4 +1,5 @@
 import gtk
+import gobject
 import math
 import os.path
 import logging
@@ -18,17 +19,20 @@ class GpsView(plugin.Plugin):
         groundstation_window.add_submenu_item("Window", "GPS", item)
 
         source.register_interest(self._on_gps_gsv, 0, "GPS_GSV")
+        self._source = source
 
         self._sky = None
         self._w = None
         self._sats = {}
 
+    def _do_redraw(self):
+        self._sky.redraw(self._sats.values())
+        return True
+
     def _on_gps_gsv(self, msg, header, payload):
         if self._sky:
             sv,prn,elevation,azimuth,snr = msg.unpack_values(payload)
             self._sats[prn] = Sat(prn,elevation,azimuth,snr)
-            #Maybe should cap the redraw rate here...
-            self._sky.redraw(self._sats.values())
 
     def _create_window(self):
         self._w = gtk.Window()
@@ -39,6 +43,11 @@ class GpsView(plugin.Plugin):
     def _show_window(self, *args):
         if not self._w:
             self._create_window()
+            self._source.request_telemetry("GPS_GSV", 1)
+            #when we rx a GPS_GSV message, we actually get a few in quick succession
+            #so cap the redraw at 10Hz
+            gobject.timeout_add(1000/10, self._do_redraw)
+
         self._w.show_all()
 
 # Fake the libgps API, make this Sat class have the same elements as expected

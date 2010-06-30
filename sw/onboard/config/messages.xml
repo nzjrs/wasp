@@ -225,8 +225,8 @@
    <message name="GPS_GSV" id="42">
       <field name="sv"  type="uint8"/>
       <field name="prn"  type="uint8"/>
-      <field name="elevation"  type="uint16"/>
-      <field name="azimuth"  type="uint16"/>
+      <field name="elevation"  type="int8"/>
+      <field name="azimuth"  type="int16"/>
       <field name="snr"  type="uint8"/>
    </message>
 

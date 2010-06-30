@@ -110,6 +110,7 @@ gps_event_task(void)
                     /* FIXME: Fill state from UTM */
                     break;
                 case UBX_NAV_SOL_ID:
+                    {
                     gps_got_msgs |= GOT_MSG_GPS_SOL;
 
                     uint8_t fix = UBX_NAV_SOL_GPSfix(ubx_msg_buf);
@@ -129,6 +130,7 @@ gps_event_task(void)
                     gps_state.sacc         = UBX_NAV_SOL_Sacc(ubx_msg_buf);
                     gps_state.pdop         = UBX_NAV_SOL_PDOP(ubx_msg_buf);
                     gps_state.num_sv       = UBX_NAV_SOL_numSV(ubx_msg_buf);
+                    }
                     break;
                 case UBX_NAV_VELNED_ID:
                     gps_got_msgs |= GOT_MSG_GPS_VEL;
@@ -137,7 +139,19 @@ gps_event_task(void)
                     gps_state.vel_e = UBX_NAV_VELNED_VEL_E(ubx_msg_buf);
                     break;
                 case UBX_NAV_SVINFO_ID:
-                    /* FIXME: Store... */
+                    {
+#if RECORD_NUM_SAT_INFO
+                    uint8_t i;
+                    uint8_t nch = UBX_NAV_SVINFO_NCH(ubx_msg_buf);
+                    gps_state.num_sat_info = Min(nch, RECORD_NUM_SAT_INFO);
+                    for (i = 0; i < gps_state.num_sat_info; i++) {
+                        gps_state.sat_info[i].sat_id = UBX_NAV_SVINFO_SVID(ubx_msg_buf, i);
+                        gps_state.sat_info[i].elevation = UBX_NAV_SVINFO_Elev(ubx_msg_buf, i);
+                        gps_state.sat_info[i].azimuth = UBX_NAV_SVINFO_Azim(ubx_msg_buf, i);
+                        gps_state.sat_info[i].signal_strength = UBX_NAV_SVINFO_CNO(ubx_msg_buf, i);
+                    }
+#endif
+                    }
                     break;
                 case UBX_NAV_STATUS_ID:
                     /* FIXME: Maybe use fix from here? */
