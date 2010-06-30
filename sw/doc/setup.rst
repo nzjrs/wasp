@@ -22,6 +22,8 @@ Building the Onboard Software
 
 You may :xref:`wasp-download` these packages from the :xref:`wasp` homepage.
 
+.. _groundstation-setup:
+
 Building the Groundstation
 --------------------------
 - Install the dependencies

@@ -1,80 +1,37 @@
-====================================
-Groundstation Software Documentation
-====================================
+Groundstation
+=============
 
-.. autosummary::
+The Wasp groundstation is the main point from which to configure, control
+and test any UAV built using the Wasp framework. Once you have 
+completed :ref:`groundstation-setup` the easiest way to start the groundstation
+to explore its functionality is to execute the following command from the
+groundstation directory (note: you do not need to have a UAV at this point)::
 
-    wasp.messages.PyField
-    wasp.messages.PyMessage
-    wasp.messages.MessagesFile
-    wasp.settings.Setting
-    wasp.settings.SettingsFile
-    libserial.SerialChooser.SerialChooser
-    libserial.SerialSender.SerialSender
-    gs.plugin.Plugin
-    gs.config.ConfigurableIface
-    gs.source.UAVSource
-    gs.source.MessageCb
+./groundstation -t
 
------------
-libwasp API
------------
+This launches the groundstation mode with a test (**-t**) data source.
 
-.. automodule:: wasp
-   :members:
-
-.. automodule:: wasp.messages
-   :members:
-   :undoc-members:
-
-.. automodule:: wasp.communication
-   :members:
-   :undoc-members:
-
-.. automodule:: wasp.settings
-   :members:
-   :undoc-members:
-
-.. automodule:: wasp.transport
-   :members:
-   :undoc-members:
-
-.. automodule:: wasp.monitor
-   :members:
-   :undoc-members:
-
--------------
-libserial API
+Configuration
 -------------
 
-.. automodule:: libserial
-   :members:
+TODO
 
-.. automodule:: libserial.SerialChooser
-   :members:
-   :undoc-members:
+Environment Variables
+^^^^^^^^^^^^^^^^^^^^^
 
-.. automodule:: libserial.SerialSender
-   :members:
-   :undoc-members:
+The following environment variables also influence the groundstation
+display
 
---------------------------------------------
-Extending the Groundstation (The Plugin API)
---------------------------------------------
+:WASP_HOME_LAT:     The default latitude for the test data source
+:WASP_HOME_LON:     The default longitude for the test data source
 
-.. autoclass:: gs.plugin.Plugin
-   :members:
+Extending the Groundstation
+---------------------------
 
-.. autoexception:: gs.plugin.PluginNotSupported
+The groundstation has a powerful and easy to use API for writing 
+plugins to extend its functionality. Please see the following;
 
-.. autoclass:: gs.config.ConfigurableIface
-   :members:
+.. toctree::
+   :maxdepth: 2
 
-.. autoclass:: gs.groundstation.Groundstation
-   :members:
-
-.. autoclass:: gs.source.UAVSource
-   :members:
-
-.. autoclass:: gs.source.MessageCb
-   :members:
+   groundstation-api
