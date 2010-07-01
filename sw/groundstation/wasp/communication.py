@@ -229,7 +229,7 @@ class DummyCommunication(_Communication):
     def is_connected(self):
         return self._is_open
 
-class FifoCommunication(Communication):
+class FifoCommunication(_Communication):
 
     COMMUNICATION_TYPE = "fifo"
 
