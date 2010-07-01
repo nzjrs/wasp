@@ -21,7 +21,6 @@ from gs.ui.tree import DBWidget
 from gs.ui.msgarea import MsgAreaController
 from gs.ui.statusbar import StatusBar
 from gs.ui.info import InfoBox
-from gs.ui.flightplan import FlightPlanEditor
 from gs.ui.log import LogBuffer, LogWindow
 from gs.ui.map import Map
 from gs.ui.settings import SettingsController
@@ -44,8 +43,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
     CONFIG_CONNECT_NAME = "Connect_to_UAV_automatically"
     CONFIG_CONNECT_DEFAULT = "1"
-    CONFIG_LAT_DEFAULT = -43.520451
-    CONFIG_LON_DEFAULT = 172.582377
+    CONFIG_LAT_DEFAULT = wasp.HOME_LAT
+    CONFIG_LON_DEFAULT = wasp.HOME_LON
     CONFIG_ZOOM_DEFAULT = 12
 
     def __init__(self, options):
@@ -57,10 +56,10 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         disable_plugins = options.disable_plugins
 
         if not os.path.exists(messagesfile):
-            message_dialog("Could not find messages.xml", None, secondary=gs.CONFIG_DIR)
+            message_dialog("Could not find messages.xml", None, secondary="%s does not exist." % messagesfile)
             sys.exit(1)
         if not os.path.exists(settingsfile):
-            message_dialog("Could not find settings.xml", None, secondary=gs.CONFIG_DIR)
+            message_dialog("Could not find settings.xml", None, secondary="%s does not exist." % settingsfile)
             sys.exit(1)
     
         #connect our log buffer to the python logging subsystem
@@ -194,13 +193,23 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             msg = _tv.get_selected_message()
             _gm.add_graph(msg, field)
 
+        def on_send_msg_clicked(btn, _tv, _source):
+            msg,vals = _tv.get_selected_message_and_values()
+            if msg:
+                LOG.info("Sending Msg: %s %s" % (msg,vals))
+                _source.send_message(msg, vals)
+
         rxts = self._source.get_rx_message_treestore()
         if rxts:
             sw = self.get_resource("telemetry_sw")
-            rxtv = MessageTreeView(rxts, editable=False, show_dt=True)
+            rxtv = MessageTreeView(rxts, editable=wasp.IS_TESTING, show_dt=not wasp.IS_TESTING)
             sw.add(rxtv)
 
             vb = self.get_resource("telemetry_left_vbox")
+            if wasp.IS_TESTING:
+                b = gtk.Button("Send Selected")
+                b.connect("clicked", on_send_msg_clicked, rxtv, self._source)
+                vb.pack_start(b, False, False)
 
             rm = RequestMessageSender(self._messagesfile)
             rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
@@ -238,27 +247,52 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
     def _disconnect(self):
         self._source.disconnect_from_uav()
 
-    def add_menu_item(self, name, item):
-        """
-        Adds an item to the main window menu. 
+    def _add_submenu(self, name, parent_menu):
+        """ adds a submenu of name to parent_menu """
+        if name not in self._menus:
+            #add a new menu
+            menuitem = gtk.MenuItem(name)
+            parent_menu.append(menuitem)
+            menu = gtk.Menu()
+            menuitem.set_submenu(menu)
+            self._menus[name] = menu
+        return self._menus[name]
 
-        :param name: the name of the menu to add to, e.g. "File". 
-                     If a menu of that name does not exist, one is created
-        :param item: the gtk.MenuItem to add
-        """
+    def _get_toplevel_menu(self, name):
+        """ gets, or creates a toplevel menu of name """
         if name in self._menus:
             menu = self._menus[name]
             if not menu:
                 menu = self.get_resource("%s_menu" % name.lower())
         else:
-            #add a new menu
-            menuitem = gtk.MenuItem(name)
-            self.get_resource("main_menubar").append(menuitem)
-            menu = gtk.Menu()
-            menuitem.set_submenu(menu)
+            menu = self._add_submenu(name, self.get_resource("main_menubar"))
 
-        self._menus[name] = menu
-        menu.append(item)
+        return menu
+
+    def add_menu_item(self, name, *item):
+        """
+        Adds an item to the main window menubar. 
+
+        :param name: the name of the top-level menu to add to, e.g. "File". 
+                     If a menu of that name does not exist, one is created
+        :param item: One or more gtk.MenuItem to add
+        """
+        menu = self._get_toplevel_menu(name)
+        for i in item:
+            menu.append(i)
+
+    def add_submenu_item(self, name, submenu_name, *item):
+        """
+        Adds a submenu and item to the main window menubar.
+
+        :param name: the name of the top-level menu to add to, e.g. "File". 
+                     If a menu of that name does not exist, one is created
+        :param submenu_name: the name of the submenu to hold the item
+        :param item: One or more gtk.MenuItem to add
+        """
+        menu = self._add_submenu(submenu_name, self._get_toplevel_menu(name))
+        for i in item:
+            menu.append(i)
 
     def add_control_widget(self, name, widget):
         """
@@ -356,9 +390,9 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             )
         except KeyError, e:
             msg = self._msgarea.new_from_text_and_icon(
-                            gtk.STOCK_DIALOG_ERROR,
                             "Mark Home Failed",
                             "A GPS location has not been received from the UAV yet",
+                            message_type=gtk.MESSAGE_ERROR,
                             timeout=5)
             msg.show_all()
 
@@ -392,15 +426,14 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         path = self._map.save_kml()
         if path:
             msg = self._msgarea.new_from_text_and_icon(
-                            gtk.STOCK_INFO,
                             "KML Export Successful",
-                            "The file has been saved to %s" % path,
+                            'The file has been saved to <a href="file://%s">%s</a>' % (path, path),
                             timeout=5)
         else:
             msg = self._msgarea.new_from_text_and_icon(
-                            gtk.STOCK_DIALOG_ERROR,
                             "KML Export Failed",
                             "You must mark the home position of the flight first.",
+                            message_type=gtk.MESSAGE_ERROR,
                             timeout=5)
         msg.show_all()
 

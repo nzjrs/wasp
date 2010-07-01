@@ -5,12 +5,7 @@ Software
    :maxdepth: 2
 
    setup
-   unittest
-   onboard
    architecture
+   onboard
    groundstation
    sim
-   comm-protocol
-   coding-standards
-
-

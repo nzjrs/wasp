@@ -20,11 +20,13 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef GPS_H
-#define GPS_H
+#ifndef _GPS_H_
+#define _GPS_H_
 
 #include "std.h"
 #include "math/pprz_geodetic_int.h"
+
+#define RECORD_NUM_SAT_INFO 10
 
 typedef enum {
     GPS_FIX_NONE,
@@ -32,30 +34,44 @@ typedef enum {
     GPS_FIX_3D,
 } GpsFix_t;
 
-struct Booz_gps_state {
-  struct EcefCoor_i ecef_pos;    /* pos ECEF in cm        */
-  struct EcefCoor_i ecef_speed;  /* speed ECEF in cm/s    */
-  uint32_t pacc;                 /* position accuracy     */
-  uint32_t sacc;                 /* speed accuracy        */
-  uint16_t pdop;                 /* dilution of precision */
-  uint8_t  num_sv;               /* number of sat in fix  */
-  GpsFix_t fix;                  /* status of fix         */
-  /* UBX NAV POSLLH */
-  int32_t  booz2_gps_lon;
-  int32_t  booz2_gps_lat;
-  int32_t  booz2_gps_hmsl;       /* height above mean seal level (mm)   */
-  uint32_t booz2_gps_vacc;       /* vertical accuracy (mm)              */
-  uint32_t booz2_gps_hacc;       /* horizontal accuracy (mm)            */
-  /* UBX NAV VELNED */
-  int32_t  booz2_gps_vel_n;
-  int32_t  booz2_gps_vel_e;
-};
+typedef struct __GPSSat {
+    uint8_t     sat_id;
+    int8_t      elevation;
+    int16_t     azimuth;
+    uint8_t     signal_strength;
+} GPSSatellite_t;
 
-extern 
-struct Booz_gps_state booz_gps_state;
+typedef struct __GPS {
+    struct EcefCoor_i ecef_pos;     /* pos ECEF in cm        */
+    struct EcefCoor_i ecef_speed;   /* speed ECEF in cm/s    */
+    uint32_t pacc;                  /* position accuracy     */
+    uint32_t sacc;                  /* speed accuracy        */
+    uint16_t pdop;                  /* dilution of precision */
+    uint8_t  num_sv;                /* number of sat in fix  */
+    GpsFix_t fix;                   /* status of fix         */
+    /* UBX NAV POSLLH */
+    int32_t  lon;
+    int32_t  lat;
+    int32_t  hmsl;                  /* height above mean seal level (mm)   */
+    uint32_t vacc;                  /* vertical accuracy (mm)              */
+    uint32_t hacc;                  /* horizontal accuracy (mm)            */
+    /* UBX NAV VELNED */
+    int32_t  vel_n;
+    int32_t  vel_e;
+    /* Status */
+    uint8_t buffer_overrun;
+    uint8_t parse_error;
+    uint8_t parse_ignored;
 
-extern
-SystemStatus_t gps_system_status;
+#if RECORD_NUM_SAT_INFO
+    uint8_t num_sat_info;
+    GPSSatellite_t  sat_info[RECORD_NUM_SAT_INFO];
+#endif
+
+} GPS_t;
+
+extern GPS_t            gps_state;
+extern SystemStatus_t   gps_system_status;
 
 void 
 gps_init(void);
@@ -66,6 +82,6 @@ gps_init(void);
 bool_t
 gps_event_task(void);
 
-#endif /* BOOZ2_GPS_H */
+#endif /* _GPS_H_ */
 
 

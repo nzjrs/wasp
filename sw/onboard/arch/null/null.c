@@ -78,7 +78,7 @@ uint8_t actuators_get_num( uint8_t bank ) { return 0; }
 
 #include "gps.h"
 SystemStatus_t gps_system_status = STATUS_UNINITIAIZED;
-struct Booz_gps_state booz_gps_state;
+GPS_t gps_state;
 
 void gps_init(void) {}
 bool_t gps_event_task(void) { return FALSE; }

@@ -1,8 +1,8 @@
 import gtk
+import gobject
 import math
 import os.path
 import logging
-import subprocess
 
 import gs.ui
 import gs.plugin as plugin
@@ -16,31 +16,44 @@ class GpsView(plugin.Plugin):
         item = gtk.ImageMenuItem("Show Detailed GPS Info")
         item.set_image(gtk.image_new_from_pixbuf(pb))
         item.connect("activate", self._show_window)
-        groundstation_window.add_menu_item("Window", item)
+        groundstation_window.add_submenu_item("Window", "GPS", item)
 
         source.register_interest(self._on_gps_gsv, 0, "GPS_GSV")
+        self._source = source
 
         self._sky = None
         self._w = None
         self._sats = {}
 
+    def _do_redraw(self):
+        self._sky.redraw(self._sats.values())
+        return True
+
     def _on_gps_gsv(self, msg, header, payload):
         if self._sky:
             sv,prn,elevation,azimuth,snr = msg.unpack_values(payload)
             self._sats[prn] = Sat(prn,elevation,azimuth,snr)
-            #Maybe should cap the redraw rate here...
-            self._sky.redraw(self._sats.values())
 
     def _create_window(self):
         self._w = gtk.Window()
-        self._w.connect("delete-event", gtk.Widget.hide_on_delete)
+        self._w.connect("delete-event", self._hide_window)
         self._sky = SkyView()
         self._w.add(self._sky)
 
     def _show_window(self, *args):
         if not self._w:
             self._create_window()
+            #when we rx a GPS_GSV message, we actually get a few in quick succession
+            #so cap the redraw at 10Hz
+            gobject.timeout_add(1000/10, self._do_redraw)
+
+        self._source.request_telemetry("GPS_GSV", 1.0)
         self._w.show_all()
+
+    def _hide_window(self, *args):
+        self._source.stop_telemetry("GPS_GSV")
+        self._w.hide()
+        return True
 
 # Fake the libgps API, make this Sat class have the same elements as expected
 # by the skyview

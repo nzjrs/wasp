@@ -8,7 +8,7 @@ PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(DOCDIR)/.doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 GENERATED_FILES =							\
-	sw/doc/messages.txt						\
+	sw/doc/comm-protocol.rst				\
 	sw/onboard/generated/messages.h			\
 	$(BUILT_DOCDIR)/onboard/xml/index.xml
 
@@ -29,11 +29,13 @@ doc: mkdir $(GENERATED_FILES) html
 
 all: onboard bootloader doc
 
-clean:
-	-rm -rf $(BUILT_DOCDIR) $(DOCDIR)/.doctrees $(GENERATED_FILES)
+clean: cleandoc
 	@make -C sw/groundstation/ clean
 	@make -C sw/onboard/ clean
 	@make -C sw/bootloader/ clean
+
+cleandoc:
+	-rm -rf $(BUILT_DOCDIR) $(DOCDIR)/.doctrees $(GENERATED_FILES)
 
 test: clean
 	@make -C sw/groundstation/ test
@@ -70,8 +72,8 @@ mkdir:
 $(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg
 	@DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen $<
 
-sw/doc/messages.txt: sw/onboard/config/messages.xml
-	@PYTHONPATH=./sw/groundstation/ ./sw/tools/gen-messages.py -m $< -f rst > $@
+sw/doc/comm-protocol.rst: sw/onboard/config/messages.xml
+	@PYTHONPATH=./sw/groundstation/ ./sw/tools/gen-messages.py -m $< -f rst --output=$@
 
 sw/onboard/generated/messages.h: sw/onboard/config/messages.xml
 	@make -C sw/onboard/ generated/messages.h

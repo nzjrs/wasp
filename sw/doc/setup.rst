@@ -9,7 +9,9 @@ Building the Documentation (Optional)
 - python-sphinx > 0.6 
 - doxygen
 
-If you are using Ubuntu Jaunty, you may :xref:`wasp-download` sphinx from the :xref:`wasp` homepage. Ubunty Karmic users, or users of other distributions should install sphinx from your package manager.
+If you are using Ubuntu Jaunty, you may :xref:`wasp-download` sphinx from the :xref:`wasp`
+homepage. Ubunty Karmic users, or users of other distributions should install
+sphinx from your package manager.
 
 Building the Onboard Software
 -----------------------------
@@ -20,26 +22,33 @@ Building the Onboard Software
 
 You may :xref:`wasp-download` these packages from the :xref:`wasp` homepage.
 
+.. _groundstation-setup:
+
 Building the Groundstation
 --------------------------
-- python-osmgpsmap > 0.4
-- python-gtk
-- python-serial
+- Install the dependencies
 
-The groundstation depends on recent features of :xref:`osm-gps-map`, so you will need to build this from source. Normal PyGtk+ dependencies apply (python-gtk2-dev). Build and install the library as per normal instructions::
+::
 
-    ./autogen; ./configure --prefix=/usr && make && sudo make install
+    sudo apt-get install python-gtk2 python-serial python-gtkglext1 python-opengl
 
-Do not forget to install the python bindings too (in the python directory, as above)::
+- Install osm-gps-map
 
-    ./configure --prefix=/usr && make && sudo make install
+The groundstation depends on :xref:`osm-gps-map`. It works with the version shipped
+in Ubuntu lucid, so it can be installed by simply typing::
 
-You do not have to install osm-gps-map if you do not wish to. To run the groundstation against an uninstalled copy of osm-gps-map remember to set PYTHONPATH environment variable. For example::
+    sudo apt-get install python-osmgpsmap
+
+If you wish to use a later verion, :xref:`wasp` also supports recent stable releases
+of :xref:`osm-gps-map`. In this case, you should follow the installation instruction
+on the :xref:`osm-gps-map` homepage.
+
+One thing to note; you do not have to install osm-gps-map to /usr if you do not wish to.
+To run the groundstation against an uninstalled copy of osm-gps-map remember to
+set PYTHONPATH environment variable. For example::
 
     PYTHONPATH=/path/to/osm-gps-map/python/.libs ./groundstation.py
 
-Build Instructions
-------------------
 - Check out the code from :xref:`wasp`.
 
 ::

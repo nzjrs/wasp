@@ -48,13 +48,39 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
         case MESSAGE_ID_GPS_LLH:
             MESSAGE_SEND_GPS_LLH(
                     chan, 
-                    &booz_gps_state.fix,
-                    &booz_gps_state.num_sv,
-                    &booz_gps_state.booz2_gps_lat,
-                    &booz_gps_state.booz2_gps_lon,
-                    &booz_gps_state.booz2_gps_hmsl,
-                    &booz_gps_state.booz2_gps_hacc,
-                    &booz_gps_state.booz2_gps_vacc);
+                    &gps_state.fix,
+                    &gps_state.num_sv,
+                    &gps_state.lat,
+                    &gps_state.lon,
+                    &gps_state.hmsl,
+                    &gps_state.hacc,
+                    &gps_state.vacc);
+            break;
+        case MESSAGE_ID_GPS_STATUS:
+            MESSAGE_SEND_GPS_STATUS(
+                    chan,
+                    &gps_state.buffer_overrun,
+                    &gps_state.parse_error,
+                    &gps_state.parse_ignored);
+            break;
+        case MESSAGE_ID_GPS_GSV:
+            {
+#if RECORD_NUM_SAT_INFO
+            static uint8_t selected_sat_info = 0;
+            if (selected_sat_info < gps_state.num_sat_info) {
+                GPSSatellite_t *sat = &gps_state.sat_info[selected_sat_info];
+                MESSAGE_SEND_GPS_GSV(
+                    chan,
+                    &gps_state.num_sat_info,
+                    &sat->sat_id,
+                    &sat->elevation,
+                    &sat->azimuth,
+                    &sat->signal_strength);
+                selected_sat_info += 1;
+            } else
+                selected_sat_info = 0;
+#endif
+            }
             break;
         case MESSAGE_ID_IMU_GYRO_RAW:
             MESSAGE_SEND_IMU_GYRO_RAW(
@@ -110,7 +136,7 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
             MESSAGE_SEND_STATUS(
                     chan,
                     &rc_status,
-                    &booz_gps_state.fix,
+                    &gps_state.fix,
                     &bat,
                     &autopilot.in_flight,
                     &autopilot.motors_on,

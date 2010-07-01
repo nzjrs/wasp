@@ -167,7 +167,7 @@ static inline void autopilot_main_event( void ) {
     ins_update_baro();
 
   if ( gps_event_task() ) {
-    if (booz_gps_state.fix == GPS_FIX_3D)
+    if (gps_state.fix == GPS_FIX_3D)
         led_on(LED_GPS);
     else
         led_toggle(LED_GPS);

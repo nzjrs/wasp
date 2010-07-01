@@ -1,48 +1,54 @@
 Q                   = @
 TOOLS               = ../../tools
 MESSAGES            = ../config/messages.xml
-LIBDIR              = .
 SRCDIR              = ..
+INCDIR              = ./include
 
-INCDIR              = $(LIBDIR)/include
-PRIVINCDIR          = $(LIBDIR)/include/private
+LIB                 = libwasp.a
+OBJS                = comm.o messages.o
 
-default: dir lib headers-copy
+default: dir $(LIB)
 
 dir:
-	$(Q)test -d $(LIBDIR) || mkdir -p $(LIBDIR)
 	$(Q)test -d $(INCDIR) || mkdir -p $(INCDIR)
-	$(Q)test -d $(PRIVINCDIR) || mkdir -p $(PRIVINCDIR)
 
 # Radio header
-$(PRIVINCDIR)/build.h: $(SRC) $(TOOLS)/gen-build-info.py
+$(INCDIR)/build.h: $(SRC) $(TOOLS)/gen-build-info.py
 	@echo GENERATE $@
 	$(Q)PYTHONPATH=$(SRCDIR)/../groundstation/ $(TOOLS)/gen-build-info.py --target=$(TARGET) > $@
 
-$(PRIVINCDIR)/messages.h: $(MESSAGES) $(TOOLS)/gen-messages.py
+$(INCDIR)/messages.h: $(MESSAGES) $(TOOLS)/gen-messages.py
 	@echo GENERATE $@
-	$(Q)PYTHONPATH=$(SRCDIR)/../groundstation/ $(TOOLS)/gen-messages.py --messages=$< > $@
+	$(Q)PYTHONPATH=$(SRCDIR)/../groundstation/ $(TOOLS)/gen-messages.py --messages=$< --format=header --output=$@
 
-$(PRIVINCDIR)/messages-lib.h: $(MESSAGES) $(TOOLS)/gen-messages.py
+messages.c: $(MESSAGES) $(TOOLS)/gen-messages.py
 	@echo GENERATE $@
-	$(Q)PYTHONPATH=$(SRCDIR)/../groundstation/ $(TOOLS)/gen-messages.py --messages=$< --format=inlinefunction > $@
+	$(Q)PYTHONPATH=$(SRCDIR)/../groundstation/ $(TOOLS)/gen-messages.py --messages=$< --format=function --output=$@
 
-generated: $(PRIVINCDIR)/build.h $(PRIVINCDIR)/messages.h $(PRIVINCDIR)/messages-lib.h
+generated: $(INCDIR)/build.h $(INCDIR)/messages.h messages.c
 
-$(LIBDIR)/comm.o: comm.c
-	@echo COMPILE comm.o
-	$(Q)gcc -g -c -Wall -I$(PRIVINCDIR) $< -o $(@)
+%.o: %.c
+	@echo COMPILE $<
+	$(Q)gcc -g -c -Wall -I$(INCDIR) $< -o $@
 
-lib:  headers-copy generated $(LIBDIR)/comm.o
-	$(Q)ar rcs libwasp.a $(LIBDIR)/comm.o
+$(LIB):  headers-copy generated $(OBJS)
+	@echo ARCHIVE $@
+	$(Q)ar rcs $@ $(OBJS)
 
 headers-copy: dir
-	$(Q) cp $(SRCDIR)/std.h $(PRIVINCDIR)
-	$(Q) cp $(SRCDIR)/messages_types.h $(PRIVINCDIR)
+	$(Q) cp $(SRCDIR)/std.h $(INCDIR)
+	$(Q) cp $(SRCDIR)/messages_types.h $(INCDIR)
 
 clean:
-	$(Q) rm -f libwasp.a
-	$(Q) rm -f $(LIBDIR)/comm.o
-	$(Q) rm -f $(PRIVINCDIR)/std.h
-	$(Q) rm -f $(PRIVINCDIR)/messages_types.h
+	$(Q) rm -f $(LIB)
+	$(Q) rm -f $(OBJS)
+	$(Q) rm -f $(INCDIR)/build.h
+	$(Q) rm -f $(INCDIR)/messages.h
+	$(Q) rm -f $(INCDIR)/std.h
+	$(Q) rm -f $(INCDIR)/messages_types.h
+	$(Q) rm -f messages.c
+	$(Q) rm -f test
 
+test: test.c $(LIB)
+	@echo COMPILE test
+	$(Q)gcc -g -Wall -I$(INCDIR) -o $@ $^

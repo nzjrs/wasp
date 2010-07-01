@@ -25,6 +25,7 @@
 #include "sys_time.h"
 #include "led.h"
 #include "comm.h"
+#include "comm_autopilot.h"
 #include "gps.h"
 #include "generated/messages.h"
 #include "generated/settings.h"
@@ -56,24 +57,21 @@ static inline void main_init( void ) {
 }
 
 static inline void main_periodic_task( void ) {
+    comm_periodic_task(COMM_1);
 
-  RunOnceEvery(250, {
-    MESSAGE_SEND_GPS_LLH( COMM_1, 
-        &booz_gps_state.fix,
-        &booz_gps_state.num_sv,
-        &booz_gps_state.booz2_gps_lat,
-        &booz_gps_state.booz2_gps_lon,
-        &booz_gps_state.booz2_gps_hmsl,
-        &booz_gps_state.booz2_gps_hacc,
-        &booz_gps_state.booz2_gps_vacc);
-  });
-
+    RunOnceEvery(250, {
+        comm_autopilot_message_send (COMM_1, MESSAGE_ID_GPS_LLH);
+        comm_autopilot_message_send (COMM_1, MESSAGE_ID_GPS_STATUS);
+        comm_autopilot_message_send (COMM_1, MESSAGE_ID_STATUS_LOWLEVEL);
+    });
 
 }
 
 static inline void main_event_task( void ) {
+    comm_event_task(COMM_1);
+
     if (gps_event_task()) {
-        if (booz_gps_state.fix == GPS_FIX_3D)
+        if (gps_state.fix == GPS_FIX_3D)
             led_on(LED_GPS);
         else
             led_toggle(LED_GPS);

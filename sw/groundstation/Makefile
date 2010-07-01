@@ -6,7 +6,6 @@ test:
 	@PYTHONPATH=. find gs/test/ -name 'test*.py' -exec python {} \;
 
 clean:
-	@rm -rf wasp/test/html/
 	@find . -name '*.pyc' -exec rm -f {} \;
 
 install:

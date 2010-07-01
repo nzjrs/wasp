@@ -22,4 +22,7 @@ do
     done
 done
 
+echo "LIBWASP"
+cd libwasp ; make clean ; make test ; cd ..
+
 exit $OK

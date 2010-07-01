@@ -16,10 +16,10 @@ class Speedometer(plugin.Plugin):
     def __init__(self, conf, source, messages_file, groundstation_window):
 
         pb = gs.ui.get_icon_pixbuf("world.svg",size=gtk.ICON_SIZE_MENU)
-        item = gtk.ImageMenuItem("Show GPS Speedometer")
+        item = gtk.ImageMenuItem("Show GPS Speed")
         item.set_image(gtk.image_new_from_pixbuf(pb))
         item.connect("activate", self._show_window)
-        groundstation_window.add_menu_item("Window", item)
+        groundstation_window.add_submenu_item("Window", "GPS", item)
 
         source.register_interest(self._on_gps_vtg, 0, "GPS_VTG")
 
