@@ -41,7 +41,7 @@ class NMEA:
     def set_footer(self, contains_cr, contains_lf):
         if contains_cr and contains_lf:
             self.footer_len = 2
-        elif self.contains_cr or contains_lf:
+        elif contains_cr or contains_lf:
             self.footer_len = 1
         else:
             self.footer_len = 0
