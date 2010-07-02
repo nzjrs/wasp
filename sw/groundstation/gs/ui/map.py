@@ -238,9 +238,9 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
             items = [proxy, cache, source]
             sg = self.build_sizegroup()
             frame = self.build_frame(None, [
-                    self.build_label("Source", source, sg),
-                    self.build_label("Proxy", proxy, sg),
-                    self.build_label("Cache", cache, sg)
+                    self.build_label("Source", source, sg=sg),
+                    self.build_label("Proxy", proxy, sg=sg),
+                    self.build_label("Cache", cache, sg=sg)
                 ])
         else:
             frame = None

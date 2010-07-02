@@ -119,21 +119,25 @@ class ConfigurableIface:
         """ Returns a *gtk.SizeGroup* """
         return gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
 
-    def build_label(self, label, widget, sg=None):
+    def _add_sizegroup(self, lbl, **kwargs):
+        sg = kwargs.get("sg")
+        if sg:
+            sg.add_widget(lbl)
+
+    def build_label(self, label, widget, **kwargs):
         """
         Returns a *gtk.HBox* containing a label and the supplied widget
         :param sg: an optional *gtk.SizeGroup* to ensure the label is the same size
         """
-        b = gtk.HBox(spacing=5)
+        b = gtk.HBox(spacing=10)
 
         lbl = gtk.Label(label)
         lbl.set_alignment(0, 0.5)
 
-        b.pack_start(lbl)
-        b.pack_start(widget)
+        b.pack_start(lbl, False, False)
+        b.pack_start(widget, True, True)
 
-        if sg:
-            sg.add_widget(lbl)
+        self._add_sizegroup(lbl, **kwargs)
 
         return b
 
@@ -151,7 +155,7 @@ class ConfigurableIface:
 
         return widget
 
-    def build_combo(self, name, *options):
+    def build_combo(self, name, *options, **kwargs):
         """
         Returns a *gtk.ComboBox* with the supplied options
         :param name: the config name 
@@ -160,9 +164,11 @@ class ConfigurableIface:
         model = gtk.ListStore(str)
         for o in options:
             model.append((o,))
-        return self._build_combo_widget(name, model)
+        widget = self._build_combo_widget(name, model)
+        self._add_sizegroup(widget, **kwargs)
+        return widget
 
-    def build_combo_with_model(self, name, *options):
+    def build_combo_with_model(self, name, *options, **kwargs):
         """
         Returns a *gtk.ComboBox* with the supplied options
         :param name: the config name
@@ -174,9 +180,10 @@ class ConfigurableIface:
             model.append((n,o))
         widget = self._build_combo_widget(name, model)
         widget.set_data("MODEL_DATA_INDEX", 1)
+        self._add_sizegroup(widget, **kwargs)
         return widget
 
-    def build_entry(self, name):
+    def build_entry(self, name, **kwargs):
         """
         Returns a *gtk.Entry*
         :param name: the config name
@@ -185,9 +192,10 @@ class ConfigurableIface:
         widget = gtk.Entry()
         widget.set_data("CONFIG_NAME", name)
         widget.set_data("CONFIG_SECTION", section)
+        self._add_sizegroup(widget, **kwargs)
         return widget
 
-    def build_checkbutton(self, name):
+    def build_checkbutton(self, name, **kwargs):
         """
         Returns a *gtk.CheckButton*
         :param name: the config name
@@ -196,22 +204,24 @@ class ConfigurableIface:
         widget = gtk.CheckButton(label=name.replace("_"," ").title())
         widget.set_data("CONFIG_NAME", name)
         widget.set_data("CONFIG_SECTION", section)
+        self._add_sizegroup(widget, **kwargs)
         return widget
 
-    def _build_radio(self, name, label):
-        button = gtk.RadioButton(label=label)
+    def build_radio(self, name, item, **kwargs):
         section = self.CONFIG_SECTION
-        button.set_data("CONFIG_NAME", name)
-        button.set_data("CONFIG_SECTION", section)
-        return button
+        widget = gtk.RadioButton(label=item)
+        widget.set_data("CONFIG_NAME", name)
+        widget.set_data("CONFIG_SECTION", section)
+        self._add_sizegroup(widget, **kwargs)
+        return widget
 
-    def build_radio_group(self, name, *options):
+    def build_radio_group(self, name, *options, **kwargs):
         """
         Returns a group of *gtk.RadioButtons* with choices among the supplied options
         :param name: the config name 
         :param options: a list of strings
         """
-        buttons = [self._build_radio(name, i) for i in options]
+        buttons = [self._build_radio(name, i, **kwargs) for i in options]
 
         #make them part of the same group
         for b in buttons[1:]:
@@ -219,7 +229,7 @@ class ConfigurableIface:
 
         return buttons
 
-    def build_frame(self, name, items):
+    def build_frame(self, name, items, **kwargs):
         """
         Return a *gtk.Frame* of the given name containig the supplied items
         """

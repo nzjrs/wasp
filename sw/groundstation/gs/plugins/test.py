@@ -51,8 +51,8 @@ class TestConfigurable(plugin.Plugin, config.ConfigurableIface):
             ck1,
             e0,
             g1[0],
-            self.build_label("Short", e1, sg),
-            self.build_label("Much Longer Label", e2, sg),
+            self.build_label("Short", e1, sg=sg),
+            self.build_label("Much Longer Label", e2, sg=sg),
             g1[1],
             g1[2]
         ])
