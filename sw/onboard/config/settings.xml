@@ -24,6 +24,7 @@
     <setting name="TASK_DT" value="(1./512.)" doc="the periodic task time (seconds), the main loop runs at 1/TASK_DT"/>
   </section>
   <section name="LED">
+    <setting name="NB" value="5"/>
     <setting name="TIME" value="1"/>
     <setting name="RC" value="1"/>
     <setting name="GPS" value="4"/>
