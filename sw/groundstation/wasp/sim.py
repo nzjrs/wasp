@@ -84,6 +84,19 @@ FGNETMINIFDM_STRUCT_DEFINITION = \
     "I4d"                   +\
     "Ii"
 
+# Convert the class FGNetGUI structure into a python struct definition
+# seeL net_fdm.hxx in the FlightGear sources
+#
+FG_NET_GUI_VERSION = 7
+FGNETGUI_STRUCT_DEFINITION = \
+    "!"                     +\
+    "I"                     +\
+    "ddfffff"               +\
+    "ff"                    +\
+    "I4f"                   +\
+    "IIf"                   +\
+    "ffIfff"
+
 class FlightGearVisualisation(_FlightGearProcess):
     def __init__(self, host=VIS_HOST, port=VIS_PORT):
         _FlightGearProcess.__init__(self, get_flightgear_vis_args(host, port))
