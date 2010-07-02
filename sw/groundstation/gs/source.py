@@ -389,16 +389,16 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
 
     def get_preference_widgets(self):
         sg = self.build_sizegroup()
-        ser_port_cb = self.build_combo("serial_port", *libserial.get_ports(), sg=sg)
-        ser_speed_cb = self.build_combo("serial_speed", *libserial.get_speeds(), sg=sg)
+        ser_port_cb = self.build_combo("serial_port", *libserial.get_ports())
+        ser_speed_cb = self.build_combo("serial_speed", *libserial.get_speeds())
 
         #all following items configuration is saved
         items = [ser_port_cb, ser_speed_cb]
 
         #the gui looks like
         frame = self.build_frame(None, [
-            self.build_label("Serial Port", ser_port_cb),
-            self.build_label("Serial Baud", ser_speed_cb),
+            self.build_label("Serial Port", ser_port_cb, sg=sg),
+            self.build_label("Serial Baud", ser_speed_cb, sg=sg),
         ])
 
         return "UAV Source", frame, items

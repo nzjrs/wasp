@@ -129,13 +129,13 @@ class ConfigurableIface:
         Returns a *gtk.HBox* containing a label and the supplied widget
         :param sg: an optional *gtk.SizeGroup* to ensure the label is the same size
         """
-        b = gtk.HBox(spacing=5)
+        b = gtk.HBox(spacing=10)
 
         lbl = gtk.Label(label)
         lbl.set_alignment(0, 0.5)
 
-        b.pack_start(lbl)
-        b.pack_start(widget)
+        b.pack_start(lbl, False, False)
+        b.pack_start(widget, True, True)
 
         self._add_sizegroup(lbl, **kwargs)
 
