@@ -26,7 +26,6 @@
 #include "init.h"
 #include "sys_time.h"
 
-#include "config/config.h"
 #include "generated/settings.h"
 
 #include "nps_fdm.h"

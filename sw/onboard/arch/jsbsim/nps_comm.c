@@ -32,10 +32,10 @@
 #include <glib/gstdio.h>
 
 #include "std.h"
-#include "config/config.h"
-
 #include "comm.h"
-#include "messages.h"
+
+#include "generated/messages.h"
+#include "generated/settings.h"
 
 /* Only provide an implementation for COMM_1, aka
  * the XBEE, which is used for telemetry. This implementation is 2

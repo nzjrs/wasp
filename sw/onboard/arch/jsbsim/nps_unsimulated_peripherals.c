@@ -1,10 +1,10 @@
 #include <stdio.h>
 
 #include "std.h"
-#include "config/config.h"
-
 #include "led.h"
-static uint8_t leds[NUM_LEDS];
+
+#include "generated/settings.h"
+static uint8_t leds[LED_NB];
 
 static void led_print(void)
 {
@@ -14,7 +14,7 @@ static void led_print(void)
 void led_init (void)
 {
     uint8_t i;
-    for (i = 1; i <= NUM_LEDS; i++)
+    for (i = 1; i <= LED_NB; i++)
         led_off(i);
 }
 
@@ -47,6 +47,14 @@ uint32_t sys_time_chrono_stop ( void ) { return 0; }
 void sys_time_usleep ( uint32_t us ) {}
 void sys_time_calculate_cpu_usage ( void ) {}
 
+#include "gpio.h"
+void gpio_init(void) {}
+void gpio_on(uint8_t id) {}
+void gpio_off(uint8_t id) {}
+void gpio_toggle(uint8_t id) {}
+void gpio_periodic_task(void) {}
+bool_t gpio_get(uint8_t id) {return FALSE; }
+
 
 #include "analog.h"
 void analog_init( void ) {}
@@ -58,14 +66,15 @@ void analog_periodic_task( void ) {}
 
 
 #include "altimeter.h"
-SystemStatus_t altimeter_system_status;
-uint16_t booz2_analog_baro_offset;
-uint16_t booz2_analog_baro_value;
+SystemStatus_t altimeter_system_status = STATUS_UNINITIAIZED;
+uint16_t altimeter_calibration_offset;
+uint16_t altimeter_calibration_raw;
 
 void altimeter_init(void) {}
 void altimeter_periodic_task(void) {}
 uint8_t altimeter_event_task ( void ) { return 0; }
 int32_t altimeter_get_altitude( void ) { return 0; }
+void altimeter_recalibrate( void ) {}
 
 
 #include "imu.h"
@@ -84,8 +93,8 @@ void actuators_commit( uint8_t bank ) {}
 
 
 #include "gps.h"
-SystemStatus_t gps_system_status;
-struct Booz_gps_state booz_gps_state;
+SystemStatus_t gps_system_status = STATUS_UNINITIAIZED;
+GPS_t gps_state;
 
 void gps_init(void) {}
 bool_t gps_event_task(void) { return FALSE; }

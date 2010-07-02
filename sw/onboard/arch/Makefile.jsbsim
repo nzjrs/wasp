@@ -1,5 +1,4 @@
 ARCHSRC =                                       \
-    math/pprz_trig_int.c                        \
     math/pprz_geodetic_double.c                 \
     arch/jsbsim/nps_main.c                      \
     arch/jsbsim/nps_unsimulated_peripherals.c   \
