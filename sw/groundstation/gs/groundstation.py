@@ -10,7 +10,6 @@ gobject.threads_init()
 gtk.gdk.threads_init()
 
 import gs
-from gs.database import Database
 from gs.config import Config, ConfigurableIface, ConfigWindow
 from gs.source import UAVSource
 from gs.plugin import PluginManager
@@ -506,27 +505,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         dlg.run()
         dlg.destroy()
         
-    def db_chooser_callback(self, widget):
-        filename = widget.get_filename()
-        if filename:
-            #tell the database to load from a new file
-            db = Database(filename)
-            
-            db_notes = self.get_resource("db_notes")
-            buff = db_notes.get_buffer()
-            
-            notes = db.fetchall("select notes from flight where rowid=1")[0][0]
-            if (notes):
-                buff.set_text(notes)
-
-            sw = self.get_resource("dbscrolledwindow")
-            for c in sw.get_children():
-                sw.remove(c)
-            dbw = DBWidget(db)
-            dbw.show()
-            sw.add(dbw)
-            db.close()
-
     def on_menu_item_show_previous_activate(self, widget):
         message_dialog("Not Implemented", self.window)
 
