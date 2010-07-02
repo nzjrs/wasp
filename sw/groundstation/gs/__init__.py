@@ -76,13 +76,13 @@ class _SourceOptionParser(optparse.OptionParser):
         return options, args
                 
 def get_default_command_line_parser(include_prefs, include_plugins, include_sources, messages_name="messages.xml", settings_name="settings.xml", preferences_name="groundstation.ini"):
-    default_messages = os.path.join(CONFIG_DIR, "messages.xml")
-    default_settings = os.path.join(CONFIG_DIR, "settings.xml")
+    default_messages = os.path.join(CONFIG_DIR, messages_name)
+    default_settings = os.path.join(CONFIG_DIR, settings_name)
 
     if include_prefs:
         if not os.path.exists(USER_CONFIG_DIR):
             os.makedirs(USER_CONFIG_DIR)
-        prefs = os.path.join(USER_CONFIG_DIR, "groundstation.ini")
+        prefs = os.path.join(USER_CONFIG_DIR, preferences_name)
 
     if include_sources:
         parser = _SourceOptionParser()
