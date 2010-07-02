@@ -355,7 +355,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                     self._messagesfile.get_message_by_name("MARK_HOME"),
                     (lat,lon,hsl)
             )
-        except KeyError, e:
+        except KeyError:
             msg = self._msgarea.new_from_text_and_icon(
                             "Mark Home Failed",
                             "A GPS location has not been received from the UAV yet",
@@ -379,7 +379,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
 
         if resp == gtk.RESPONSE_OK:
             csv = self.get_resource("log_csv_radiobutton")
-            fcb = self.get_resource("log_filechooserbutton")
 
             messages = ("STATUS", "GPS_LLH")
             if csv.get_active():
