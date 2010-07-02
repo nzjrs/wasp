@@ -21,3 +21,7 @@ From the onboard directory::
 
     $ make ARCH=jsbsim TARGET=test/test_led_main
     $ LD_LIBRARY_PATH=/opt/jsbsim/lib/ ./bin/jsbsim/test/test_led_main.elf
+
+The simulator is also affected by some environment variables
+
+:WASP_NO_FLIGHTGEAR:    Disables FlightGear visualisation

@@ -56,6 +56,7 @@ struct FGNetGUI {
 };
 
 static struct  {
+    int disabled;
     int socket;
     struct sockaddr_in addr;
 } flightgear;
@@ -64,6 +65,15 @@ static struct  {
 void nps_flightgear_init(const char* host,  unsigned int port) {
     int so_reuseaddr;
     struct protoent *pte;
+
+    flightgear.socket = -1;
+    flightgear.disabled = FALSE;
+
+    if (g_getenv("WASP_NO_FLIGHTGEAR")) {
+        flightgear.disabled = TRUE;
+        return;
+    }
+
 
     /* if the host is 127.0.0.1 or localhost then also start flightgear */
     if (    (g_strcmp0(host, "127.0.0.1") == 0) ||
@@ -99,6 +109,9 @@ void nps_flightgear_init(const char* host,  unsigned int port) {
 void nps_flightgear_send() {
 
     struct FGNetGUI gui;
+
+    if (flightgear.disabled)
+        return;
 
     gui.version = FG_NET_GUI_VERSION; 
 
