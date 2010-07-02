@@ -1,6 +1,8 @@
+import os.path
 import socket
 import random
 import gobject
+import logging
 
 import libserial.SerialSender
 
@@ -9,6 +11,8 @@ import wasp.transport
 import wasp.fms
 
 UDP_PORT = 1212
+
+LOG = logging.getLogger('wasp.comm')
 
 class _Communication(gobject.GObject):
 
@@ -234,7 +238,7 @@ class FifoCommunication(_Communication):
     COMMUNICATION_TYPE = "fifo"
 
     def __init__(self, transport, messages_file, message_header):
-        Communication.__init__(self, transport, messages_file, message_header)
+        _Communication.__init__(self, transport, messages_file, message_header)
         self.readfd = -1
         self.writefd = -1
         self.watch = None
@@ -249,6 +253,8 @@ class FifoCommunication(_Communication):
             os.write(self.writefd, data)
 
     def connect_to_uav(self):
+        LOG.info("Connecting to FIFO: %s" % self.fifo_path)
+
         if self.fifo_path:
             rdpath = self.fifo_path + "_SOGI"
             wrpath = self.fifo_path + "_SIGO"
@@ -267,7 +273,7 @@ class FifoCommunication(_Communication):
         self.emit("uav-connected", self.is_connected())
 
     def on_data_available(self, fd, condition):
-        data = os.read(self.readfd, nbytes)
+        data = os.read(self.readfd, 1)
         for header, payload in self.transport.parse_many(data):
             msg = self.messages_file.get_message_by_id(header.msgid)
             if msg:
@@ -284,7 +290,7 @@ class FifoCommunication(_Communication):
         return self.writefd != -1 and self.readfd != -1
 
     def configure_connection(self, **kwargs):
-        self.fifo_path = kwargs.get("fifo_path")
+        self.fifo_path = "/tmp/WASP_COMM_1" #kwargs.get("fifo_path")
 
     def get_connection_string(self):
         return "%s" % self.fifo_path
