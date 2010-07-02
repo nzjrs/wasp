@@ -13,7 +13,6 @@ import gs.utils as utils
 import wasp
 import wasp.transport as transport
 import wasp.communication as communication
-import wasp.messages as messages
 import wasp.ui.treeview as treeview
 
 DEBUG=False

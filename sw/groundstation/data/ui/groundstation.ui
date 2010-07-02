@@ -102,17 +102,6 @@
                   <object class="GtkMenu" id="window_menu">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="menu_item_dock_all">
-                        <property name="label">Dock All</property>
-                        <property name="visible">True</property>
-                        <property name="image">image2</property>
-                        <property name="use_stock">False</property>
-                        <property name="accel_group">accelgroup1</property>
-                        <property name="always_show_image">True</property>
-                        <signal name="activate" handler="on_menu_item_dock_all_activate"/>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkImageMenuItem" id="menu_item_plane_view">
                         <property name="label">Plane View</property>
                         <property name="visible">True</property>
@@ -482,76 +471,7 @@
               <object class="GtkHBox" id="telemetry_hbox">
                 <property name="visible">True</property>
                 <child>
-                  <object class="GtkHPaned" id="hpaned2">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <child>
-                      <object class="GtkVBox" id="telemetry_left_vbox">
-                        <property name="visible">True</property>
-                        <child>
-                          <object class="GtkLabel" id="label1">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Messages Received</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkScrolledWindow" id="telemetry_sw">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="hscrollbar_policy">automatic</property>
-                            <child>
-                              <placeholder/>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkButton" id="graph_button">
-                            <property name="label" translatable="yes">Graph Selected</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="image">add_image</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="resize">False</property>
-                        <property name="shrink">False</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkVBox" id="graphs_box">
-                        <property name="visible">True</property>
-                        <property name="spacing">5</property>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="resize">True</property>
-                        <property name="shrink">False</property>
-                      </packing>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="position">0</property>
-                  </packing>
+                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -672,11 +592,6 @@
     <property name="page_increment">10</property>
   </object>
   <object class="GtkAccelGroup" id="accelgroup1"/>
-  <object class="GtkImage" id="image2">
-    <property name="visible">True</property>
-    <property name="stock">gtk-unindent</property>
-    <property name="icon-size">1</property>
-  </object>
   <object class="GtkImage" id="image3">
     <property name="visible">True</property>
     <property name="stock">gtk-missing-image</property>
@@ -1069,10 +984,6 @@
       <action-widget response="0">button4</action-widget>
       <action-widget response="-5">button3</action-widget>
     </action-widgets>
-  </object>
-  <object class="GtkImage" id="add_image">
-    <property name="visible">True</property>
-    <property name="stock">gtk-add</property>
   </object>
   <object class="GtkImage" id="image22">
     <property name="visible">True</property>

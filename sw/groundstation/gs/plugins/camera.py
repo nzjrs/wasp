@@ -1,7 +1,8 @@
-import logging
-import subprocess
 import gtk
 import gst
+import os.path
+import logging
+import subprocess
 
 import gs.plugin as plugin
 import gs.config as config
@@ -87,7 +88,7 @@ class _Camera(gtk.DrawingArea):
             self._playing = False
             self.pipeline.set_state(gst.STATE_PAUSED)
 
-class CameraWindow(plugin.Plugin, config.ConfigurableIface):
+class Video4LinuxCameraWindow(plugin.Plugin, config.ConfigurableIface):
 
     CONFIG_SECTION = "CAMERA"
 
@@ -96,12 +97,21 @@ class CameraWindow(plugin.Plugin, config.ConfigurableIface):
     DEFAULT_NORM = "PAL-N"
     DEFAULT_INPUT_CHANNEL = "Composite1"
 
+    MAX_CAMERAS = 10
+
     def __init__(self, conf, source, messages_file, groundstation_window):
         config.ConfigurableIface.__init__(self, conf)
 
+        #look for any video4linux devices
+        found = False
+        for i in range(self.MAX_CAMERAS):
+            if os.path.exists("/dev/video%d" % i):
+                found = True
+        if not found:
+            raise plugin.PluginNotSupported("No Video4Linux (/dev/video) devices found")
+
         #add an entry to the window menu
-        item = gtk.ImageMenuItem("Camera View")
-        item.set_image(gtk.image_new_from_stock(gtk.STOCK_MISSING_IMAGE, gtk.ICON_SIZE_MENU))
+        item = gtk.MenuItem("Show Camera")
         item.connect("activate", self._show_window)
         groundstation_window.add_menu_item("Window", item)
 

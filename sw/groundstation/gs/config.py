@@ -2,7 +2,6 @@ import logging
 import ConfigParser
 
 import gtk
-import gobject
 
 LOG = logging.getLogger('config')
 
@@ -222,8 +221,7 @@ class ConfigurableIface:
         :param name: the config name 
         :param options: a list of strings
         """
-        section = self.CONFIG_SECTION
-        buttons = [self.build_radio(name, i, **kwargs) for i in options]
+        buttons = [self._build_radio(name, i, **kwargs) for i in options]
 
         #make them part of the same group
         for b in buttons[1:]:
