@@ -90,7 +90,7 @@ class UI:
         self._messagesfile.parse()
 
         self._config = Config(filename=prefsfile)
-        self._source = UAVSource(self._config, self._messagesfile, options.source)
+        self._source = UAVSource(self._config, self._messagesfile, options)
         self._tm = TabletGraphManager(self._config, self._source, self._messagesfile, self)
 
         self._in_fullscreen = False

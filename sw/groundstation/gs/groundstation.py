@@ -94,7 +94,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._messagesfile = MessagesFile(path=messagesfile, debug=False)
         self._messagesfile.parse()
 
-        self._source = UAVSource(self._config, self._messagesfile, options.source)
+        self._source = UAVSource(self._config, self._messagesfile, options)
         self._source.connect("source-connected", self._on_source_connected)
         self._source.connect("uav-selected", self._on_uav_selected)
 

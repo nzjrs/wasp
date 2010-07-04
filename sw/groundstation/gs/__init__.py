@@ -75,7 +75,7 @@ class _SourceOptionParser(optparse.OptionParser):
             options.source = "test"
         return options, args
                 
-def get_default_command_line_parser(include_prefs, include_plugins, include_sources, messages_name="messages.xml", settings_name="settings.xml", preferences_name="groundstation.ini"):
+def get_default_command_line_parser(include_prefs, include_plugins, include_sources, messages_name="messages.xml", settings_name="settings.xml", preferences_name="groundstation.ini", ping_time=2):
     default_messages = os.path.join(CONFIG_DIR, messages_name)
     default_settings = os.path.join(CONFIG_DIR, settings_name)
 
@@ -97,6 +97,10 @@ def get_default_command_line_parser(include_prefs, include_plugins, include_sour
     parser.add_option("-d", "--debug",
                     action="store_true",
                     help="Print extra debugging information")
+    parser.add_option("-g", "--ping-time",
+                    type="int", default=ping_time, metavar="n",
+                    help="Send ping every n seconds, 0 disables")
+
     if include_prefs:
         parser.add_option("-p", "--preferences",
                         default=prefs,
