@@ -18,7 +18,6 @@ from gs.config import Config
 from gs.source import UAVSource
 from gs.ui import message_dialog
 from gs.ui.info import InfoBox
-from gs.ui.window import DialogWindow
 from gs.ui.graph import Graph, GraphHolder, GraphManager
 from wasp.messages import MessagesFile
 from wasp.settings import SettingsFile
@@ -183,8 +182,8 @@ class UI:
             self._tm.add_graph(msg, field)
 
     def _on_request_telemetry(self, btn):
-        dlg = DialogWindow(
-                    "Requrest Telemetry",
+        dlg = gtk.Dialog(
+                    title="Requrest Telemetry",
                     parent=self._win)
 
         rm = RequestTelemetrySender(self._messagesfile)
@@ -192,6 +191,8 @@ class UI:
         dlg.vbox.pack_start(rm, False, False)
 
         dlg.show_all()
+        dlg.run()
+        dlg.destroy()
 
     def make_telemetry_page(self):
         rxts = self._source.get_rx_message_treestore()
