@@ -13,15 +13,17 @@ sys.path.insert(0,'/home/user/pythonlibs')
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
 import gs
+import gs.ui
 from gs.config import Config
 from gs.source import UAVSource
 from gs.ui import message_dialog
 from gs.ui.info import InfoBox
+from gs.ui.window import DialogWindow
 from gs.ui.graph import Graph, GraphHolder, GraphManager
 from wasp.messages import MessagesFile
 from wasp.settings import SettingsFile
 from wasp.ui.treeview import MessageTreeView
-from wasp.ui.senders import RequestMessageSender, RequestMessageButton
+from wasp.ui.senders import RequestMessageSender, RequestMessageButton, RequestTelemetrySender
 
 HILDON_AVAILABLE = False
 try:
@@ -174,12 +176,24 @@ class UI:
 
         return hb
 
-    def make_telemetry_page(self):
-        def on_gb_clicked(btn, _tv, _gm):
-            field = _tv.get_selected_field()
-            msg = _tv.get_selected_message()
-            _gm.add_graph(msg, field)
+    def _on_graph_clicked(self, btn, rxtv):
+        field = rxtv.get_selected_field()
+        msg = rxtv.get_selected_message()
+        if field and msg:
+            self._tm.add_graph(msg, field)
 
+    def _on_request_telemetry(self, btn):
+        dlg = DialogWindow(
+                    "Requrest Telemetry",
+                    parent=self._win)
+
+        rm = RequestTelemetrySender(self._messagesfile)
+        rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
+        dlg.vbox.pack_start(rm, False, False)
+
+        dlg.show_all()
+
+    def make_telemetry_page(self):
         rxts = self._source.get_rx_message_treestore()
         if not rxts:
             LOG.critical("Could not get RX treestore")
@@ -189,8 +203,12 @@ class UI:
         rxtv = MessageTreeView(rxts, editable=False, show_dt=True)
         vb.pack_start(rxtv, expand=True, fill=True)
 
-        b = gtk.Button(stock=gtk.STOCK_ADD)
-        b.connect("clicked", on_gb_clicked, rxtv, self._tm)
+        b = gs.ui.get_button("Graph Selected", image_stock=gtk.STOCK_ADD)
+        b.connect("clicked", self._on_graph_clicked, rxtv)
+        vb.pack_start(b, expand=False, fill=True)
+
+        b = gs.ui.get_button("Request Telemetry", image_stock=gtk.STOCK_INFO)
+        b.connect("clicked", self._on_request_telemetry)
         vb.pack_start(b, expand=False, fill=True)
 
         sw = gtk.ScrolledWindow()

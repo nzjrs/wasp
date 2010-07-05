@@ -67,6 +67,14 @@ def get_icon_pixbuf(name=None, stock=None, size=gtk.ICON_SIZE_DIALOG):
 def get_icon_image(*args, **kwargs):
     return gtk.image_new_from_pixbuf(get_icon_pixbuf(*args,**kwargs))
 
+def get_button(label, stock=None, image_name=None, image_stock=None):
+    if stock:
+        return gtk.Button(stock=stock)
+
+    b = gtk.Button(label=label)
+    b.set_image(get_icon_image(name=image_name, stock=image_stock, size=gtk.ICON_SIZE_BUTTON))
+    return b
+
 def get_ui_file(name):
     mydir = os.path.dirname(os.path.abspath(__file__))
     ui = os.path.abspath(os.path.join(mydir, name))
