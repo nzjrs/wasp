@@ -182,12 +182,16 @@ class UI:
             self._tm.add_graph(msg, field)
 
     def _on_request_telemetry(self, btn):
+        def _request_clicked(_rm, _msg, _vals, _source, _dlg):
+            _source.send_message(_msg, _vals)
+            _dlg.response(gtk.RESPONSE_OK)
+
         dlg = gtk.Dialog(
                     title="Requrest Telemetry",
                     parent=self._win)
 
         rm = RequestTelemetrySender(self._messagesfile)
-        rm.connect("send-message", lambda _rm, _msg, _vals: self._source.send_message(_msg, _vals))
+        rm.connect("send-message", _request_clicked, self._source, dlg)
         dlg.vbox.pack_start(rm, False, False)
 
         dlg.show_all()
