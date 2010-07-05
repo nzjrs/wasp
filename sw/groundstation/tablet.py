@@ -44,14 +44,14 @@ class TabletGraphManager(GraphManager):
         GraphManager.__init__(self, conf, source, messages, None, None)
         self._ui = ui
 
-    def add_graph(self, msg, field, adjustable=True):
+    def add_graph(self, msg, field, adjustable=True, double_buffer=False):
         name = "%s:%s" % (msg.name, field.name)
 
         if name not in self._graphs:
             LOG.info("Adding graph: %s" % name)
 
             gh = GraphHolder(
-                    Graph(self._source, msg, field),
+                    Graph(self._source, msg, field, double_buffer=True),
                     name,
                     adjustable,
                     None,#self._on_pause,
