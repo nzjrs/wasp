@@ -133,6 +133,9 @@ class UI:
             if c:
                 c.update_state_from_config()
 
+        gobject.timeout_add(2000, lambda: self._source.connect_to_uav())
+        gobject.timeout_add(3000, lambda: self._source.refresh_uav_info())
+
         self._win.show_all()
 
     def main(self):

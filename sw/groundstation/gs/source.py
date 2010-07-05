@@ -321,6 +321,10 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
     def disconnect_from_uav(self):
         self.communication.disconnect_from_uav()
 
+    def refresh_uav_info(self):
+        m = self._messages_file.get_message_by_name("BUILD_INFO")
+        self.request_message(m.id)
+
     def request_message(self, message_id):
         """ Resuests the UAV send us the message with the supplied ID """
         self.send_message(self._rm, (message_id,))
