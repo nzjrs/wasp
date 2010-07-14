@@ -41,8 +41,8 @@ class InfoBox:
             self.rc_value,
             self.gps_value,
             self.in_flight_value,
-            self.motors_on_value,
-            self.autopilot_mode_value) = self._build_aligned_labels("ID","Runtime","RC","GPS","In Flight","Autopilot","Motors")
+            self.autopilot_mode_value,
+            self.motors_on_value) = self._build_aligned_labels("ID","Runtime","RC","GPS","In Flight","Autopilot","Motors")
             if show_images: image = gs.ui.get_icon_image("dashboard.svg")
             self.widget.pack_start(
                 self._build_section(
