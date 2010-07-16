@@ -208,12 +208,27 @@ class ConfigurableIface:
         return widget
 
     def build_radio(self, name, item, **kwargs):
+        """
+        Returns a *gtk.RadioButton*
+        :param name: the config name
+        :param item: the visible label
+        """
         section = self.CONFIG_SECTION
         widget = gtk.RadioButton(label=item)
         widget.set_data("CONFIG_NAME", name)
         widget.set_data("CONFIG_SECTION", section)
         self._add_sizegroup(widget, **kwargs)
         return widget
+
+    def build_hbox(self, *items, **kwargs):
+        """
+        Returns a *gtk.HBox*
+        :param items: items added to the HBox
+        """
+        hb = gtk.HBox(**kwargs)
+        for i in items:
+            hb.pack_start(i, False)
+        return hb
 
     def build_radio_group(self, name, *options, **kwargs):
         """
