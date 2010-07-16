@@ -97,14 +97,12 @@ class Video4LinuxCameraWindow(plugin.Plugin, config.ConfigurableIface):
     DEFAULT_NORM = "PAL-N"
     DEFAULT_INPUT_CHANNEL = "Composite1"
 
-    MAX_CAMERAS = 10
-
     def __init__(self, conf, source, messages_file, groundstation_window):
         config.ConfigurableIface.__init__(self, conf)
 
-        #look for any video4linux devices
+        #look for any (up to 10) video4linux devices
         found = False
-        for i in range(self.MAX_CAMERAS):
+        for i in range(10):
             if os.path.exists("/dev/video%d" % i):
                 found = True
         if not found:
