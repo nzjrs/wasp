@@ -45,5 +45,8 @@ Here is an example plugin which has its own user interface. It
 contains a label which shows data received from the UAV, and a single button,
 which when clicked sends a message to the UAV.
 
+The plugin file (e.g. foo.py) should reside in the
+**sw/groundstation/gs/plugins** directory
+
 .. literalinclude:: /sw/groundstation/gs/plugins/example.py
 
