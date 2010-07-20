@@ -19,6 +19,7 @@ SRC =                               \
     math/pprz_geodetic_float.c      \
     lib/debug.c                     \
     rc.c                            \
+    fms.c                           \
     autopilot.c                     \
     ins/booz2_ins.c                 \
     ins/booz2_hf_float.c            \
