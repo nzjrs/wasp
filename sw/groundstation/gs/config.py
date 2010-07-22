@@ -384,8 +384,12 @@ class ConfigWindow:
                             idx = i
                     widget.set_active(idx)
                 elif type(widget) == gtk.RadioButton:
-                    if name == val:
-                        widget.set_active()
+                    if widget.get_group():
+                        if widget.get_label() == val:
+                            widget.set_active(True)
+                    else:
+                        if name == val:
+                            widget.set_active(True)
                 elif type(widget) == gtk.CheckButton:
                     i = int(val)
                     if i == 1:
