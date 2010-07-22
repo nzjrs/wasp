@@ -199,9 +199,14 @@ class ConfigurableIface:
         """
         Returns a *gtk.CheckButton*
         :param name: the config name
+
+        Kwargs:
+           label (str): The label to be shown in the CheckButton. If not
+           supplied, one is generated from the name automatically
         """
         section = self.CONFIG_SECTION
-        widget = gtk.CheckButton(label=name.replace("_"," ").title())
+        label = kwargs.get("label", name.replace("_"," ").title())
+        widget = gtk.CheckButton(label=label)
         widget.set_data("CONFIG_NAME", name)
         widget.set_data("CONFIG_SECTION", section)
         self._add_sizegroup(widget, **kwargs)
