@@ -51,6 +51,11 @@ def norm_chan(c):
 
 gentools.print_header(H, generatedfrom=os.path.abspath(sys.argv[1]))
 
+#include the complete contents of the XML file for the simulator
+print
+lines = open(sys.argv[1]).readlines()
+print '#define RADIO_XML "\\\n%s"' % "\\\n".join([l.strip().replace('"',"'") for l in lines])
+print
 print '#define RADIO_NAME "%s"' % radio.name
 print
 print '#define RADIO_CTL_NB', len(channels)
