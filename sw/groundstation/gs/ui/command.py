@@ -6,7 +6,7 @@ import gs.config as config
 import wasp.ui.treeview as treeview
 import wasp.fms as fms
 
-LOG = logging.getLogger("settings")
+LOG = logging.getLogger("ui.command")
 
 class CommandController(gs.ui.GtkBuilderWidget):
 
