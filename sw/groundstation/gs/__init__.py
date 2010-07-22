@@ -51,15 +51,17 @@ def user_file_path(filename):
                 "Desktop",
                 filename)
 
-def scale_to_range(val, oldrange, newrange=(0.0,1.0), reverse=False):
-    oldmin = float(oldrange[0])
-    oldmax = float(oldrange[1])
-    newmin = float(newrange[0])
-    newmax = float(newrange[1])
-    val += newmin - oldmin
-    val *= (newmax-newmin)/(oldmax-oldmin)
-    if reverse:
-        return newmin + (newmax - val)
+def scale_to_range(val, oldrange, newrange=(0.0,1.0)):
+    #make 0 based
+    tmpoldmax = float(oldrange[1]) - oldrange[0]
+    tmpnewmax = float(newrange[1]) - newrange[0]
+
+    #scale to new range
+    val = ((val - oldrange[0]) / tmpoldmax) * tmpnewmax
+
+    #offset from new min
+    val += newrange[0]
+
     return val
 
 class _SourceOptionParser(optparse.OptionParser):

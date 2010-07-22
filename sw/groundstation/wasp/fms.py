@@ -72,14 +72,41 @@ class ControlManager:
         self.source = source
         self.enabled = False
 
-    def enable(self):
-        pass
+        #cache supported messages
+        self._msg_fms_rate = None
+        self._msg_fms_attitude = None
+        self._msg_fms_speed = None
+        self._msg_fms_position = None
+        self._msg_rc = messages_file["RC"]
+
+        #current message and args
+        self._msg = None
+        self._args = ()
+        #send FMS messages at regular frequency
+        self._timout_id = None
+
+    def _send_control(self):
+        if self._msg:
+            print "."
+            self.source.send_message(self._msg, self._args)
+        return True
+
+    def enable(self, enable=True):
+        #if currently enabled and disabling then remove the source
+        if self.enabled and not enable:
+            gobject.source_remove(self._timeout_id)
+        #else if enabling and not currently enabled then add the source
+        elif not self.enabled and enable:
+            self._timout_id = gobject.timeout_add(1000/20, self._send_control)
+        self.enabled = enable
+
+    def send_servo(self, *args):
+        self._args = args
+        self._msg = self._msg_rc
 
     def send_attitude(self, roll, pitch, yaw, thrust):
-        if self.enabled:
-            pass
+        pass
 
     def send_position(self, lat, lon, heading, alt):
-        if self.enabled:
-            pass
+        pass
 

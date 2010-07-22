@@ -45,6 +45,7 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface):
                 update_state_cb=self._on_joystick_device_set)
     
         self.control = fms.ControlManager(source, messages_file)
+        self.control.enable()
 
         self.joystick = None
         self.joystick_id = None
@@ -52,6 +53,8 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface):
         groundstation_window.add_control_widget(
                 "Joystick Control",
                 self._build_ui())
+
+        self._servo_vals = [0,0,0,0,0,0]
 
     def _on_joystick_device_set(self):
         if self.joystick != None:
@@ -86,7 +89,11 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface):
         return vb
 
     def _on_joystick_event(self, joystick, joystick_axis, joystick_value, init):
-        pass
+        self._servo_vals[joystick_axis] = int(gs.scale_to_range(
+                                                    joystick_value,
+                                                    oldrange=(-32767,32767),
+                                                    newrange=(-9600,9600)))
+        self.control.send_servo(*self._servo_vals)
         #try:
         #    label, progress_bar, fms_axis_id = self.progress[ self.axis_channel[joystick_axis] ]
         #    value = gs.scale_to_range(
