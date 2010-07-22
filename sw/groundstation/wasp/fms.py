@@ -7,6 +7,11 @@ COMMAND_ERROR_PENDING   = 0
 COMMAND_ERROR_LOST      = 1
 COMMAND_ERROR_NACK      = 2
 
+ID_ROLL                 = 1
+ID_PITCH                = 2
+ID_HEADING              = 3
+ID_THRUST               = 4
+
 class _Command:
     def __init__(self, msgid, ok_cb, failed_cb, delete_myself_cb, timeout=1000):
         self.msgid = msgid

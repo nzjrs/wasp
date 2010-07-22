@@ -13,6 +13,7 @@ sys.path.insert(0,'/home/user/pythonlibs')
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
 import gs
+import gs.ui
 from gs.config import Config
 from gs.source import UAVSource
 from gs.ui import message_dialog
@@ -21,7 +22,7 @@ from gs.ui.graph import Graph, GraphHolder, GraphManager
 from wasp.messages import MessagesFile
 from wasp.settings import SettingsFile
 from wasp.ui.treeview import MessageTreeView
-from wasp.ui.senders import RequestMessageSender, RequestMessageButton
+from wasp.ui.senders import RequestMessageSender, RequestMessageButton, RequestTelemetrySender
 
 HILDON_AVAILABLE = False
 try:
@@ -42,14 +43,14 @@ class TabletGraphManager(GraphManager):
         GraphManager.__init__(self, conf, source, messages, None, None)
         self._ui = ui
 
-    def add_graph(self, msg, field, adjustable=True):
+    def add_graph(self, msg, field, adjustable=True, double_buffer=False):
         name = "%s:%s" % (msg.name, field.name)
 
         if name not in self._graphs:
             LOG.info("Adding graph: %s" % name)
 
             gh = GraphHolder(
-                    Graph(self._source, msg, field),
+                    Graph(self._source, msg, field, double_buffer=True),
                     name,
                     adjustable,
                     None,#self._on_pause,
@@ -90,7 +91,7 @@ class UI:
         self._messagesfile.parse()
 
         self._config = Config(filename=prefsfile)
-        self._source = UAVSource(self._config, self._messagesfile, options.source)
+        self._source = UAVSource(self._config, self._messagesfile, options)
         self._tm = TabletGraphManager(self._config, self._source, self._messagesfile, self)
 
         self._in_fullscreen = False
@@ -131,6 +132,9 @@ class UI:
         for c in self._configurable:
             if c:
                 c.update_state_from_config()
+
+        gobject.timeout_add(2000, lambda: self._source.connect_to_uav())
+        gobject.timeout_add(3000, lambda: self._source.refresh_uav_info())
 
         self._win.show_all()
 
@@ -174,12 +178,30 @@ class UI:
 
         return hb
 
-    def make_telemetry_page(self):
-        def on_gb_clicked(btn, _tv, _gm):
-            field = _tv.get_selected_field()
-            msg = _tv.get_selected_message()
-            _gm.add_graph(msg, field)
+    def _on_graph_clicked(self, btn, rxtv):
+        field = rxtv.get_selected_field()
+        msg = rxtv.get_selected_message()
+        if field and msg:
+            self._tm.add_graph(msg, field)
 
+    def _on_request_telemetry(self, btn):
+        def _request_clicked(_rm, _msg, _vals, _source, _dlg):
+            _source.send_message(_msg, _vals)
+            _dlg.response(gtk.RESPONSE_OK)
+
+        dlg = gtk.Dialog(
+                    title="Requrest Telemetry",
+                    parent=self._win)
+
+        rm = RequestTelemetrySender(self._messagesfile)
+        rm.connect("send-message", _request_clicked, self._source, dlg)
+        dlg.vbox.pack_start(rm, False, False)
+
+        dlg.show_all()
+        dlg.run()
+        dlg.destroy()
+
+    def make_telemetry_page(self):
         rxts = self._source.get_rx_message_treestore()
         if not rxts:
             LOG.critical("Could not get RX treestore")
@@ -189,8 +211,12 @@ class UI:
         rxtv = MessageTreeView(rxts, editable=False, show_dt=True)
         vb.pack_start(rxtv, expand=True, fill=True)
 
-        b = gtk.Button(stock=gtk.STOCK_ADD)
-        b.connect("clicked", on_gb_clicked, rxtv, self._tm)
+        b = gs.ui.get_button("Graph Selected", image_stock=gtk.STOCK_ADD)
+        b.connect("clicked", self._on_graph_clicked, rxtv)
+        vb.pack_start(b, expand=False, fill=True)
+
+        b = gs.ui.get_button("Request Telemetry", image_stock=gtk.STOCK_INFO)
+        b.connect("clicked", self._on_request_telemetry)
         vb.pack_start(b, expand=False, fill=True)
 
         sw = gtk.ScrolledWindow()

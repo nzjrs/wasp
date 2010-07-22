@@ -10,7 +10,7 @@ import gobject
 try:
     import osmgpsmap
     MAP_AVAILABLE   = osmgpsmap.__version__ >= "0.5.0"
-    MAP_NEW_API     = osmgpsmap.__version__ >= "0.7.1"
+    MAP_NEW_API     = osmgpsmap.__version__ >= "0.7.2"
 except:
     MAP_AVAILABLE = False
 
@@ -181,10 +181,16 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
         if not self._map:
             if MAP_AVAILABLE:
-                self._map = osmgpsmap.GpsMap(
-                            map_source=int(self._source),
-                            proxy_uri=self._proxy,
-                            tile_cache_base=self._cachebase)
+                kwargs = {
+                    "map_source":int(self._source),
+                    "proxy_uri":self._proxy,
+                    "tile_cache_base":self._cachebase
+                }
+                if MAP_NEW_API:
+                    kwargs["tile_cache"] = osmgpsmap.CACHE_FRIENDLY
+
+                self._map = osmgpsmap.GpsMap(**kwargs)
+
                 #add OSD
                 if MAP_NEW_API:
                     self._map.layer_add(

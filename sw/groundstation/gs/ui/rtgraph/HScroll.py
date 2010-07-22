@@ -33,7 +33,8 @@ class HScrollGraph(PolledGraph):
                  pollInterval = 10,
                  bgColor      = None,
                  gridColor    = None,
-                 axisLabel    = False
+                 axisLabel    = False,
+                 doubleBuffer = False
                  ):
         PolledGraph.__init__(self, size, channels, pollInterval, bgColor, gridColor)
         self.gridSize = gridSize
@@ -44,7 +45,7 @@ class HScrollGraph(PolledGraph):
         # Normally we copy from backbuffer to backbuffer when scrolling.
         # This breaks under the win32 implementation of GDK, so use a temporary
         # buffer then.
-        self.useTemporaryPixmap = os.name == "nt"
+        self.useTemporaryPixmap = (os.name == "nt") or doubleBuffer
 
     def _get_gridlines_y(self):
         #first gridline is at the bottom (y = gheight), subsequent gridlines
@@ -239,10 +240,11 @@ class HScrollLineGraph(HScrollGraph):
                  pollInterval = 10,
                  bgColor      = None,
                  gridColor    = None,
+                 doubleBuffer = False,
                  ):
         HScrollGraph.__init__(self, size, channels, gridSize,
                               scrollRate, pollInterval, bgColor, 
-                              gridColor, axisLabel)
+                              gridColor, axisLabel, doubleBuffer)
         self.autoScale = autoScale
         self.range = list(range)
         self.penVectors = {}

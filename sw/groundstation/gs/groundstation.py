@@ -94,7 +94,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._messagesfile = MessagesFile(path=messagesfile, debug=False)
         self._messagesfile.parse()
 
-        self._source = UAVSource(self._config, self._messagesfile, options.source)
+        self._source = UAVSource(self._config, self._messagesfile, options)
         self._source.connect("source-connected", self._on_source_connected)
         self._source.connect("uav-selected", self._on_uav_selected)
 
@@ -201,7 +201,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             disconn_menu.set_sensitive(True)
 
             #request UAV info once connected
-            gobject.timeout_add(500, self.on_menu_item_refresh_uav_activate)
+            gobject.timeout_add(500, lambda: self._source.refresh_uav_info())
         else:
             disconn_menu.set_sensitive(False)
             conn_menu.set_sensitive(True)
@@ -418,14 +418,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                 self._source.select_uav(acid)
 
     def on_menu_item_refresh_uav_activate(self, *args):
-        #request a number of messages from the UAV
-        for n in ("BUILD_INFO", ):
-            m = self._messagesfile.get_message_by_name(n)
-            if m:
-                self._source.request_message(m.id)
-
-        #so we can be called on timeout_add
-        return False
+        self._source.refresh_uav_info()
 
     def on_menu_item_request_telemetry_activate(self, *args):
         self.telemetrycontroller.request_telemetry()

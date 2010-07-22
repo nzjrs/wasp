@@ -199,15 +199,25 @@ class ConfigurableIface:
         """
         Returns a *gtk.CheckButton*
         :param name: the config name
+
+        Kwargs:
+           label (str): The label to be shown in the CheckButton. If not
+           supplied, one is generated from the name automatically
         """
         section = self.CONFIG_SECTION
-        widget = gtk.CheckButton(label=name.replace("_"," ").title())
+        label = kwargs.get("label", name.replace("_"," ").title())
+        widget = gtk.CheckButton(label=label)
         widget.set_data("CONFIG_NAME", name)
         widget.set_data("CONFIG_SECTION", section)
         self._add_sizegroup(widget, **kwargs)
         return widget
 
     def build_radio(self, name, item, **kwargs):
+        """
+        Returns a *gtk.RadioButton*
+        :param name: the config name
+        :param item: the visible label
+        """
         section = self.CONFIG_SECTION
         widget = gtk.RadioButton(label=item)
         widget.set_data("CONFIG_NAME", name)
@@ -215,13 +225,23 @@ class ConfigurableIface:
         self._add_sizegroup(widget, **kwargs)
         return widget
 
+    def build_hbox(self, *items, **kwargs):
+        """
+        Returns a *gtk.HBox*
+        :param items: items added to the HBox
+        """
+        hb = gtk.HBox(**kwargs)
+        for i in items:
+            hb.pack_start(i, False)
+        return hb
+
     def build_radio_group(self, name, *options, **kwargs):
         """
         Returns a group of *gtk.RadioButtons* with choices among the supplied options
         :param name: the config name 
         :param options: a list of strings
         """
-        buttons = [self._build_radio(name, i, **kwargs) for i in options]
+        buttons = [self.build_radio(name, i, **kwargs) for i in options]
 
         #make them part of the same group
         for b in buttons[1:]:
@@ -369,8 +389,12 @@ class ConfigWindow:
                             idx = i
                     widget.set_active(idx)
                 elif type(widget) == gtk.RadioButton:
-                    if name == val:
-                        widget.set_active()
+                    if widget.get_group():
+                        if widget.get_label() == val:
+                            widget.set_active(True)
+                    else:
+                        if name == val:
+                            widget.set_active(True)
                 elif type(widget) == gtk.CheckButton:
                     i = int(val)
                     if i == 1:

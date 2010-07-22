@@ -32,14 +32,15 @@ class RandomChannel(FieldChannel):
         return random.random()
        
 class Graph(rtgraph.HScrollLineGraph):
-    def __init__(self, source, msg, field, ymin=0.0, ymax=1.0, width=150, height=50, rate=30):
+    def __init__(self, source, msg, field, double_buffer, ymin=0.0, ymax=1.0, width=150, height=50, rate=30):
         rtgraph.HScrollLineGraph.__init__(self, 
                     scrollRate=rate,
                     size=(width,height),
                     range=(ymin,ymax),
                     autoScale=True,
                     axisLabel=True,
-                    channels=[FieldChannel(msg, field)]
+                    channels=[FieldChannel(msg, field)],
+                    doubleBuffer=double_buffer
         )
         self._source = source
         self._source.register_interest(self._on_msg, 0, msg.name)
@@ -229,14 +230,14 @@ class GraphManager(config.ConfigurableIface):
         LOG.info("Saved %s graphs" % num)
         self.config_set("num_graphs", num)
 
-    def add_graph(self, msg, field, adjustable=True):
+    def add_graph(self, msg, field, adjustable=True, double_buffer=False):
         name = "%s:%s" % (msg.name, field.name)
 
         if name not in self._graphs:
             LOG.info("Adding graph: %s" % name)
 
             gh = GraphHolder(
-                    Graph(self._source, msg, field),
+                    Graph(self._source, msg, field, double_buffer),
                     name,
                     adjustable,
                     self._on_pause,

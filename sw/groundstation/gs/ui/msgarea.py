@@ -1,8 +1,8 @@
 import gtk
 import gobject
 
-class _InfoBar(gtk.InfoBar):
-    def __init__(self, primary_text, secondary_text, message_type, buttons):
+class InfoBar(gtk.InfoBar):
+    def __init__(self, primary_text, secondary_text=None, message_type=gtk.MESSAGE_INFO, buttons=()):
         gtk.InfoBar.__init__(self)
 
         vbox = gtk.VBox(False, 6)
@@ -17,7 +17,8 @@ class _InfoBar(gtk.InfoBar):
         if secondary_text:
             secondary_label = gtk.Label()
             vbox.pack_start(secondary_label, True, True, 0)
-            secondary_label.set_line_wrap(True)
+            if buttons:
+                secondary_label.set_line_wrap(True)
             secondary_label.set_alignment(0, 0.5)
         self._secondary_label = secondary_label
 
@@ -48,11 +49,11 @@ class MsgAreaController(gtk.VBox):
         
     def clear(self):
         for i in self.get_children():
-            if type(i) == _InfoBar:
+            if type(i) == InfoBar:
                 self.remove(i)
         
     def new_from_text_and_icon(self, primary, secondary=None, message_type=gtk.MESSAGE_INFO, buttons=(), timeout=0):
-        infobar = _InfoBar(primary, secondary, message_type, buttons)
+        infobar = InfoBar(primary, secondary, message_type, buttons)
         infobar.show_all()
         self.pack_start(infobar, False, True)
         

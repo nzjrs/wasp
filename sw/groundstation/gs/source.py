@@ -116,8 +116,6 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
     DEFAULT_SPEED = 57600
     DEFAULT_TIMEOUT = 1
 
-    PING_TIME = 3
-
     #: the groundstation is (physically) connected to the UAV
     STATUS_CONNECTED                =   1
     #: the groundstation is connected and receiving data
@@ -136,7 +134,7 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
                 gobject.TYPE_INT]),         #The ACID of a selected UAV
     }
 
-    def __init__(self, conf, messages, source_name, listen_acid=wasp.ACID_ALL):
+    def __init__(self, conf, messages, options, listen_acid=wasp.ACID_ALL):
         config.ConfigurableIface.__init__(self, conf)
         gobject.GObject.__init__(self)
 
@@ -164,6 +162,7 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
             "serial_speed":self._speed
         }
 
+        source_name = options.source
         comm_klass = communication.get_source(source_name)
         LOG.info("Source: %s" % comm_klass)
 
@@ -184,7 +183,8 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         self._pingtime = 0
         self._pingmsg = messages.get_message_by_name("PING")
         self.register_interest(self._got_pong, 0, "PONG")
-        gobject.timeout_add(2000, self._do_ping)
+        if options.ping_time > 0:
+            gobject.timeout_add(1000*options.ping_time, self._do_ping)
 
     def _got_pong(self, msg, header, payload):
         #calculate difference in send and rx in milliseconds
@@ -320,6 +320,10 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
 
     def disconnect_from_uav(self):
         self.communication.disconnect_from_uav()
+
+    def refresh_uav_info(self):
+        m = self._messages_file.get_message_by_name("BUILD_INFO")
+        self.request_message(m.id)
 
     def request_message(self, message_id):
         """ Resuests the UAV send us the message with the supplied ID """
