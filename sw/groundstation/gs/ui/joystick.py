@@ -1,4 +1,5 @@
 import gtk
+import gobject
 
 import gs.joystick
 import gs.ui.progressbar as progressbar
@@ -22,18 +23,33 @@ class JoystickWidget(gtk.VBox):
         self.joystick = None
         self.joystick_id = None
 
+        #update the joystick values in an idle handler, otherwise we
+        #redraw the UI far too fast
+        self.joystick_values = {}
+        gobject.timeout_add(1000/20, self._update_progressbars)
+
     def set_joystick(self, joystick):
         self.joystick = joystick
         self.joystick_id = self.joystick.connect("axis", self._on_joystick_event)
 
     def _on_joystick_event(self, joystick, joystick_axis, joystick_value, init):
-        try:
             if self.show_uncalibrated:
                 joystick_axis, joystick_value = self.joystick.get_uncalibrated_axis_and_value(joystick_axis)
-            self.progress[joystick_axis].set_value(joystick_value)
-        except IndexError:
-            #ignored axis
-            pass
+            self.joystick_values[joystick_axis] = joystick_value
+
+    def _update_progressbars(self):
+        while True:
+            try:
+                axis, value = self.joystick_values.popitem()
+                self.progress[axis].set_value(value)
+            except IndexError:
+                #ignored axis
+                pass
+            except KeyError:
+                #dict empty, finished updating all axis
+                break
+
+        return True
 
 if __name__ == "__main__":
     w = gtk.Window()
