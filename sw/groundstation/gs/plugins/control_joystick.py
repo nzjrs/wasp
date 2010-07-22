@@ -9,12 +9,13 @@ import gs.joystick as joystick
 import gs.ui.progressbar as progressbar
 import gs.ui.joystick as joystickui
 import gs.ui.msgarea as msgarea
+import gs.ui.control as control
 
 import wasp.fms as fms
 
 LOG = logging.getLogger('control.joystick')
 
-class ControlJoystick(plugin.Plugin, config.ConfigurableIface):
+class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWidgetIface):
 
     CONFIG_SECTION          = "CONTROL_JOYSTICK"
     DEFAULT_DEVICE          = "/dev/input/js0"
@@ -45,14 +46,17 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface):
                 update_state_cb=self._on_joystick_device_set)
     
         self.control = fms.ControlManager(source, messages_file)
-        self.control.enable()
 
         self.joystick = None
         self.joystick_id = None
 
+        self.ui = gtk.VBox()
+        self.jsw = joystickui.JoystickWidget(num_axis=4, axis_labels=("R","P","Y","T"), show_range=False)
+        self.ui.pack_start(self.jsw, True, True)
+
         groundstation_window.add_control_widget(
                 "Joystick Control",
-                self._build_ui())
+                self)
 
         self._servo_vals = [0,0,0,0,0,0]
 
@@ -81,12 +85,6 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface):
         self.jsw.set_joystick(self.joystick)
 
         LOG.info("Joystick initialized: %s" % self._device)
-
-    def _build_ui(self):
-        vb = gtk.VBox()
-        self.jsw = joystickui.JoystickWidget(num_axis=4, axis_labels=("R","P","Y","T"), show_range=False)
-        vb.pack_start(self.jsw, True, True)
-        return vb
 
     def _on_joystick_event(self, joystick, joystick_axis, joystick_value, init):
         self._servo_vals[joystick_axis] = int(gs.scale_to_range(
@@ -149,4 +147,11 @@ can also reverse the axis be selecting the 'R' check-box.""")
         vb.pack_start(info, False, False)
 
         return "Joystick", vb, items
+
+    def set_control_enabled(self, enabled):
+        self.control.enable(enabled)
+
+    def get_ui_widget(self):
+        return self.ui
+
  

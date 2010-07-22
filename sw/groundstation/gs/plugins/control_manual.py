@@ -13,9 +13,15 @@ class ControlManual(plugin.Plugin, gs.ui.GtkBuilderWidget):
         uifile = os.path.join(mydir, "control_manual.ui")
         gs.ui.GtkBuilderWidget.__init__(self, uifile)
 
+        self.ui = self.get_resource("table1")
         groundstation_window.add_control_widget(
                 "Manual Control",
-                self.get_resource("table1"))
+                self)
 
         LOG.info("Manual Control initialized")
 
+    def set_control_enabled(self, enabled):
+        pass
+
+    def get_ui_widget(self):
+        return self.ui

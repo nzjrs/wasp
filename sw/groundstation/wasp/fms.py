@@ -97,7 +97,7 @@ class ControlManager:
             gobject.source_remove(self._timeout_id)
         #else if enabling and not currently enabled then add the source
         elif not self.enabled and enable:
-            self._timout_id = gobject.timeout_add(1000/20, self._send_control)
+            self._timeout_id = gobject.timeout_add(1000/20, self._send_control)
         self.enabled = enable
 
     def send_servo(self, *args):
