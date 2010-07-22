@@ -13,8 +13,8 @@ import gs.utils as utils
 #    """)
 
 class ProgressBar(gtk.HBox):
-    def __init__(self, range, average=0):
-        gtk.HBox.__init__(self, False, 5)
+    def __init__(self, range, average=0, show_range=True, show_value=True, label="", **kwargs):
+        gtk.HBox.__init__(self, False, spacing=5)
         try:
             self._min, self._max = range
             self._auto = False
@@ -27,16 +27,25 @@ class ProgressBar(gtk.HBox):
         else:
             self._avg = None
 
-        self._lblmin = gtk.Label("%.1f" % self._min)
-        self._lblmin.props.xalign = 0
         self._bar = gtk.ProgressBar()
         self._bar.set_name("PlainProgress")
-        self._lblmax = gtk.Label("%.1f" % self._max)
-        self._lblmax.props.xalign = 0
 
-        self.pack_start(self._lblmin, False)
+        if show_range:
+            self._lblmin = gtk.Label("%.1f" % self._min)
+            self._lblmin.props.xalign = 0
+            self._lblmax = gtk.Label("%.1f" % self._max)
+            self._lblmax.props.xalign = 0
+
+        if label:
+            l = gtk.Label(label)
+            l.props.xalign = 0
+            self.pack_start(l, False, False)
+
+        if show_range:
+            self.pack_start(self._lblmin, False)
         self.pack_start(self._bar, True)
-        self.pack_start(self._lblmax, False)
+        if show_range:
+            self.pack_start(self._lblmax, False)
 
     def set_value(self, value):
         val = float(value)
