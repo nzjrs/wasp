@@ -13,12 +13,6 @@ static NpsRC_t nps_rc_state;
 
 SystemStatus_t rc_system_status = STATUS_UNINITIAIZED;
 
-static gboolean ping(gpointer data)
-{
-    g_printf("TEST\n");
-    return TRUE;
-}
-
 static gpointer rc_mainloop_thread(gpointer data)
 {
     gboolean rc_ok;
@@ -28,9 +22,9 @@ static gpointer rc_mainloop_thread(gpointer data)
     state->loop = g_main_loop_new(state->context, FALSE);
 
     /* start a regular timer */
-    GSource *timeout = g_timeout_source_new_seconds (1);
-    g_source_set_callback(timeout, (GSourceFunc)ping, NULL, NULL);
-    g_source_attach(timeout, state->context);
+    //GSource *timeout = g_timeout_source_new_seconds (1);
+    //g_source_set_callback(timeout, (GSourceFunc)ping, NULL, NULL);
+    //g_source_attach(timeout, state->context);
 
     /* init the joystick device, it uses io_add_watch, so it needs the context */
     rc_ok = nps_radio_control_joystick_init("/dev/input/js0", state->context);
@@ -38,7 +32,6 @@ static gpointer rc_mainloop_thread(gpointer data)
         rc_system_status = STATUS_INITIALIZED;
 
     /* start the mainloop */
-    g_printf("STARTING MAINLOOP\n");
     g_main_loop_run(state->loop);
     return NULL;
 }
@@ -46,8 +39,6 @@ static gpointer rc_mainloop_thread(gpointer data)
 void rc_init ( void )
 {
     int i;
-
-    g_printf("RC INIT\n");
 
     /* init the RC state */
     for (i = 0; i < RADIO_CTL_NB; i++) {

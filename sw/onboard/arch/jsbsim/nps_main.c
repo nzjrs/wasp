@@ -64,6 +64,7 @@ void hw_init(void)
     nps_flightgear_init(NPS_FLIGHTGEAR_HOST, NPS_FLIGHTGEAR_PORT);
 }
 
+/* This is baiscally the main loop, this function gets called very fast */
 bool_t sys_time_periodic( void ) 
 {
     bool_t ret;

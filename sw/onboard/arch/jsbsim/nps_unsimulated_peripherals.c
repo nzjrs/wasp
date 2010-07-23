@@ -1,40 +1,7 @@
 #include <stdio.h>
 
 #include "std.h"
-#include "led.h"
-
 #include "generated/settings.h"
-static uint8_t leds[LED_NB];
-
-static void led_print(void)
-{
-    ;//printf("[%d] [%d] [%d] [%d]\n", leds[0], leds[1], leds[2], leds[3]);
-}
-
-void led_init (void)
-{
-    uint8_t i;
-    for (i = 1; i <= LED_NB; i++)
-        led_off(i);
-}
-
-void led_on (uint8_t id)
-{
-    leds[id-1] = 1;
-    led_print();
-}
-
-void led_off (uint8_t id)
-{
-    leds[id-1] = 0;
-    led_print();
-}
-
-void led_toggle (uint8_t id)
-{
-    leds[id-1] ^= 1;
-    led_print();
-}
 
 #include "init.h"
 void int_enable(void) {}
