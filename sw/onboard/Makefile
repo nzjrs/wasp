@@ -4,7 +4,7 @@ INCLUDE_BUILD_INFO  ?= 1
 OBJDIR              = bin/$(ARCH)
 Q                   = @
 TOOLS               = ../tools
-RADIO               = config/radio/T6EXAP.xml
+RADIO               = config/radio/SimJoystick.xml
 # Be very careful if you change these, by default the groundstation 
 # looks for config/{messages,settings}.xml
 MESSAGES        = config/messages.xml

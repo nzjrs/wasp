@@ -8,7 +8,7 @@ static uint8_t leds[LED_NB];
 
 static void led_print(void)
 {
-    printf("[%d] [%d] [%d] [%d]\n", leds[0], leds[1], leds[2], leds[3]);
+    ;//printf("[%d] [%d] [%d] [%d]\n", leds[0], leds[1], leds[2], leds[3]);
 }
 
 void led_init (void)
@@ -99,11 +99,4 @@ GPS_t gps_state;
 void gps_init(void) {}
 bool_t gps_event_task(void) { return FALSE; }
 
-
-#include "rc.h"
-SystemStatus_t rc_system_status;
-
-void rc_init ( void ) {}
-void rc_periodic_task ( void ) {}
-bool_t rc_event_task ( void ) { return FALSE; }
 
