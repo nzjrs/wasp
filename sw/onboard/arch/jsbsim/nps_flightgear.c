@@ -14,6 +14,10 @@
 #include "nps_flightgear.h"
 #include "nps_fdm.h"
 #include "nps_utils.h"
+#include "nps_led.h"
+
+#define MODEL_PREFIX    "/usr/share/games/FlightGear/"
+#define MODEL_PATH      "Models/Aircraft/wasp/mikrokopter.xml"
 
 /* THIS STRUCTURE IS TAKEN FROM THE FLIGHTGEAR SOURCE, AND MUST BE KEPT UP}
    TO DATE WITH FLIGHTGEAR, ALTHOUGH PRACTICALLY SPEAKING, IT HAS NOT BEEN
@@ -76,16 +80,21 @@ void nps_flightgear_init(const char* host,  unsigned int port) {
 
 
     /* if the host is 127.0.0.1 or localhost then also start flightgear */
-    if (    (g_strcmp0(host, "127.0.0.1") == 0) ||
-            (g_strcmp0(host, "localhost") == 0))
-    {
-        char *cmd = g_strdup_printf(
-                        "fgfs --fdm=null --native-gui=socket,in,%d,%s,%d,udp",
-                        NPS_FLIGHTGEAR_UPDATE_FREQUENCY,
-                        host,
-                        port);
+    if ((g_strcmp0(host, "127.0.0.1") == 0) || (g_strcmp0(host, "localhost") == 0)) {
+        char *cmd = NULL;
+        char *model_command = NULL;
 
-        g_debug("FLIGHTGEAR: %s", cmd);
+        if (g_file_test(MODEL_PREFIX MODEL_PATH, G_FILE_TEST_EXISTS))
+            model_command = g_strdup_printf("--prop:/sim/model/path=" MODEL_PATH);
+
+        cmd = g_strdup_printf(
+                    "fgfs --fdm=null --native-gui=socket,in,%d,%s,%d,udp %s",
+                    NPS_FLIGHTGEAR_UPDATE_FREQUENCY,
+                    host,
+                    port,
+                    model_command);
+
+        nps_log("FLIGHTGEAR: %s\n", cmd);
 
         /* Setup the SIGCHILD handler, as flightgear is spawned occasionally */
         sigset(SIGCHLD, &sigchild_sighandler);
