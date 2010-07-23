@@ -48,7 +48,8 @@ void nps_fdm_init(double dt) {
 
 void nps_fdm_run_step(double* commands) {
 
-  feed_jsbsim(commands);
+  if (commands != NULL)
+    feed_jsbsim(commands);
 
   FDMExec->Run();
 

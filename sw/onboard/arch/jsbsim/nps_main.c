@@ -33,6 +33,7 @@
 #include "nps_led.h"
 #include "nps_flightgear.h"
 #include "nps_global.h"
+#include "nps_sensors.h"
 
 /* The main entry point for the sim, largely equivilent to main() is hw_init.
  * 
@@ -84,6 +85,10 @@ bool_t sys_time_periodic( void )
     } else {
         ret = FALSE;
     }
+
+    /* copy state from the FDM */
+    nps_fdm_run_step(NULL);
+    nps_sensors_run_step(sim.time);
 
     /* Update flightgear */
     fg_elapsed_sec = g_timer_elapsed(fg_timer, NULL);
