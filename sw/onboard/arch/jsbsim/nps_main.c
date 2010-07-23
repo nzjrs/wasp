@@ -21,6 +21,7 @@
  *
  */
 #include <glib.h>
+#include <stdio.h>
 
 #include "std.h"
 #include "init.h"
@@ -29,13 +30,9 @@
 #include "generated/settings.h"
 
 #include "nps_fdm.h"
+#include "nps_led.h"
 #include "nps_flightgear.h"
-
-typedef struct __SIM {
-    GTimer          *started;
-    GTimer          *timer;
-    GTimer          *fg_timer;
-} SIM_t;
+#include "nps_global.h"
 
 /* The main entry point for the sim, largely equivilent to main() is hw_init.
  * 
@@ -47,18 +44,23 @@ typedef struct __SIM {
  * between the FDM and the autopilot is through sys_time_periodic */
 
 SIM_t       sim;
+
 uint16_t    cpu_time_sec;
 uint8_t     cpu_usage;
 
-#include <stdio.h>
+static GTimer *loop_timer;
+static GTimer *fg_timer;
 
 void hw_init(void)
 {
     g_thread_init(NULL);
 
+    /* initialize the global state */
     sim.started = g_timer_new();
-    sim.timer = g_timer_new();
-    sim.fg_timer = g_timer_new();  
+    sim.time = 0.0;
+    
+    loop_timer = g_timer_new();
+    fg_timer = g_timer_new();  
 
     nps_fdm_init(PERIODIC_TASK_DT);
     nps_flightgear_init(NPS_FLIGHTGEAR_HOST, NPS_FLIGHTGEAR_PORT);
@@ -70,22 +72,23 @@ bool_t sys_time_periodic( void )
     bool_t ret;
     gdouble elapsed_sec, fg_elapsed_sec;
 
-    elapsed_sec = g_timer_elapsed(sim.timer, NULL); 
-    cpu_time_sec = g_timer_elapsed(sim.started, NULL);
+    sim.time = g_timer_elapsed(sim.started, NULL);
+    cpu_time_sec = sim.time;
     cpu_usage = 0;
 
+    elapsed_sec = g_timer_elapsed(loop_timer, NULL);
     if (elapsed_sec > PERIODIC_TASK_DT) {
         /* reset the timer */
-        g_timer_start(sim.timer);
+        g_timer_start(loop_timer);
         ret = TRUE;
     } else {
         ret = FALSE;
     }
 
     /* Update flightgear */
-    fg_elapsed_sec = g_timer_elapsed(sim.fg_timer, NULL);
+    fg_elapsed_sec = g_timer_elapsed(fg_timer, NULL);
     if (fg_elapsed_sec > (1.0 / NPS_FLIGHTGEAR_UPDATE_FREQUENCY)) {
-        g_timer_start(sim.fg_timer);
+        g_timer_start(fg_timer);
         nps_flightgear_send();
     }
 
