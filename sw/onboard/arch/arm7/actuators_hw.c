@@ -78,3 +78,18 @@ uint8_t actuators_get_num( uint8_t bank )
 #endif
     return 0;
 }
+
+uint8_t actuators_get( ActuatorID_t id )
+{
+    /* mask out the bank */
+    ActuatorID_t aid = id & 0x0F;
+
+    if ( id & ACTUATOR_BANK_MOTORS )
+        return buss_twi_blmc_motor_power[aid];
+#if USE_SERVOS_4017
+    if (bank == ACTUATOR_BANK_SERVOS)
+        return servos_values[aid];
+#endif
+    return 0;
+}
+
