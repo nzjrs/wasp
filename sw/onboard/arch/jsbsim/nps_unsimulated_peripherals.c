@@ -32,31 +32,3 @@ bool_t analog_event_task( void ) { return FALSE; }
 void analog_periodic_task( void ) {}
 
 
-#include "altimeter.h"
-SystemStatus_t altimeter_system_status = STATUS_UNINITIAIZED;
-uint16_t altimeter_calibration_offset;
-uint16_t altimeter_calibration_raw;
-
-void altimeter_init(void) {}
-void altimeter_periodic_task(void) {}
-uint8_t altimeter_event_task ( void ) { return 0; }
-int32_t altimeter_get_altitude( void ) { return 0; }
-void altimeter_recalibrate( void ) {}
-
-
-#include "imu.h"
-IMU_t booz_imu;
-
-void imu_init(void) {}
-void imu_periodic_task ( void ) {}
-uint8_t imu_event_task ( void ) { return 0; }
-void imu_adjust_alignment( float phi, float theta, float psi ) {}
-
-#include "gps.h"
-SystemStatus_t gps_system_status = STATUS_UNINITIAIZED;
-GPS_t gps_state;
-
-void gps_init(void) {}
-bool_t gps_event_task(void) { return FALSE; }
-
-

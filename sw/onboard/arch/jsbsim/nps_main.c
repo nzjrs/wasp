@@ -34,6 +34,7 @@
 #include "nps_flightgear.h"
 #include "nps_global.h"
 #include "nps_sensors.h"
+#include "nps_state.h"
 
 /* The main entry point for the sim, largely equivilent to main() is hw_init.
  * 
@@ -89,6 +90,7 @@ bool_t sys_time_periodic( void )
     /* copy state from the FDM */
     nps_fdm_run_step();
     nps_sensors_run_step(sim.time);
+    nps_state_update();
 
     /* Update flightgear */
     fg_elapsed_sec = g_timer_elapsed(fg_timer, NULL);

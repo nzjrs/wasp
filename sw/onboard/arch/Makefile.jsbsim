@@ -18,6 +18,7 @@ ARCHSRC =                                       \
     arch/jsbsim/nps_rc.c                        \
     arch/jsbsim/nps_rc_joystick.c               \
     arch/jsbsim/nps_actuators.c                 \
+    arch/jsbsim/nps_state.c                     \
     $(NULL)
 
 ARCHASMSRC =                            \
