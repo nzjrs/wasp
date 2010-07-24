@@ -52,13 +52,6 @@ void imu_periodic_task ( void ) {}
 uint8_t imu_event_task ( void ) { return 0; }
 void imu_adjust_alignment( float phi, float theta, float psi ) {}
 
-
-#include "actuators.h"
-void actuators_init( uint8_t bank ) {}
-void actuators_set( ActuatorID_t id, uint8_t value ) {}
-void actuators_commit( uint8_t bank ) {}
-
-
 #include "gps.h"
 SystemStatus_t gps_system_status = STATUS_UNINITIAIZED;
 GPS_t gps_state;

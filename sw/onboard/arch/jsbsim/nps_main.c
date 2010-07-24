@@ -87,7 +87,7 @@ bool_t sys_time_periodic( void )
     }
 
     /* copy state from the FDM */
-    nps_fdm_run_step(NULL);
+    nps_fdm_run_step();
     nps_sensors_run_step(sim.time);
 
     /* Update flightgear */

@@ -10,13 +10,14 @@
 #include "math/pprz_algebra.h"
 #include "math/pprz_algebra_float.h"
 
+#include "actuators.h"
 #include "generated/settings.h"
 
 #define MetersOfFeet(_f) ((_f)/3.2808399)
 
 using namespace JSBSim;
 
-static void feed_jsbsim(double* commands);
+static void feed_jsbsim(void);
 static void fetch_state(void);
 
 static void jsbsimvec_to_vec(DoubleVect3* fdm_vector, const FGColumnVector3* jsb_vector);
@@ -46,10 +47,9 @@ void nps_fdm_init(double dt) {
  
 }
 
-void nps_fdm_run_step(double* commands) {
+void nps_fdm_run_step(void) {
 
-  if (commands != NULL)
-    feed_jsbsim(commands);
+  feed_jsbsim();
 
   FDMExec->Run();
 
@@ -57,17 +57,21 @@ void nps_fdm_run_step(double* commands) {
 
 }
 
-static void feed_jsbsim(double* commands) {
+/* convert the 8 bit actuator values into double precision values, and map them
+from the acutator ID to the simulator model property name */
+static void feed_jsbsim(void) {
 
+  const char* names[NPS_ACTUATOR_NUM] = NPS_ACTUATOR_NAMES;
+  ActuatorID_t ids[NPS_ACTUATOR_NUM] = NPS_ACTUATOR_IDS;
   char buf[64];
-  const char* names[] = NPS_ACTUATOR_NAMES;
   string property;
 
   int i;
-  for (i=0; i<SERVO_NB; i++) {
+  for (i=0; i<NPS_ACTUATOR_NUM; i++) {
+    double value = float(actuators_get(ids[i])) / UINT8_MAX;
     sprintf(buf,"fcs/%s",names[i]);
     property = string(buf);
-    FDMExec->GetPropertyManager()->SetDouble(property,commands[i]);
+    FDMExec->GetPropertyManager()->SetDouble(property,value);
   }
 }
 

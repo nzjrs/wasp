@@ -60,6 +60,6 @@ struct NpsFdm {
 extern struct NpsFdm fdm;
 
 extern void nps_fdm_init(double dt);
-extern void nps_fdm_run_step(double* commands);
+extern void nps_fdm_run_step(void);
 
 #endif /* NPS_FDM */
