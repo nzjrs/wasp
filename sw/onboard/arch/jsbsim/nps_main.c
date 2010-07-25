@@ -66,6 +66,7 @@ void hw_init(void)
 
     nps_fdm_init(PERIODIC_TASK_DT);
     nps_flightgear_init(NPS_FLIGHTGEAR_HOST, NPS_FLIGHTGEAR_PORT);
+    nps_state_init(TRUE);
 }
 
 /* This is baiscally the main loop, this function gets called very fast */
