@@ -27,7 +27,7 @@ bool_t gpio_get(uint8_t id) {return FALSE; }
 void analog_init( void ) {}
 void analog_enable_channel( AnalogChannel_t channel ) {}
 uint16_t analog_read_channel( AnalogChannel_t channel ) { return 0; }
-uint8_t analog_read_battery( void ) { return 0; }
+uint8_t analog_read_battery( void ) { return 120; }
 bool_t analog_event_task( void ) { return FALSE; }
 void analog_periodic_task( void ) {}
 
