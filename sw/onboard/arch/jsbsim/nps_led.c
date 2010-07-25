@@ -22,14 +22,20 @@ void led_init (void)
 
 void led_on (uint8_t id)
 {
+    uint8_t old = leds[id-1];
     leds[id-1] = 1;
-    led_print(TRUE);
+    /* only print if changed */
+    if (!old)
+        led_print(TRUE);
 }
 
 void led_off (uint8_t id)
 {
+    uint8_t old = leds[id-1];
     leds[id-1] = 0;
-    led_print(TRUE);
+    /* only print if changed */
+    if (old)
+        led_print(TRUE);
 }
 
 void led_toggle (uint8_t id)

@@ -73,7 +73,7 @@ void rc_init ( void )
     }
     rc_status = RC_REALLY_LOST;
 
-#if 0
+#if 1
     nps_rc_state.joystick_device = g_strdup("/dev/input/js0");
     nps_rc_state.script_func = NULL;
 #else
