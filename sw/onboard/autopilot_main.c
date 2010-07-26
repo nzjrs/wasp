@@ -117,16 +117,6 @@ static inline void autopilot_main_periodic( void ) {
   /* set actuators     */
   autopilot_set_actuators();
 
-  /* because the ahrs does not follow the normal event/periodic interface,
-     do led flashing here */
-  if (ahrs_status == STATUS_INITIALIZING) {
-    RunOnceEvery(50, {
-      led_toggle(LED_AHRS);
-    });
-  } else if (ahrs_status == STATUS_INITIALIZED) {
-    led_on(LED_AHRS);
-  }
-
   /* Run the following tasks 10x times slower than the periodic rate */
   _cnt++;
   if (_cnt >= 10)
@@ -149,6 +139,22 @@ static inline void autopilot_main_periodic( void ) {
     case 2:
         booz_fms_periodic();
         break;
+  }
+
+  /* flash leds... */
+  if (ahrs_status == STATUS_INITIALIZING) {
+    RunOnceEvery(50, {
+      led_toggle(LED_AHRS);
+    });
+  } else if (ahrs_status == STATUS_INITIALIZED) {
+    led_on(LED_AHRS);
+  }
+  if (altimeter_system_status == STATUS_INITIALIZING) {
+    RunOnceEvery(50, {
+      led_toggle(LED_BARO);
+    });
+  } else if (altimeter_system_status == STATUS_INITIALIZED) {
+    led_on(LED_BARO);
   }
 
 }
