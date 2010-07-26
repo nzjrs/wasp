@@ -6,6 +6,9 @@
 #include "nps_fdm.h"
 #include "nps_led.h"
 #include "nps_state.h"
+#include "nps_sensors.h"
+
+#include "generated/settings.h"
 
 static bool_t bypass_ahrs;
 
@@ -29,16 +32,51 @@ void altimeter_recalibrate( void ) {}
  The state is always valid and we get an update from the FDM of every sensor */
 IMU_t booz_imu;
 
-void imu_init(void) {}
-void imu_periodic_task ( void ) {}
+void imu_init(void)
+{
+    /* initialises neutrals */
+    RATES_ASSIGN(booz_imu.gyro_neutral,  IMU_NEUTRAL_GYRO_P,  IMU_NEUTRAL_GYRO_Q,  IMU_NEUTRAL_GYRO_R);
+    VECT3_ASSIGN(booz_imu.accel_neutral, IMU_NEUTRAL_ACCEL_X, IMU_NEUTRAL_ACCEL_Y, IMU_NEUTRAL_ACCEL_Z);
+    VECT3_ASSIGN(booz_imu.mag_neutral,   IMU_NEUTRAL_MAG_X,   IMU_NEUTRAL_MAG_Y,   IMU_NEUTRAL_MAG_Z);
+
+    /* initialise IMU alignment */
+    imu_adjust_alignment(IMU_ALIGNMENT_BODY_TO_IMU_PHI, IMU_ALIGNMENT_BODY_TO_IMU_THETA, IMU_ALIGNMENT_BODY_TO_IMU_PSI);
+}
+
+void imu_periodic_task ( void )
+{
+
+}
+
 uint8_t imu_event_task ( void )
 {
-    uint8_t valid = IMU_ACC | IMU_GYR | IMU_MAG;
+    uint8_t valid = 0;
+
+    if (sensors.gyro.data_available) {
+        valid |= IMU_GYR;
+        /* copy the gyro values across, x,y,z = p,q,r */
+        booz_imu.gyro_unscaled.p = sensors.gyro.value.x;
+        booz_imu.gyro_unscaled.q = sensors.gyro.value.y;
+        booz_imu.gyro_unscaled.r = sensors.gyro.value.z;
+    }
+
+    if (sensors.accel.data_available) {
+        valid |= IMU_ACC;
+        /* copy the accel values across, x,y,z = p,q,r */
+        booz_imu.accel_unscaled.x = sensors.accel.value.x;
+        booz_imu.accel_unscaled.y = sensors.accel.value.y;
+        booz_imu.accel_unscaled.z = sensors.accel.value.z;
+    }
+
+    if (sensors.mag.data_available) {
+        valid |= IMU_MAG;
+        /* copy the mag values across, x,y,z = p,q,r */
+        booz_imu.mag_unscaled.x = sensors.gyro.value.x;
+        booz_imu.mag_unscaled.y = sensors.gyro.value.y;
+        booz_imu.mag_unscaled.z = sensors.gyro.value.z;
+    }
+
     return valid;
-}
-void imu_adjust_alignment( float phi, float theta, float psi )
-{
-    ;
 }
 
 /***** GPS
@@ -76,10 +114,7 @@ void nps_state_update(void)
         ahrs.body_rate.r = RATE_BFP_OF_REAL(fdm.body_ecef_rotvel.r);
 
         INT32_RMAT_OF_QUAT(ahrs.ltp_to_body_rmat, ahrs.ltp_to_body_quat);
-    } else {
-      nps_log("FIXME\n");
     }
-
 }
 
 void nps_state_init(bool_t _bypass_ahrs)

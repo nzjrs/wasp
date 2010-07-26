@@ -57,6 +57,9 @@ void nps_fdm_run_step(void) {
 
 }
 
+#include "nps_led.h"
+#include "autopilot.h"
+
 /* convert the 8 bit actuator values into double precision values, and map them
 from the acutator ID to the simulator model property name */
 static void feed_jsbsim(void) {
@@ -71,7 +74,11 @@ static void feed_jsbsim(void) {
     double value = float(actuators_get(ids[i])) / UINT8_MAX;
     sprintf(buf,"fcs/%s",names[i]);
     property = string(buf);
-    FDMExec->GetPropertyManager()->SetDouble(property,value);
+        if (autopilot.in_flight) {
+        value = 10.0;
+        FDMExec->GetPropertyManager()->SetDouble(property,value);
+        nps_log(" %s = %f\n", buf, value);
+    }
   }
 }
 

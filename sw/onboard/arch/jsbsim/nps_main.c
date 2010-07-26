@@ -36,6 +36,9 @@
 #include "nps_sensors.h"
 #include "nps_state.h"
 
+#include "autopilot.h"
+static bool_t enabled = FALSE;
+
 /* The main entry point for the sim, largely equivilent to main() is hw_init.
  * 
  * However the sim complexity is also due ot it running in a seperate thread
@@ -86,6 +89,13 @@ bool_t sys_time_periodic( void )
     sim.time = g_timer_elapsed(sim.started, NULL);
     cpu_time_sec = sim.time;
 
+    if (cpu_time_sec > 20 && !enabled) {
+        nps_log("ENABLING AUTOPILOT");
+        autopilot_set_mode(AP_MODE_ATTITUDE_DIRECT);
+        autopilot_set_motors(TRUE);
+        enabled = TRUE;
+    }
+
     elapsed_sec = g_timer_elapsed(loop_timer, NULL);
     if (elapsed_sec > PERIODIC_TASK_DT) {
         /* reset the timer */
@@ -94,7 +104,6 @@ bool_t sys_time_periodic( void )
         switch(nth_time_run) {
             case 0:
                 cpu_usage = 100;
-                nps_log("PC TOO SLOW\n");
                 break;
             /* these are just made up numbers */
             case 1:
