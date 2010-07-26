@@ -75,7 +75,7 @@ static void feed_jsbsim(void) {
     sprintf(buf,"fcs/%s",names[i]);
     property = string(buf);
         if (autopilot.in_flight) {
-        value = 10.0;
+        value = 1.0;
         FDMExec->GetPropertyManager()->SetDouble(property,value);
         nps_log(" %s = %f\n", buf, value);
     }

@@ -11,6 +11,7 @@
 #include "generated/settings.h"
 
 static bool_t bypass_ahrs;
+static bool_t bypass_gps;
 
 /***** Altimeter
  The state is always valid and we get an update from the FDM of every sensor */
@@ -115,9 +116,16 @@ void nps_state_update(void)
 
         INT32_RMAT_OF_QUAT(ahrs.ltp_to_body_rmat, ahrs.ltp_to_body_quat);
     }
+
+    if (bypass_gps) {
+        gps_state.lat = DegOfRad(fdm.lla_pos.lat)/1e-7;
+        gps_state.lon = DegOfRad(fdm.lla_pos.lon)/1e-7;
+        gps_state.hmsl = fdm.lla_pos.alt * 1000.0; /* convert to mm */
+    }
 }
 
 void nps_state_init(bool_t _bypass_ahrs)
 {
     bypass_ahrs = _bypass_ahrs;
+    bypass_gps = _bypass_ahrs;
 }
