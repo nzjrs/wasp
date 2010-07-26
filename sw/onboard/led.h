@@ -45,4 +45,7 @@ led_off ( uint8_t id);
 void
 led_toggle ( uint8_t id);
 
+void
+led_periodic_task (void);
+
 #endif /* LED_H */

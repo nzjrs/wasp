@@ -142,6 +142,8 @@ static inline void autopilot_main_periodic( void ) {
   }
 
   /* flash leds... */
+  led_periodic_task();
+
   if (ahrs_status == STATUS_INITIALIZING) {
     RunOnceEvery(50, {
       led_toggle(LED_AHRS);
