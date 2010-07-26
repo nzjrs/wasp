@@ -53,6 +53,11 @@ uint8_t     cpu_usage;
 static GTimer *loop_timer;
 static GTimer *fg_timer;
 
+/* used to guestimate if the PC running the sim is too slow. If we have to
+run every time, i.e. we can't keep up with PERIODIC_TASK_DT then we are not
+really being a true SITL */
+uint32_t    nth_time_run;
+
 void hw_init(void)
 {
     g_thread_init(NULL);
@@ -60,6 +65,9 @@ void hw_init(void)
     /* initialize the global state */
     sim.started = g_timer_new();
     sim.time = 0.0;
+
+    nth_time_run = 0;
+    cpu_usage = 0;
     
     loop_timer = g_timer_new();
     fg_timer = g_timer_new();  
@@ -77,15 +85,35 @@ bool_t sys_time_periodic( void )
 
     sim.time = g_timer_elapsed(sim.started, NULL);
     cpu_time_sec = sim.time;
-    cpu_usage = 0;
 
     elapsed_sec = g_timer_elapsed(loop_timer, NULL);
     if (elapsed_sec > PERIODIC_TASK_DT) {
         /* reset the timer */
         g_timer_start(loop_timer);
         ret = TRUE;
+        switch(nth_time_run) {
+            case 0:
+                cpu_usage = 100;
+                nps_log("PC TOO SLOW\n");
+                break;
+            /* these are just made up numbers */
+            case 1:
+                cpu_usage = 75;
+                break;
+            case 2:
+                cpu_usage = 50;
+                break;
+            case 3:
+                cpu_usage = 25;
+                break;
+            default:
+                cpu_usage = 0;
+                break;
+        }
+        nth_time_run = 0;
     } else {
         ret = FALSE;
+        nth_time_run += 1;
     }
 
     /* copy state from the FDM */
@@ -105,7 +133,6 @@ bool_t sys_time_periodic( void )
         g_usleep((PERIODIC_TASK_DT - elapsed_sec) * 0.25 * G_USEC_PER_SEC);
         ret = FALSE;
     }
-
 
     return ret;
 }
