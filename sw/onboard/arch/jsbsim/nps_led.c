@@ -7,10 +7,12 @@
 #include <glib/gprintf.h>
 
 static uint8_t leds[LED_NB];
+static char tick[] = {'\\','|','/','-','\\','|','/','-'};
+static int tock = 0;
 
 static void led_print(gboolean newline)
 {
-    g_printf("[%d][%d][%d][%d]%c", leds[0], leds[1], leds[2], leds[3], newline ? '\n' : NULL);
+    g_printf("[%c][%d][%d][%d][%d]%c", tick[tock], leds[0], leds[1], leds[2], leds[3], newline ? '\n' : NULL);
 }
 
 void led_init (void)
@@ -54,5 +56,14 @@ gint nps_log (gchar const *format, ...)
     va_start (args, format);
     g_vprintf (format, args);
     va_end (args);
+}
+
+void
+led_periodic_task (void)
+{
+    RunOnceEvery(100, {
+        led_print(TRUE);
+        tock = (tock + 1) % (sizeof(tick)/sizeof(char));
+    };);
 }
 
