@@ -9,11 +9,17 @@
 
 static bool_t bypass_ahrs;
 
-SystemStatus_t altimeter_system_status = STATUS_UNINITIAIZED;
+/***** Altimeter
+ The state is always valid and we get an update from the FDM of every sensor */
+SystemStatus_t altimeter_system_status;
 uint16_t altimeter_calibration_offset;
 uint16_t altimeter_calibration_raw;
 
-void altimeter_init(void) {}
+void altimeter_init(void)
+{
+    altimeter_system_status = STATUS_INITIALIZED;
+}
+
 void altimeter_periodic_task(void) {}
 uint8_t altimeter_event_task ( void ) { return 0; }
 int32_t altimeter_get_altitude( void ) { return 0; }
@@ -45,6 +51,7 @@ void gps_init(void)
 }
 bool_t gps_event_task(void)
 {
+    gps_state.fix = GPS_FIX_3D;
     return TRUE;
 }
 
