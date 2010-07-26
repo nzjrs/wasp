@@ -21,6 +21,7 @@ SRC =                               \
     math/pid_int.c                  \
     lib/debug.c                     \
     rc.c                            \
+    imu.c                           \
     autopilot.c                     \
     ins/booz2_ins.c                 \
     ins/booz2_hf_float.c            \
