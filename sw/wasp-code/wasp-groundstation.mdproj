@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ItemType>PythonProject</ItemType>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5BD90A16-212F-446A-8EC3-0D3953F8458F}</ProjectGuid>
+    <BaseDirectory>..\groundstation</BaseDirectory>
+    <newfilesearch>OnLoadAutoInsert</newfilesearch>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>Debug</OutputPath>
+    <Build>
+      <Build Optimize="false" />
+    </Build>
+    <Runtime>
+      <Runtime Module="groundstation" PythonOptions="">
+        <Interpreter path="/usr/bin/python2.6" ctype="Python26Runtime" />
+      </Runtime>
+    </Runtime>
+    <ConsolePause>false</ConsolePause>
+    <Commandlineparameters>--use-test-source --messages=/home/john/Programming/wasp.git/sw/onboard/config/messages.xml --settings=/home/john/Programming/wasp.git/sw/onboard/config/settings.xml</Commandlineparameters>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="LD_LIBRARY_PATH" value="/opt/osmgpsmap/lib/" />
+        <Variable name="PYTHONPATH" value="/opt/osmgpsmap/lib/python2.6/site-packages/gtk-2.0/" />
+        <Variable name="WASP_DATA_DIR" value="/home/john/Programming/wasp.git/sw/groundstation/data/" />
+        <Variable name="WASP_PLUGIN_DIR" value="/home/john/Programming/wasp.git/sw/groundstation/gs/plugins/" />
+        <Variable name="WASP_CONFIG_DIR" value="/home/john/Programming/wasp.git/sw/onboard/config/" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>Debug</OutputPath>
+    <Build>
+      <Build Optimize="false" />
+    </Build>
+    <Runtime>
+      <Runtime Module="groundstation" PythonOptions="">
+        <Interpreter path="/usr/bin/python2.6" ctype="Python26Runtime" />
+      </Runtime>
+    </Runtime>
+    <ConsolePause>false</ConsolePause>
+    <Commandlineparameters>--messages=/home/john/Programming/wasp.git/sw/onboard/config/messages.xml --settings=/home/john/Programming/wasp.git/sw/onboard/config/settings.xml</Commandlineparameters>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="LD_LIBRARY_PATH" value="/opt/osmgpsmap/lib/" />
+        <Variable name="PYTHONPATH" value="/opt/osmgpsmap/lib/python2.6/site-packages/gtk-2.0/" />
+        <Variable name="WASP_DATA_DIR" value="/home/john/Programming/wasp.git/sw/groundstation/data/" />
+        <Variable name="WASP_PLUGIN_DIR" value="/home/john/Programming/wasp.git/sw/groundstation/gs/plugins/" />
+        <Variable name="WASP_CONFIG_DIR" value="/home/john/Programming/wasp.git/sw/onboard/config/" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\groundstation\groundstation.py" />
+    <Compile Include="..\groundstation\tablet.py" />
+    <Compile Include="..\groundstation\gs\NMEA.py" />
+    <Compile Include="..\groundstation\gs\__init__.py" />
+    <Compile Include="..\groundstation\gs\config.py" />
+    <Compile Include="..\groundstation\gs\groundstation.py" />
+    <Compile Include="..\groundstation\gs\joystick.py" />
+    <Compile Include="..\groundstation\gs\plugin.py" />
+    <Compile Include="..\groundstation\gs\source.py" />
+    <Compile Include="..\groundstation\gs\utils.py" />
+    <Compile Include="..\groundstation\gs\geo\__init__.py" />
+    <Compile Include="..\groundstation\gs\geo\constants.py" />
+    <Compile Include="..\groundstation\gs\geo\decimaldegrees.py" />
+    <Compile Include="..\groundstation\gs\geo\distance.py" />
+    <Compile Include="..\groundstation\gs\geo\kml.py" />
+    <Compile Include="..\groundstation\gs\plugins\camera.py" />
+    <Compile Include="..\groundstation\gs\plugins\control_joystick.py" />
+    <Compile Include="..\groundstation\gs\plugins\control_manual.py" />
+    <Compile Include="..\groundstation\gs\plugins\example.py" />
+    <Compile Include="..\groundstation\gs\plugins\flightgearvis.py" />
+    <Compile Include="..\groundstation\gs\plugins\googleearthvis.py" />
+    <Compile Include="..\groundstation\gs\plugins\gpsview.py" />
+    <Compile Include="..\groundstation\gs\plugins\help.py" />
+    <Compile Include="..\groundstation\gs\plugins\programmer.py" />
+    <Compile Include="..\groundstation\gs\plugins\radiocalibration.py" />
+    <Compile Include="..\groundstation\gs\plugins\speak.py" />
+    <Compile Include="..\groundstation\gs\plugins\speedometer.py" />
+    <Compile Include="..\groundstation\gs\plugins\test.py" />
+    <Compile Include="..\groundstation\gs\test\test_geo.py" />
+    <Compile Include="..\groundstation\gs\test\test_geo_decimal_degrees.py" />
+    <Compile Include="..\groundstation\gs\test\test_util.py" />
+    <Compile Include="..\groundstation\gs\ui\__init__.py" />
+    <Compile Include="..\groundstation\gs\ui\altwidget.py" />
+    <Compile Include="..\groundstation\gs\ui\command.py" />
+    <Compile Include="..\groundstation\gs\ui\custom.py" />
+    <Compile Include="..\groundstation\gs\ui\dockable.py" />
+    <Compile Include="..\groundstation\gs\ui\graph.py" />
+    <Compile Include="..\groundstation\gs\ui\horizon.py" />
+    <Compile Include="..\groundstation\gs\ui\indicators.py" />
+    <Compile Include="..\groundstation\gs\ui\info.py" />
+    <Compile Include="..\groundstation\gs\ui\joystick.py" />
+    <Compile Include="..\groundstation\gs\ui\log.py" />
+    <Compile Include="..\groundstation\gs\ui\map.py" />
+    <Compile Include="..\groundstation\gs\ui\msgarea.py" />
+    <Compile Include="..\groundstation\gs\ui\plane.py" />
+    <Compile Include="..\groundstation\gs\ui\progressbar.py" />
+    <Compile Include="..\groundstation\gs\ui\settings.py" />
+    <Compile Include="..\groundstation\gs\ui\statusbar.py" />
+    <Compile Include="..\groundstation\gs\ui\statusicon.py" />
+    <Compile Include="..\groundstation\gs\ui\telemetry.py" />
+    <Compile Include="..\groundstation\gs\ui\tree.py" />
+    <Compile Include="..\groundstation\gs\ui\window.py" />
+    <Compile Include="..\groundstation\gs\ui\rtgraph\Channel.py" />
+    <Compile Include="..\groundstation\gs\ui\rtgraph\Graph.py" />
+    <Compile Include="..\groundstation\gs\ui\rtgraph\GraphUI.py" />
+    <Compile Include="..\groundstation\gs\ui\rtgraph\HScroll.py" />
+    <Compile Include="..\groundstation\gs\ui\rtgraph\IsometricVector.py" />
+    <Compile Include="..\groundstation\gs\ui\rtgraph\PolarVector.py" />
+    <Compile Include="..\groundstation\gs\ui\rtgraph\StaticGrid.py" />
+    <Compile Include="..\groundstation\gs\ui\rtgraph\Tweak.py" />
+    <Compile Include="..\groundstation\gs\ui\rtgraph\Util.py" />
+    <Compile Include="..\groundstation\gs\ui\rtgraph\__init__.py" />
+    <Compile Include="..\groundstation\libserial\SerialChooser.py" />
+    <Compile Include="..\groundstation\libserial\SerialSender.py" />
+    <Compile Include="..\groundstation\libserial\__init__.py" />
+    <Compile Include="..\groundstation\libserial\setup.py" />
+    <Compile Include="..\groundstation\tools\console-serial-monitor.py" />
+    <Compile Include="..\groundstation\tools\multi-uav-test.py" />
+    <Compile Include="..\groundstation\tools\nmea-to-groundstation.py" />
+    <Compile Include="..\groundstation\wasp\__init__.py" />
+    <Compile Include="..\groundstation\wasp\communication.py" />
+    <Compile Include="..\groundstation\wasp\fms.py" />
+    <Compile Include="..\groundstation\wasp\messages.py" />
+    <Compile Include="..\groundstation\wasp\settings.py" />
+    <Compile Include="..\groundstation\wasp\sim.py" />
+    <Compile Include="..\groundstation\wasp\transport.py" />
+    <Compile Include="..\groundstation\wasp\xmlobject.py" />
+    <Compile Include="..\groundstation\wasp\test\test.py" />
+    <Compile Include="..\groundstation\wasp\test\test_ui.py" />
+    <Compile Include="..\groundstation\wasp\test\testcommon.py" />
+    <Compile Include="..\groundstation\wasp\ui\__init__.py" />
+    <Compile Include="..\groundstation\wasp\ui\senders.py" />
+    <Compile Include="..\groundstation\wasp\ui\treeview.py" />
+    <Compile Include="..\groundstation\win32\setup.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\groundstation\README" />
+    <None Include="..\groundstation\env.sh" />
+    <None Include="..\groundstation\groundstation.desktop" />
+    <None Include="..\groundstation\data\icons\compass.png" />
+    <None Include="..\groundstation\data\icons\compass.svg" />
+    <None Include="..\groundstation\data\icons\dashboard.png" />
+    <None Include="..\groundstation\data\icons\dashboard.svg" />
+    <None Include="..\groundstation\data\icons\electronics.png" />
+    <None Include="..\groundstation\data\icons\electronics.svg" />
+    <None Include="..\groundstation\data\icons\joystick.svg" />
+    <None Include="..\groundstation\data\icons\radar.png" />
+    <None Include="..\groundstation\data\icons\radar.svg" />
+    <None Include="..\groundstation\data\icons\radio.png" />
+    <None Include="..\groundstation\data\icons\radio.svg" />
+    <None Include="..\groundstation\data\icons\rocket.png" />
+    <None Include="..\groundstation\data\icons\rocket.svg" />
+    <None Include="..\groundstation\data\icons\status.png" />
+    <None Include="..\groundstation\data\icons\status.svg" />
+    <None Include="..\groundstation\data\icons\world.svg" />
+    <None Include="..\groundstation\data\ui\command.ui" />
+    <None Include="..\groundstation\data\ui\flightplan.ui" />
+    <None Include="..\groundstation\data\ui\groundstation.ui" />
+    <None Include="..\groundstation\data\ui\map.ui" />
+    <None Include="..\groundstation\data\ui\settings.ui" />
+    <None Include="..\groundstation\data\ui\telemetry.ui" />
+    <None Include="..\groundstation\gs\__init__.pyc" />
+    <None Include="..\groundstation\gs\config.pyc" />
+    <None Include="..\groundstation\gs\groundstation.pyc" />
+    <None Include="..\groundstation\gs\joystick.pyc" />
+    <None Include="..\groundstation\gs\plugin.pyc" />
+    <None Include="..\groundstation\gs\source.pyc" />
+    <None Include="..\groundstation\gs\utils.pyc" />
+    <None Include="..\groundstation\gs\geo\__init__.pyc" />
+    <None Include="..\groundstation\gs\geo\constants.pyc" />
+    <None Include="..\groundstation\gs\geo\convert.pyc" />
+    <None Include="..\groundstation\gs\geo\decimaldegrees.pyc" />
+    <None Include="..\groundstation\gs\geo\distance.pyc" />
+    <None Include="..\groundstation\gs\geo\kml.pyc" />
+    <None Include="..\groundstation\gs\plugins\camera.pyc" />
+    <None Include="..\groundstation\gs\plugins\control_joystick.pyc" />
+    <None Include="..\groundstation\gs\plugins\control_manual.pyc" />
+    <None Include="..\groundstation\gs\plugins\control_manual.ui" />
+    <None Include="..\groundstation\gs\plugins\example.pyc" />
+    <None Include="..\groundstation\gs\plugins\flightgearvis.pyc" />
+    <None Include="..\groundstation\gs\plugins\googleearthvis.pyc" />
+    <None Include="..\groundstation\gs\plugins\gpsview.pyc" />
+    <None Include="..\groundstation\gs\plugins\help.pyc" />
+    <None Include="..\groundstation\gs\plugins\programmer.pyc" />
+    <None Include="..\groundstation\gs\plugins\programmer.ui" />
+    <None Include="..\groundstation\gs\plugins\radiocalibration.pyc" />
+    <None Include="..\groundstation\gs\plugins\radiocalibration.ui" />
+    <None Include="..\groundstation\gs\plugins\speak.pyc" />
+    <None Include="..\groundstation\gs\plugins\speedometer.pyc" />
+    <None Include="..\groundstation\gs\plugins\test.pyc" />
+    <None Include="..\groundstation\gs\ui\__init__.pyc" />
+    <None Include="..\groundstation\gs\ui\altwidget.pyc" />
+    <None Include="..\groundstation\gs\ui\command.pyc" />
+    <None Include="..\groundstation\gs\ui\control.pyc" />
+    <None Include="..\groundstation\gs\ui\custom.pyc" />
+    <None Include="..\groundstation\gs\ui\graph.pyc" />
+    <None Include="..\groundstation\gs\ui\horizon.pyc" />
+    <None Include="..\groundstation\gs\ui\indicators.pyc" />
+    <None Include="..\groundstation\gs\ui\info.pyc" />
+    <None Include="..\groundstation\gs\ui\joystick.pyc" />
+    <None Include="..\groundstation\gs\ui\log.pyc" />
+    <None Include="..\groundstation\gs\ui\map.pyc" />
+    <None Include="..\groundstation\gs\ui\msgarea.pyc" />
+    <None Include="..\groundstation\gs\ui\plane.pyc" />
+    <None Include="..\groundstation\gs\ui\plane.raw" />
+    <None Include="..\groundstation\gs\ui\progressbar.pyc" />
+    <None Include="..\groundstation\gs\ui\settings.pyc" />
+    <None Include="..\groundstation\gs\ui\statusbar.pyc" />
+    <None Include="..\groundstation\gs\ui\statusicon.pyc" />
+    <None Include="..\groundstation\gs\ui\telemetry.pyc" />
+    <None Include="..\groundstation\gs\ui\tree.pyc" />
+    <None Include="..\groundstation\gs\ui\window.pyc" />
+    <None Include="..\groundstation\gs\ui\rtgraph\Channel.pyc" />
+    <None Include="..\groundstation\gs\ui\rtgraph\Graph.pyc" />
+    <None Include="..\groundstation\gs\ui\rtgraph\GraphUI.pyc" />
+    <None Include="..\groundstation\gs\ui\rtgraph\HScroll.pyc" />
+    <None Include="..\groundstation\gs\ui\rtgraph\IsometricVector.pyc" />
+    <None Include="..\groundstation\gs\ui\rtgraph\PolarVector.pyc" />
+    <None Include="..\groundstation\gs\ui\rtgraph\StaticGrid.pyc" />
+    <None Include="..\groundstation\gs\ui\rtgraph\Tweak.pyc" />
+    <None Include="..\groundstation\gs\ui\rtgraph\Util.pyc" />
+    <None Include="..\groundstation\gs\ui\rtgraph\__init__.pyc" />
+    <None Include="..\groundstation\libserial\README" />
+    <None Include="..\groundstation\libserial\SerialChooser.pyc" />
+    <None Include="..\groundstation\libserial\SerialSender.pyc" />
+    <None Include="..\groundstation\libserial\__init__.pyc" />
+    <None Include="..\groundstation\libserial\.git\FETCH_HEAD" />
+    <None Include="..\groundstation\libserial\.git\HEAD" />
+    <None Include="..\groundstation\libserial\.git\config" />
+    <None Include="..\groundstation\libserial\.git\description" />
+    <None Include="..\groundstation\libserial\.git\index" />
+    <None Include="..\groundstation\libserial\.git\packed-refs" />
+    <None Include="..\groundstation\libserial\.git\hooks\applypatch-msg.sample" />
+    <None Include="..\groundstation\libserial\.git\hooks\commit-msg.sample" />
+    <None Include="..\groundstation\libserial\.git\hooks\post-commit.sample" />
+    <None Include="..\groundstation\libserial\.git\hooks\post-receive.sample" />
+    <None Include="..\groundstation\libserial\.git\hooks\post-update.sample" />
+    <None Include="..\groundstation\libserial\.git\hooks\pre-applypatch.sample" />
+    <None Include="..\groundstation\libserial\.git\hooks\pre-commit.sample" />
+    <None Include="..\groundstation\libserial\.git\hooks\pre-rebase.sample" />
+    <None Include="..\groundstation\libserial\.git\hooks\prepare-commit-msg.sample" />
+    <None Include="..\groundstation\libserial\.git\hooks\update.sample" />
+    <None Include="..\groundstation\libserial\.git\info\exclude" />
+    <None Include="..\groundstation\libserial\.git\logs\HEAD" />
+    <None Include="..\groundstation\libserial\.git\logs\refs\heads\master" />
+    <None Include="..\groundstation\libserial\.git\logs\refs\remotes\origin\master" />
+    <None Include="..\groundstation\libserial\.git\objects\17\ea3c899a1a3a27278e18893b2910f0cb0545b5" />
+    <None Include="..\groundstation\libserial\.git\objects\31\1cad8d59c1d3c7acbd40a5b8c372691a65b133" />
+    <None Include="..\groundstation\libserial\.git\objects\9a\b2dac6c7de82d18aca4ca8c88e9f2cebcabab3" />
+    <None Include="..\groundstation\libserial\.git\objects\pack\pack-84542e8b0d1dd6607d29549f81d2b8861804ac99.idx" />
+    <None Include="..\groundstation\libserial\.git\objects\pack\pack-84542e8b0d1dd6607d29549f81d2b8861804ac99.pack" />
+    <None Include="..\groundstation\libserial\.git\refs\heads\master" />
+    <None Include="..\groundstation\libserial\.git\refs\remotes\origin\HEAD" />
+    <None Include="..\groundstation\libserial\.git\refs\remotes\origin\master" />
+    <None Include="..\groundstation\wasp\__init__.pyc" />
+    <None Include="..\groundstation\wasp\communication.pyc" />
+    <None Include="..\groundstation\wasp\fms.pyc" />
+    <None Include="..\groundstation\wasp\messages.pyc" />
+    <None Include="..\groundstation\wasp\settings.pyc" />
+    <None Include="..\groundstation\wasp\sim.pyc" />
+    <None Include="..\groundstation\wasp\transport.pyc" />
+    <None Include="..\groundstation\wasp\xmlobject.pyc" />
+    <None Include="..\groundstation\wasp\test\testcommon.pyc" />
+    <None Include="..\groundstation\wasp\ui\__init__.pyc" />
+    <None Include="..\groundstation\wasp\ui\senders.pyc" />
+    <None Include="..\groundstation\wasp\ui\treeview.pyc" />
+    <None Include="..\groundstation\win32\rocket-48x48.ico" />
+  </ItemGroup>
+</Project>
