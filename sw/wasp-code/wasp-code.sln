@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{9344bdbb-3e7f-41fc-a0dd-8665d75ee146}") = "wasp-groundstation", "wasp-groundstation.mdproj", "{5BD90A16-212F-446A-8EC3-0D3953F8458F}"
+EndProject
+Project("{2857B73E-F847-4B02-9238-064979017E93}") = "wasp-onboard", "wasp-onboard\wasp-onboard.cproj", "{35D7D53B-04A4-45F9-A441-958C4E926FEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{35D7D53B-04A4-45F9-A441-958C4E926FEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35D7D53B-04A4-45F9-A441-958C4E926FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35D7D53B-04A4-45F9-A441-958C4E926FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35D7D53B-04A4-45F9-A441-958C4E926FEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BD90A16-212F-446A-8EC3-0D3953F8458F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BD90A16-212F-446A-8EC3-0D3953F8458F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BD90A16-212F-446A-8EC3-0D3953F8458F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BD90A16-212F-446A-8EC3-0D3953F8458F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = wasp-groundstation.mdproj
+	EndGlobalSection
+EndGlobal

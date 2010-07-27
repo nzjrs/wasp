@@ -17,7 +17,9 @@
     </Build>
     <Runtime>
       <Runtime Module="groundstation" PythonOptions="">
-        <Interpreter path="/usr/bin/python2.6" ctype="Python26Runtime" />
+        <Interpreter path="/usr/bin/python2.6" ctype="Python26Runtime">
+          <compiler ctype="Python25Compiler" />
+        </Interpreter>
       </Runtime>
     </Runtime>
     <ConsolePause>false</ConsolePause>
@@ -39,7 +41,9 @@
     </Build>
     <Runtime>
       <Runtime Module="groundstation" PythonOptions="">
-        <Interpreter path="/usr/bin/python2.6" ctype="Python26Runtime" />
+        <Interpreter path="/usr/bin/python2.6" ctype="Python26Runtime">
+          <compiler ctype="Python25Compiler" />
+        </Interpreter>
       </Runtime>
     </Runtime>
     <ConsolePause>false</ConsolePause>

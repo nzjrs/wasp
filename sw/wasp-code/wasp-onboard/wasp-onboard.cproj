@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{35D7D53B-04A4-45F9-A441-958C4E926FEB}</ProjectGuid>
+    <Target>Bin</Target>
+    <BaseDirectory>..\..\onboard</BaseDirectory>
+    <Compiler>
+      <Compiler ctype="GccCompiler" />
+    </Compiler>
+    <Language>C</Language>
+    <newfilesearch>OnLoad</newfilesearch>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineSymbols>DEBUG MONODEVELOP</DefineSymbols>
+    <SourceDirectory>.</SourceDirectory>
+    <OutputName>wasp-onboard</OutputName>
+    <CompileTarget>Bin</CompileTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release</OutputPath>
+    <DefineSymbols>MONODEVELOP</DefineSymbols>
+    <SourceDirectory>.</SourceDirectory>
+    <OptimizationLevel>3</OptimizationLevel>
+    <OutputName>wasp-onboard</OutputName>
+    <CompileTarget>Bin</CompileTarget>
+  </PropertyGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="true" RelativeMakefileName="Makefile">
+          <BuildFilesVar />
+          <DeployFilesVar />
+          <ResourcesVar />
+          <OthersVar />
+          <GacRefVar />
+          <AsmRefVar />
+          <ProjectRefVar />
+          <MessageRegex Name="gcc" />
+        </MonoDevelop.Autotools.MakefileInfo>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+  <ItemGroup>
+    <None Include="..\..\onboard\actuators.h" />
+    <None Include="..\..\onboard\ahrs.h" />
+    <None Include="..\..\onboard\altimeter.h" />
+    <None Include="..\..\onboard\analog.h" />
+    <None Include="..\..\onboard\autopilot.h" />
+    <None Include="..\..\onboard\autopilot_main.h" />
+    <None Include="..\..\onboard\comm.h" />
+    <None Include="..\..\onboard\comm_autopilot.h" />
+    <None Include="..\..\onboard\gpio.h" />
+    <None Include="..\..\onboard\gps.h" />
+    <None Include="..\..\onboard\guidance.h" />
+    <None Include="..\..\onboard\imu.h" />
+    <None Include="..\..\onboard\init.h" />
+    <None Include="..\..\onboard\ins.h" />
+    <None Include="..\..\onboard\led.h" />
+    <None Include="..\..\onboard\messages_types.h" />
+    <None Include="..\..\onboard\rc.h" />
+    <None Include="..\..\onboard\settings.h" />
+    <None Include="..\..\onboard\stabilization.h" />
+    <None Include="..\..\onboard\std.h" />
+    <None Include="..\..\onboard\supervision.h" />
+    <None Include="..\..\onboard\sys_time.h" />
+    <None Include="..\..\onboard\ahrs\booz2_filter_attitude_cmpl_euler.h" />
+    <None Include="..\..\onboard\ahrs\booz_ahrs_aligner.h" />
+    <None Include="..\..\onboard\build-all.sh">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\arch\arm7\LPC2148-ROM-bl.ld" />
+    <None Include="..\..\onboard\arch\arm7\armVIC.h" />
+    <None Include="..\..\onboard\arch\arm7\buss_twi_blmc_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\comm_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\config.h" />
+    <None Include="..\..\onboard\arch\arm7\crt0.S" />
+    <None Include="..\..\onboard\arch\arm7\gpio_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\i2c_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\imu_booz_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\max1168.h" />
+    <None Include="..\..\onboard\arch\arm7\micromag.h" />
+    <None Include="..\..\onboard\arch\arm7\rc_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\servos_4017_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\spi_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\sys_time_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\uart_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\usb_ser_hw.h" />
+    <None Include="..\..\onboard\arch\arm7\include\LPC21xx.h" />
+    <None Include="..\..\onboard\arch\arm7\include\inttypes.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcADC.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcCAN.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcEMC.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcGPIO.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcI2C.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcPIN.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcRTC.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcSCB.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcSPI.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcTMR.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcUART.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcVIC.h" />
+    <None Include="..\..\onboard\arch\arm7\include\lpcWD.h" />
+    <None Include="..\..\onboard\arch\arm7\lpcusb\CHANGELOG" />
+    <None Include="..\..\onboard\arch\arm7\lpcusb\Doxyfile" />
+    <None Include="..\..\onboard\arch\arm7\lpcusb\type.h" />
+    <None Include="..\..\onboard\arch\arm7\lpcusb\usbapi.h" />
+    <None Include="..\..\onboard\arch\arm7\lpcusb\usbdebug.h" />
+    <None Include="..\..\onboard\arch\arm7\lpcusb\usbhw_lpc.h" />
+    <None Include="..\..\onboard\arch\arm7\lpcusb\usbstruct.h" />
+    <None Include="..\..\onboard\config\messages.xml">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\config\settings.xml">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\config\radio\PCM9X.xml">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\config\radio\T6EXAP.xml">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\fms\booz2_fms.h" />
+    <None Include="..\..\onboard\fms\booz2_fms_datalink.h" />
+    <None Include="..\..\onboard\fms\booz2_fms_test_signal.h" />
+    <None Include="..\..\onboard\generated\build.h" />
+    <None Include="..\..\onboard\generated\messages.h" />
+    <None Include="..\..\onboard\generated\radio.h" />
+    <None Include="..\..\onboard\generated\settings.h" />
+    <None Include="..\..\onboard\guidance\booz2_guidance_h.h" />
+    <None Include="..\..\onboard\guidance\booz2_guidance_v.h" />
+    <None Include="..\..\onboard\guidance\booz2_guidance_v_adpt.h" />
+    <None Include="..\..\onboard\guidance\booz2_guidance_v_ref.h" />
+    <None Include="..\..\onboard\guidance\booz2_navigation.h" />
+    <None Include="..\..\onboard\guidance\fixedwing_guidance.h" />
+    <None Include="..\..\onboard\ins\booz2_hf_float.h" />
+    <None Include="..\..\onboard\ins\booz2_vf_float.h" />
+    <None Include="..\..\onboard\lib\debug.h" />
+    <None Include="..\..\onboard\lib\ubx_protocol.h" />
+    <None Include="..\..\onboard\libwasp\comm.c">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\comm.o">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\libwasp.a">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\messages.c">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\messages.o">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\test">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\test.c">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\include\build.h">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\include\comm.h">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\include\messages.h">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\include\messages_types.h">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\include\std.h">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\libwasp\include\wasp.h">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\math\pid_float.h" />
+    <None Include="..\..\onboard\math\pid_int.h" />
+    <None Include="..\..\onboard\math\pprz_algebra.h" />
+    <None Include="..\..\onboard\math\pprz_algebra_double.h" />
+    <None Include="..\..\onboard\math\pprz_algebra_float.h" />
+    <None Include="..\..\onboard\math\pprz_algebra_int.h" />
+    <None Include="..\..\onboard\math\pprz_geodetic.h" />
+    <None Include="..\..\onboard\math\pprz_geodetic_double.h" />
+    <None Include="..\..\onboard\math\pprz_geodetic_float.h" />
+    <None Include="..\..\onboard\math\pprz_geodetic_int.h" />
+    <None Include="..\..\onboard\math\pprz_trig_int.h" />
+    <None Include="..\..\onboard\math\tests\test_support.h" />
+    <None Include="..\..\onboard\stabilization\booz2_stabilization.h" />
+    <None Include="..\..\onboard\stabilization\booz2_stabilization_attitude.h" />
+    <None Include="..\..\onboard\stabilization\booz2_stabilization_attitude_ref_traj_euler.h" />
+    <None Include="..\..\onboard\stabilization\booz2_stabilization_rate.h" />
+    <None Include="..\..\onboard\stabilization\fixedwing_stabilization.h" />
+    <None Include="..\..\onboard\doxygen.cfg">
+      <Visible>False</Visible>
+    </None>
+    <None Include="..\..\onboard\env.sh">
+      <Visible>False</Visible>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\onboard\autopilot.c" />
+    <Compile Include="..\..\onboard\autopilot_main.c" />
+    <Compile Include="..\..\onboard\comm.c" />
+    <Compile Include="..\..\onboard\comm_autopilot.c" />
+    <Compile Include="..\..\onboard\rc.c" />
+    <Compile Include="..\..\onboard\settings.c" />
+    <Compile Include="..\..\onboard\ahrs\booz2_filter_attitude_cmpl_euler.c" />
+    <Compile Include="..\..\onboard\ahrs\booz_ahrs_aligner.c" />
+    <Compile Include="..\..\onboard\arch\arm7\actuators_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\altimeter_analog_baro_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\analog_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\armVIC.c" />
+    <Compile Include="..\..\onboard\arch\arm7\buss_twi_blmc_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\comm_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\gpio_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\i2c_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\imu_booz_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\init_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\led_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\max1168.c" />
+    <Compile Include="..\..\onboard\arch\arm7\micromag.c" />
+    <Compile Include="..\..\onboard\arch\arm7\rc_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\servos_4017_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\settings_mem_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\sys_time_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\uart_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\ublox_gps_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\usb_ser_hw.c" />
+    <Compile Include="..\..\onboard\arch\arm7\lpcusb\usbcontrol.c" />
+    <Compile Include="..\..\onboard\arch\arm7\lpcusb\usbhw_lpc.c" />
+    <Compile Include="..\..\onboard\arch\arm7\lpcusb\usbinit.c" />
+    <Compile Include="..\..\onboard\arch\arm7\lpcusb\usbstdreq.c" />
+    <Compile Include="..\..\onboard\arch\null\null.c" />
+    <Compile Include="..\..\onboard\autopilot\booz2_autopilot.c" />
+    <Compile Include="..\..\onboard\autopilot\fixedwing_autopilot.c" />
+    <Compile Include="..\..\onboard\fms\booz2_fms.c" />
+    <Compile Include="..\..\onboard\fms\booz2_fms_datalink.c" />
+    <Compile Include="..\..\onboard\fms\booz2_fms_test_signal.c" />
+    <Compile Include="..\..\onboard\guidance\booz2_guidance.c" />
+    <Compile Include="..\..\onboard\guidance\booz2_guidance_h.c" />
+    <Compile Include="..\..\onboard\guidance\booz2_guidance_v.c" />
+    <Compile Include="..\..\onboard\guidance\booz2_navigation.c" />
+    <Compile Include="..\..\onboard\guidance\fixedwing_guidance.c" />
+    <Compile Include="..\..\onboard\ins\booz2_hf_float.c" />
+    <Compile Include="..\..\onboard\ins\booz2_ins.c" />
+    <Compile Include="..\..\onboard\ins\booz2_vf_float.c" />
+    <Compile Include="..\..\onboard\lib\debug.c" />
+    <Compile Include="..\..\onboard\math\pid_float.c" />
+    <Compile Include="..\..\onboard\math\pid_int.c" />
+    <Compile Include="..\..\onboard\math\pprz_geodetic_double.c" />
+    <Compile Include="..\..\onboard\math\pprz_geodetic_float.c" />
+    <Compile Include="..\..\onboard\math\pprz_geodetic_int.c" />
+    <Compile Include="..\..\onboard\math\pprz_trig_int.c" />
+    <Compile Include="..\..\onboard\math\tests\difference_tc.c" />
+    <Compile Include="..\..\onboard\math\tests\pprz_algebra_double_tc.c" />
+    <Compile Include="..\..\onboard\math\tests\pprz_algebra_float_tc.c" />
+    <Compile Include="..\..\onboard\math\tests\sum_tc.c" />
+    <Compile Include="..\..\onboard\stabilization\booz2_stabilization.c" />
+    <Compile Include="..\..\onboard\stabilization\booz2_stabilization_attitude.c" />
+    <Compile Include="..\..\onboard\stabilization\booz2_stabilization_rate.c" />
+    <Compile Include="..\..\onboard\stabilization\fixedwing_stabilization.c" />
+    <Compile Include="..\..\onboard\supervision\booz2_supervision.c" />
+    <Compile Include="..\..\onboard\supervision\fixedwing_supervision.c" />
+    <Compile Include="..\..\onboard\test\test_baro_main.c" />
+    <Compile Include="..\..\onboard\test\test_comm_main.c" />
+    <Compile Include="..\..\onboard\test\test_gps_main.c" />
+    <Compile Include="..\..\onboard\test\test_gps_tunnel.c" />
+    <Compile Include="..\..\onboard\test\test_imu_main.c" />
+    <Compile Include="..\..\onboard\test\test_led_main.c" />
+    <Compile Include="..\..\onboard\test\test_mc_main.c" />
+    <Compile Include="..\..\onboard\test\test_messages_main.c" />
+    <Compile Include="..\..\onboard\test\test_rc_main.c" />
+    <Compile Include="..\..\onboard\test\test_servo_main.c" />
+    <Compile Include="..\..\onboard\test\test_servo_rc_main.c" />
+    <Compile Include="..\..\onboard\test\test_uart_main.c" />
+  </ItemGroup>
+</Project>
