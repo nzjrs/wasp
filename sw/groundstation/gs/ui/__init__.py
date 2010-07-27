@@ -35,7 +35,7 @@ def get_icon_pixbuf(name=None, stock=None, size=gtk.ICON_SIZE_DIALOG):
         #use png icons on windows
         if gs.IS_WINDOWS:
             name = os.path.splitext(name)[0] + ".png"
-        filename = os.path.join(gs.ICON_DIR, name)
+        filename = os.path.join(gs.DATA_DIR, "icons", name)
         try:
             pb = gtk.gdk.pixbuf_new_from_file_at_size(
                             os.path.abspath(filename),
@@ -85,7 +85,7 @@ def get_ui_file(name):
 class GtkBuilderWidget:
     def __init__(self, filename, abspath=None):
         if not abspath:
-            abspath = os.path.join(gs.UI_DIR, filename)
+            abspath = os.path.join(gs.DATA_DIR, "ui", filename)
         self._builder = gtk.Builder()
         self._builder.add_from_file(abspath)
         self._resources = {}

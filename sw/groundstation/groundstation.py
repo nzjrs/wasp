@@ -36,4 +36,4 @@ if __name__ == "__main__":
     if gs.IS_WINDOWS:
         import gtk.gdk
         gtk.gdk.threads_leave()
-    sys.exit(1)
+    sys.exit(0)
