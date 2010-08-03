@@ -4,7 +4,7 @@ MESSAGES            = ../config/messages.xml
 SRCDIR              = ..
 INCDIR              = ./include
 
-LIB                 = libwasp.a
+LIB                 = ./lib/libwasp.a
 OBJS                = comm.o messages.o
 
 default: dir $(LIB)
