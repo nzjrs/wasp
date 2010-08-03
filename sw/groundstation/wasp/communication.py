@@ -1,6 +1,7 @@
 import socket
 import random
 import gobject
+import logging
 
 import libserial.SerialSender
 
@@ -9,6 +10,8 @@ import wasp.transport
 import wasp.fms
 
 UDP_PORT = 1212
+
+LOG = logging.getLogger('wasp.communication')
 
 class _Communication(gobject.GObject):
 
@@ -360,6 +363,6 @@ def get_source(name):
     if name == "network":
         return UdpCommunication
 
-    print "UNKNOWN SOURCE"
+    LOG.warning("Unknown Source: %s" % name)
     return DummyCommunication
 
