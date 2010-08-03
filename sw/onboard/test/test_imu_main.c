@@ -52,7 +52,7 @@ static inline void main_init( void ) {
     sys_time_init();
     led_init();
 
-    comm_init(COMM_1);
+    comm_init(COMM_TELEMETRY);
 
     imu_init();
 
@@ -60,7 +60,7 @@ static inline void main_init( void ) {
 }
 
 static inline void main_periodic_task( void ) {
-    comm_periodic_task(COMM_1);
+    comm_periodic_task(COMM_TELEMETRY);
 
     RunOnceEvery(100, {
         led_toggle(3);
@@ -75,7 +75,7 @@ static inline void main_periodic_task( void ) {
 static inline void main_event_task( void )
 {
     uint8_t valid = 0;
-    comm_event_task(COMM_1);
+    comm_event_task(COMM_TELEMETRY);
 
     valid = imu_event_task();
     if ( (valid & IMU_ACC) || (valid & IMU_GYR) ) 
@@ -94,19 +94,19 @@ static inline void on_imu_event(void)
         led_on(2);
 
         MESSAGE_SEND_IMU_GYRO_RAW(
-                COMM_1,
+                COMM_TELEMETRY,
                 &booz_imu.gyro_unscaled.p,
                 &booz_imu.gyro_unscaled.q,
                 &booz_imu.gyro_unscaled.r);
 
         MESSAGE_SEND_IMU_ACCEL_RAW(
-                COMM_1,
+                COMM_TELEMETRY,
                 &booz_imu.accel_unscaled.x,
 			    &booz_imu.accel_unscaled.y,
 			    &booz_imu.accel_unscaled.z);
 
         MESSAGE_SEND_IMU_MAG_RAW(
-                COMM_1,
+                COMM_TELEMETRY,
                 &booz_imu.mag_unscaled.x,
 			    &booz_imu.mag_unscaled.y,
 			    &booz_imu.mag_unscaled.z);
@@ -116,19 +116,19 @@ static inline void on_imu_event(void)
         led_off(2);
 
         MESSAGE_SEND_IMU_GYRO(
-                COMM_1,
+                COMM_TELEMETRY,
                 &booz_imu.gyro.p,
                 &booz_imu.gyro.q,
                 &booz_imu.gyro.r);
 
         MESSAGE_SEND_IMU_ACCEL(
-                COMM_1,
+                COMM_TELEMETRY,
                 &booz_imu.accel.x,
                 &booz_imu.accel.y,
                 &booz_imu.accel.z);
 
         MESSAGE_SEND_IMU_MAG(
-                COMM_1,
+                COMM_TELEMETRY,
                 &booz_imu.mag.x,
 			    &booz_imu.mag.y,
 			    &booz_imu.mag.z);

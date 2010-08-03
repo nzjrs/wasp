@@ -59,7 +59,7 @@ static inline void main_init( void ) {
 
 #if USE_DA_UART1
   /* Uart 1 (aka telemetry) */
-  comm_init(COMM_1);
+  comm_init(COMM_TELEMETRY);
 #endif
 
 #if USE_DA_USB
@@ -77,7 +77,7 @@ static inline void main_periodic_task( void ) {
 #endif
 
 #if USE_DA_UART1
-        comm_periodic_task(COMM_1);
+        comm_periodic_task(COMM_TELEMETRY);
 #endif
 
 #if USE_DA_USB
@@ -92,7 +92,7 @@ static inline void main_event_task( void ) {
 #endif
 
 #if USE_DA_UART1
-    comm_event_task(COMM_1);
+    comm_event_task(COMM_TELEMETRY);
 #endif
 
 #if USE_DA_USB

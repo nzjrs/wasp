@@ -28,9 +28,9 @@
 #define COMM_MAX_PAYLOAD_LEN 256
 
 typedef enum {
-    COMM_0,         /**< UART0, the GPS */
-    COMM_1,         /**< UART1, the XBEE */
-    COMM_USB,       /**< USB */
+    COMM_0,
+    COMM_TELEMETRY,
+    COMM_USB,
     COMM_NB
 } CommChannel_t;
 
