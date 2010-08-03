@@ -318,7 +318,7 @@ class FifoCommunication(_Communication):
         return self.writefd != -1 and self.readfd != -1
 
     def configure_connection(self, **kwargs):
-        self.fifo_path = "/tmp/WASP_COMM_1" #kwargs.get("fifo_path")
+        self.fifo_path = "/tmp/WASP_COMM_TELEMETRY" #kwargs.get("fifo_path")
 
     def get_connection_string(self):
         return "%s" % self.fifo_path

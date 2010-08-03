@@ -51,7 +51,7 @@ static inline void main_init( void ) {
     sys_time_init();
     led_init();
 
-    comm_init(COMM_1);
+    comm_init(COMM_TELEMETRY);
 
     rc_init();
 
@@ -59,7 +59,7 @@ static inline void main_init( void ) {
 }
 
 static inline void main_periodic_task( void ) {
-    comm_periodic_task(COMM_1);
+    comm_periodic_task(COMM_TELEMETRY);
 
     rc_periodic_task();
     if (rc_status == RC_OK)
@@ -68,15 +68,15 @@ static inline void main_periodic_task( void ) {
         led_off(LED_RC);
 
     RunOnceEvery(250, {
-        MESSAGE_SEND_PPM(COMM_1, ppm_pulses);
-        MESSAGE_SEND_RC(COMM_1, rc_values);
+        MESSAGE_SEND_PPM(COMM_TELEMETRY, ppm_pulses);
+        MESSAGE_SEND_RC(COMM_TELEMETRY, rc_values);
     });
 
 }
 
 static inline void main_event_task( void )
 {
-    comm_event_task(COMM_1);
+    comm_event_task(COMM_TELEMETRY);
     rc_event_task();
 }
 

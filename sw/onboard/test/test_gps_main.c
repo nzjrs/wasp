@@ -49,7 +49,7 @@ static inline void main_init( void ) {
   sys_time_init();
   led_init();
 
-  comm_init(COMM_1);
+  comm_init(COMM_TELEMETRY);
 
   gps_init();
 
@@ -57,18 +57,18 @@ static inline void main_init( void ) {
 }
 
 static inline void main_periodic_task( void ) {
-    comm_periodic_task(COMM_1);
+    comm_periodic_task(COMM_TELEMETRY);
 
     RunOnceEvery(250, {
-        comm_autopilot_message_send (COMM_1, MESSAGE_ID_GPS_LLH);
-        comm_autopilot_message_send (COMM_1, MESSAGE_ID_GPS_STATUS);
-        comm_autopilot_message_send (COMM_1, MESSAGE_ID_STATUS_LOWLEVEL);
+        comm_autopilot_message_send (COMM_TELEMETRY, MESSAGE_ID_GPS_LLH);
+        comm_autopilot_message_send (COMM_TELEMETRY, MESSAGE_ID_GPS_STATUS);
+        comm_autopilot_message_send (COMM_TELEMETRY, MESSAGE_ID_STATUS_LOWLEVEL);
     });
 
 }
 
 static inline void main_event_task( void ) {
-    comm_event_task(COMM_1);
+    comm_event_task(COMM_TELEMETRY);
 
     if (gps_event_task()) {
         if (gps_state.fix == GPS_FIX_3D)

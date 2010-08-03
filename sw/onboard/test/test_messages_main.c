@@ -35,7 +35,7 @@ static inline void main_event_task( void );
 bool_t test_message_tx ( CommChannel_t chan, uint8_t msgid );
 bool_t test_message_rx (CommChannel_t chan, CommMessage_t *message);
 
-#define DA_COMM COMM_1
+#define DA_COMM COMM_TELEMETRY
 
 /*
     <message name="TEST_MESSAGE" id="26">

@@ -53,7 +53,7 @@ static inline void main_init( void ) {
     sys_time_init();
     led_init();
 
-    comm_init(COMM_1);
+    comm_init(COMM_TELEMETRY);
 
     actuators_init(ACTUATOR_BANK_MOTORS);
 

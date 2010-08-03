@@ -42,13 +42,13 @@ comm_init ( CommChannel_t chan )
     }
 #endif
 #if USE_UART1
-    if ( chan == COMM_1 ) {
+    if ( chan == COMM_TELEMETRY ) {
         uart1_init_tx();
         comm_channel_used[chan] = TRUE;
     }
 #endif
 #if USE_USB_SERIAL
-    if ( chan == COMM_USB ) {
+    if ( chan == COMM_1 ) {
         VCOM_init();
         comm_channel_used[chan] = TRUE;
     }
@@ -76,12 +76,12 @@ comm_ch_available ( CommChannel_t chan )
     }
 #endif
 #if USE_UART1
-    if (chan == COMM_1) {
+    if (chan == COMM_TELEMETRY) {
         return Uart1ChAvailable();
     }
 #endif
 #if USE_USB_SERIAL
-    if (chan == COMM_USB)
+    if (chan == COMM_1)
         return VCOM_check_available();
 #endif
     return FALSE;
@@ -98,12 +98,12 @@ comm_get_ch( CommChannel_t chan )
     }
 #endif
 #if USE_UART1
-    if (chan == COMM_1) {
+    if (chan == COMM_TELEMETRY) {
         return Uart1Getch();
     }
 #endif
 #if USE_USB_SERIAL
-    if (chan == COMM_USB)
+    if (chan == COMM_1)
         return VCOM_getchar();
 #endif
     return '\0';
@@ -119,11 +119,11 @@ comm_send_ch( CommChannel_t chan, uint8_t ch )
         uart0_transmit(ch);
 #endif
 #if USE_UART1
-    if (chan == COMM_1)
+    if (chan == COMM_TELEMETRY)
         uart1_transmit(ch);
 #endif
 #if USE_USB_SERIAL
-    if (chan == COMM_USB)
+    if (chan == COMM_1)
         VCOM_putchar(ch);
 #endif
 }
@@ -136,11 +136,11 @@ comm_check_free_space ( CommChannel_t chan, uint8_t len )
         return uart0_check_free_space(len);
 #endif
 #if USE_UART1
-    if (chan == COMM_1)
+    if (chan == COMM_TELEMETRY)
         return uart1_check_free_space(len);
 #endif
 #if USE_USB_SERIAL
-    if (chan == COMM_USB)
+    if (chan == COMM_1)
         return VCOM_check_free_space(len);
 #endif
     return FALSE;

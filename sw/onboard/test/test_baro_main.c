@@ -52,9 +52,9 @@ static inline void main_init( void ) {
     sys_time_init();
     led_init();
 
-    comm_init(COMM_1);
+    comm_init(COMM_TELEMETRY);
     /* add rx callback so we can send ALTIMETER_RESET messages */
-    comm_add_rx_callback(COMM_1, comm_autopilot_message_received);
+    comm_add_rx_callback(COMM_TELEMETRY, comm_autopilot_message_received);
 
     analog_init();
     analog_enable_channel(ANALOG_CHANNEL_PRESSURE);
@@ -67,11 +67,11 @@ static inline void main_init( void ) {
 static inline void main_periodic_task( void ) {
     analog_periodic_task();
     altimeter_periodic_task();
-    comm_periodic_task(COMM_1);
+    comm_periodic_task(COMM_TELEMETRY);
 
     RunOnceEvery(250, {
         int32_t alt = altimeter_get_altitude();
-        MESSAGE_SEND_ALTIMETER(COMM_1,
+        MESSAGE_SEND_ALTIMETER(COMM_TELEMETRY,
             &alt,
             &altimeter_system_status,
             &altimeter_calibration_offset,
@@ -83,6 +83,6 @@ static inline void main_event_task( void )
 {
     analog_event_task();
     altimeter_event_task();
-    comm_event_task(COMM_1);
+    comm_event_task(COMM_TELEMETRY);
 }
 

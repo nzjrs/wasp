@@ -37,18 +37,18 @@
 #include "generated/messages.h"
 #include "generated/settings.h"
 
-/* Only provide an implementation for COMM_1, aka
+/* Only provide an implementation for COMM_TELEMETRY, aka
  * the XBEE, which is used for telemetry. This implementation is 2
  * local FIFOs in /tmp which other processes can read/write to 
  *
  * FIFOs are unidirectional so two are created, one each for write and read
- *     - /tmp/WASP_COMM_N_SOGI      (SOGI = sim-out-groundstation-in)
- *     - /tmp/WASP_COMM_N_SIGO      (SIGO = sim-in-groundstation-out)
+ *     - /tmp/WASP_COMM_XXX_SOGI      (SOGI = sim-out-groundstation-in)
+ *     - /tmp/WASP_COMM_XXX_SIGO      (SIGO = sim-in-groundstation-out)
  */
 
 #define FIFO_PATH   "/tmp/WASP_"
-#define FIFO_WRITE  FIFO_PATH"COMM_1_SOGI"
-#define FIFO_READ   FIFO_PATH"COMM_1_SIGO"
+#define FIFO_WRITE  FIFO_PATH"COMM_TELEMETRY_SOGI"
+#define FIFO_READ   FIFO_PATH"COMM_TELEMETRY_SIGO"
 
 SystemStatus_t  comm_system_status;
 int             write_fd;
@@ -92,7 +92,7 @@ void comm_init ( CommChannel_t chan )
 {
     int i;
 
-    if (chan == COMM_1) {
+    if (chan == COMM_TELEMETRY) {
         if (make_fifo(FIFO_WRITE) && make_fifo(FIFO_READ)) {
             /* Open the write end with O_RDWR, to prevent errors when writing 
              * to it before the groundstation has opened it for reading */
@@ -124,7 +124,7 @@ void comm_init ( CommChannel_t chan )
 bool_t comm_ch_available ( CommChannel_t chan )
 {
     /* read one byte at a time */
-    if ((chan == COMM_1) && (comm_system_status == STATUS_INITIALIZED)) {
+    if ((chan == COMM_TELEMETRY) && (comm_system_status == STATUS_INITIALIZED)) {
         uint8_t ch;
         int i;
 
@@ -140,14 +140,14 @@ bool_t comm_ch_available ( CommChannel_t chan )
 
 void comm_send_ch (CommChannel_t chan, uint8_t c)
 {
-    if ((chan == COMM_1) && (comm_system_status == STATUS_INITIALIZED))
+    if ((chan == COMM_TELEMETRY) && (comm_system_status == STATUS_INITIALIZED))
         if (write(write_fd, &c, 1) != 1)
             g_warning("Write error");
 }
 
 uint8_t comm_get_ch(CommChannel_t chan)
 {
-    if ((chan == COMM_1) && (comm_system_status == STATUS_INITIALIZED)) {
+    if ((chan == COMM_TELEMETRY) && (comm_system_status == STATUS_INITIALIZED)) {
         uint8_t c;
 
         c = read_buf[read_tail];

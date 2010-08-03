@@ -77,9 +77,9 @@ static inline void autopilot_main_init( void ) {
 
   rc_init();
 
-  comm_init(COMM_1);
-  comm_add_tx_callback(COMM_1, comm_autopilot_message_send);
-  comm_add_rx_callback(COMM_1, comm_autopilot_message_received);
+  comm_init(COMM_TELEMETRY);
+  comm_add_tx_callback(COMM_TELEMETRY, comm_autopilot_message_send);
+  comm_add_rx_callback(COMM_TELEMETRY, comm_autopilot_message_received);
 
   gps_init();
 
@@ -134,7 +134,7 @@ static inline void autopilot_main_periodic( void ) {
         }
         break;
     case 1:
-        comm_periodic_task(COMM_1);
+        comm_periodic_task(COMM_TELEMETRY);
         break;
     case 2:
         booz_fms_periodic();
@@ -192,7 +192,7 @@ static inline void autopilot_main_event( void ) {
     ins_update_gps();
   }
 
-  comm_event_task(COMM_1);
+  comm_event_task(COMM_TELEMETRY);
 }
 
 

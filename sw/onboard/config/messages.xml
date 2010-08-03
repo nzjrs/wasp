@@ -252,14 +252,14 @@
    </message>
 
    <!-- Begin periodic messages -->
-   <periodic channel="COMM_0">
-      <message name="COMM_STATUS" frequency="0.25"/>
-   </periodic>
-
-   <periodic channel="COMM_1" adjustable="2">
+   <periodic channel="COMM_TELEMETRY" adjustable="2">
       <message name="COMM_STATUS" frequency="0.25"/>
       <message name="STATUS" frequency="1"/>
       <message name="TIME" frequency="0.1"/>
       <message name="GPS_LLH" frequency="0.1"/>
    </periodic>
+
+   <periodic channel="COMM_0" />
+   <periodic channel="COMM_1" />
+
 </messages>
