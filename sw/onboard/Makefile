@@ -24,8 +24,6 @@ SRC =                               \
     ins/booz2_ins.c                 \
     ins/booz2_hf_float.c            \
     ins/booz2_vf_float.c            \
-    fms/booz2_fms.c                 \
-    fms/booz2_fms_test_signal.c     \
     ahrs/booz_ahrs_aligner.c                \
     ahrs/booz2_filter_attitude_cmpl_euler.c \
     guidance/booz2_guidance.c       \

@@ -40,7 +40,6 @@
 #include "analog.h"
 #include "altimeter.h"
 
-#include "fms/booz2_fms.h"
 #include "autopilot.h"
 #include "stabilization.h"
 
@@ -91,7 +90,6 @@ static inline void autopilot_main_init( void ) {
 
   imu_init();
 
-  booz_fms_init();
   autopilot_init();
   guidance_init();
   stabilization_init();
@@ -135,9 +133,6 @@ static inline void autopilot_main_periodic( void ) {
         break;
     case 1:
         comm_periodic_task(COMM_TELEMETRY);
-        break;
-    case 2:
-        booz_fms_periodic();
         break;
     }
 

@@ -27,7 +27,6 @@
 #include "rc.h"
 #include "ins.h"
 #include "stabilization/booz2_stabilization.h"
-#include "fms/booz2_fms.h"
 #include "guidance/booz2_navigation.h"
 
 #include "math/pprz_algebra_int.h"
@@ -164,8 +163,6 @@ void booz2_guidance_v_run(bool_t in_flight) {
     break;
 
   case BOOZ2_GUIDANCE_V_MODE_CLIMB:
-    if (booz_fms_on && booz_fms_input.v_mode == BOOZ2_GUIDANCE_V_MODE_CLIMB)
-      booz2_guidance_v_zd_sp = booz_fms_input.v_sp.climb;
     b2_gv_update_ref_from_zd_sp(booz2_guidance_v_zd_sp);
     run_hover_loop(in_flight);
     // saturate max authority with RC stick
@@ -173,8 +170,6 @@ void booz2_guidance_v_run(bool_t in_flight) {
     break;
 
   case BOOZ2_GUIDANCE_V_MODE_HOVER:
-    if (booz_fms_on && booz_fms_input.v_mode == BOOZ2_GUIDANCE_V_MODE_HOVER)
-      booz2_guidance_v_z_sp = booz_fms_input.v_sp.height;
     b2_gv_update_ref_from_z_sp(booz2_guidance_v_z_sp);
     run_hover_loop(in_flight);
     // saturate max authority with RC stick
