@@ -53,6 +53,13 @@ class _Communication(gobject.GObject):
     def configure_connection(self, **kwargs):
         pass
 
+    def get_configuration_default(self):
+        return {}
+
+    @staticmethod
+    def parse_command_line_configuration(opts):
+        return {}
+
     def get_connection_string(self):
         return ""
 
@@ -121,12 +128,21 @@ class UdpCommunication(_Communication):
     def configure_connection(self, **kwargs):
         pass
 
+    @staticmethod
+    def parse_command_line_configuration(opts):
+        if len(opts) == 2:
+            return {"network_host":opts[0],"network_port":opts[1]}
+        return {}
+
     def get_connection_string(self):
         return "%s:%s" % (self.host, UDP_PORT)
 
 class SerialCommunication(_Communication):
 
     COMMUNICATION_TYPE = "serial"
+
+    DEFAULT_PORT = "/dev/ttyUSB0"
+    DEFAULT_SPEED = "57600"
 
     def __init__(self, transport, messages_file, message_header):
         _Communication.__init__(self, transport, messages_file, message_header)
@@ -185,6 +201,18 @@ class SerialCommunication(_Communication):
     def configure_connection(self, **kwargs):
         self.port = kwargs.get("serial_port")
         self.speed = int(kwargs.get("serial_speed"))
+
+    def get_configuration_default(self):
+        return {
+            "serial_port":self.DEFAULT_PORT,
+            "serial_speed":self.DEFAULT_SPEED
+        }
+
+    @staticmethod
+    def parse_command_line_configuration(opts):
+        if len(opts) == 2:
+            return {"serial_port":opts[0],"serial_speed":opts[1]}
+        return {}
 
     def get_connection_string(self):
         return "%s@%s" % (self.port, self.speed)
@@ -355,14 +383,37 @@ class DummyUAV:
                 self._cpu.value()))
         return True
 
-def get_source(name):
-    if name == "serial":
-        return SerialCommunication
-    if name == "test":
-        return DummyCommunication
-    if name == "network":
-        return UdpCommunication
+ALL_COMMUNICATION_KLASSES = [
+    SerialCommunication,
+    DummyCommunication,
+    UdpCommunication
+]
 
-    LOG.warning("Unknown Source: %s" % name)
-    return DummyCommunication
+def get_source(source_name):
+    """
+    Parses the source and options as passed on the command line. The user supplies
+    the source in the format of 
 
+    name:opt1:opt2
+
+    where opt1 and opt2 meaning depends on the particular source
+
+    :returns: (sournce_name, klass, **options)
+    """
+    bits = source_name.split(":")
+    name = bits[0]
+    opts = bits[1:]
+
+    klass = None
+    config = {}
+    for k in ALL_COMMUNICATION_KLASSES:
+        if name == k.COMMUNICATION_TYPE:
+            klass = k
+            config = k.parse_command_line_configuration(opts)
+
+    if klass == None:
+        LOG.warning("Unknown Source: %s" % name)
+        klass = DummyCommunication
+        name = "test"
+
+    return name,klass,config
