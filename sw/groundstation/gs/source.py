@@ -7,7 +7,7 @@ import gobject
 import libserial
 
 import gs
-import gs.config as config
+import gs.config
 import gs.utils as utils
 
 import wasp
@@ -108,12 +108,35 @@ class _LogCsvCb(MessageCb):
     def quit(self):
         self._f.close()
 
-class UAVSource(config.ConfigurableIface, gobject.GObject):
+class _SourceConfig:
+
+    @staticmethod
+    def get_preference_widgets(configurable):
+        return None, None, []
+
+class _SourceConfigSerial(_SourceConfig):
+
+    @staticmethod
+    def get_preference_widgets(configurable):
+        self = configurable
+        sg = self.build_sizegroup()
+        ser_port_cb = self.build_combo("serial_port", *libserial.get_ports())
+        ser_speed_cb = self.build_combo("serial_speed", *libserial.get_speeds())
+        items = [ser_port_cb, ser_speed_cb]
+        frame = self.build_frame(None, [
+            self.build_label("Serial Port", ser_port_cb, sg=sg),
+            self.build_label("Serial Baud", ser_speed_cb, sg=sg),
+        ])
+        return "UAV Source", frame, items
+
+_SOURCE_CONFIG_GUIS = {
+    communication.SerialCommunication.COMMUNICATION_TYPE : _SourceConfigSerial
+}
+
+class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
 
     CONFIG_SECTION = "UAVSOURCE"
 
-    DEFAULT_PORT = "/dev/ttyUSB0"
-    DEFAULT_SPEED = 57600
     DEFAULT_TIMEOUT = 1
 
     #: the groundstation is (physically) connected to the UAV
@@ -135,11 +158,9 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
     }
 
     def __init__(self, conf, messages, options, listen_acid=wasp.ACID_ALL):
-        config.ConfigurableIface.__init__(self, conf)
+        gs.config.ConfigurableIface.__init__(self, conf)
         gobject.GObject.__init__(self)
 
-        self._port = self.config_get("serial_port", self.DEFAULT_PORT)
-        self._speed = self.config_get("serial_speed", self.DEFAULT_SPEED)
         self._rxts = treeview.MessageTreeStore()
 
         #dictionary of msgid : [list, of, MessageCb objects]
@@ -156,18 +177,19 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         self._rm = self._messages_file.get_message_by_name("REQUEST_MESSAGE")
         self._rt = self._messages_file.get_message_by_name("REQUEST_TELEMETRY")
 
-        #initialise the communication class
-        connection_configuration = {
-            "serial_port":self._port,
-            "serial_speed":self._speed
-        }
-
-        source_name = options.source
-        comm_klass = communication.get_source(source_name)
+        source_name, comm_klass, cmdline_config = communication.get_source(options.source)
         LOG.info("Source: %s" % comm_klass)
-
         self.communication = comm_klass(self._transport, self._messages_file, self._groundstation_header)
-        self.communication.configure_connection(**connection_configuration)
+
+        #configure the class, updating with command line values
+        self._default_config = self.communication.get_configuration_default()
+        self._default_config.update(cmdline_config)
+        self.communication.configure_connection(**self._default_config)
+        LOG.debug("Source config: %s" % self._default_config)
+
+        #attach the config UI
+        self._config_gui = _SOURCE_CONFIG_GUIS.get(source_name, _SourceConfig)()
+
         self.communication.connect("message-received", self.on_message_received)
         self.communication.connect("uav-connected", self.on_uav_connected)
 
@@ -374,37 +396,17 @@ class UAVSource(config.ConfigurableIface, gobject.GObject):
         return 0.0
 
     def update_state_from_config(self):
-        port = self.config_get("serial_port", self.DEFAULT_PORT)
-        speed = self.config_get("serial_speed", self.DEFAULT_SPEED)
-
-        if port != self._port or speed != self._speed:
-            self.communication.configure_connection(
-                    serial_port=port,
-                    serial_speed=speed)
-
-        self._port = port
-        self._speed = speed
-        LOG.info("Updating state from config: %s %s" % (self._port, self._speed))
+        for k in self._default_config:
+            if self.config_has_key(k):
+                self._default_config[k] = self.config_get(k, default=self._default_config[k])
 
     def update_config_from_state(self):
-        LOG.info("Updating config from state")
-        self.config_set("serial_port", self._port or self.DEFAULT_PORT)
-        self.config_set("serial_speed", self._speed or self.DEFAULT_SPEED)
+        for k in self._default_config:
+            self.config_set(k, self._default_config[k])
 
     def get_preference_widgets(self):
-        sg = self.build_sizegroup()
-        ser_port_cb = self.build_combo("serial_port", *libserial.get_ports())
-        ser_speed_cb = self.build_combo("serial_speed", *libserial.get_speeds())
+        return self._config_gui.get_preference_widgets(self)
 
-        #all following items configuration is saved
-        items = [ser_port_cb, ser_speed_cb]
 
-        #the gui looks like
-        frame = self.build_frame(None, [
-            self.build_label("Serial Port", ser_port_cb, sg=sg),
-            self.build_label("Serial Baud", ser_speed_cb, sg=sg),
-        ])
-
-        return "UAV Source", frame, items
 
 

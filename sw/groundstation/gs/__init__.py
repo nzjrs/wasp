@@ -13,23 +13,20 @@ if IS_WINDOWS:
     if IS_INSTALLED:
         #report a dir relative to the executable. these values
         #must be kept in sync with the py2exe configuration
-        ICON_DIR = os.path.join("..","share","groundstation", "icons")
-        UI_DIR = os.path.join("..", "share", "groundstation", "ui")
-        PLUGIN_DIR = os.path.join("..", "lib", "groundstation", "plugins")
-        CONFIG_DIR = os.path.join("..", "etc", "groundstation", "config")
+        DATA_DIR =      os.environ.get("WASP_DATA_DIR",   os.path.join("..", "share","groundstation"))
+        PLUGIN_DIR =    os.environ.get("WASP_PLUGIN_DIR", os.path.join("..", "lib", "groundstation", "plugins"))
+        CONFIG_DIR =    os.environ.get("WASP_CONFIG_DIR", os.path.join("..", "etc", "groundstation", "config"))
     else:
         #report absolute dir
-        ICON_DIR = os.path.abspath(os.path.join(_thisdir, "..", "data", "icons"))
-        UI_DIR = os.path.abspath(os.path.join(_thisdir, "..", "data", "ui"))
-        PLUGIN_DIR = os.path.abspath(os.path.join(_thisdir, "plugins"))
-        CONFIG_DIR = os.path.abspath(os.path.join(_thisdir, "..", "..", "onboard", "config"))
+        DATA_DIR =      os.environ.get("WASP_DATA_DIR",   os.path.abspath(os.path.join(_thisdir, "..", "data")))
+        PLUGIN_DIR =    os.environ.get("WASP_PLUGIN_DIR", os.path.abspath(os.path.join(_thisdir, "plugins")))
+        CONFIG_DIR =    os.environ.get("WASP_CONFIG_DIR", os.path.abspath(os.path.join(_thisdir, "..", "..", "onboard", "config")))
 else:
     #FIXME: dont support running installed yet..
     IS_INSTALLED = False
-    ICON_DIR = os.path.join(_thisdir, "..", "data", "icons")
-    UI_DIR = os.path.join(_thisdir, "..", "data", "ui")
-    PLUGIN_DIR = os.path.join(_thisdir, "plugins")
-    CONFIG_DIR = os.path.join(_thisdir, "..", "..", "onboard", "config")
+    DATA_DIR =          os.environ.get("WASP_DATA_DIR", os.path.join(_thisdir, "..", "data"))
+    PLUGIN_DIR =        os.environ.get("WASP_PLUGIN_DIR", os.path.join(_thisdir, "plugins"))
+    CONFIG_DIR =        os.environ.get("WASP_CONFIG_DIR", os.path.join(_thisdir, "..", "..", "onboard", "config"))
 
 USER_CONFIG_DIR = os.environ.get("XDG_CONFIG_HOME", os.path.join(os.environ.get("HOME","."), ".config", "wasp"))
 

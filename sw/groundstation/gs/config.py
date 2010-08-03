@@ -45,6 +45,10 @@ class ConfigurableIface:
         """ Deletes all configuration values in the objects secion """
         self._config.delete_keys_in_section(section=self.CONFIG_SECTION)
 
+    def config_has_key(self, key):
+        """ Returns True if the config knows about this section """
+        return self._config.has_key(key, section=self.CONFIG_SECTION)
+
     def autobind_config(self, *keys, **kwargs):
         """
         Autobinds configuration variables of the supplied names to
@@ -292,6 +296,15 @@ class Config:
 
     def get_sections(self):
         return self._config.sections()
+
+    def has_key(self, key, section="DEFAULT"):
+        try:
+            self._config.get(section,key)
+            return True
+        except ConfigParser.NoOptionError:
+            return False
+        except ConfigParser.NoSectionError:
+            return False
 
     def delete_keys_in_section(self, section="DEFAULT"):
         for k in self.get_keys_in_section(section):

@@ -64,6 +64,16 @@
 #define UINT32_MAX (0xFFFFFFFF)
 #endif
 
+#ifndef G_BEGIN_DECLS
+# ifdef  __cplusplus
+#  define G_BEGIN_DECLS  extern "C" {
+#  define G_END_DECLS    }
+# else
+#  define G_BEGIN_DECLS
+#  define G_END_DECLS
+# endif
+#endif
+
 /* Boolean values */
 typedef uint8_t bool_t;
 

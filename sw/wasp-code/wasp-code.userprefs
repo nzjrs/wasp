@@ -1,0 +1,22 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ctype="Workspace" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="../onboard/autopilot_main.c" ctype="Workbench">
+    <Files>
+      <File FileName="../groundstation/groundstation.py" Line="40" Column="1" />
+      <File FileName="../onboard/autopilot_main.c" Line="76" Column="40" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="wasp-groundstation" expanded="True" />
+          <Node name="wasp-onboard" expanded="True">
+            <Node name="autopilot_main.c" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+</Properties>
