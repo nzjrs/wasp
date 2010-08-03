@@ -48,7 +48,7 @@ comm_init ( CommChannel_t chan )
     }
 #endif
 #if USE_USB_SERIAL
-    if ( chan == COMM_USB ) {
+    if ( chan == COMM_1 ) {
         VCOM_init();
         comm_channel_used[chan] = TRUE;
     }
@@ -81,7 +81,7 @@ comm_ch_available ( CommChannel_t chan )
     }
 #endif
 #if USE_USB_SERIAL
-    if (chan == COMM_USB)
+    if (chan == COMM_1)
         return VCOM_check_available();
 #endif
     return FALSE;
@@ -103,7 +103,7 @@ comm_get_ch( CommChannel_t chan )
     }
 #endif
 #if USE_USB_SERIAL
-    if (chan == COMM_USB)
+    if (chan == COMM_1)
         return VCOM_getchar();
 #endif
     return '\0';
@@ -123,7 +123,7 @@ comm_send_ch( CommChannel_t chan, uint8_t ch )
         uart1_transmit(ch);
 #endif
 #if USE_USB_SERIAL
-    if (chan == COMM_USB)
+    if (chan == COMM_1)
         VCOM_putchar(ch);
 #endif
 }
@@ -140,7 +140,7 @@ comm_check_free_space ( CommChannel_t chan, uint8_t len )
         return uart1_check_free_space(len);
 #endif
 #if USE_USB_SERIAL
-    if (chan == COMM_USB)
+    if (chan == COMM_1)
         return VCOM_check_free_space(len);
 #endif
     return FALSE;

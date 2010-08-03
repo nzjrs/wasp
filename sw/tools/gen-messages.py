@@ -68,7 +68,7 @@ class Periodic:
     #to wait until releasing this message for transmission
     CNT_MAX = (2 ** 16) - 1
 
-    AVAILABLE_CHANNELS = ("COMM_0", "COMM_TELEMETRY", "COMM_USB")
+    AVAILABLE_CHANNELS = ("COMM_TELEMETRY", "COMM_0", "COMM_1")
 
     def __init__(self, name, frequency, chan, periodicfreq=60.0):
         self._periodicfreq = periodicfreq

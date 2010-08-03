@@ -28,9 +28,9 @@
 #define COMM_MAX_PAYLOAD_LEN 256
 
 typedef enum {
-    COMM_0,
     COMM_TELEMETRY,
-    COMM_USB,
+    COMM_0,
+    COMM_1,
     COMM_NB
 } CommChannel_t;
 

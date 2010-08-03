@@ -64,7 +64,7 @@ static inline void main_init( void ) {
 
 #if USE_DA_USB
   /* USB */
-  comm_init(COMM_USB);
+  comm_init(COMM_1);
 #endif
 
   int_enable();
@@ -85,7 +85,7 @@ static inline void main_periodic_task( void ) {
 #endif
 
 #if USE_DA_USB
-    comm_send_ch(COMM_USB, c);
+    comm_send_ch(COMM_1, c);
 #endif
 
     c = (c < 'z' ? c + 1 : 'a');
