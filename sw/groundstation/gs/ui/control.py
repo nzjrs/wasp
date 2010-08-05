@@ -1,21 +1,23 @@
-import logging
 import gtk
+import logging
+import wasp.fms
 
 LOG = logging.getLogger("ui.control")
 
 class ControlController:
 
     def __init__(self, source, messages_file):
-
         self._source = source
         self._messages_file = messages_file
-
         self.widget = gtk.VBox(spacing=5)
+
+        self._fms_control = wasp.fms.ControlManager(source, messages_file)
 
     def _on_enabled(self, btn, widget, control_widget):
         enabled = btn.get_active()
         widget.set_sensitive(enabled)
-        control_widget.set_control_enabled(enabled)
+        control_widget.set_control_enabled(enabled, self._fms_control)
+        self._fms_control.enable(enabled)
 
     def add_control_widget(self, name, control_widget):
         #Each control widget is in a frame with a label and nice padding.
@@ -44,7 +46,10 @@ class ControlController:
         self.widget.pack_start(f, False, True)
 
 class ControlWidgetIface:
-    def set_control_enabled(self, enabled):
+
+    fms_control = None
+
+    def set_control_enabled(self, enabled, fms_control):
         raise NotImplementedError
 
     def get_ui_widget(self):

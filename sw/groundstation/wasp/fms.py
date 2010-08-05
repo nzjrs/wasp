@@ -1,3 +1,4 @@
+import logging
 import gobject
 
 COMMAND_ACK             = "ACK"
@@ -7,10 +8,19 @@ COMMAND_ERROR_PENDING   = 0
 COMMAND_ERROR_LOST      = 1
 COMMAND_ERROR_NACK      = 2
 
-ID_ROLL                 = 1
-ID_PITCH                = 2
-ID_HEADING              = 3
-ID_THRUST               = 4
+ID_ROLL                 = 0
+ID_PITCH                = 1
+ID_HEADING              = 2
+ID_THRUST               = 3
+
+ID_LIST_FMS_ATTITUDE    = [ID_ROLL, ID_PITCH, ID_HEADING, ID_THRUST]
+
+ID_RC                   = 0
+ID_ATTITUDE             = 1
+
+ID_LIST_FMS_MODE        = [ID_RC, ID_ATTITUDE]
+
+LOG = logging.getLogger("wasp.fms")
 
 class _Command:
     def __init__(self, msgid, ok_cb, failed_cb, delete_myself_cb, timeout=1000):
@@ -68,27 +78,32 @@ class CommandManager:
             self.communication.send_message(msg, values)
 
 class ControlManager:
+
+
+
     def __init__(self, source, messages_file):
         self.source = source
         self.enabled = False
 
         #cache supported messages
-        self._msg_fms_rate = None
-        self._msg_fms_attitude = None
-        self._msg_fms_speed = None
-        self._msg_fms_position = None
-        self._msg_rc = messages_file["RC"]
+        self._msg_fms_rc = messages_file["FMS_RC"]
+        self._msg_fms_attitude = messages_file["FMS_ATTITUDE"]
 
         #current message and args
         self._msg = None
-        self._args = ()
+        self._msg_id = None
         #send FMS messages at regular frequency
         self._timout_id = None
 
+        #setpoints
+        self._sp = [
+            [0] * len(ID_LIST_FMS_ATTITUDE),
+            [0] * len(ID_LIST_FMS_ATTITUDE)
+        ]
+
     def _send_control(self):
-        if self._msg:
-            print "."
-            self.source.send_message(self._msg, self._args)
+        if self._msg != None and self._msg_id != None:
+            self.source.send_message(self._msg, self._sp[self._msg_id])
         return True
 
     def enable(self, enable=True):
@@ -100,13 +115,30 @@ class ControlManager:
             self._timeout_id = gobject.timeout_add(1000/20, self._send_control)
         self.enabled = enable
 
-    def send_servo(self, *args):
-        self._args = args
-        self._msg = self._msg_rc
+    def _generic_set(self, msg, _id, r, p, y, t):
+        self._sp[_id][ID_ROLL] = r
+        self._sp[_id][ID_PITCH] = p
+        self._sp[_id][ID_HEADING] = y
+        self._sp[_id][ID_THRUST] = t
+        if self._msg != msg and self._msg_id != _id:
+            self._msg = msg
+            self._msg_id = _id
 
-    def send_attitude(self, roll, pitch, yaw, thrust):
-        pass
+    def set_attitude(self, roll, pitch, yaw, thrust):
+        self._generic_set(
+            self._msg_fms_attitude, ID_ATTITUDE,
+            roll, pitch, yaw, thrust)
 
-    def send_position(self, lat, lon, heading, alt):
-        pass
+    def set_rc(self, roll, pitch, yaw, thrust, *args):
+        self._generic_set(
+            self._msg_fms_rc, ID_RC,
+            roll, pitch, yaw, thrust)
+
+    def adjust_attitude(self, axis, delta):
+        assert axis in ID_LIST_FMS_ATTITUDE
+        assert type(delta) == int
+        self._sp[ID_ATTITUDE][axis] += delta
+        self._msg = self._msg_fms_attitude
+        self._msg_id = ID_ATTITUDE
+
 

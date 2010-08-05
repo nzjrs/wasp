@@ -9,7 +9,7 @@
     <property name="n_columns">5</property>
     <property name="homogeneous">True</property>
     <child>
-      <object class="GtkButton" id="button5">
+      <object class="GtkButton" id="roll_left">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
@@ -29,7 +29,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkButton" id="button6">
+      <object class="GtkButton" id="pitch_down">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
@@ -47,7 +47,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkButton" id="button7">
+      <object class="GtkButton" id="roll_right">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
@@ -67,7 +67,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkButton" id="button8">
+      <object class="GtkButton" id="pitch_up">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
@@ -87,7 +87,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkButton" id="button9">
+      <object class="GtkButton" id="thrust_up">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
@@ -103,7 +103,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkButton" id="button10">
+      <object class="GtkButton" id="thrust_down">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>

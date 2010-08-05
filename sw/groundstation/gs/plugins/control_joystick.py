@@ -44,8 +44,6 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
                 "axis_roll", "axis_pitch", "axis_heading", "axis_thrust",
                 "reverse_roll", "reverse_pitch", "reverse_heading", "reverse_thrust",
                 update_state_cb=self._on_joystick_device_set)
-    
-        self.control = fms.ControlManager(source, messages_file)
 
         self.joystick = None
         self.joystick_id = None
@@ -87,11 +85,12 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
         LOG.info("Joystick initialized: %s" % self._device)
 
     def _on_joystick_event(self, joystick, joystick_axis, joystick_value, init):
-        self._servo_vals[joystick_axis] = int(gs.scale_to_range(
-                                                    joystick_value,
-                                                    oldrange=(-32767,32767),
-                                                    newrange=(-9600,9600)))
-        self.control.send_servo(*self._servo_vals)
+        if self.fms_control:
+            self._servo_vals[joystick_axis] = int(gs.scale_to_range(
+                                                        joystick_value,
+                                                        oldrange=(-32767,32767),
+                                                        newrange=(-9600,9600)))
+            self.fms_control.set_rc(*self._servo_vals)
         #try:
         #    label, progress_bar, fms_axis_id = self.progress[ self.axis_channel[joystick_axis] ]
         #    value = gs.scale_to_range(
@@ -148,8 +147,8 @@ can also reverse the axis be selecting the 'R' check-box.""")
 
         return "Joystick", vb, items
 
-    def set_control_enabled(self, enabled):
-        self.control.enable(enabled)
+    def set_control_enabled(self, enabled, fms_control):
+        self.fms_control = fms_control
 
     def get_ui_widget(self):
         return self.ui
