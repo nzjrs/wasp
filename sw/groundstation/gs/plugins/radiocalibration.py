@@ -18,7 +18,7 @@ RADIO_CHANNELS = (
     "ROLL",
     "PITCH",
     "MODE",
-    "GAIN1"
+    "FMS"
 )
 
 class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
@@ -116,7 +116,7 @@ class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
         # <channel ctl="2" function="PITCH"    min="1099" neutral="1525" max="1921" average="0"/>
         # <channel ctl="3" function="THROTTLE" min="1930" neutral="1930" max="1108" average="0"/>
         # <channel ctl="4" function="YAW"      min="1940" neutral="1518" max="1116" average="0"/>
-        # <channel ctl="5" function="GAIN1"    min="1100" neutral="1500" max="3000" average="1"/>
+        # <channel ctl="5" function="FMS"      min="1100" neutral="1500" max="3000" average="1"/>
         # <channel ctl="6" function="MODE"     min="1900" neutral="1500" max="1100" average="1"/>
         #</radio>
 

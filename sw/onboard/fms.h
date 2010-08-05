@@ -20,14 +20,21 @@ typedef struct __FMSCommand {
     uint8_t v_mode;
 } FMSCommand_t;
 
+typedef enum {
+    FMS_OFF,
+    FMS_RC_ENABLED,
+    FMS_ON
+} FMSEnabled_t;
+
 typedef struct __FMS {
     FMSCommand_t    command;
-    bool_t          enabled;
+    FMSEnabled_t    enabled;
+    uint8_t         mode;
     bool_t          timeout;
     uint8_t         last_msg;
 } FMS_t;
 
-extern FMS_t            fms_state;
+extern FMS_t            fms;
 extern SystemStatus_t   fms_system_status;
 
 void fms_init(void);

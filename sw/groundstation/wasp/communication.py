@@ -370,6 +370,8 @@ class DummyUAV:
         #     <field name="motors_on" type="uint8" values="MOTORS_OFF|MOTORS_ON"/>
         #     <field name="autopilot_mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|ATTITUDE_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|ATTITUDE_HOLD|HOVER_DIRECT|HOVER_CLIMB|HOVER_Z_HOLD|NAV|RC_DIRECT"/>
         #     <field name="cpu_usage" type="uint8" unit="pct"/>
+        #     <field name="fms_on" type="uint8" values="FMS_OFF|FMS_RC_ENABLED|FMS_ON"/>
+        #     <field name="fms_mode" type="uint8"/>
         #   </message>
         msg = self.messages_file.get_message_by_name("STATUS")
         self.send_message(
@@ -380,7 +382,9 @@ class DummyUAV:
                 msg.get_field_by_name("in_flight").interpret_value_from_user_string("ON_GROUND"),
                 msg.get_field_by_name("motors_on").interpret_value_from_user_string("MOTORS_OFF"),
                 msg.get_field_by_name("autopilot_mode").interpret_value_from_user_string("FAILSAFE"),
-                self._cpu.value()))
+                self._cpu.value(),
+                msg.get_field_by_name("fms_on").interpret_value_from_user_string("FMS_OFF"),
+                0))
         return True
 
 ALL_COMMUNICATION_KLASSES = [

@@ -50,6 +50,8 @@
 #include "ahrs.h"
 #include "ins.h"
 
+#include "fms.h"
+
 #include "autopilot_main.h"
 
 #include "generated/settings.h"
@@ -97,6 +99,8 @@ static inline void autopilot_main_init( void ) {
   ahrs_init();
   ins_init();
 
+  fms_init();
+
   int_enable();
 }
 
@@ -123,16 +127,18 @@ static inline void autopilot_main_periodic( void ) {
   {
     case 0:
         rc_periodic_task();
-        if (rc_status == RC_OK)
+        if (rc_status == RC_OK) {
             led_on(LED_RC);
-        else
-        {
+        } else {
             led_off(LED_RC);
             autopilot_set_mode(AP_MODE_FAILSAFE);
         }
         break;
     case 1:
         comm_periodic_task(COMM_TELEMETRY);
+        break;
+    case 2:
+        fms_periodic_task();
         break;
     }
 

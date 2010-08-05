@@ -42,7 +42,8 @@ class InfoBox:
             self.gps_value,
             self.in_flight_value,
             self.autopilot_mode_value,
-            self.motors_on_value) = self._build_aligned_labels("ID","Runtime","RC","GPS","In Flight","Autopilot","Motors")
+            self.motors_on_value,
+            self.fms_on_value) = self._build_aligned_labels("ID","Runtime","RC","GPS","In Flight","Autopilot","Motors","FMS")
             if show_images: image = gs.ui.get_icon_image("dashboard.svg")
             self.widget.pack_start(
                 self._build_section(
@@ -145,7 +146,7 @@ class InfoBox:
         self.config_value.set_text(comm_config)
 
     def _on_status(self, msg, header, payload):
-        rc, gps, bv, in_flight, motors_on, autopilot_mode, cpu_usage = msg.unpack_values(payload)
+        rc, gps, bv, in_flight, motors_on, autopilot_mode, cpu_usage, fms_on, fms_mode = msg.unpack_values(payload)
         self.id_value.set_text(
                 str(header.acid))
         self.rc_value.set_text(
@@ -158,6 +159,9 @@ class InfoBox:
                 msg.get_field_by_name("motors_on").get_printable_value(motors_on))
         self.autopilot_mode_value.set_text(
                 msg.get_field_by_name("autopilot_mode").get_printable_value(autopilot_mode))
+        self.fms_on_value.set_text("%s (%s)" % (
+                    msg.get_field_by_name("fms_on").get_printable_value(fms_on),
+                    msg.get_field_by_name("fms_mode").get_printable_value(fms_mode)))
 
         self._cpu_pb.set_value(cpu_usage)
         self._batt_pb.set_value(bv/10.0)
