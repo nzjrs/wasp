@@ -49,10 +49,4 @@ extern void booz2_guidance_h_mode_changed(uint8_t new_mode);
 extern void booz2_guidance_h_read_rc(bool_t  in_flight);
 extern void booz2_guidance_h_run(bool_t  in_flight);
 
-
-#define booz2_guidance_h_SetKi(_val) {			\
-    booz2_guidance_h_igain = _val;			\
-    INT_VECT2_ZERO(booz2_guidance_h_pos_err_sum);	\
-  }
-
 #endif /* BOOZ2_GUIDANCE_H_H */

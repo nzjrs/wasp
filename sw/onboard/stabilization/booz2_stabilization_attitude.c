@@ -77,12 +77,26 @@ void booz2_stabilization_attitude_init(void) {
 }
 
 
-void booz2_stabilization_attitude_read_rc(bool_t in_flight) {
+void booz2_stabilization_attitude_read_rc(struct Int32Eulers *sp, bool_t in_flight) {
 
-  BOOZ2_STABILIZATION_ATTITUDE_READ_RC(booz_stabilization_att_sp, in_flight);
-
+  sp->phi =
+    ((int32_t)-rc_values[RADIO_ROLL]  * BOOZ_STABILIZATION_ATTITUDE_SP_MAX_PHI / MAX_PPRZ)
+    << (ANGLE_REF_RES - INT32_ANGLE_FRAC);
+  sp->theta =
+    ((int32_t) rc_values[RADIO_PITCH] * BOOZ_STABILIZATION_ATTITUDE_SP_MAX_THETA / MAX_PPRZ)
+    << (ANGLE_REF_RES - INT32_ANGLE_FRAC);
+  if (in_flight) {
+    if (rc_values[RADIO_YAW] >  BOOZ_STABILIZATION_ATTITUDE_DEADBAND_R ||
+        rc_values[RADIO_YAW] < -BOOZ_STABILIZATION_ATTITUDE_DEADBAND_R ) {
+        sp->psi +=
+            ((int32_t)-rc_values[RADIO_YAW] * BOOZ_STABILIZATION_ATTITUDE_SP_MAX_R / MAX_PPRZ / RC_UPDATE_FREQ)
+            << (ANGLE_REF_RES - INT32_ANGLE_FRAC);
+        ANGLE_REF_NORMALIZE(sp->psi);
+    }
+  } else { /* if not flying, use current yaw as setpoint */
+    sp->psi = (ahrs.ltp_to_body_euler.psi << (ANGLE_REF_RES - INT32_ANGLE_FRAC));
+  }
 }
-
 
 void booz2_stabilization_attitude_enter(void) {
 

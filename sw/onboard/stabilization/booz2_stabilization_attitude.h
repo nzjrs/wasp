@@ -26,7 +26,7 @@
 #include "math/pprz_algebra_int.h"
 
 extern void booz2_stabilization_attitude_init(void);
-extern void booz2_stabilization_attitude_read_rc(bool_t in_flight);
+extern void booz2_stabilization_attitude_read_rc(struct Int32Eulers *sp, bool_t in_flight);
 extern void booz2_stabilization_attitude_enter(void);
 extern void booz2_stabilization_attitude_run(bool_t  in_flight);
 

@@ -109,15 +109,12 @@ void booz2_guidance_h_read_rc(bool_t  in_flight) {
     break;
     
   case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
-    booz2_stabilization_attitude_read_rc(in_flight);
+    booz2_stabilization_attitude_read_rc(&booz_stabilization_att_sp, in_flight);
   
   case BOOZ2_GUIDANCE_H_MODE_HOVER:
-    BOOZ2_STABILIZATION_ATTITUDE_READ_RC(booz2_guidance_h_rc_sp, in_flight);
+    booz2_stabilization_attitude_read_rc(&booz2_guidance_h_rc_sp, in_flight);
     break;
-  
-  case BOOZ2_GUIDANCE_H_MODE_NAV:
-//    BOOZ2_STABILIZATION_ATTITUDE_READ_RC(booz2_guidance_h_rc_sp, in_flight);
-    break;
+
   }
 
 }
@@ -137,12 +134,6 @@ void booz2_guidance_h_run(bool_t  in_flight) {
   case BOOZ2_GUIDANCE_H_MODE_HOVER:
     booz2_guidance_h_hover_run();
     booz2_stabilization_attitude_run(in_flight);
-    break;
-    
-  case BOOZ2_GUIDANCE_H_MODE_NAV:
-//    INT32_VECT2_NED_OF_ENU(booz2_guidance_h_pos_sp, booz2_navigation_carrot);
-//    booz2_guidance_h_hover_run();
-//    booz2_stabilization_attitude_run(in_flight);
     break;
     
   }

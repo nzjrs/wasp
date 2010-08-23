@@ -146,34 +146,6 @@ extern struct Int32Vect3  booz_stabilization_accel_ref;
 
 #define RC_UPDATE_FREQ 40
 
-#define BOOZ2_STABILIZATION_ATTITUDE_READ_RC(_sp, _inflight) {		\
-    									\
-    _sp.phi =								\
-      ((int32_t)-rc_values[RADIO_ROLL]  * BOOZ_STABILIZATION_ATTITUDE_SP_MAX_PHI / MAX_PPRZ) \
-      << (ANGLE_REF_RES - INT32_ANGLE_FRAC);					\
-    _sp.theta =								\
-      ((int32_t) rc_values[RADIO_PITCH] * BOOZ_STABILIZATION_ATTITUDE_SP_MAX_THETA / MAX_PPRZ) \
-      << (ANGLE_REF_RES - INT32_ANGLE_FRAC);					\
-    if (_inflight) {							\
-      if (rc_values[RADIO_YAW] >  BOOZ_STABILIZATION_ATTITUDE_DEADBAND_R || \
-	  rc_values[RADIO_YAW] < -BOOZ_STABILIZATION_ATTITUDE_DEADBAND_R ) { \
-	_sp.psi +=							\
-	  ((int32_t)-rc_values[RADIO_YAW] * BOOZ_STABILIZATION_ATTITUDE_SP_MAX_R / MAX_PPRZ / RC_UPDATE_FREQ) \
-	  << (ANGLE_REF_RES - INT32_ANGLE_FRAC);				\
-	ANGLE_REF_NORMALIZE(_sp.psi);					\
-      }									\
-    }									\
-    else { /* if not flying, use current yaw as setpoint */		\
-      _sp.psi = (ahrs.ltp_to_body_euler.psi << (ANGLE_REF_RES - INT32_ANGLE_FRAC));		\
-    }									\
-  }
-
-#define BOOZ2_STABILIZATION_ATTITUDE_ADD_SP(_add_sp) { \
-    EULERS_ADD(booz_stabilization_att_sp,_add_sp);	\
-    ANGLE_REF_NORMALIZE(booz_stabilization_att_sp.psi); \
-}
-
-
 #define BOOZ2_STABILIZATION_ATTITUDE_RESET_PSI_REF(_sp) {			\
     _sp.psi = ahrs.ltp_to_body_euler.psi << (ANGLE_REF_RES - INT32_ANGLE_FRAC); \
     booz_stabilization_att_ref.psi = _sp.psi;				\
