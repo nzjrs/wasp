@@ -110,6 +110,7 @@ void booz2_guidance_h_read_rc(bool_t  in_flight) {
     
   case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
     booz2_stabilization_attitude_read_rc(&booz_stabilization_att_sp, in_flight);
+    break;
   
   case BOOZ2_GUIDANCE_H_MODE_HOVER:
     booz2_stabilization_attitude_read_rc(&booz2_guidance_h_rc_sp, in_flight);
@@ -142,9 +143,9 @@ void booz2_guidance_h_run(bool_t  in_flight) {
 
 }
 
-#define MAX_POS_ERR   POS_BFP_OF_REAL(16.)
-#define MAX_SPEED_ERR SPEED_BFP_OF_REAL(16.)
-#define MAX_POS_ERR_SUM ((int32_t)(MAX_POS_ERR)<< 12)
+#define MAX_POS_ERR         POS_BFP_OF_REAL(16.)
+#define MAX_SPEED_ERR       SPEED_BFP_OF_REAL(16.)
+#define MAX_POS_ERR_SUM     ((int32_t)(MAX_POS_ERR)<< 12)
 
 // 15 degres
 #define MAX_BANK 65536
