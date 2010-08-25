@@ -22,7 +22,7 @@ class Field:
 
     ARRAY_LENGTH = re.compile("^([a-z0-9]+)\[(\d{1,2})\]$")
 
-    def __init__(self, f):
+    def __init__(self, f, **kwargs):
         self.name = f.name
         self.ctype = f.type
         self.type, self.length = self._get_field_length(f.type)
@@ -69,14 +69,16 @@ class Message:
           field can have multiple elements, such as if it is an array)
         - num_fields: the number of fields in the message
     """
-    def __init__(self, m, field_klass):
+    def __init__(self, m, field_klass, **field_kwargs):
+        self._field_kwargs = field_kwargs
+
         self.name = m.name.upper()
         if int(m.id) <= 255 and int(m.id) > 0:
             self.id = int(m.id)
         else:
             raise Exception("Message IDs must be 0 > ID <= 255")
         try:
-            self.fields = [field_klass(f) for f in xmlobject.ensure_list(m.field)]
+            self.fields = [field_klass(f, **self._field_kwargs) for f in xmlobject.ensure_list(m.field)]
         except AttributeError:
             self.fields = []
 
@@ -129,16 +131,24 @@ class PyField(Field):
             "float" :   (-3.4e38,3.4e38)    #not exactly correct
     }
 
-    def __init__(self, node):
-        Field.__init__(self, node)
+    def __init__(self, node, **kwargs):
+        Field.__init__(self, node, **kwargs)
+
+        shared_values = kwargs["shared_values"]
 
         self.is_enum = False
         if self.type == "uint8":
             try:
-                self._enum_values = node.values.split("|")
+                values = node.values
+                if values[0] == "@":
+                    self._enum_values = shared_values[values[1:]]
+                else:
+                    self._enum_values = values.split("|")
                 self.is_enum = True
             except AttributeError:
                 self._enum_values = []
+            except KeyError, e:
+                raise Exception("Referenced value does not exist: %s", e)
 
         if self.is_array:
             self.struct_format = "%d%s" % (self.num_elements, self.TYPE_TO_STRUCT_MAP[self.type])
@@ -265,8 +275,8 @@ class PyMessage(Message):
     #Messages are packed in the payload in little endian format
     MESSAGE_ENDIANESS = "<"
 
-    def __init__(self, name, id, node):
-        Message.__init__(self, node, PyField)
+    def __init__(self, name, id, node, **kwargs):
+        Message.__init__(self, node, PyField, **kwargs)
         self._fields_by_name = {}
         
         format = self.MESSAGE_ENDIANESS
@@ -433,12 +443,26 @@ class MessagesFile:
             raise Exception("Could not find message file")
 
         try:
-            #Must have >= 1 message element
-            messages = xmlobject.XMLFile(**kwargs).root.message
-            self._messages = xmlobject.ensure_list(messages)
+            root = xmlobject.XMLFile(**kwargs).root
         except AttributeError:
-            raise Exception("Error parsing messages")
-        
+            raise Exception("Invalid XML")
+
+        try:
+            #Must have >= 1 message element
+            self._messages = xmlobject.ensure_list( root.message )
+        except AttributeError:
+            raise Exception("Missing <message> elements")
+
+        self._values = {}
+        try:
+            for v in xmlobject.ensure_list( root.value ):
+                if v.name in self._values:
+                    raise Exception("Duplicate <value> element")
+                self._values[v.name] = v.values.split("|")
+        except AttributeError:
+            #Values are optional (at this stage of parsing)
+            pass
+
         self._msgs_by_id = {}
         self._msgs_by_name = {}
 
@@ -451,7 +475,7 @@ class MessagesFile:
     def parse(self):
         """ Parses the xml file """
         for m in self._messages:
-            msg = PyMessage(m.name, m.id, m)
+            msg = PyMessage(m.name, m.id, m, shared_values=self._values)
             self._msgs_by_id[int(m.id)] = msg
             self._msgs_by_name[m.name] = msg
 
