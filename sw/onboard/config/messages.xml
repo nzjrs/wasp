@@ -265,10 +265,10 @@
    </message>
 
    <message name="FMS_ATTITUDE" id="51">
-     <field name="roll"    type="int32"/>
-     <field name="pitch"   type="int32"/>
-     <field name="heading" type="int32"/>
-     <field name="thrust"  type="int32"/>
+     <field name="roll"    type="float"/>
+     <field name="pitch"   type="float"/>
+     <field name="heading" type="float"/>
+     <field name="thrust"  type="float"/>
    </message>
 
    <message name="FMS_RC" id="52">

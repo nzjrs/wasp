@@ -2,6 +2,7 @@
 #define _FMS_H_
 
 #include "std.h"
+#include "messages_types.h"
 #include "math/pprz_algebra_int.h"
 
 typedef struct __FMSCommand {
@@ -16,8 +17,6 @@ typedef struct __FMSCommand {
         int32_t climb;
         int32_t height;
     } v_sp;
-    uint8_t h_mode;
-    uint8_t v_mode;
 } FMSCommand_t;
 
 typedef enum {
@@ -39,5 +38,6 @@ extern SystemStatus_t   fms_system_status;
 
 void fms_init(void);
 void fms_periodic_task(void);
+void fms_set(CommMessage_t *message);
 
 #endif /* _FMS_H_ */

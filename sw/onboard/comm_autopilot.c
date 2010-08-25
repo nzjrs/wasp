@@ -276,6 +276,9 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
             ret = settings_handle_message_received(chan, message);
             need_ack = FALSE;
             break;
+        case MESSAGE_ID_FMS_ATTITUDE:
+            fms_set(message);
+            need_ack = FALSE;
         case MESSAGE_ID_ALTIMETER_RESET:
             altimeter_recalibrate();
             break;

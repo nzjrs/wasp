@@ -24,6 +24,7 @@
 
 #include "rc.h"
 #include "ahrs.h"
+#include "fms.h"
 #include "booz2_stabilization.h"
 
 #include "generated/settings.h"
@@ -275,6 +276,12 @@ static inline void booz_stabilization_attitude_ref_traj_euler_update(void)
 
 static inline void booz_stabilization_update_ref(void)
 {
+
+  //FIXME: Should probbably add FMS to RC, and also need to put this
+  //somewhere so it can consider V mode
+//  if (fms.enabled == FMS_RC_ENABLED) {
+//    EULERS_COPY(booz_stabilization_att_ref, fms.command.h_sp.attitude);
+//  }
 
 #ifdef USE_REF
   booz_stabilization_attitude_ref_traj_euler_update();

@@ -8,12 +8,15 @@ COMMAND_ERROR_PENDING   = 0
 COMMAND_ERROR_LOST      = 1
 COMMAND_ERROR_NACK      = 2
 
+CONTROL_REFRESH_FREQ    = 10
+
 ID_ROLL                 = 0
 ID_PITCH                = 1
 ID_HEADING              = 2
 ID_THRUST               = 3
 
 ID_LIST_FMS_ATTITUDE    = [ID_ROLL, ID_PITCH, ID_HEADING, ID_THRUST]
+ID_LIST_FMS_RC          = [ID_ROLL, ID_PITCH, ID_HEADING, ID_THRUST]
 
 ID_RC                   = 0
 ID_ATTITUDE             = 1
@@ -97,8 +100,8 @@ class ControlManager:
 
         #setpoints
         self._sp = [
-            [0] * len(ID_LIST_FMS_ATTITUDE),
-            [0] * len(ID_LIST_FMS_ATTITUDE)
+            [0]     * len(ID_LIST_FMS_RC),
+            [0.0]   * len(ID_LIST_FMS_ATTITUDE)
         ]
 
     def _send_control(self):
@@ -112,7 +115,7 @@ class ControlManager:
             gobject.source_remove(self._timeout_id)
         #else if enabling and not currently enabled then add the source
         elif not self.enabled and enable:
-            self._timeout_id = gobject.timeout_add(1000/20, self._send_control)
+            self._timeout_id = gobject.timeout_add(1000/CONTROL_REFRESH_FREQ, self._send_control)
         self.enabled = enable
 
     def _generic_set(self, msg, _id, r, p, y, t):
