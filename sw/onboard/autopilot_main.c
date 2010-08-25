@@ -45,7 +45,6 @@
 
 #include "gps.h"
 #include "guidance.h"
-//#include "booz2_navigation.h"
 
 #include "ahrs.h"
 #include "ins.h"
