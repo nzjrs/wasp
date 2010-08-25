@@ -267,6 +267,13 @@
      <field name="thrust"  type="int32"/>
    </message>
 
+   <message name="SP_ATTITUDE" id="53">
+     <field name="mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|ATTITUDE_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|ATTITUDE_HOLD|HOVER_DIRECT|HOVER_CLIMB|HOVER_Z_HOLD|NAV|RC_DIRECT"/>
+     <field name="roll"    type="float"/>
+     <field name="pitch"   type="float"/>
+     <field name="heading" type="float"/>
+   </message>
+
    <!-- Begin periodic messages -->
    <periodic channel="COMM_TELEMETRY" adjustable="2">
       <message name="COMM_STATUS" frequency="0.25"/>

@@ -36,6 +36,7 @@
 #include "sys_time.h"
 #include "autopilot.h"
 #include "guidance.h"
+#include "stabilization.h"
 
 #include "generated/radio.h"
 #include "generated/messages.h"
@@ -232,6 +233,25 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &autopilot.commands[1],
                     &autopilot.commands[2],
                     &autopilot.commands[3]);
+            break;
+        case MESSAGE_ID_SP_ATTITUDE:
+            {
+                float r,p,y;
+                struct Int32Eulers *sp = stabilization_sp_get_attitude();
+                if (sp) {
+                    r = ANGLE_FLOAT_OF_BFP(sp->phi);
+                    p = ANGLE_FLOAT_OF_BFP(sp->theta);
+                    y = ANGLE_FLOAT_OF_BFP(sp->psi);
+                } else {
+                    r = p = y = 0.0;
+                }
+                MESSAGE_SEND_SP_ATTITUDE(
+                    chan,
+                    &autopilot.mode,
+                    &r,
+                    &p,
+                    &y);
+            }
             break;
         default:
             ret = FALSE;

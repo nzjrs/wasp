@@ -21,6 +21,8 @@
  *
  */
 
+#include "guidance.h"
+#include "guidance/booz2_guidance_h.h"
 #include "stabilization.h"
 #include "booz2_stabilization.h"
 #include "booz2_stabilization_rate.h"
@@ -32,4 +34,18 @@ void stabilization_init(void)
 {
     booz2_stabilization_rate_init();
     booz2_stabilization_attitude_init();
+}
+
+struct Int32Eulers *
+stabilization_sp_get_attitude(void)
+{
+    switch ( booz2_guidance_h_mode ) {
+        case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
+            return &booz_stabilization_att_sp;
+        case BOOZ2_GUIDANCE_H_MODE_HOVER:
+            return &booz2_guidance_h_rc_sp;
+        case BOOZ2_GUIDANCE_H_MODE_RATE:
+        default:
+            return NULL;
+    }
 }

@@ -28,4 +28,7 @@
 void
 stabilization_init(void);
 
+struct Int32Eulers *
+stabilization_sp_get_attitude(void);
+
 #endif /* _STABILIZATION_INIT_H_ */
