@@ -26,9 +26,9 @@
 #include "ins.h"
 #include "ahrs.h"
 
+#include "stabilization/booz2_stabilization.h"
 #include "stabilization/booz2_stabilization_rate.h"
 #include "stabilization/booz2_stabilization_attitude.h"
-#include "stabilization/booz2_stabilization_attitude_ref_traj_euler.h"
 #include "guidance/booz2_navigation.h"
 
 #include "generated/settings.h"
@@ -205,7 +205,7 @@ static inline void booz2_guidance_h_hover_enter(void) {
 
   VECT2_COPY(booz2_guidance_h_pos_sp, ins.ltp_pos);
 
-  BOOZ2_STABILIZATION_ATTITUDE_RESET_PSI_REF( booz2_guidance_h_rc_sp );
+  booz2_stabilization_attitude_reset_psi_ref( &booz2_guidance_h_rc_sp );
 
   INT_VECT2_ZERO(booz2_guidance_h_pos_err_sum);
 

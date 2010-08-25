@@ -24,7 +24,6 @@
 
 #include "rc.h"
 #include "ahrs.h"
-#include "booz2_stabilization_attitude_ref_traj_euler.h"
 #include "booz2_stabilization.h"
 
 #include "generated/settings.h"
@@ -42,6 +41,7 @@ struct Int32Vect3  booz_stabilization_igain;
 struct Int32Eulers booz_stabilization_att_sum_err;
 
 static inline void booz_stabilization_update_ref(void);
+static inline void booz_stabilization_attitude_ref_traj_euler_update(void);
 
 
 void booz2_stabilization_attitude_init(void) {
@@ -76,6 +76,7 @@ void booz2_stabilization_attitude_init(void) {
 
 }
 
+#define RC_UPDATE_FREQ  40
 
 void booz2_stabilization_attitude_read_rc(struct Int32Eulers *sp, bool_t in_flight) {
 
@@ -100,7 +101,7 @@ void booz2_stabilization_attitude_read_rc(struct Int32Eulers *sp, bool_t in_flig
 
 void booz2_stabilization_attitude_enter(void) {
 
-  BOOZ2_STABILIZATION_ATTITUDE_RESET_PSI_REF(  booz_stabilization_att_sp );
+  booz2_stabilization_attitude_reset_psi_ref(  &booz_stabilization_att_sp );
   INT_EULERS_ZERO( booz_stabilization_att_sum_err );
   
 }
@@ -183,19 +184,113 @@ void booz2_stabilization_attitude_run(bool_t  in_flight) {
 
 */
 
-#define USE_REF 1
+#define OMEGA_PQ            RadOfDeg(800)
+#define ZETA_PQ             0.85
+#define ZETA_OMEGA_PQ_RES   10
+#define ZETA_OMEGA_PQ       BFP_OF_REAL((ZETA_PQ*OMEGA_PQ), ZETA_OMEGA_PQ_RES)
+#define OMEGA_2_PQ_RES      7
+#define OMEGA_2_PQ          BFP_OF_REAL((OMEGA_PQ*OMEGA_PQ), OMEGA_2_PQ_RES)
+#define OMEGA_R             RadOfDeg(500)
+#define ZETA_R              0.85
+#define ZETA_OMEGA_R_RES    10
+#define ZETA_OMEGA_R        BFP_OF_REAL((ZETA_R*OMEGA_R), ZETA_OMEGA_R_RES)
+#define OMEGA_2_R_RES       7
+#define OMEGA_2_R           BFP_OF_REAL((OMEGA_R*OMEGA_R), OMEGA_2_R_RES)
 
-static inline void booz_stabilization_update_ref(void) {
+static inline void booz_stabilization_attitude_ref_traj_euler_update(void)
+{
+     /* dumb integrate reference attitude        */
+    const struct Int32Eulers d_angle = {
+      booz_stabilization_rate_ref.x >> ( F_UPDATE_RES + RATE_REF_RES - ANGLE_REF_RES),
+      booz_stabilization_rate_ref.y >> ( F_UPDATE_RES + RATE_REF_RES - ANGLE_REF_RES),
+      booz_stabilization_rate_ref.z >> ( F_UPDATE_RES + RATE_REF_RES - ANGLE_REF_RES)};
+    EULERS_ADD(booz_stabilization_att_ref, d_angle );
+    ANGLE_REF_NORMALIZE(booz_stabilization_att_ref.psi);
+
+    /* integrate reference rotational speeds   */
+    const struct Int32Vect3 d_rate = {
+      booz_stabilization_accel_ref.x >> ( F_UPDATE_RES + ACCEL_REF_RES - RATE_REF_RES),
+      booz_stabilization_accel_ref.y >> ( F_UPDATE_RES + ACCEL_REF_RES - RATE_REF_RES),
+      booz_stabilization_accel_ref.z >> ( F_UPDATE_RES + ACCEL_REF_RES - RATE_REF_RES)};
+    VECT3_ADD(booz_stabilization_rate_ref, d_rate);
+
+    /* compute reference attitude error        */
+    struct Int32Eulers ref_err;
+    EULERS_DIFF(ref_err, booz_stabilization_att_ref, booz_stabilization_att_sp);
+    /* wrap it in the shortest direction       */
+    ANGLE_REF_NORMALIZE(ref_err.psi);
+
+    /* compute reference angular accelerations */
+    const struct Int32Vect3 accel_rate = {
+      ((int32_t)(-2.*ZETA_OMEGA_PQ)* (booz_stabilization_rate_ref.x >> (RATE_REF_RES - ACCEL_REF_RES))) \
+      >> (ZETA_OMEGA_PQ_RES),
+      ((int32_t)(-2.*ZETA_OMEGA_PQ)* (booz_stabilization_rate_ref.y >> (RATE_REF_RES - ACCEL_REF_RES))) \
+      >> (ZETA_OMEGA_PQ_RES),
+      ((int32_t)(-2.*ZETA_OMEGA_R) * (booz_stabilization_rate_ref.z >> (RATE_REF_RES - ACCEL_REF_RES))) \
+      >> (ZETA_OMEGA_R_RES) };
+
+    const struct Int32Vect3 accel_angle = {
+      ((int32_t)(-OMEGA_2_PQ)* (ref_err.phi   >> (ANGLE_REF_RES - ACCEL_REF_RES))) >> (OMEGA_2_PQ_RES),
+      ((int32_t)(-OMEGA_2_PQ)* (ref_err.theta >> (ANGLE_REF_RES - ACCEL_REF_RES))) >> (OMEGA_2_PQ_RES),
+      ((int32_t)(-OMEGA_2_R )* (ref_err.psi   >> (ANGLE_REF_RES - ACCEL_REF_RES))) >> (OMEGA_2_R_RES ) };
+
+    VECT3_SUM(booz_stabilization_accel_ref, accel_rate, accel_angle);
+
+    /*	saturate acceleration */
+    const struct Int32Vect3 MIN_ACCEL = { -ACCEL_REF_MAX_PQ, -ACCEL_REF_MAX_PQ, -ACCEL_REF_MAX_R };
+    const struct Int32Vect3 MAX_ACCEL = {  ACCEL_REF_MAX_PQ,  ACCEL_REF_MAX_PQ,  ACCEL_REF_MAX_R };
+    VECT3_BOUND_BOX(booz_stabilization_accel_ref, MIN_ACCEL, MAX_ACCEL);
+
+    /* saturate speed and trim accel accordingly */
+    if (booz_stabilization_rate_ref.x >= RATE_REF_MAX_PQ) {
+      booz_stabilization_rate_ref.x = RATE_REF_MAX_PQ;
+      if (booz_stabilization_accel_ref.x > 0)
+	    booz_stabilization_accel_ref.x = 0;
+    } else if (booz_stabilization_rate_ref.x <= -RATE_REF_MAX_PQ) {
+      booz_stabilization_rate_ref.x = -RATE_REF_MAX_PQ;
+      if (booz_stabilization_accel_ref.x < 0)
+        booz_stabilization_accel_ref.x = 0;
+    }
+    if (booz_stabilization_rate_ref.y >= RATE_REF_MAX_PQ) {
+      booz_stabilization_rate_ref.y = RATE_REF_MAX_PQ;
+      if (booz_stabilization_accel_ref.y > 0)
+        booz_stabilization_accel_ref.y = 0;
+    } else if (booz_stabilization_rate_ref.y <= -RATE_REF_MAX_PQ) {
+      booz_stabilization_rate_ref.y = -RATE_REF_MAX_PQ;
+      if (booz_stabilization_accel_ref.y < 0)
+        booz_stabilization_accel_ref.y = 0;
+    }
+    if (booz_stabilization_rate_ref.z >= RATE_REF_MAX_R) {
+      booz_stabilization_rate_ref.z = RATE_REF_MAX_R;
+      if (booz_stabilization_accel_ref.z > 0)
+        booz_stabilization_accel_ref.z = 0;
+    } else if (booz_stabilization_rate_ref.z <= -RATE_REF_MAX_R) {
+      booz_stabilization_rate_ref.z = -RATE_REF_MAX_R;
+      if (booz_stabilization_accel_ref.z < 0)
+        booz_stabilization_accel_ref.z = 0;
+    }
+  }
+
+#define USE_REF         1
+
+static inline void booz_stabilization_update_ref(void)
+{
 
 #ifdef USE_REF
-  BOOZ_STABILIZATION_ATTITUDE_REF_TRAJ_EULER_UPDATE();
+  booz_stabilization_attitude_ref_traj_euler_update();
 #else
   EULERS_COPY(booz_stabilization_att_ref, booz_stabilization_att_sp);
   INT_VECT3_ZERO(booz_stabilization_rate_ref);
   INT_VECT3_ZERO(booz_stabilization_accel_ref);
 #endif
 
+}
 
+void booz2_stabilization_attitude_reset_psi_ref(struct Int32Eulers *sp)
+{
+    sp->psi = ahrs.ltp_to_body_euler.psi << (ANGLE_REF_RES - INT32_ANGLE_FRAC);
+    booz_stabilization_att_ref.psi = sp->psi;
+    booz_stabilization_rate_ref.z = 0;
 }
 
 
