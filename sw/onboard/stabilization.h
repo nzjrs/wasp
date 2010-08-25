@@ -28,7 +28,4 @@
 void
 stabilization_init(void);
 
-void
-stabilization_tune(uint8_t setting, int32_t val);
-
 #endif /* _STABILIZATION_INIT_H_ */
