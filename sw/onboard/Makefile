@@ -1,5 +1,5 @@
-TARGET              ?= autopilot_main
-ARCH                ?= arm7
+TARGET              ?= test/test_rc_main
+ARCH                ?= gumstix
 INCLUDE_BUILD_INFO  ?= 1
 OBJDIR              = bin/$(ARCH)
 Q                   = @
