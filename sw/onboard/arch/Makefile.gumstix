@@ -4,20 +4,37 @@ ARCHSRC =                                \
 ARCHASMSRC =                             \
     $(NULL)
 
+ifeq ($(strip $(OVEROTOP)),)
+    $(error $$OVEROTOP is undefined! Source your gumstix profile)
+endif
+
+# OpenEmbedded/Gumstix specific variables (valid for OE builds > 30 July 2010)
+OETMP       = $(OVEROTOP)/tmp
+TOOLDIR     = $(OETMP)/sysroots/`uname -m`-linux/usr/armv7a/bin
+STAGEDIR    = $(OETMP)/sysroots/armv7a-angstrom-linux-gnueabi/usr
+LIBDIR      = $(STAGEDIR)/lib
+INCDIR      = $(STAGEDIR)/include
+PKCDIR      = $(STAGEDIR)/lib/pkgconfig/
+
 # Define programs and commands.
-CC		    = gcc
-LD		    = gcc
-OBJCOPY     = objcopy
-OBJDUMP     = objdump
-SIZE        = size
-NM          = nm
+CC		    = $(TOOLDIR)/arm-angstrom-linux-gnueabi-gcc
+LD		    = $(TOOLDIR)/arm-angstrom-linux-gnueabi-gcc
+OBJCOPY     = $(TOOLDIR)/arm-angstrom-linux-gnueabi-objcopy
+OBJDUMP     = $(TOOLDIR)/arm-angstrom-linux-gnueabi-objdump
+SIZE        = $(TOOLDIR)/arm-angstrom-linux-gnueabi-size
+NM          = $(TOOLDIR)/arm-angstrom-linux-gnueabi-nm
 
 GTESTER     = gtester
 
+# While one can coax pkg-config to work in a cross environment, it is sometimes
+# easier to just look at the pc file oneself, and extract the flags
+GLIB_CFLAGS     = -I$(INCDIR)/glib-2.0 -I$(LIBDIR)/glib-2.0/include
+GLIB_LDFLAGS    = -L$(LIBDIR) -lglib-2.0
+
 # Arch specific flags
-ARCHCFLAGS  = -g `pkg-config --cflags glib-2.0`
+ARCHCFLAGS  = -I$(STAGEDIR)/include -g $(GLIB_CFLAGS)
 ARCHASFLAGS = 
-ARCHLDFLAGS = 
+ARCHLDFLAGS = -L$(STAGEDIR)/lib $(GLIB_LDFLAGS)
 
 # Flags specific to automated testing
 TEST_PROGS = test_math
