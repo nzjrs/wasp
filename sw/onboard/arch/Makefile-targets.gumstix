@@ -55,4 +55,5 @@ $(OBJDIR)/%_test.c: $(TOOLS)/gen-testsuite.py %.c
 %_test.o: %_test.c
 	$(CC) -c $(CFLAGS) -o $@  $^
 
-
+upload-to-gumstix: build
+	scp $(OBJDIR)/$(TARGET).elf root@$(GUMSTIX):/home/root/

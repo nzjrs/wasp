@@ -1,5 +1,5 @@
 ARCHSRC =                                \
-    arch/null/null.c
+    arch/gumstix/null.c
 
 ARCHASMSRC =                             \
     $(NULL)
@@ -7,6 +7,9 @@ ARCHASMSRC =                             \
 ifeq ($(strip $(OVEROTOP)),)
     $(error $$OVEROTOP is undefined! Source your gumstix profile)
 endif
+
+# Gumstix IP
+GUMSTIX     = 192.168.0.2
 
 # OpenEmbedded/Gumstix specific variables (valid for OE builds > 30 July 2010)
 OETMP       = $(OVEROTOP)/tmp
@@ -40,5 +43,3 @@ ARCHLDFLAGS = -L$(STAGEDIR)/lib $(GLIB_LDFLAGS)
 TEST_PROGS = test_math
 
 test_math_TESTSRCS = math/tests/*_tc.c 
-
-
