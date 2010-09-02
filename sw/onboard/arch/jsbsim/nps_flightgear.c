@@ -11,9 +11,10 @@
 #include "std.h"
 #include "generated/settings.h"
 
+#include "lib/spawn.h"
+
 #include "nps_flightgear.h"
 #include "nps_fdm.h"
-#include "nps_utils.h"
 #include "nps_led.h"
 
 #define MODEL_PREFIX    "/usr/share/games/FlightGear/"
@@ -97,7 +98,7 @@ void nps_flightgear_init(const char* host,  unsigned int port) {
         nps_log("FLIGHTGEAR: %s\n", cmd);
 
         /* Setup the SIGCHILD handler, as flightgear is spawned occasionally */
-        sigset(SIGCHLD, &sigchild_sighandler);
+        sigset(SIGCHLD, &spawn_sigchild_sighandler);
         /* Start flightgear */
         spawn_background_command(cmd,NULL,NULL,NULL);
 

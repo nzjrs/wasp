@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include "nps_utils.h"
+#include "spawn.h"
 
 /* closeall() - close all FDs >= a specified value */
 static void closeall(int fd)
@@ -107,7 +107,7 @@ pid_t spawn_background_command(const char *cmd,
 }
 
 
-void sigchild_sighandler(int sig) {
+void spawn_sigchild_sighandler(int sig) {
         /* wait() is the key to acknowledging the SIGCHLD */
         wait(0);
 }
