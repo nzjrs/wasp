@@ -28,6 +28,7 @@
 #include "gpio.h"
 #include "imu.h"
 #include "ins.h"
+#include "fms.h"
 #include "ahrs.h"
 #include "analog.h"
 #include "altimeter.h"
@@ -141,7 +142,9 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &autopilot.in_flight,
                     &autopilot.motors_on,
                     &autopilot.mode,
-                    &cpu_usage);
+                    &cpu_usage,
+                    &fms.enabled,
+                    &fms.mode);
             }
             break;
         case MESSAGE_ID_ALTIMETER:

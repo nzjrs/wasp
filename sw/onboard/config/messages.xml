@@ -34,6 +34,8 @@
      <field name="motors_on" type="uint8" values="MOTORS_OFF|MOTORS_ON"/>
      <field name="autopilot_mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|ATTITUDE_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|ATTITUDE_HOLD|HOVER_DIRECT|HOVER_CLIMB|HOVER_Z_HOLD|NAV|RC_DIRECT"/>
      <field name="cpu_usage" type="uint8" unit="pct"/>
+     <field name="fms_on" type="uint8" values="FMS_OFF|FMS_RC_ENABLED|FMS_ON"/>
+     <field name="fms_mode" type="uint8"/>
    </message>
 
    <message name="BUILD_INFO" id="9">
@@ -249,6 +251,20 @@
 
    <message name="DEBUG_FLOAT" id="50">
      <field name="value" type="float"/>
+   </message>
+
+   <message name="FMS_ATTITUDE" id="51">
+     <field name="roll"    type="int32"/>
+     <field name="pitch"   type="int32"/>
+     <field name="heading" type="int32"/>
+     <field name="thrust"  type="int32"/>
+   </message>
+
+   <message name="FMS_RC" id="52">
+     <field name="roll"    type="int32"/>
+     <field name="pitch"   type="int32"/>
+     <field name="heading" type="int32"/>
+     <field name="thrust"  type="int32"/>
    </message>
 
    <!-- Begin periodic messages -->

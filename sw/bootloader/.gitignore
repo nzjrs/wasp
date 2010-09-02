@@ -1,0 +1,8 @@
+*.o
+*.elf
+*.hex
+*.map
+*.lst
+bl.dmp
+bl_ram.dmp
+usbstack.a

@@ -29,7 +29,6 @@
 #include "stabilization/booz2_stabilization_rate.h"
 #include "stabilization/booz2_stabilization_attitude.h"
 #include "stabilization/booz2_stabilization_attitude_ref_traj_euler.h"
-#include "fms/booz2_fms.h"
 #include "guidance/booz2_navigation.h"
 
 #include "generated/settings.h"
@@ -111,13 +110,8 @@ void booz2_guidance_h_read_rc(bool_t  in_flight) {
     
   case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
     booz2_stabilization_attitude_read_rc(in_flight);
-    if (booz_fms_on)
-      BOOZ2_STABILIZATION_ATTITUDE_ADD_SP(booz_fms_input.h_sp.attitude);
-    break;
   
   case BOOZ2_GUIDANCE_H_MODE_HOVER:
-    if (booz_fms_on && booz_fms_input.h_mode >= BOOZ2_GUIDANCE_H_MODE_HOVER)
-      BOOZ2_FMS_SET_POS_SP(booz2_guidance_h_pos_sp,booz_stabilization_att_sp.psi);
     BOOZ2_STABILIZATION_ATTITUDE_READ_RC(booz2_guidance_h_rc_sp, in_flight);
     break;
   
@@ -224,6 +218,5 @@ static inline void booz2_guidance_h_hover_enter(void) {
 
   INT_VECT2_ZERO(booz2_guidance_h_pos_err_sum);
 
-  BOOZ2_FMS_POS_INIT(booz2_guidance_h_pos_sp,booz2_guidance_h_rc_sp.psi);
 }
 

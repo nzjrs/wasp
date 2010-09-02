@@ -24,6 +24,7 @@ from gs.ui.map import Map
 from gs.ui.telemetry import TelemetryController
 from gs.ui.settings import SettingsController
 from gs.ui.command import CommandController
+from gs.ui.control import ControlController
 from gs.ui.statusicon import StatusIcon
 
 import wasp
@@ -117,10 +118,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                 "Help"      :   None,
         }
 
-        self._plugin_manager = PluginManager(plugindir)
-        if not disable_plugins:
-            self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
-
         self._map = Map(self._config, self._source)
         self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
@@ -146,6 +143,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         #The command and control tab page
         self.commandcontroller = CommandController(self._source, self._messagesfile)
         self.get_resource("command_hbox").pack_start(self.commandcontroller.widget, False, True)
+        self.controlcontroller = ControlController(self._source, self._messagesfile)
+        self.get_resource("control_hbox").pack_start(self.controlcontroller.widget, True, True)
 
         #Lazy initialize the following when first needed
         self._plane_view = None
@@ -156,6 +155,11 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("map_holder").add(self._map.get_widget())
         self._map.connect("notify::auto-center", self.on_map_autocenter_property_change)
         self._map.connect("notify::show-trip-history", self.on_map_show_trip_history_property_change)
+
+        #initialize the plugins
+        self._plugin_manager = PluginManager(plugindir)
+        if not disable_plugins:
+            self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
     
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface
@@ -260,38 +264,16 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         for i in item:
             menu.append(i)
 
-    def add_control_widget(self, name, widget):
+    def add_control_widget(self, name, control_widget):
         """
-        Adds a widget to the Command and Control page
+        Adds a control widget to the Command and Control page
 
         :param name: the name, a string describing the control method, 
                      i.e. 'Joystick'
-        :param widget: a gtk.Widget that gets placed in the Command and
-                       control page of the GUI
+        :param control_widget: a `gs.ui.control.ControlWidgetIface` that gets placed
+                     in the Command and control page of the GUI
         """
-        #Each control widget is in a frame with a label and nice padding.
-        #to the right lies an unlock button that must be clicked to make the
-        #widget sensitive
-        b = gtk.CheckButton()
-        l = gtk.Label("<b>Enable %s</b>" % name)
-        l.props.use_markup = True
-        h = gtk.HBox()
-        h.pack_start(b, False, False)
-        h.pack_start(l, True, True)
-        f = gtk.Frame()
-        f.props.shadow_type = gtk.SHADOW_NONE
-        f.props.label_widget = h
-        a = gtk.Alignment()
-        a.set_padding(5,0,10,0)
-        f.add(a)
-        b.connect("toggled", lambda b,w: w.set_sensitive(b.get_active()), widget)
-        hb = gtk.HBox(spacing=5)
-        #make widget unsensitive by default
-        widget.set_sensitive(False)
-        hb.pack_start(widget, True, True)
-        a.add(hb)
-        f.show_all()
-        self.get_resource("control_vbox").pack_start(f, False, True)
+        self.controlcontroller.add_control_widget(name, control_widget)
 
     def update_state_from_config(self):
         self._c = self.config_get(self.CONFIG_CONNECT_NAME, self.CONFIG_CONNECT_DEFAULT)

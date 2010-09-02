@@ -49,7 +49,7 @@ class Speak(plugin.Plugin, config.ConfigurableIface):
             self._speak("disconnected")
 
     def _on_status(self, msg, header, payload):
-        rc, gps, bv, in_flight, motors_on, autopilot_mode, cpu_usage = msg.unpack_values(payload)
+        rc, gps, bv, in_flight, motors_on, autopilot_mode, cpu_usage, fms_on, fms_mode = msg.unpack_values(payload)
         say = []
 
         #check battery voltage (in decivolts)

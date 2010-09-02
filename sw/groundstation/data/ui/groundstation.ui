@@ -528,7 +528,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="control_vbox">
+                      <object class="GtkHBox" id="control_hbox">
                         <property name="visible">True</property>
                         <child>
                           <placeholder/>
