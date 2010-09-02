@@ -2,6 +2,8 @@ import sys
 import os.path
 import optparse
 
+import wasp.communication
+
 _thisdir = os.path.dirname(os.path.abspath(__file__))
 
 NAME = "Wasp Groundstation"
@@ -115,9 +117,12 @@ def get_default_command_line_parser(include_prefs, include_plugins, include_sour
         parser.add_option("-t", "--use-test-source",
                         action="store_true", default=False,
                         help="Use a test source, equiv to --source=test")
+        all_sources = wasp.communication.get_available_sources()
         parser.add_option("-S", "--source",
                         default="serial",
-                        help="Source of uav data (serial,test,etc)", metavar="SOURCE")
+                        choices=all_sources,
+                        help="Source of uav data (%s)" % ",".join(all_sources),
+                        metavar="SOURCE")
 
     return parser
 

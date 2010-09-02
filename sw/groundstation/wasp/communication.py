@@ -485,3 +485,8 @@ def get_source(source_name):
         name = "test"
 
     return name,klass,config
+
+def get_available_sources():
+    """ Returns the name of all available communication sources """
+    return [k.COMMUNICATION_TYPE for k in ALL_COMMUNICATION_KLASSES]
+
