@@ -1,8 +1,8 @@
 ARCHSRC =                                       \
     math/pprz_geodetic_double.c                 \
+    arch/lib/comm_fifo.c                        \
     arch/jsbsim/nps_main.c                      \
     arch/jsbsim/nps_unsimulated_peripherals.c   \
-    arch/jsbsim/nps_comm.c                      \
     arch/jsbsim/nps_fdm_jsbsim.c                \
     arch/jsbsim/nps_flightgear.c                \
     arch/jsbsim/nps_utils.c                     \
