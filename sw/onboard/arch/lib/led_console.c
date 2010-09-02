@@ -48,7 +48,7 @@ void led_toggle (uint8_t id)
 }
 
 
-int led_log (char const *format, ...)
+void led_log (char const *format, ...)
 {
     va_list args;
 
@@ -59,8 +59,7 @@ int led_log (char const *format, ...)
     va_end (args);
 }
 
-void
-led_periodic_task (void)
+void led_periodic_task (void)
 {
     RunOnceEvery(100, {
         led_print(TRUE);
