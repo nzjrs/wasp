@@ -4,7 +4,6 @@
 #include <glib.h>
 
 typedef struct __SIM {
-    GTimer          *started;
     gdouble         time;
 } SIM_t;
 

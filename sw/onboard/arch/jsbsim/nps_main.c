@@ -31,6 +31,8 @@
 
 #include "generated/settings.h"
 
+#include "lib/time_helpers.h"
+
 #include "nps_fdm.h"
 #include "nps_flightgear.h"
 #include "nps_global.h"
@@ -53,28 +55,21 @@ SIM_t       sim;
 uint16_t    cpu_time_sec;
 uint8_t     cpu_usage;
 
-static GTimer *loop_timer;
 static GTimer *fg_timer;
-
-/* used to guestimate if the PC running the sim is too slow. If we have to
-run every time, i.e. we can't keep up with PERIODIC_TASK_DT then we are not
-really being a true SITL */
-uint32_t    nth_time_run;
 
 void hw_init(void)
 {
     g_thread_init(NULL);
 
-    /* initialize the global state */
-    sim.started = g_timer_new();
-    sim.time = 0.0;
+    time_helpers_init();
 
-    nth_time_run = 0;
+    /* sys_time.h */
     cpu_usage = 0;
-    
-    loop_timer = g_timer_new();
-    fg_timer = g_timer_new();  
+    cpu_time_sec = 0;
 
+    /* nps specific */
+    sim.time = 0.0;
+    fg_timer = g_timer_new();  
     nps_fdm_init(PERIODIC_TASK_DT);
     nps_flightgear_init(NPS_FLIGHTGEAR_HOST, NPS_FLIGHTGEAR_PORT);
     nps_state_init(TRUE);
@@ -83,46 +78,19 @@ void hw_init(void)
 /* This is baiscally the main loop, this function gets called very fast */
 bool_t sys_time_periodic( void ) 
 {
-    bool_t ret;
-    gdouble elapsed_sec, fg_elapsed_sec;
+    gulong sleep_time;
+    bool_t should_run;
+    gdouble fg_elapsed_sec;
 
-    sim.time = g_timer_elapsed(sim.started, NULL);
+    sim.time = time_helpers_check_periodic(&should_run, &cpu_usage, &sleep_time);
     cpu_time_sec = sim.time;
 
+    //FIXME: Temp hack for testing...
     if (cpu_time_sec > 20 && !enabled) {
         led_log("ENABLING AUTOPILOT");
         autopilot_set_mode(AP_MODE_ATTITUDE_DIRECT);
         autopilot_set_motors(TRUE);
         enabled = TRUE;
-    }
-
-    elapsed_sec = g_timer_elapsed(loop_timer, NULL);
-    if (elapsed_sec > PERIODIC_TASK_DT) {
-        /* reset the timer */
-        g_timer_start(loop_timer);
-        ret = TRUE;
-        switch(nth_time_run) {
-            case 0:
-                cpu_usage = 100;
-                break;
-            /* these are just made up numbers */
-            case 1:
-                cpu_usage = 75;
-                break;
-            case 2:
-                cpu_usage = 50;
-                break;
-            case 3:
-                cpu_usage = 25;
-                break;
-            default:
-                cpu_usage = 0;
-                break;
-        }
-        nth_time_run = 0;
-    } else {
-        ret = FALSE;
-        nth_time_run += 1;
     }
 
     /* copy state from the FDM */
@@ -137,12 +105,9 @@ bool_t sys_time_periodic( void )
         nps_flightgear_send();
     }
 
-    /* sleep for 1/4 of the time remaining before we need to run again */
-    if (ret == FALSE) {
-        g_usleep((PERIODIC_TASK_DT - elapsed_sec) * 0.25 * G_USEC_PER_SEC);
-        ret = FALSE;
-    }
-
-    return ret;
+    if (should_run == FALSE)
+        time_helpers_sleep(sleep_time);
+        
+    return should_run;
 }
 
