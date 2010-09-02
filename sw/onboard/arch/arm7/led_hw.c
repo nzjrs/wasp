@@ -47,4 +47,4 @@ void led_toggle( uint8_t id)
 }
 
 void led_periodic_task (void) {}
-int led_log (char const *format, ...) {}
+void led_log (char const *format, ...) {}
