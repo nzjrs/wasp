@@ -1,5 +1,5 @@
+#include "led.h"
 #include "actuators.h"
-#include "nps_led.h"
 
 #include "generated/settings.h"
 
@@ -31,7 +31,7 @@ static uint8_t actuator_id_to_index(ActuatorID_t id)
         case ACTUATOR_BANK_4:
             base = 4 * ACTUATOR_MAX; break;
         default:
-            nps_log("Unknown actuator bank 0x%X\n", id & 0xF0);
+            led_log("Unknown actuator bank 0x%X\n", id & 0xF0);
             return 0;
     }
 

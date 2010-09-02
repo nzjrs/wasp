@@ -2,6 +2,7 @@ ARCHSRC =                                       \
     math/pprz_geodetic_double.c                 \
     arch/lib/comm_fifo.c                        \
     arch/lib/spawn.c                            \
+    arch/lib/led_console.c                      \
     arch/jsbsim/nps_main.c                      \
     arch/jsbsim/nps_unsimulated_peripherals.c   \
     arch/jsbsim/nps_fdm_jsbsim.c                \
@@ -14,7 +15,6 @@ ARCHSRC =                                       \
     arch/jsbsim/nps_sensor_mag.c                \
     arch/jsbsim/nps_sensors.c                   \
     arch/jsbsim/nps_sensors_utils.c             \
-    arch/jsbsim/nps_led.c                       \
     arch/jsbsim/nps_rc.c                        \
     arch/jsbsim/nps_rc_joystick.c               \
     arch/jsbsim/nps_actuators.c                 \

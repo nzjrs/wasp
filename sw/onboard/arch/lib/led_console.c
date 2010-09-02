@@ -1,6 +1,7 @@
 #include "std.h"
 #include "generated/settings.h"
-#include "nps_led.h"
+
+#include "led.h"
 
 #include <stdarg.h>
 #include <glib.h>
@@ -47,7 +48,7 @@ void led_toggle (uint8_t id)
 }
 
 
-gint nps_log (gchar const *format, ...)
+int led_log (char const *format, ...)
 {
     va_list args;
 

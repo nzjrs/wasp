@@ -10,7 +10,10 @@
 #include "math/pprz_algebra.h"
 #include "math/pprz_algebra_float.h"
 
+#include "led.h"
 #include "actuators.h"
+#include "autopilot.h"
+
 #include "generated/settings.h"
 
 #define MetersOfFeet(_f) ((_f)/3.2808399)
@@ -57,9 +60,6 @@ void nps_fdm_run_step(void) {
 
 }
 
-#include "nps_led.h"
-#include "autopilot.h"
-
 /* convert the 8 bit actuator values into double precision values, and map them
 from the acutator ID to the simulator model property name */
 static void feed_jsbsim(void) {
@@ -77,7 +77,7 @@ static void feed_jsbsim(void) {
         if (autopilot.in_flight) {
         value = 1.0;
         FDMExec->GetPropertyManager()->SetDouble(property,value);
-        nps_log(" %s = %f\n", buf, value);
+        led_log(" %s = %f\n", buf, value);
     }
   }
 }

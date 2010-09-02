@@ -9,13 +9,13 @@
 #include <glib.h>
 
 #include "std.h"
+#include "led.h"
 #include "generated/settings.h"
 
 #include "lib/spawn.h"
 
 #include "nps_flightgear.h"
 #include "nps_fdm.h"
-#include "nps_led.h"
 
 #define MODEL_PREFIX    "/usr/share/games/FlightGear/"
 #define MODEL_PATH      "Models/Aircraft/wasp/mikrokopter.xml"
@@ -95,7 +95,7 @@ void nps_flightgear_init(const char* host,  unsigned int port) {
                     port,
                     model_command);
 
-        nps_log("FLIGHTGEAR: %s\n", cmd);
+        led_log("FLIGHTGEAR: %s\n", cmd);
 
         /* Setup the SIGCHILD handler, as flightgear is spawned occasionally */
         sigset(SIGCHLD, &spawn_sigchild_sighandler);

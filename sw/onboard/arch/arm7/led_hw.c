@@ -46,8 +46,5 @@ void led_toggle( uint8_t id)
     gpio_toggle(id);
 }
 
-void
-led_periodic_task (void)
-{
-    ;
-}
+void led_periodic_task (void) {}
+int led_log (char const *format, ...) {}

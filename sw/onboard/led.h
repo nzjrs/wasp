@@ -48,4 +48,7 @@ led_toggle ( uint8_t id);
 void
 led_periodic_task (void);
 
+int
+led_log (char const *format, ...) G_GNUC_PRINTF (1, 2);
+
 #endif /* LED_H */

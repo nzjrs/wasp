@@ -26,17 +26,17 @@
 #include "std.h"
 #include "init.h"
 #include "sys_time.h"
+#include "led.h"
+#include "autopilot.h"
 
 #include "generated/settings.h"
 
 #include "nps_fdm.h"
-#include "nps_led.h"
 #include "nps_flightgear.h"
 #include "nps_global.h"
 #include "nps_sensors.h"
 #include "nps_state.h"
 
-#include "autopilot.h"
 static bool_t enabled = FALSE;
 
 /* The main entry point for the sim, largely equivilent to main() is hw_init.
@@ -90,7 +90,7 @@ bool_t sys_time_periodic( void )
     cpu_time_sec = sim.time;
 
     if (cpu_time_sec > 20 && !enabled) {
-        nps_log("ENABLING AUTOPILOT");
+        led_log("ENABLING AUTOPILOT");
         autopilot_set_mode(AP_MODE_ATTITUDE_DIRECT);
         autopilot_set_motors(TRUE);
         enabled = TRUE;

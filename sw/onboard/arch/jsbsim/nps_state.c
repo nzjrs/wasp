@@ -2,13 +2,13 @@
 #include "imu.h"
 #include "altimeter.h"
 #include "ahrs.h"
-
-#include "nps_fdm.h"
-#include "nps_led.h"
-#include "nps_state.h"
-#include "nps_sensors.h"
+#include "led.h"
 
 #include "generated/settings.h"
+
+#include "nps_fdm.h"
+#include "nps_state.h"
+#include "nps_sensors.h"
 
 static bool_t bypass_ahrs;
 static bool_t bypass_gps;

@@ -1,6 +1,7 @@
 #include "std.h"
 #include "rc.h"
-#include "nps_led.h"
+#include "led.h"
+
 #include "nps_global.h"
 #include "nps_rc_joystick.h"
 
@@ -43,14 +44,14 @@ static gpointer rc_mainloop_thread(gpointer data)
     state->loop = g_main_loop_new(state->context, FALSE);
 
     if (state->joystick_device) {
-        nps_log("RC: Using Joystick %s\n", state->joystick_device);
+        led_log("RC: Using Joystick %s\n", state->joystick_device);
         /* init the joystick device, it uses io_add_watch, so it needs the context */
         rc_ok = nps_radio_control_joystick_init(state->joystick_device, state->context);
         if (rc_ok)
             rc_system_status = STATUS_INITIALIZED;
     } else if (state->script_func) {
         /* start a regular timer */
-        nps_log("RC: Using script function\n");
+        led_log("RC: Using script function\n");
         GSource *timeout = g_timeout_source_new (1000/NPS_RC_SCRIPT_FREQ);
         g_source_set_callback(timeout, (GSourceFunc)rc_run_script, state, NULL);
         g_source_attach(timeout, state->context);
