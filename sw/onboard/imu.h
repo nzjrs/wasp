@@ -60,6 +60,7 @@ imu_init(void);
 void
 imu_periodic_task ( void );
 
+/* Return a IMUComponentMast_t indicating which IMU components got updated */
 uint8_t 
 imu_event_task ( void );
 

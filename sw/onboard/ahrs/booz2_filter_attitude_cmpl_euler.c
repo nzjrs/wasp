@@ -62,6 +62,7 @@ static uint8_t samples_idx;
 void ahrs_init(void) {
   booz_ahrs_aligner_init();
 
+  ahrs.enabled = TRUE;
   ahrs_status = STATUS_UNINITIAIZED;
   INT_EULERS_ZERO(ahrs.ltp_to_body_euler);
   INT_EULERS_ZERO(ahrs.ltp_to_imu_euler);
@@ -75,6 +76,8 @@ void ahrs_init(void) {
 }
 
 void ahrs_align(void) {
+  if (!ahrs.enabled)
+    return;
   if (ahrs_status != STATUS_INITIALIZED) {
     booz_ahrs_aligner_run();
     if (booz_ahrs_aligner.status == BOOZ_AHRS_ALIGNER_LOCKED) {
@@ -138,7 +141,8 @@ void ahrs_align(void) {
  */
 
 void ahrs_propagate(void) {
-
+  if (!ahrs.enabled)
+    return;
   /* low pass accels         */
   VECT3_SUB(lp_accel_sum, lp_accel_samples[samples_idx]);
   VECT3_COPY(lp_accel_samples[samples_idx], booz_imu.accel);
@@ -208,8 +212,8 @@ void ahrs_propagate(void) {
 }
 
 void ahrs_update(void) {
-
-
+  if (!ahrs.enabled)
+    return;
 }
 
 
