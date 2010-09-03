@@ -114,12 +114,14 @@ comm_parse ( CommChannel_t chan )
 
     while ( comm_ch_available(chan) && !comm_status[chan].msg_received ) 
     {
-        uint8_t c = comm_get_ch(chan);
+        uint8_t c;
+
+        c = comm_get_ch(chan);
         switch (comm_status[chan].parse_state) 
         {
             case STATE_UNINIT:
                 if (c == COMM_STX) {
-                    comm_status[chan].parse_state++;
+                    comm_status[chan].parse_state = STATE_GOT_STX;
                     rxmsg->ck_a = COMM_STX;
                     rxmsg->ck_b = COMM_STX;
                 }
@@ -133,12 +135,12 @@ comm_parse ( CommChannel_t chan )
                 rxmsg->len = c - COMM_NUM_NON_PAYLOAD_BYTES; 
                 rxmsg->idx = 0;
                 UPDATE_CHECKSUM(rxmsg, c)
-                comm_status[chan].parse_state++;
+                comm_status[chan].parse_state = STATE_GOT_LENGTH;
                 break;
             case STATE_GOT_LENGTH:
                 rxmsg->acid = c;
                 UPDATE_CHECKSUM(rxmsg, c)
-                comm_status[chan].parse_state++;
+                comm_status[chan].parse_state = STATE_GOT_ACID;
                 break;
             case STATE_GOT_ACID:
                 rxmsg->msgid = c;
@@ -146,18 +148,18 @@ comm_parse ( CommChannel_t chan )
                 if (rxmsg->len == 0)
                     comm_status[chan].parse_state = STATE_GOT_PAYLOAD;
                 else
-                    comm_status[chan].parse_state++;
+                    comm_status[chan].parse_state = STATE_GOT_MSGID;
                 break;
             case STATE_GOT_MSGID:
                 ADD_CHAR(rxmsg, c)
                 UPDATE_CHECKSUM(rxmsg, c)
                 if (rxmsg->idx == rxmsg->len)
-                    comm_status[chan].parse_state++;
+                    comm_status[chan].parse_state = STATE_GOT_PAYLOAD;
                 break;
             case STATE_GOT_PAYLOAD:
                 if (c != rxmsg->ck_a)
                     goto error;
-                comm_status[chan].parse_state++;
+                comm_status[chan].parse_state = STATE_GOT_CRC1;
                 break;
             case STATE_GOT_CRC1:
                 if (c != rxmsg->ck_b)
