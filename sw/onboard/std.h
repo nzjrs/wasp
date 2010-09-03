@@ -74,6 +74,10 @@
 # endif
 #endif
 
+#ifndef G_GNUC_PRINTF
+# define G_GNUC_PRINTF( format_idx, arg_idx ) __attribute__((__format__ (__printf__, format_idx, arg_idx)))
+#endif
+
 /* Boolean values */
 typedef uint8_t bool_t;
 
