@@ -44,6 +44,8 @@ void led_init ( void ) {}
 void led_on ( uint8_t id) {}
 void led_off ( uint8_t id) {}
 void led_toggle ( uint8_t id) {}
+void led_periodic_task (void) {}
+void led_log (char const *format, ...) {}
 
 #include "comm.h"
 SystemStatus_t comm_system_status = STATUS_UNINITIAIZED;
