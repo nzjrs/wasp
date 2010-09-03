@@ -45,4 +45,10 @@ led_off ( uint8_t id);
 void
 led_toggle ( uint8_t id);
 
+void
+led_periodic_task (void);
+
+void
+led_log (char const *format, ...) G_GNUC_PRINTF (1, 2);
+
 #endif /* LED_H */
