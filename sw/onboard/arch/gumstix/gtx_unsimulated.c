@@ -24,20 +24,8 @@
 #include "std.h"
 
 #include "init.h"
-void hw_init(void) {}
 void int_enable(void) {}
 void int_disable(void) {}
-
-#include "sys_time.h"
-uint16_t cpu_time_sec;
-uint8_t  cpu_usage;
-
-void sys_time_init( void ) {}
-bool_t sys_time_periodic( void ) { return TRUE; }
-void sys_time_chrono_start ( void ) {}
-uint32_t sys_time_chrono_stop ( void ) { return 0; }
-void sys_time_usleep ( uint32_t us ) {}
-void sys_time_calculate_cpu_usage ( void ) {}
 
 #include "led.h"
 void led_init ( void ) {}
