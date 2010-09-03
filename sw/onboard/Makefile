@@ -18,7 +18,6 @@ SRC =                               \
     math/pprz_trig_int.c            \
     math/pprz_geodetic_int.c        \
     math/pprz_geodetic_float.c      \
-    math/pid_int.c                  \
     lib/debug.c                     \
     rc.c                            \
     imu.c                           \
