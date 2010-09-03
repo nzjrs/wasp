@@ -173,7 +173,7 @@ $(AOBJARM) : $(OBJDIR)/%.o : %.S
 	$(Q)test -d $(dir $@) || mkdir -p $(dir $@)
 	$(Q)$(CC) -c $(ASFLAGS) $< -o $@
 
-include arch/Makefile-targets.$(ARCH)
+-include arch/Makefile-targets.$(ARCH)
 
 clean:
 	$(REMOVE) $(OBJDIR)/$(TARGET).obj
