@@ -68,7 +68,6 @@ IMU_t booz_imu;
 void imu_init(void) {}
 void imu_periodic_task ( void ) {}
 uint8_t imu_event_task ( void ) { return 0; }
-void imu_adjust_alignment( float phi, float theta, float psi ) {}
 
 #include "actuators.h"
 void actuators_init( uint8_t bank ) {}
