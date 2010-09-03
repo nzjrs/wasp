@@ -29,6 +29,10 @@
 #include "generated/settings.h"
 #include "generated/radio.h"
 
+PID_t   pid_pitch;
+PID_t   pid_roll;
+PID_t   pid_yaw;
+
 typedef struct _Int32RC {
     int32_t     roll;
     int32_t     pitch;
