@@ -10,9 +10,6 @@ ifeq ($(strip $(OVEROTOP)),)
     $(error $$OVEROTOP is undefined! Source your gumstix profile)
 endif
 
-# Gumstix IP
-GUMSTIX     = 192.168.0.2
-
 # OpenEmbedded/Gumstix specific variables (valid for OE builds > 30 July 2010)
 OETMP       = $(OVEROTOP)/tmp
 TOOLDIR     = $(OETMP)/sysroots/`uname -m`-linux/usr/armv7a/bin
