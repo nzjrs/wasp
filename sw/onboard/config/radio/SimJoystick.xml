@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE radio SYSTEM "radio.dtd">
+<radio name="Logitech" data_min="0" data_max="0" sync_min ="0" sync_max ="0" pulse_type="POSITIVE">
+ <channel ctl="1" function="ROLL"     min="-32767" neutral="0" max="32767" average="0"/>
+ <channel ctl="2" function="PITCH"    min="-32767" neutral="0" max="32767" average="0"/>
+ <channel ctl="3" function="YAW"      min="-32767" neutral="0" max="32767" average="0"/>
+ <channel ctl="4" function="THROTTLE" min="32767" neutral="0" max="-32767" average="0"/>
+ <channel ctl="5" function="FMS"      min="-32767" neutral="0" max="32767" average="0"/>
+ <channel ctl="6" function="MODE"     min="-32767" neutral="0" max="32767" average="0"/>
+</radio>
