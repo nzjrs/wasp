@@ -41,7 +41,8 @@ typedef uint8_t ActuatorID_t;
 #define ACTUATOR_BANK_3                 0x40
 #define ACTUATOR_BANK_4                 0x80
 
-#define ACTUATOR_MAX                    (4*16)
+#define ACTUATOR_BANK_MAX               4
+#define ACTUATOR_MAX                    16
 
 void actuators_init( uint8_t bank );
 
@@ -50,5 +51,7 @@ void actuators_set( ActuatorID_t id, uint8_t value );
 void actuators_commit( uint8_t bank );
 
 uint8_t actuators_get_num( uint8_t bank );
+
+uint8_t actuators_get( ActuatorID_t id );
 
 #endif /* ACTUATORS_H */

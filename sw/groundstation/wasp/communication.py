@@ -1,3 +1,4 @@
+import os.path
 import socket
 import random
 import gobject
@@ -260,6 +261,68 @@ class DummyCommunication(_Communication):
     def is_connected(self):
         return self._is_open
 
+class FifoCommunication(_Communication):
+
+    COMMUNICATION_TYPE = "fifo"
+
+    def __init__(self, transport, messages_file, message_header):
+        _Communication.__init__(self, transport, messages_file, message_header)
+        self.readfd = -1
+        self.writefd = -1
+        self.watch = None
+        self.fifo_path = ""
+
+    def send_message(self, msg, values):
+        if self.is_connected():
+            data = self.transport.pack_message_with_values(
+                        self.message_header,
+                        msg,
+                        *values)
+            os.write(self.writefd, data)
+
+    def connect_to_uav(self):
+        LOG.info("Connecting to FIFO: %s" % self.fifo_path)
+
+        if self.fifo_path:
+            rdpath = self.fifo_path + "_SOGI"
+            wrpath = self.fifo_path + "_SIGO"
+
+            if os.path.exists(rdpath) and os.path.exists(wrpath):
+                self.readfd = os.open(rdpath, os.O_RDONLY)
+                self.writefd = os.open(wrpath, os.O_WRONLY)
+
+            if self.is_connected():
+                self.watch = gobject.io_add_watch(
+                            self.readfd, 
+                            gobject.IO_IN | gobject.IO_PRI,
+                            self.on_data_available,
+                            priority=gobject.PRIORITY_HIGH)
+
+        self.emit("uav-connected", self.is_connected())
+
+    def on_data_available(self, fd, condition):
+        data = os.read(self.readfd, 1)
+        for header, payload in self.transport.parse_many(data):
+            msg = self.messages_file.get_message_by_id(header.msgid)
+            if msg:
+                self.emit("message-received", msg, header, payload)
+        return True
+
+    def disconnect_from_uav(self):
+        if self.is_connected():
+            gobject.source_remove(self.watch)
+            self.readfd = self.writefd = -1
+        self.emit("uav-connected", self.is_connected())
+
+    def is_connected(self):
+        return self.writefd != -1 and self.readfd != -1
+
+    def configure_connection(self, **kwargs):
+        self.fifo_path = "/tmp/WASP_COMM_TELEMETRY" #kwargs.get("fifo_path")
+
+    def get_connection_string(self):
+        return "%s" % self.fifo_path
+
 class DummyUAV:
     """ Generates sensible default messages for a UAV """
     def __init__(self, messages_file, send_message_function, **kwargs):
@@ -390,7 +453,8 @@ class DummyUAV:
 ALL_COMMUNICATION_KLASSES = [
     SerialCommunication,
     DummyCommunication,
-    UdpCommunication
+    UdpCommunication,
+    FifoCommunication
 ]
 
 def get_source(source_name):
@@ -421,3 +485,8 @@ def get_source(source_name):
         name = "test"
 
     return name,klass,config
+
+def get_available_sources():
+    """ Returns the name of all available communication sources """
+    return [k.COMMUNICATION_TYPE for k in ALL_COMMUNICATION_KLASSES]
+

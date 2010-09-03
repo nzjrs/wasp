@@ -26,9 +26,9 @@
 #include "std.h"
 #include "math/pid_int.h"
 
-PID_t   pid_pitch;
-PID_t   pid_roll;
-PID_t   pid_yaw;
+extern PID_t   pid_pitch;
+extern PID_t   pid_roll;
+extern PID_t   pid_yaw;
 
 void fixedwing_stabiliziation_alt_h_run(int32_t *commands);
 void fixedwing_stabiliziation_alt_v_run(int32_t *commands);

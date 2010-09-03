@@ -140,7 +140,25 @@ static inline void autopilot_main_periodic( void ) {
     case 2:
         fms_periodic_task();
         break;
-    }
+  }
+
+  /* flash leds... */
+  led_periodic_task();
+
+  if (ahrs_status == STATUS_INITIALIZING) {
+    RunOnceEvery(50, {
+      led_toggle(LED_AHRS);
+    });
+  } else if (ahrs_status == STATUS_INITIALIZED) {
+    led_on(LED_AHRS);
+  }
+  if (altimeter_system_status == STATUS_INITIALIZING) {
+    RunOnceEvery(50, {
+      led_toggle(LED_BARO);
+    });
+  } else if (altimeter_system_status == STATUS_INITIALIZED) {
+    led_on(LED_BARO);
+  }
 
 }
 

@@ -34,7 +34,8 @@ typedef struct __AHRS {
   struct Int32Quat   ltp_to_imu_quat;
   struct Int32RMat   ltp_to_imu_rmat;
   struct Int32Rates  imu_rate;
-  struct Int32Rates  body_rate;  
+  struct Int32Rates  body_rate;
+  bool_t enabled;
 } AHRS_t;
 
 extern AHRS_t ahrs;

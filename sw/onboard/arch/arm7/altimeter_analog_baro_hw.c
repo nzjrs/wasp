@@ -60,9 +60,6 @@ void altimeter_recalibrate( void )
     analog_baro_data_available = FALSE;
 
     altimeter_system_status = STATUS_INITIALIZING;
-#if LED_BARO
-    led_off(LED_BARO);
-#endif
 }
 
 uint8_t
@@ -91,14 +88,8 @@ analog_baro_calibrate(void)
             altimeter_calibration_offset--;
 
         AnalogSetDAC(altimeter_calibration_offset);
-#if LED_BARO
-        led_toggle(LED_BARO);
-#endif
     } else {
         altimeter_system_status = STATUS_INITIALIZED;
-#if LED_BARO
-        led_on(LED_BARO);
-#endif
     }
     });
 }

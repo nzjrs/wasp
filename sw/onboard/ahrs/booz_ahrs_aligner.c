@@ -61,10 +61,6 @@ void booz_ahrs_aligner_run(void) {
   ref_sensor_samples[samples_idx] = booz_imu.accel.z;
   samples_idx++;
 
-#if LED_AHRS
-  RunOnceEvery(50, {led_toggle(LED_AHRS);});
-#endif
-
   if (samples_idx >= SAMPLES_NB) {
     int32_t avg_ref_sensor = accel_sum.z;
     if ( avg_ref_sensor >= 0)
@@ -97,9 +93,6 @@ void booz_ahrs_aligner_run(void) {
     
     if (booz_ahrs_aligner.low_noise_cnt > LOW_NOISE_TIME) {
       booz_ahrs_aligner.status = BOOZ_AHRS_ALIGNER_LOCKED;
-#if LED_AHRS
-      led_on(LED_AHRS);
-#endif
     }
   }
 

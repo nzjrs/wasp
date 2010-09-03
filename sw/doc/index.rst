@@ -8,3 +8,4 @@ Software
    architecture
    onboard
    groundstation
+   sim
