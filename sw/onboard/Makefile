@@ -116,14 +116,6 @@ ELFSIZE = $(SIZE) -A $(OBJDIR)/$(TARGET).elf
 size:
 	@if [ -f $(OBJDIR)/$(TARGET).elf ]; then echo; $(ELFSIZE); echo; fi
 
-# Program the device.  
-LPC21IAP    = ../lpc21iap/lpc21iap
-programmer:
-	$(Q)cd `dirname $(LPC21IAP)` && make --quiet --no-print-directory Q=$(Q)
-upload: $(OBJDIR)/$(TARGET).elf programmer
-	@echo UPLOAD $(OBJDIR)/$(TARGET).elf
-	$(Q)$(LPC21IAP)  $(OBJDIR)/$(TARGET).elf
-
 # All generated headers
 generated: generated/radio.h generated/build.h generated/messages.h generated/settings.h
 
