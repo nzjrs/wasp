@@ -24,7 +24,6 @@
 #include "comm.h"
 
 #include "arm7/config.h"
-#include "arm7/comm_hw.h"
 #include "arm7/uart_hw.h"
 #include "arm7/usb_ser_hw.h"
 
