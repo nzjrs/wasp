@@ -12,6 +12,7 @@ uint8_t  cpu_usage;
 void hw_init(void)
 {
     g_thread_init(NULL);
+    g_type_init();
 }
 
 void sys_time_init( void )

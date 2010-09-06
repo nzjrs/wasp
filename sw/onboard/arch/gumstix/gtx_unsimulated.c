@@ -27,22 +27,6 @@
 void int_enable(void) {}
 void int_disable(void) {}
 
-#include "led.h"
-void led_init ( void ) {}
-void led_on ( uint8_t id) {}
-void led_off ( uint8_t id) {}
-void led_toggle ( uint8_t id) {}
-
-#include "comm.h"
-SystemStatus_t comm_system_status = STATUS_UNINITIAIZED;
-
-void comm_init ( CommChannel_t chan ) {}
-bool_t comm_ch_available ( CommChannel_t chan ) { return FALSE; }
-void comm_send_ch ( CommChannel_t chan, uint8_t c ) {}
-uint8_t comm_get_ch( CommChannel_t chan ) { return '\0'; }
-bool_t comm_check_free_space ( CommChannel_t chan, uint8_t len ) { return TRUE; }
-void comm_overrun ( CommChannel_t chan ) {}
-
 #include "rc.h"
 SystemStatus_t rc_system_status = STATUS_UNINITIAIZED;
 
