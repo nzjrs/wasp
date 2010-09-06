@@ -13,7 +13,7 @@ static int tock = 0;
 
 static void led_print(gboolean newline)
 {
-    g_printf("[%c][%d][%d][%d][%d]%c", tick[tock], leds[0], leds[1], leds[2], leds[3], newline ? '\n' : NULL);
+    g_printf("[%c][%d][%d][%d][%d]%c", tick[tock], leds[0], leds[1], leds[2], leds[3], newline ? '\n' : '\0');
 }
 
 void led_init (void)
