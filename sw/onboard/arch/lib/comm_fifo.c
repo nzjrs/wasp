@@ -168,3 +168,14 @@ void comm_overrun ( CommChannel_t chan )
 {
     ;
 }
+
+void comm_start_message_hw ( void )
+{
+    ;
+}
+
+void comm_end_message_hw ( void )
+{
+    ;
+}
+
