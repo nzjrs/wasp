@@ -87,5 +87,11 @@ comm_send_command_ack (CommChannel_t chan, uint8_t msgid);
 void
 comm_send_command_nack (CommChannel_t chan, uint8_t msgid);
 
+void
+comm_start_message_hw ( CommChannel_t chan );
+
+void
+comm_end_message_hw ( CommChannel_t chan );
+
 #endif /* COMM_H */
 

@@ -61,6 +61,8 @@ comm_start_message ( CommChannel_t chan, uint8_t id, uint8_t len )
     /* Counting STX, LENGTH, ACID, MSGID, CRC1 and CRC2 */
     uint8_t total_len = len + COMM_NUM_NON_PAYLOAD_BYTES;
 
+    comm_start_message_hw (chan);
+
     comm_status[chan].ck_a = COMM_STX;
     comm_status[chan].ck_b = COMM_STX;
     comm_send_ch(chan, COMM_STX);
@@ -75,6 +77,8 @@ comm_end_message ( CommChannel_t chan )
 {
     comm_send_ch(chan, comm_status[chan].ck_a);
     comm_send_ch(chan, comm_status[chan].ck_b);
+
+    comm_end_message_hw (chan);
 }
 
 void
