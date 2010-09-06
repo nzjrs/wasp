@@ -62,10 +62,12 @@ static inline void main_periodic_task( void ) {
     comm_periodic_task(COMM_TELEMETRY);
 
     rc_periodic_task();
+
     if (rc_status == RC_OK)
         led_on(LED_RC);
     else
         led_off(LED_RC);
+    led_periodic_task();
 
     RunOnceEvery(250, {
         MESSAGE_SEND_PPM(COMM_TELEMETRY, ppm_pulses);
