@@ -152,3 +152,6 @@ comm_overrun ( CommChannel_t chan )
         comm_status[chan].buffer_overrun++;
 }
 
+void comm_start_message_hw ( CommChannel_t chan ) {}
+void comm_end_message_hw ( CommChannel_t chan ) {}
+

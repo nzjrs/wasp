@@ -56,6 +56,9 @@ void comm_send_ch ( CommChannel_t chan, uint8_t c ) {}
 uint8_t comm_get_ch( CommChannel_t chan ) { return '\0'; }
 bool_t comm_check_free_space ( CommChannel_t chan, uint8_t len ) { return TRUE; }
 void comm_overrun ( CommChannel_t chan ) {}
+void comm_start_message_hw ( CommChannel_t chan ) {}
+void comm_end_message_hw ( CommChannel_t chan ) {}
+
 
 #include "rc.h"
 SystemStatus_t rc_system_status = STATUS_UNINITIAIZED;
