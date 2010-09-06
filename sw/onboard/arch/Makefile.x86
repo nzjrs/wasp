@@ -1,0 +1,40 @@
+ARCHSRC =                               \
+    arch/lib/time_helpers.c             \
+    arch/gumstix/gtx_main.c             \
+    arch/gumstix/gtx_unsimulated.c
+
+ARCHASMSRC =                            \
+    $(NULL)
+
+# OpenEmbedded/Gumstix specific variables (valid for OE builds > 30 July 2010)
+OETMP       = $(OVEROTOP)/tmp
+TOOLDIR     = $(OETMP)/sysroots/`uname -m`-linux/usr/armv7a/bin
+STAGEDIR    = $(OETMP)/sysroots/armv7a-angstrom-linux-gnueabi/usr
+LIBDIR      = $(STAGEDIR)/lib
+INCDIR      = $(STAGEDIR)/include
+PKCDIR      = $(STAGEDIR)/lib/pkgconfig/
+
+# Define programs and commands.
+CC		    = gcc
+LD		    = gcc
+OBJCOPY     = objcopy
+OBJDUMP     = objdump
+SIZE        = size
+NM          = nm
+
+GTESTER     = gtester
+
+# While one can coax pkg-config to work in a cross environment, it is sometimes
+# easier to just look at the pc file oneself, and extract the flags
+GLIB_CFLAGS     = `pkg-config --cflags glib-2.0 gthread-2.0 gio-2.0`
+GLIB_LDFLAGS    = `pkg-config --libs glib-2.0 gthread-2.0 gio-2.0`
+
+# Arch specific flags
+ARCHCFLAGS  = -I$(STAGEDIR)/include -g $(GLIB_CFLAGS)
+ARCHASFLAGS = 
+ARCHLDFLAGS = -L$(STAGEDIR)/lib $(GLIB_LDFLAGS)
+
+# Flags specific to automated testing
+TEST_PROGS = test_math
+
+test_math_TESTSRCS = math/tests/*_tc.c 
