@@ -1,4 +1,5 @@
 #include <glib.h>
+#include <glib-object.h>
 
 #include "std.h"
 #include "init.h"
