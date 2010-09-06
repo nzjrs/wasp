@@ -51,8 +51,6 @@ INCLUDES    = -I . -I math -I arch -I arch/$(ARCH)/include
 
 # Compiler flags.
 CFLAGS = $(INCLUDES)
-CFLAGS += -Os
-CFLAGS += -Winline
 CFLAGS += -Wall
 CFLAGS += -Wcast-qual
 CFLAGS += -Wimplicit

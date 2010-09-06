@@ -42,7 +42,11 @@ THUMB_IW    = -mthumb-interwork
 FORMAT      = ihex
 LDSCRIPT    = arch/arm7/LPC2148-ROM-bl.ld
 
+# Warning flags, etc
+WARNFLAGS   = -Os
+WARNFLAGS   += -Winline
+
 # Arch specific flags
-ARCHCFLAGS  = -mcpu=$(MCU) $(THUMB_IW)
+ARCHCFLAGS  = -mcpu=$(MCU) $(THUMB_IW) $(WARNFLAGS)
 ARCHASFLAGS = -mcpu=$(MCU) $(THUMB_IW) -x assembler-with-cpp
 ARCHLDFLAGS = -n -nostartfiles -lgcc -T$(LDSCRIPT)
