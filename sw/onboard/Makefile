@@ -1,5 +1,5 @@
 TARGET              ?= test/test_rc_main
-ARCH                ?= x86
+ARCH                ?= gumstix
 INCLUDE_BUILD_INFO  ?= 1
 OBJDIR              = bin/$(ARCH)
 Q                   = @
