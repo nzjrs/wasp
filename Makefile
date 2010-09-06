@@ -42,7 +42,7 @@ test: clean
 	@cd sw/onboard ; ./build-tests.sh
 
 showdoc: doc
-	@firefox doc/built/html/index.html
+	@gnome-www-browser doc/built/html/index.html
 
 uploaddoc_open: doc
 	-rsync -av doc/built/html/* john@open.grcnz.com:/srv/default/http/downloads/wasp/doc/
