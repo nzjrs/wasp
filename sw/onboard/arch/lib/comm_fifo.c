@@ -32,10 +32,11 @@
 #include <glib/gstdio.h>
 
 #include "std.h"
-#include "comm.h"
 
 #include "generated/messages.h"
 #include "generated/settings.h"
+
+#include "lib/comm_fifo.h"
 
 /* Only provide an implementation for COMM_TELEMETRY, aka
  * the XBEE, which is used for telemetry. This implementation is 2
@@ -50,7 +51,6 @@
 #define FIFO_WRITE  FIFO_PATH"COMM_TELEMETRY_SOGI"
 #define FIFO_READ   FIFO_PATH"COMM_TELEMETRY_SIGO"
 
-SystemStatus_t  comm_system_status;
 int             write_fd;
 int             read_fd;
 
@@ -88,94 +88,48 @@ static bool_t make_fifo(const char *path)
     return TRUE;
 }
 
-void comm_init ( CommChannel_t chan )
+bool_t comm_fifo_init ( void )
 {
-    int i;
-
-    if (chan == COMM_TELEMETRY) {
-        if (make_fifo(FIFO_WRITE) && make_fifo(FIFO_READ)) {
-            /* Open the write end with O_RDWR, to prevent errors when writing 
-             * to it before the groundstation has opened it for reading */
-            write_fd = open(FIFO_WRITE, O_RDWR | O_NONBLOCK);
-            /* Open the read end normally */
-            read_fd = open(FIFO_READ, O_RDONLY | O_NONBLOCK);
-            /* mark channel as used */
-            comm_channel_used[chan] = (write_fd != -1 && read_fd != -1);
-        } else 
-            comm_system_status = STATUS_FAIL;
-    }
-
-    for (i = 0; i < COMM_NB; i++) {
-        comm_callback_rx[i] = 0;
-        comm_callback_tx[i] = 0;
-    
-        comm_status[i].parse_state = STATE_UNINIT;
-        comm_status[i].msg_received = FALSE;
-        comm_status[i].buffer_overrun = 0;
-        comm_status[i].parse_error = 0;
-    }
-
-    comm_system_status = STATUS_INITIALIZED;
-
+    write_fd = read_fd = -1;
     read_head = read_tail = 0;
 
+    if (make_fifo(FIFO_WRITE) && make_fifo(FIFO_READ)) {
+        /* Open the write end with O_RDWR, to prevent errors when writing 
+         * to it before the groundstation has opened it for reading */
+        write_fd = open(FIFO_WRITE, O_RDWR | O_NONBLOCK);
+        /* Open the read end normally */
+        read_fd = open(FIFO_READ, O_RDONLY | O_NONBLOCK);
+    }
+
+    return (write_fd != -1 && read_fd != -1);
 }
 
-bool_t comm_ch_available ( CommChannel_t chan )
+bool_t comm_fifo_ch_available ( void )
 {
     /* read one byte at a time */
-    if ((chan == COMM_TELEMETRY) && (comm_system_status == STATUS_INITIALIZED)) {
-        uint8_t ch;
-        int i;
+    uint8_t ch;
+    int i;
 
-        i = read(read_fd, &read_buf[read_head], 1);
-        if (i == 1)
-            read_head = (read_head + 1) % CBUF_SIZE;
+    i = read(read_fd, &read_buf[read_head], 1);
+    if (i == 1)
+        read_head = (read_head + 1) % CBUF_SIZE;
 
-        return read_head > read_tail;
-    }
-
-    return FALSE;
+    return read_head > read_tail;
 }
 
-void comm_send_ch (CommChannel_t chan, uint8_t c)
+void comm_fifo_send_ch ( uint8_t c)
 {
-    if ((chan == COMM_TELEMETRY) && (comm_system_status == STATUS_INITIALIZED))
-        if (write(write_fd, &c, 1) != 1)
-            g_warning("Write error");
+    if (write(write_fd, &c, 1) != 1)
+        g_warning("Write error");
 }
 
-uint8_t comm_get_ch(CommChannel_t chan)
+uint8_t comm_fifo_get_ch( void )
 {
-    if ((chan == COMM_TELEMETRY) && (comm_system_status == STATUS_INITIALIZED)) {
-        uint8_t c;
+    uint8_t c;
 
-        c = read_buf[read_tail];
-        read_tail = (read_tail + 1) % CBUF_SIZE;
+    c = read_buf[read_tail];
+    read_tail = (read_tail + 1) % CBUF_SIZE;
 
-        return c;
-    }
-
-    return '\0';
-}
-
-bool_t comm_check_free_space ( CommChannel_t chan, uint8_t len )
-{
-    return TRUE;
-}
-
-void comm_overrun ( CommChannel_t chan ) 
-{
-    ;
-}
-
-void comm_start_message_hw ( void )
-{
-    ;
-}
-
-void comm_end_message_hw ( void )
-{
-    ;
+    return c;
 }
 
