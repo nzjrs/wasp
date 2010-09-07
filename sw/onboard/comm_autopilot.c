@@ -37,6 +37,7 @@
 #include "autopilot.h"
 #include "guidance.h"
 
+#include "generated/radio.h"
 #include "generated/messages.h"
 
 bool_t
@@ -126,10 +127,18 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
 			        &booz_imu.mag.z);
             break;
         case MESSAGE_ID_PPM:
+#if MESSAGE_PPM_NUM_ELEMENTS_values == RADIO_CTL_NB
             MESSAGE_SEND_PPM(chan, ppm_pulses);
+#else
+            #error PPM message size mismatch
+#endif
             break;
         case MESSAGE_ID_RC:
+#if MESSAGE_RC_NUM_ELEMENTS_values == RADIO_CTL_NB
             MESSAGE_SEND_RC(chan, rc_values);
+#else
+            #error RC message size mismatch
+#endif
             break;
         case MESSAGE_ID_STATUS:
             {
