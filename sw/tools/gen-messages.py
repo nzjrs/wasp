@@ -189,6 +189,7 @@ class _MacroWriter(_CWriter):
             if f.is_array:
                 l = f.length * f.element_length
                 print >> outfile, "(%s *)((uint8_t*)_payload+%d)" % (_type, offset)
+                print >> outfile, "#define MESSAGE_%s_NUM_ELEMENTS_%s %d" % (m.name, f.name, f.num_elements)
             else:
                 l = f.length
                 if l == 1:
