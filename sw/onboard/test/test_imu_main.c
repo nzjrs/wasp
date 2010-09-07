@@ -61,6 +61,7 @@ static inline void main_init( void ) {
 
 static inline void main_periodic_task( void ) {
     comm_periodic_task(COMM_TELEMETRY);
+    led_periodic_task();
 
     RunOnceEvery(100, {
         led_toggle(3);

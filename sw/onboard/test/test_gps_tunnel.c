@@ -55,10 +55,10 @@ static inline void main_init( void ) {
 }
  
 static inline void main_periodic_task( void ) {
+    led_periodic_task();
     RunOnceEvery(100, {
         led_toggle(LED_GPS);
     });
- 
 }
  
 static inline void main_event_task( void ) {

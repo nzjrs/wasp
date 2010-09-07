@@ -55,6 +55,8 @@ static inline void main_init( void ) {
 static inline void main_periodic_task( void ) {
     uint8_t i, val;
 
+    led_periodic_task();
+
     rc_periodic_task();
     if (rc_status == RC_OK) {
         led_on(LED_RC);

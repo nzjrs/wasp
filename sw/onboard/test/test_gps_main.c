@@ -58,6 +58,7 @@ static inline void main_init( void ) {
 
 static inline void main_periodic_task( void ) {
     comm_periodic_task(COMM_TELEMETRY);
+    led_periodic_task();
 
     RunOnceEvery(250, {
         comm_autopilot_message_send (COMM_TELEMETRY, MESSAGE_ID_GPS_LLH);

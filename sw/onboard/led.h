@@ -23,9 +23,10 @@
  */
 
 /** \file led.h
- *  \brief arch independant LED (Light Emitting Diodes) API
+ *  \brief LED (Light Emitting Diodes) API
  *
- *  Should ignore LEDs with IDs <= 0
+ *  Assignment of IDs is handeled in settings.xml, for example RC_LED, GPS_LED.
+ *  etc. Should ignore LEDs with IDs <= 0
  */
 
 #ifndef LED_H
@@ -33,22 +34,34 @@
 
 #include "std.h"
 
-void
-led_init ( void );
+/**
+ * To be called at startup. Backend dependant
+ */
+void    led_init ( void );
 
-void
-led_on ( uint8_t id);
+/**
+ * Turn on LED
+ */
+void    led_on ( uint8_t id);
 
-void
-led_off ( uint8_t id);
+/**
+ * Turn off LED
+ */
+void    led_off ( uint8_t id);
 
-void
-led_toggle ( uint8_t id);
+/**
+ * Toggle LED
+ */
+void    led_toggle ( uint8_t id);
 
-void
-led_periodic_task (void);
+/**
+ * To be called at periodic frequency. Backend dependant
+ */
+void    led_periodic_task (void);
 
-void
-led_log (char const *format, ...) G_GNUC_PRINTF (1, 2);
+/**
+ * Printf style debug API. Backend dependant
+ */
+void    led_log (char const *format, ...) G_GNUC_PRINTF (1, 2);
 
 #endif /* LED_H */

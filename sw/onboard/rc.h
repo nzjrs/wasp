@@ -20,39 +20,66 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
+/** \file rc.h
+ *  \brief Remote Control API
+ *
+ *  Manages the acquisition of RC signals. Channel assignment is handled
+ *  by the radio XML.
+ */
+
 #ifndef RC_H
 #define RC_H
 
 #include "std.h"
 #include "generated/radio.h"
 
-typedef enum {
-    RC_OK,
-    RC_LOST,
-    RC_REALLY_LOST
-} RCStatus_t;
-
-extern pprz_t       rc_values[RADIO_CTL_NB];
-extern RCStatus_t   rc_status;
-
 extern SystemStatus_t rc_system_status;
 
-extern uint8_t  rc_values_contains_avg_channels;
-extern uint8_t  time_since_last_ppm;
-extern uint8_t  ppm_cpt, last_ppm_cpt;
-extern uint16_t ppm_pulses[RADIO_CTL_NB];
-extern bool_t   ppm_valid;
-
-void
-rc_init ( void );
-
-void
-rc_periodic_task ( void );
+/**
+ * Connectivity of RC. The RC_LOST and RC_REALLY_LOST state seperation is
+ * designed to act as hysteresis for intermittant signal loss. Backends may
+ * switch between RC_OK and RC_REALLY_LOST if they wish.
+ */
+typedef enum {
+    RC_OK,              /**< RC is connected and data is being received */
+    RC_LOST,            /**< RC was connected, recently lost */
+    RC_REALLY_LOST      /**< RC not connected, completely lost */
+} RCStatus_t;
 
 /**
- * @return: TRUE if there is a valid RC signal
+ * Array of values of each of the RC channels. Scaled from -9600 - +9600. The
+ * index in the array is determined from the radio.xml
  */
-bool_t
-rc_event_task ( void );
+extern pprz_t       rc_values[RADIO_CTL_NB];
+
+/**
+ * FIXME
+ */
+extern uint8_t      rc_values_contains_avg_channels;
+
+/**
+ * Connectivity of RC
+ */
+extern RCStatus_t   rc_status;
+/**
+ * Raw unscaled RC values. Backend dependent
+ */
+extern uint16_t     ppm_pulses[RADIO_CTL_NB];
+
+/**
+ * To be called at startup. Backend dependant
+ */
+void    rc_init ( void );
+
+/**
+ * To be called at periodic frequency. Backend dependant
+ */
+void    rc_periodic_task ( void );
+
+/**
+ * Return TRUE if there is a valid RC signal.
+ */
+bool_t  rc_event_task ( void );
 
 #endif /* RC_H */

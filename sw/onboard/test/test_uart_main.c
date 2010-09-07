@@ -38,59 +38,61 @@ static inline void main_event_task( void );
 
 
 int main( void ) {
-  main_init();
-  while(1) {
-    if (sys_time_periodic())
-      main_periodic_task();
-    main_event_task();
-  }
-  return 0;
+    main_init();
+    while(1) {
+        if (sys_time_periodic())
+            main_periodic_task();
+        main_event_task();
+    }
+    return 0;
 }
 
 static inline void main_init( void ) {
-  hw_init();
-  sys_time_init();
-  led_init();
+    hw_init();
+    sys_time_init();
+    led_init();
 
 #if USE_DA_UART0
-  /* Uart 0 (aka gps) */
-  comm_init(COMM_0);
+    /* Uart 0 (aka gps) */
+    comm_init(COMM_0);
 #endif
 
 #if USE_DA_UART1
-  /* Uart 1 (aka telemetry) */
-  comm_init(COMM_TELEMETRY);
+    /* Uart 1 (aka telemetry) */
+    comm_init(COMM_TELEMETRY);
 #endif
 
 #if USE_DA_USB
-  /* USB */
-  comm_init(COMM_1);
+    /* USB */
+    comm_init(COMM_1);
 #endif
 
-  int_enable();
+    int_enable();
 }
 
 static inline void main_periodic_task( void ) {
     static uint8_t c = 'a';
 
-  RunOnceEvery(200, {
-    led_toggle(4);
+    led_periodic_task();
+
+    RunOnceEvery(200, {
+        led_toggle(4);
 
 #if USE_DA_UART0
-    comm_send_ch(COMM_0, c);
+        comm_send_ch(COMM_0, c);
 #endif
 
 #if USE_DA_UART1
-    comm_send_ch(COMM_TELEMETRY, c);
+        comm_send_ch(COMM_TELEMETRY, c);
 #endif
 
 #if USE_DA_USB
-    comm_send_ch(COMM_1, c);
+        comm_send_ch(COMM_1, c);
 #endif
 
-    c = (c < 'z' ? c + 1 : 'a');
+        c = (c < 'z' ? c + 1 : 'a');
 
-  });
+    });
 
 }
 

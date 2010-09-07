@@ -34,10 +34,12 @@
 #define RC_LOST_TIME 30         /* 500ms with a 60Hz timer */
 #define RC_REALLY_LOST_TIME 60  /* ~1s */
 
-int32_t avg_rc_values[RADIO_CTL_NB];
-bool_t  ppm_valid;
-uint8_t state;
-uint32_t last;
+int32_t     avg_rc_values[RADIO_CTL_NB];
+bool_t      ppm_valid;
+uint8_t     state;
+uint32_t    last;
+uint8_t     time_since_last_ppm;
+uint8_t     ppm_cpt, last_ppm_cpt;
 
 static inline void ppm_isr ( void )
 {

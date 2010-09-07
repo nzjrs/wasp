@@ -10,6 +10,10 @@
 
 #include "lib/comm_network.h"
 
+/*
+http://beej.us/guide/bgnet/output/html/multipage/clientserver.html#datagram
+*/
+
 GSocketAddress  *address = NULL;
 GSocket         *socket = NULL;
 

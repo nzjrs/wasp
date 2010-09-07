@@ -71,6 +71,7 @@ static inline void main_init( void ) {
 }
 
 static inline void main_periodic_task( void ) {
+    led_periodic_task();
     RunOnceEvery(10, {
 #if USE_DA_UART0
         comm_periodic_task(COMM_0);

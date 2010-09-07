@@ -68,6 +68,7 @@ static inline void main_periodic_task( void ) {
     analog_periodic_task();
     altimeter_periodic_task();
     comm_periodic_task(COMM_TELEMETRY);
+    led_periodic_task();
 
     RunOnceEvery(250, {
         int32_t alt = altimeter_get_altitude();

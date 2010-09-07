@@ -51,8 +51,6 @@ INCLUDES    = -I . -I math -I arch -I arch/$(ARCH)/include
 
 # Compiler flags.
 CFLAGS = $(INCLUDES)
-CFLAGS += -Os
-CFLAGS += -Winline
 CFLAGS += -Wall
 CFLAGS += -Wcast-qual
 CFLAGS += -Wimplicit
@@ -165,6 +163,13 @@ $(AOBJARM) : $(OBJDIR)/%.o : %.S
 	$(Q)test -d $(dir $@) || mkdir -p $(dir $@)
 	$(Q)$(CC) -c $(ASFLAGS) $< -o $@
 
+# Include test framework
+GTESTER             = gtester
+TEST_PROGS          = test_math
+test_math_TESTSRCS  = math/tests/*_tc.c
+include Makefile.test
+
+# Arch specific definitions
 -include arch/Makefile-targets.$(ARCH)
 
 clean:

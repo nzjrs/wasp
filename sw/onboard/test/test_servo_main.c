@@ -86,6 +86,8 @@ static inline void main_periodic_task( void ) {
     uint8_t i;
     static uint16_t cnt = 0;
 
+    led_periodic_task();
+
     if (++cnt == SERVO_SPEED) 
     {
         /* Move all servos forward or backward by dval */

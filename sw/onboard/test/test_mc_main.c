@@ -63,6 +63,8 @@ static inline void main_init( void ) {
 static inline void main_periodic_task( void ) {
     static uint16_t i = 0;
 
+    led_periodic_task();
+
     switch(i++) 
     {
         case 1:
