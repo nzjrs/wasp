@@ -52,6 +52,12 @@ typedef enum {
  * index in the array is determined from the radio.xml
  */
 extern pprz_t       rc_values[RADIO_CTL_NB];
+
+/**
+ * FIXME
+ */
+extern uint8_t      rc_values_contains_avg_channels;
+
 /**
  * Connectivity of RC
  */
@@ -60,12 +66,6 @@ extern RCStatus_t   rc_status;
  * Raw unscaled RC values. Backend dependent
  */
 extern uint16_t     ppm_pulses[RADIO_CTL_NB];
-
-//FIXME: Remove these from public API
-extern bool_t       ppm_valid;
-extern uint8_t      rc_values_contains_avg_channels;
-extern uint8_t      time_since_last_ppm;
-extern uint8_t      ppm_cpt, last_ppm_cpt;
 
 /**
  * To be called at startup. Backend dependant
