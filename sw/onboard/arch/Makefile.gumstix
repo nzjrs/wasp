@@ -1,6 +1,9 @@
 ARCHSRC =                               \
     arch/lib/time_helpers.c             \
+    arch/lib/comm_network.c             \
+    arch/lib/led_console.c              \
     arch/gumstix/gtx_main.c             \
+    arch/gumstix/gtx_comm.c             \
     arch/gumstix/gtx_unsimulated.c
 
 ARCHASMSRC =                            \
@@ -31,7 +34,7 @@ GTESTER     = gtester
 # While one can coax pkg-config to work in a cross environment, it is sometimes
 # easier to just look at the pc file oneself, and extract the flags
 GLIB_CFLAGS     = -I$(INCDIR)/glib-2.0 -I$(LIBDIR)/glib-2.0/include
-GLIB_LDFLAGS    = -L$(LIBDIR) -lglib-2.0 -lgthread-2.0
+GLIB_LDFLAGS    = -L$(LIBDIR) -lglib-2.0 -lgthread-2.0 -lgobject-2.0 -lgio-2.0
 
 # Arch specific flags
 ARCHCFLAGS  = -I$(STAGEDIR)/include -g $(GLIB_CFLAGS)
