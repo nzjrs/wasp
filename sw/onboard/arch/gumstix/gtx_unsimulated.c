@@ -27,13 +27,6 @@
 void int_enable(void) {}
 void int_disable(void) {}
 
-#include "rc.h"
-SystemStatus_t rc_system_status = STATUS_UNINITIAIZED;
-
-void rc_init ( void ) {}
-void rc_periodic_task ( void ) {}
-bool_t rc_event_task ( void ) { return FALSE; }
-
 #include "imu.h"
 IMU_t booz_imu;
 

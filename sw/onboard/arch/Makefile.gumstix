@@ -3,6 +3,7 @@ ARCHSRC =                               \
     arch/lib/comm_network.c             \
     arch/lib/led_console.c              \
     arch/gumstix/gtx_main.c             \
+    arch/gumstix/gtx_rc.c               \
     arch/gumstix/gtx_comm.c             \
     arch/gumstix/gtx_unsimulated.c
 
