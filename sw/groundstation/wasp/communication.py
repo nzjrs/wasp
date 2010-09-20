@@ -73,7 +73,10 @@ class UdpCommunication(_Communication):
         self.socket = None
         self.watch = None
         self.connected = False
-        self.host = "127.0.0.1"
+        self.host = ""
+        self.port = UDP_PORT
+
+        self.peers = {}
 
     def send_message(self, msg, values):
         if self.connected:
@@ -81,14 +84,19 @@ class UdpCommunication(_Communication):
                         self.message_header,
                         msg,
                         *values)
-            try:
-                self.socket.send(data.tostring())
-            except socket.error, err:
-                print "Could not send: %s" % err
+            if self.peers:
+                data = data.tostring()
+                for addr in self.peers:
+                    try:
+                        self.socket.sendto(data, addr)
+                    except socket.error, err:
+                        print "Could not send: %s" % err
 
     def on_data_available(self, fd, condition):
         try:
-            data = self.socket.recv(1024)
+            data,addr = self.socket.recvfrom(1024)
+            if addr not in self.peers:
+                self.peers[addr] = True
             for header, payload in self.transport.parse_many(data):
                 msg = self.messages_file.get_message_by_id(header.msgid)
                 if msg:
@@ -101,7 +109,7 @@ class UdpCommunication(_Communication):
     def connect_to_uav(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
-            s.bind((self.host, UDP_PORT))
+            s.bind((self.host, self.port))
             self.watch = gobject.io_add_watch(
                             s.fileno(), 
                             gobject.IO_IN | gobject.IO_PRI,
@@ -136,7 +144,7 @@ class UdpCommunication(_Communication):
         return {}
 
     def get_connection_string(self):
-        return "%s:%s" % (self.host, UDP_PORT)
+        return "%s:%s" % (self.host, self.port)
 
 class SerialCommunication(_Communication):
 
