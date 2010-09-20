@@ -3,6 +3,8 @@
 
 #include "lib/comm_network.h"
 
+#include "generated/settings.h"
+
 SystemStatus_t comm_system_status = STATUS_UNINITIAIZED;
 
 void comm_init ( CommChannel_t chan )
@@ -22,7 +24,10 @@ void comm_init ( CommChannel_t chan )
         comm_status[i].parse_error = 0;
     }
 
-    comm_network_init ("192.168.0.1", 1212);
+    comm_network_init (
+        GUMSTIX_HOST_IP_ADDRESS,
+        GUMSTIX_HOST_PORT);
+
 }
 
 bool_t comm_ch_available ( CommChannel_t chan )

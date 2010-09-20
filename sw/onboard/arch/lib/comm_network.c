@@ -3,6 +3,7 @@
 
 #include "std.h"
 #include "comm.h"
+#include "led.h"
 #include "messages_types.h"
 
 #include "generated/messages.h"

@@ -142,5 +142,9 @@
     <setting name="H_DGAIN" value="-0"/>
     <setting name="H_IGAIN" value="-5"/>
   </section>
+  <section name="GUMSTIX">
+    <setting name="HOST_IP_ADDRESS" value='"192.168.0.1"'/>
+    <setting name="HOST_PORT" value='1212'/>
+  </section>
 </settings>
 
