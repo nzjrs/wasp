@@ -33,17 +33,19 @@ void comm_network_init ( const gchar *host, guint16 port )
     rx_i = 0;
     rx_len = 0;
 
-    socket = g_socket_new(G_SOCKET_FAMILY_IPV4,
-                          G_SOCKET_TYPE_DATAGRAM,
-                          G_SOCKET_PROTOCOL_UDP,
-                          NULL);
+    led_log("INIT: %s:%d\n", host, port);
 
     hostaddress = g_inet_address_new_from_string(host);
     address = g_inet_socket_address_new(hostaddress, port);
     g_object_unref(hostaddress);
 
+    socket = g_socket_new(G_SOCKET_FAMILY_IPV4,
+                          G_SOCKET_TYPE_DATAGRAM,
+                          G_SOCKET_PROTOCOL_UDP,
+                          NULL);
+
     /* bind to local address to start receiving connections */
-    localaddress = g_inet_address_new_from_string("127.0.0.1");
+    localaddress = g_inet_address_new_any(G_SOCKET_FAMILY_IPV4);//from_string("127.0.0.1");
     local = g_inet_socket_address_new(localaddress, port);
     g_object_unref(localaddress);
     g_socket_bind(socket,
@@ -69,6 +71,7 @@ void comm_network_end_message_hw ( void )
                                    tx_i,
                                    NULL,
                                    &err);
+
     if (sent != tx_i)
         ;
 }
@@ -78,8 +81,9 @@ bool_t comm_network_ch_available ( void )
     GError *err = NULL;
 
     /* Bail if we are still processing the last packet */
-    if (rx_len && rx_i != (rx_len - 1))
+    if (rx_len && rx_i != rx_len) {
         return TRUE;
+    }
 
     gssize got = g_socket_receive(socket,
                                   (gchar *)rx_buf,
