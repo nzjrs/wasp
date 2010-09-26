@@ -432,7 +432,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         w.show_all()
 
     def on_menu_item_home_activate(self, widget):
-        self._map.set_mapcenter(self._home_lat, self._home_lon, self._home_zoom)
+        self._map.centre(self._home_lat, self._home_lon, self._home_zoom)
 
     def on_menu_item_centre_activate(self, widget):
         self._map.centre()

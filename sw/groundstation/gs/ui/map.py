@@ -254,11 +254,17 @@ class Map(config.ConfigurableIface, gs.ui.GtkBuilderWidget):
 
         return "Map", frame, items
 
-    def centre(self):
+    def centre(self, lat=None, lon=None, zoom=None):
         if not MAP_AVAILABLE:
             return
 
-        self._map.set_zoom(self._map.props.max_zoom)
+        if lat and lon and zoom:
+            if MAP_NEW_API:
+                self._map.set_center_and_zoom(lat, lon, int(zoom))
+            else:
+                self._map.set_mapcenter(lat, lon, int(zoom))
+        else:
+            self._map.set_zoom(self._map.props.max_zoom)
 
     def mark_home(self, lat, lon):
         if not MAP_AVAILABLE:
