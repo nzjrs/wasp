@@ -26,8 +26,7 @@
 #include "rc.h"
 #include "actuators.h"
 #include "supervision.h"
-#include "guidance/booz2_guidance_h.h"
-#include "guidance/booz2_guidance_v.h"
+#include "guidance/booz2_guidance.h"
 #include "stabilization/booz2_stabilization.h"
 
 Autopilot_t autopilot;
@@ -237,7 +236,7 @@ void autopilot_on_rc_event(void)
     autopilot_check_motors_on();
     autopilot_check_in_flight();
 
-    booz2_guidance_v_read_rc();
+    booz2_guidance_v_read_rc(autopilot.in_flight);
     booz2_guidance_h_read_rc(autopilot.in_flight);
 
 }
