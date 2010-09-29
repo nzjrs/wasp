@@ -110,9 +110,6 @@ void booz2_guidance_v_mode_changed(uint8_t new_mode) {
     booz2_guidance_v_z_sum_err = 0;
     Booz2GuidanceVSetRef(ins.ltp_pos.z, ins.ltp_speed.z, 0);
     break;
-  case BOOZ2_GUIDANCE_V_MODE_NAV:
-    break;
-
   }
 
   
@@ -151,13 +148,6 @@ void booz2_guidance_v_run(bool_t in_flight) {
     booz2_stabilization_cmd[COMMAND_THRUST] = Min( booz2_guidance_v_rc_delta_t, booz2_guidance_v_delta_t);
     break;
 
-  case BOOZ2_GUIDANCE_V_MODE_NAV:
-    //booz2_guidance_v_z_sp = -nav_altitude;
-    //b2_gv_update_ref_from_z_sp(booz2_guidance_v_z_sp);
-    //run_hover_loop(in_flight);
-    // saturate max authority with RC stick
-    //booz2_stabilization_cmd[COMMAND_THRUST] = Min( booz2_guidance_v_rc_delta_t, booz2_guidance_v_delta_t);
-    break;
   }
 }
 
