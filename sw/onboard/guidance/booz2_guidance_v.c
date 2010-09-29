@@ -42,9 +42,6 @@ int32_t booz2_guidance_v_delta_t;
 /* direct throttle from radio control             */
 /* range 0:200                                    */
 int32_t booz2_guidance_v_rc_delta_t;
-/* vertical speed setpoint from radio control     */
-/* Q12.19 : accuracy 0.0000019, range +/-4096     */
-int32_t booz2_guidance_v_rc_zd_sp;
 /* altitude setpoint in meter (input)             */
 /* Q23.8 : accuracy 0.0039, range 8388km          */
 int32_t booz2_guidance_v_z_sp;
@@ -94,14 +91,8 @@ void booz2_guidance_v_init(void) {
 
 
 void booz2_guidance_v_read_rc(void) {
-
-  // used in RC_DIRECT directly and as saturation in CLIMB and HOVER
+  // used in RC_DIRECT directly
   booz2_guidance_v_rc_delta_t = (int32_t)rc_values[RADIO_THROTTLE] * 200 / MAX_PPRZ;
-  // used in RC_CLIMB
-  booz2_guidance_v_rc_zd_sp   = ((MAX_PPRZ/2) - (int32_t)rc_values[RADIO_THROTTLE]) * 
-                                BOOZ2_GUIDANCE_V_RC_CLIMB_COEF;
-  DeadBand(booz2_guidance_v_rc_zd_sp, BOOZ2_GUIDANCE_V_RC_CLIMB_DEAD_BAND);
-  
 }
 
 void booz2_guidance_v_mode_changed(uint8_t new_mode) {
@@ -115,8 +106,6 @@ void booz2_guidance_v_mode_changed(uint8_t new_mode) {
    
   switch (new_mode) {
 
-  case BOOZ2_GUIDANCE_V_MODE_RC_CLIMB:
-  case BOOZ2_GUIDANCE_V_MODE_CLIMB:
   case BOOZ2_GUIDANCE_V_MODE_HOVER:
     booz2_guidance_v_z_sum_err = 0;
     Booz2GuidanceVSetRef(ins.ltp_pos.z, ins.ltp_speed.z, 0);
@@ -153,20 +142,6 @@ void booz2_guidance_v_run(bool_t in_flight) {
     booz2_guidance_v_z_sp = ins.ltp_pos.z;  // not sure why we do that
     Booz2GuidanceVSetRef(ins.ltp_pos.z, 0, 0); // or that - mode enter should take care of it ?
     booz2_stabilization_cmd[COMMAND_THRUST] = booz2_guidance_v_rc_delta_t;
-    break;
-
-  case BOOZ2_GUIDANCE_V_MODE_RC_CLIMB:
-    booz2_guidance_v_zd_sp = booz2_guidance_v_rc_zd_sp;
-    b2_gv_update_ref_from_zd_sp(booz2_guidance_v_zd_sp);
-    run_hover_loop(in_flight);
-    booz2_stabilization_cmd[COMMAND_THRUST] = booz2_guidance_v_delta_t;
-    break;
-
-  case BOOZ2_GUIDANCE_V_MODE_CLIMB:
-    b2_gv_update_ref_from_zd_sp(booz2_guidance_v_zd_sp);
-    run_hover_loop(in_flight);
-    // saturate max authority with RC stick
-    booz2_stabilization_cmd[COMMAND_THRUST] = Min( booz2_guidance_v_rc_delta_t, booz2_guidance_v_delta_t);
     break;
 
   case BOOZ2_GUIDANCE_V_MODE_HOVER:

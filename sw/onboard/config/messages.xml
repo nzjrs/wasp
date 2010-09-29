@@ -6,9 +6,9 @@
    <value name="gps" values="NO_FIX|2D_FIX|3D_FIX"/>
    <value name="in_flight" values="ON_GROUND|IN_FLIGHT"/>
    <value name="motors_on" values="MOTORS_OFF|MOTORS_ON"/>
-   <value name="autopilot_mode" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|ATTITUDE_CLIMB|ATTITUDE_HOLD|HOVER_DIRECT|HOVER_CLIMB|NAV|RC_DIRECT"/>
+   <value name="autopilot_mode" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|ATTITUDE_HOLD|HOVER_DIRECT|NAV|RC_DIRECT"/>
    <value name="autopilot_h_mode" values="KILL|RATE|ATTITUDE|HOVER|NAV"/>
-   <value name="autopilot_v_mode" values="KILL|RC_DIRECT|RC_CLIMB|CLIMB|HOVER|NAV"/>
+   <value name="autopilot_v_mode" values="KILL|RC_DIRECT|HOVER|NAV"/>
    <value name="fms_on" values="FMS_OFF|FMS_RC_ENABLED|FMS_ON"/>
    <value name="status" values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
 
