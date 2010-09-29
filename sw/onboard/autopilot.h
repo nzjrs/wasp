@@ -36,7 +36,6 @@ typedef enum {
     AP_MODE_KILL,
     AP_MODE_RC_DIRECT,
     AP_MODE_ATTITUDE_DIRECT,
-    AP_MODE_ATTITUDE_HOLD,
     AP_MODE_HOVER_DIRECT
 } AutopilotMode_t;
 
