@@ -72,7 +72,6 @@ void autopilot_periodic(void)
     }
     else
     {
-        //RunOnceEvery(50, nav_periodic_task_10Hz())
         booz2_guidance_v_run( autopilot.in_flight );
         booz2_guidance_h_run( autopilot.in_flight );
         autopilot_set_commands(
@@ -111,7 +110,7 @@ void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
                 autopilot.motors_on = FALSE;
                 booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_KILL);
                 break;
-            case AP_MODE_RATE_DIRECT:
+            case AP_MODE_RC_DIRECT:
                 booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_RATE);
                 break;
             case AP_MODE_ATTITUDE_DIRECT:
@@ -130,7 +129,7 @@ void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
             case AP_MODE_KILL:
                 booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_KILL);
                 break;
-            case AP_MODE_RATE_DIRECT:
+            case AP_MODE_RC_DIRECT:
             case AP_MODE_ATTITUDE_DIRECT:
             case AP_MODE_HOVER_DIRECT:
                 booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_DIRECT);

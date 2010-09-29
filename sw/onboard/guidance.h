@@ -32,8 +32,6 @@
 
 #define BOOZ2_GUIDANCE_V_MODE_KILL      0
 #define BOOZ2_GUIDANCE_V_MODE_RC_DIRECT 1
-#define BOOZ2_GUIDANCE_V_MODE_CLIMB     3
-#define BOOZ2_GUIDANCE_V_MODE_HOVER     4
 
 extern uint8_t booz2_guidance_h_mode;
 extern uint8_t booz2_guidance_v_mode;

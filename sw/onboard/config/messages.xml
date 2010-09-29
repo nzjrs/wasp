@@ -8,7 +8,7 @@
    <value name="motors_on" values="MOTORS_OFF|MOTORS_ON"/>
    <value name="autopilot_mode" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|ATTITUDE_HOLD|HOVER_DIRECT|RC_DIRECT"/>
    <value name="autopilot_h_mode" values="KILL|RATE|ATTITUDE|HOVER"/>
-   <value name="autopilot_v_mode" values="KILL|RC_DIRECT|HOVER"/>
+   <value name="autopilot_v_mode" values="KILL|RC_DIRECT"/>
    <value name="fms_on" values="FMS_OFF|FMS_RC_ENABLED|FMS_ON"/>
    <value name="status" values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
 
