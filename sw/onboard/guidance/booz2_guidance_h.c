@@ -29,7 +29,6 @@
 #include "stabilization/booz2_stabilization.h"
 #include "stabilization/booz2_stabilization_rate.h"
 #include "stabilization/booz2_stabilization_attitude.h"
-#include "guidance/booz2_navigation.h"
 
 #include "generated/settings.h"
 
@@ -89,9 +88,6 @@ void booz2_guidance_h_mode_changed(uint8_t new_mode) {
     
   case BOOZ2_GUIDANCE_H_MODE_HOVER:
     booz2_guidance_h_hover_enter();
-    break;
-
-  case BOOZ2_GUIDANCE_H_MODE_NAV:
     break;
 
   }

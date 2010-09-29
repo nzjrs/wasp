@@ -26,7 +26,6 @@
 #include "rc.h"
 #include "actuators.h"
 #include "supervision.h"
-#include "guidance/booz2_navigation.h"
 #include "guidance/booz2_guidance_h.h"
 #include "guidance/booz2_guidance_v.h"
 #include "stabilization/booz2_stabilization.h"
@@ -121,9 +120,6 @@ void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
             case AP_MODE_HOVER_DIRECT:
                 booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_HOVER);
                 break;
-            case AP_MODE_NAV:
-                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_NAV);
-                break;
             default:
                 ok = FALSE;
                 break;
@@ -138,9 +134,6 @@ void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
             case AP_MODE_ATTITUDE_DIRECT:
             case AP_MODE_HOVER_DIRECT:
                 booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_DIRECT);
-                break;
-            case AP_MODE_NAV:
-                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_NAV);
                 break;
             default:
                 ok = FALSE;

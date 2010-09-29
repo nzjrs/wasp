@@ -27,7 +27,6 @@
 #include "rc.h"
 #include "ins.h"
 #include "stabilization/booz2_stabilization.h"
-#include "guidance/booz2_navigation.h"
 
 #include "math/pprz_algebra_int.h"
 
