@@ -27,9 +27,9 @@ SRC =                               \
     ins/booz2_vf_float.c            \
     ahrs/booz_ahrs_aligner.c                \
     ahrs/booz2_filter_attitude_cmpl_euler.c \
-    autopilot/control/quad/booz2_guidance.c       \
-    autopilot/control/quad/booz2_stabilization_rate.c      \
-    autopilot/control/quad/booz2_stabilization_attitude.c  \
+    autopilot/control/booz2/booz2_guidance.c       \
+    autopilot/control/booz2/booz2_stabilization_rate.c      \
+    autopilot/control/booz2/booz2_stabilization_attitude.c  \
     autopilot/booz2_autopilot.c     \
     supervision/booz2_supervision.c \
     comm.c                          \

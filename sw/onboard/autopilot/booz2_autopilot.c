@@ -26,7 +26,7 @@
 #include "rc.h"
 #include "actuators.h"
 #include "supervision.h"
-#include "control/quad/booz2_guidance.h"
+#include "control/booz2/booz2_guidance.h"
 
 Autopilot_t autopilot;
 uint32_t    autopilot_motors_on_counter;
