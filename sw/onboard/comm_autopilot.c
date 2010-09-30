@@ -172,11 +172,15 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
             }
             break;
         case MESSAGE_ID_AUTOPILOT:
+            {
+            uint8_t h_mode, v_mode;
+            autopilot_get_h_and_v_control_modes(&h_mode, &v_mode);
             MESSAGE_SEND_AUTOPILOT(
                     chan,
                     &autopilot.mode,
-                    &booz2_guidance_h_mode,
-                    &booz2_guidance_v_mode);
+                    &h_mode,
+                    &v_mode);
+            }
             break;
         case MESSAGE_ID_STATUS_LOWLEVEL:
             MESSAGE_SEND_STATUS_LOWLEVEL(

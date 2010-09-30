@@ -26,12 +26,8 @@
 #include "std.h"
 #include "generated/settings.h"
 
-extern uint8_t booz2_guidance_h_mode;
-extern uint8_t booz2_guidance_v_mode;
-
 extern int32_t booz2_stabilization_cmd[COMMAND_NB];
 
-void stabilization_init(void);
 struct Int32Eulers *stabilization_sp_get_attitude(void);
 
 #endif /* _GUIDANCE_H_ */

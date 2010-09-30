@@ -34,6 +34,9 @@
 #define BOOZ2_GUIDANCE_V_MODE_KILL      0
 #define BOOZ2_GUIDANCE_V_MODE_RC_DIRECT 1
 
+extern uint8_t booz2_guidance_h_mode;
+extern uint8_t booz2_guidance_v_mode;
+
 void booz2_guidance_init(void);
 void booz2_guidance_mode_changed(uint8_t h_mode, uint8_t v_mode);
 void booz2_guidance_read_rc(bool_t in_flight);

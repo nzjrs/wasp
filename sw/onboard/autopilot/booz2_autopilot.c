@@ -258,3 +258,9 @@ void autopilot_set_motors(bool_t on)
     }
 }
 
+void autopilot_get_h_and_v_control_modes(uint8_t *h_mode, uint8_t *v_mode)
+{
+    *h_mode = booz2_guidance_h_mode;
+    *v_mode = booz2_guidance_v_mode;
+}
+
