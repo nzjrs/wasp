@@ -31,7 +31,7 @@
 Autopilot_t autopilot;
 uint32_t    autopilot_motors_on_counter;
 uint32_t    autopilot_in_flight_counter;
-int32_t     booz2_commands_failsafe[COMMAND_NB] = COMMAND_FAILSAFE;
+int32_t     commands_failsafe[COMMAND_NB] = COMMAND_FAILSAFE;
 
 #define BOOZ2_AUTOPILOT_MOTOR_ON_TIME     40
 #define BOOZ2_AUTOPILOT_IN_FLIGHT_TIME    40
@@ -66,7 +66,7 @@ void autopilot_periodic(void)
          autopilot.mode == AP_MODE_KILL ) 
     {
         autopilot_set_commands(
-            booz2_commands_failsafe, 
+            commands_failsafe,
             autopilot.in_flight,
             autopilot.motors_on);
     }
