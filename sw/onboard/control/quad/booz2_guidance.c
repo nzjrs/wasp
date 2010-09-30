@@ -63,6 +63,9 @@ static inline void booz2_guidance_v_init(void);
 
 void guidance_init(void)
 {
+    booz2_stabilization_rate_init();
+    booz2_stabilization_attitude_init();
+
     booz2_guidance_h_init();
     booz2_guidance_v_init();
 }

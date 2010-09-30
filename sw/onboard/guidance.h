@@ -38,4 +38,7 @@ extern uint8_t booz2_guidance_v_mode;
 
 void guidance_init(void);
 
+void stabilization_init(void);
+struct Int32Eulers *stabilization_sp_get_attitude(void);
+
 #endif /* _GUIDANCE_H_ */

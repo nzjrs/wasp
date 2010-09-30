@@ -36,7 +36,6 @@
 #include "sys_time.h"
 #include "autopilot.h"
 #include "guidance.h"
-#include "stabilization.h"
 
 #include "generated/radio.h"
 #include "generated/messages.h"
