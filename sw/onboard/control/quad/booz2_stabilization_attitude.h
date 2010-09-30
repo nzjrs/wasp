@@ -32,14 +32,5 @@ extern void booz2_stabilization_attitude_enter(void);
 extern void booz2_stabilization_attitude_run(bool_t  in_flight);
 
 extern struct Int32Eulers booz_stabilization_att_sp;
-extern struct Int32Eulers booz_stabilization_att_ref;
-extern struct Int32Vect3  booz_stabilization_rate_ref;
-extern struct Int32Vect3  booz_stabilization_accel_ref;
-
-extern struct Int32Vect3  booz_stabilization_igain;
-extern struct Int32Vect3  booz_stabilization_pgain;
-extern struct Int32Vect3  booz_stabilization_dgain;
-extern struct Int32Vect3  booz_stabilization_ddgain;
-extern struct Int32Eulers booz_stabilization_att_sum_err;
 
 #endif /* BOOZ2_STABILIZATION_ATTITUDE_H */
