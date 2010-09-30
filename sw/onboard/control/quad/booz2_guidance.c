@@ -37,7 +37,9 @@
 uint8_t booz2_guidance_h_mode;
 uint8_t booz2_guidance_v_mode;
 
-struct Int32Vect2 booz2_guidance_h_pos_sp;
+/* horizontal setpoint in NED */
+/* Q_int32_xx_8        */
+struct Int32Vect2  booz2_guidance_h_pos_sp;
 int32_t            booz2_guidance_h_psi_sp;
 
 struct Int32Vect2 booz2_guidance_h_pos_err;
@@ -60,16 +62,25 @@ int32_t booz2_stabilization_cmd[COMMAND_NB];
 
 static inline void booz2_guidance_h_hover_run(void);
 static inline void booz2_guidance_h_hover_enter(void);
-static inline void booz2_guidance_h_init(void);
-static inline void booz2_guidance_v_init(void);
 
 void guidance_init(void)
 {
     booz2_stabilization_rate_init();
     booz2_stabilization_attitude_init();
 
-    booz2_guidance_h_init();
-    booz2_guidance_v_init();
+    /* horizontal control mode */
+    booz2_guidance_h_mode = BOOZ2_GUIDANCE_H_MODE_KILL;
+    booz2_guidance_h_psi_sp = 0;
+    INT_VECT2_ZERO(booz2_guidance_h_pos_sp);
+    INT_VECT2_ZERO(booz2_guidance_h_pos_err_sum);
+    INT_EULERS_ZERO(booz2_guidance_h_rc_sp);
+    INT_EULERS_ZERO(booz2_guidance_h_command_body);
+    booz2_guidance_h_pgain = BOOZ2_GUIDANCE_H_PGAIN;
+    booz2_guidance_h_igain = BOOZ2_GUIDANCE_H_IGAIN;
+    booz2_guidance_h_dgain = BOOZ2_GUIDANCE_H_DGAIN;
+
+    /* vertical control mode */
+    booz2_guidance_v_mode = BOOZ2_GUIDANCE_V_MODE_KILL;
 }
 
 struct Int32Eulers *
@@ -77,21 +88,6 @@ stabilization_sp_get_attitude(void)
 {
     return &booz_stabilization_att_sp;
 }
-
-static inline void booz2_guidance_h_init(void) {
-
-  booz2_guidance_h_mode = BOOZ2_GUIDANCE_H_MODE_KILL;
-  booz2_guidance_h_psi_sp = 0;
-  INT_VECT2_ZERO(booz2_guidance_h_pos_sp);
-  INT_VECT2_ZERO(booz2_guidance_h_pos_err_sum);
-  INT_EULERS_ZERO(booz2_guidance_h_rc_sp);
-  INT_EULERS_ZERO(booz2_guidance_h_command_body);
-  booz2_guidance_h_pgain = BOOZ2_GUIDANCE_H_PGAIN;
-  booz2_guidance_h_igain = BOOZ2_GUIDANCE_H_IGAIN;
-  booz2_guidance_h_dgain = BOOZ2_GUIDANCE_H_DGAIN;
-
-}
-
 
 void booz2_guidance_h_mode_changed(uint8_t new_mode) {
   if (new_mode == booz2_guidance_h_mode)
@@ -160,10 +156,6 @@ void booz2_guidance_h_run(bool_t  in_flight) {
 
 
 
-}
-
-static inline void booz2_guidance_v_init(void) {
-  booz2_guidance_v_mode = BOOZ2_GUIDANCE_V_MODE_KILL;
 }
 
 void booz2_guidance_v_read_rc(bool_t in_flight) {
