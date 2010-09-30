@@ -45,7 +45,6 @@
 
 #include "fms.h"
 #include "autopilot.h"
-#include "guidance.h"
 
 #include "autopilot_main.h"
 
@@ -88,7 +87,6 @@ static inline void autopilot_main_init( void ) {
   imu_init();
 
   autopilot_init();
-  guidance_init();
 
   ahrs_init();
   ins_init();

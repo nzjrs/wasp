@@ -63,7 +63,7 @@ int32_t booz2_stabilization_cmd[COMMAND_NB];
 static inline void booz2_guidance_h_hover_run(void);
 static inline void booz2_guidance_h_hover_enter(void);
 
-void guidance_init(void)
+void booz2_guidance_init(void)
 {
     booz2_stabilization_rate_init();
     booz2_stabilization_attitude_init();
@@ -83,106 +83,103 @@ void guidance_init(void)
     booz2_guidance_v_mode = BOOZ2_GUIDANCE_V_MODE_KILL;
 }
 
+void booz2_guidance_mode_changed(uint8_t h_mode, uint8_t v_mode)
+{
+    bool_t ok;
+
+    /* horizontal control mode */
+    if (h_mode != booz2_guidance_h_mode) {
+        ok = TRUE;
+        switch (h_mode)
+        {
+            case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
+                booz2_stabilization_attitude_enter();
+                break;
+            case BOOZ2_GUIDANCE_H_MODE_HOVER:
+                booz2_guidance_h_hover_enter();
+                break;
+            default:
+                ok = FALSE;
+                break;
+        }
+        if (ok)
+            booz2_guidance_h_mode = h_mode;
+    }
+
+    /* vertical control mode */
+    if (v_mode != booz2_guidance_v_mode) {
+        ok = TRUE;
+        switch (v_mode)
+        {
+            case BOOZ2_GUIDANCE_V_MODE_RC_DIRECT:
+                break;
+            default:
+                ok = FALSE;
+        }
+        if (ok)
+            booz2_guidance_v_mode = v_mode;
+    }
+
+}
+
+void booz2_guidance_read_rc(bool_t in_flight)
+{
+    /* horizontal control mode */
+    switch ( booz2_guidance_h_mode )
+    {
+        case BOOZ2_GUIDANCE_H_MODE_RATE:
+            booz2_stabilization_rate_read_rc();
+            break;
+
+        /* FIXME: John, I think hover should be the command from FMS, and attitude should be
+        the only thing to call read_rc */
+        case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
+            booz2_stabilization_attitude_read_rc(&booz_stabilization_att_sp, in_flight);
+            break;
+        case BOOZ2_GUIDANCE_H_MODE_HOVER:
+            booz2_stabilization_attitude_read_rc(&booz2_guidance_h_rc_sp, in_flight);
+            break;
+    }
+
+    /* vertical control mode */
+    switch (booz2_guidance_v_mode)
+    {
+        case BOOZ2_GUIDANCE_V_MODE_RC_DIRECT:
+            booz2_guidance_v_rc_delta_t = (int32_t)rc_values[RADIO_THROTTLE] * 200 / MAX_PPRZ;
+            break;
+    }
+}
+
+void booz2_guidance_run(bool_t in_flight)
+{
+    /* horizontal control mode */
+    switch ( booz2_guidance_h_mode )
+    {
+    case BOOZ2_GUIDANCE_H_MODE_RATE:
+        booz2_stabilization_rate_run(in_flight, booz2_stabilization_cmd);
+        break;
+    case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
+        booz2_stabilization_attitude_run(in_flight, booz2_stabilization_cmd);
+        break;
+    case BOOZ2_GUIDANCE_H_MODE_HOVER:
+        booz2_guidance_h_hover_run();
+        booz2_stabilization_attitude_run(in_flight, booz2_stabilization_cmd);
+        break;
+    }
+
+    /* vertical control mode */
+    switch (booz2_guidance_v_mode)
+    {
+        case BOOZ2_GUIDANCE_V_MODE_RC_DIRECT:
+            booz2_stabilization_cmd[COMMAND_THRUST] = booz2_guidance_v_rc_delta_t;
+            break;
+    }
+}
+
 struct Int32Eulers *
 stabilization_sp_get_attitude(void)
 {
     return &booz_stabilization_att_sp;
-}
-
-void booz2_guidance_h_mode_changed(uint8_t new_mode) {
-  if (new_mode == booz2_guidance_h_mode)
-    return;
-
-  switch ( booz2_guidance_h_mode ) {
-	//      case BOOZ2_GUIDANCE_H_MODE_RATE:
-	//	booz_stabilization_rate_exit();
-	//	break;
-  }
-   
-  switch (new_mode) {
-
-  case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
-    booz2_stabilization_attitude_enter();
-    break;
-    
-  case BOOZ2_GUIDANCE_H_MODE_HOVER:
-    booz2_guidance_h_hover_enter();
-    break;
-
-  }
-
-  booz2_guidance_h_mode = new_mode;
-  
-}
-
-void booz2_guidance_h_read_rc(bool_t  in_flight) {
-  
-  switch ( booz2_guidance_h_mode ) {
-
-  case BOOZ2_GUIDANCE_H_MODE_RATE:
-    booz2_stabilization_rate_read_rc();
-    break;
-    
-  case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
-    booz2_stabilization_attitude_read_rc(&booz_stabilization_att_sp, in_flight);
-    break;
-  
-  case BOOZ2_GUIDANCE_H_MODE_HOVER:
-    booz2_stabilization_attitude_read_rc(&booz2_guidance_h_rc_sp, in_flight);
-    break;
-
-  }
-
-}
-
-
-void booz2_guidance_h_run(bool_t  in_flight) {
-  switch ( booz2_guidance_h_mode ) {
-
-  case BOOZ2_GUIDANCE_H_MODE_RATE:
-    booz2_stabilization_rate_run(in_flight, booz2_stabilization_cmd);
-    break;
-
-  case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
-    booz2_stabilization_attitude_run(in_flight, booz2_stabilization_cmd);
-    break;
-    
-  case BOOZ2_GUIDANCE_H_MODE_HOVER:
-    booz2_guidance_h_hover_run();
-    booz2_stabilization_attitude_run(in_flight, booz2_stabilization_cmd);
-    break;
-    
-  }
-
-
-
-}
-
-void booz2_guidance_v_read_rc(bool_t in_flight) {
-  booz2_guidance_v_rc_delta_t = (int32_t)rc_values[RADIO_THROTTLE] * 200 / MAX_PPRZ;
-}
-
-void booz2_guidance_v_mode_changed(uint8_t new_mode) {
-  
-  if (new_mode == booz2_guidance_v_mode)
-    return;
-
-  switch (new_mode) {
-  case BOOZ2_GUIDANCE_V_MODE_RC_DIRECT:
-    break;
-  }
-
-  booz2_guidance_v_mode = new_mode;
-}
-
-void booz2_guidance_v_run(bool_t in_flight) {
-  switch (booz2_guidance_v_mode) {
-
-  case BOOZ2_GUIDANCE_V_MODE_RC_DIRECT:
-    booz2_stabilization_cmd[COMMAND_THRUST] = booz2_guidance_v_rc_delta_t;
-    break;
-
-  }
 }
 
 #define MAX_POS_ERR         POS_BFP_OF_REAL(16.)

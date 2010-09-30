@@ -26,12 +26,17 @@
 #include "guidance.h"
 #include "math/pprz_algebra_int.h"
 
-void booz2_guidance_h_mode_changed(uint8_t new_mode);
-void booz2_guidance_h_read_rc(bool_t in_flight);
-void booz2_guidance_h_run(bool_t in_flight);
+#define BOOZ2_GUIDANCE_H_MODE_KILL      0
+#define BOOZ2_GUIDANCE_H_MODE_RATE      1
+#define BOOZ2_GUIDANCE_H_MODE_ATTITUDE  2
+#define BOOZ2_GUIDANCE_H_MODE_HOVER     3
 
-void booz2_guidance_v_read_rc(bool_t in_flight);
-void booz2_guidance_v_mode_changed(uint8_t new_mode);
-void booz2_guidance_v_run(bool_t in_flight);
+#define BOOZ2_GUIDANCE_V_MODE_KILL      0
+#define BOOZ2_GUIDANCE_V_MODE_RC_DIRECT 1
+
+void booz2_guidance_init(void);
+void booz2_guidance_mode_changed(uint8_t h_mode, uint8_t v_mode);
+void booz2_guidance_read_rc(bool_t in_flight);
+void booz2_guidance_run(bool_t in_flight);
 
 #endif /* BOOZ2_GUIDANCE_H_H */

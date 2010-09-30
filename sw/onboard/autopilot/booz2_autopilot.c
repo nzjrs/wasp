@@ -46,6 +46,8 @@ void autopilot_init(void) {
 
     autopilot_motors_on_counter = 0;
     autopilot_in_flight_counter = 0;
+
+    booz2_guidance_init();
 }
 
 static inline void autopilot_set_commands( int32_t *in_cmd, uint8_t in_flight, uint8_t motors_on )
@@ -70,8 +72,7 @@ void autopilot_periodic(void)
     }
     else
     {
-        booz2_guidance_v_run( autopilot.in_flight );
-        booz2_guidance_h_run( autopilot.in_flight );
+        booz2_guidance_run( autopilot.in_flight );
         autopilot_set_commands(
             booz2_stabilization_cmd, 
             autopilot.in_flight,
@@ -99,6 +100,8 @@ void autopilot_set_actuators(void)
 void autopilot_set_mode(AutopilotMode_t new_autopilot_mode) 
 {
     bool_t ok = TRUE;
+    uint8_t h_mode = BOOZ2_GUIDANCE_H_MODE_KILL;
+    uint8_t v_mode = BOOZ2_GUIDANCE_V_MODE_KILL;
 
     if (new_autopilot_mode != autopilot.mode || new_autopilot_mode == AP_MODE_KILL) {
         /* horizontal mode */
@@ -106,16 +109,16 @@ void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
             case AP_MODE_FAILSAFE:
             case AP_MODE_KILL:
                 autopilot.motors_on = FALSE;
-                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_KILL);
+                h_mode = BOOZ2_GUIDANCE_H_MODE_KILL;
                 break;
             case AP_MODE_RC_DIRECT:
-                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_RATE);
+                h_mode = BOOZ2_GUIDANCE_H_MODE_RATE;
                 break;
             case AP_MODE_ATTITUDE_DIRECT:
-                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_ATTITUDE);
+                h_mode = BOOZ2_GUIDANCE_H_MODE_ATTITUDE;
                 break;
             case AP_MODE_HOVER_DIRECT:
-                booz2_guidance_h_mode_changed(BOOZ2_GUIDANCE_H_MODE_HOVER);
+                h_mode = BOOZ2_GUIDANCE_H_MODE_HOVER;
                 break;
             default:
                 ok = FALSE;
@@ -125,19 +128,21 @@ void autopilot_set_mode(AutopilotMode_t new_autopilot_mode)
         switch (new_autopilot_mode) {
             case AP_MODE_FAILSAFE:
             case AP_MODE_KILL:
-                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_KILL);
+                v_mode = BOOZ2_GUIDANCE_V_MODE_KILL;
                 break;
             case AP_MODE_RC_DIRECT:
             case AP_MODE_ATTITUDE_DIRECT:
             case AP_MODE_HOVER_DIRECT:
-                booz2_guidance_v_mode_changed(BOOZ2_GUIDANCE_V_MODE_RC_DIRECT);
+                v_mode = BOOZ2_GUIDANCE_V_MODE_RC_DIRECT;
                 break;
             default:
                 ok = FALSE;
                 break;
-    }
-    if (ok)
-        autopilot.mode = new_autopilot_mode;
+        }
+        if (ok) {
+            booz2_guidance_mode_changed(h_mode, v_mode);
+            autopilot.mode = new_autopilot_mode;
+        }
     } 
 
 }
@@ -235,8 +240,7 @@ void autopilot_on_rc_event(void)
     autopilot_check_motors_on();
     autopilot_check_in_flight();
 
-    booz2_guidance_v_read_rc(autopilot.in_flight);
-    booz2_guidance_h_read_rc(autopilot.in_flight);
+    booz2_guidance_read_rc(autopilot.in_flight);
 
 }
 
