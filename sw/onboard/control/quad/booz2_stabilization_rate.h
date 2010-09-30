@@ -27,6 +27,6 @@
 
 extern void booz2_stabilization_rate_init(void);
 extern void booz2_stabilization_rate_read_rc(void);
-extern void booz2_stabilization_rate_run(void);
+extern void booz2_stabilization_rate_run(bool_t in_flight, int32_t *stabilization_cmd);
 
 #endif /* BOOZ2_STABILIZATION_RATE */

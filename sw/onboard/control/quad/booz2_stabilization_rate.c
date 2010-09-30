@@ -55,7 +55,8 @@ void booz2_stabilization_rate_read_rc( void ) {
 }
 
 
-void booz2_stabilization_rate_run(void) {
+void booz2_stabilization_rate_run(bool_t in_flight, int32_t *stabilization_cmd)
+{
 
   /* low pass */
   RATES_ADD(booz2_stabilization_rate_measure, booz_imu.gyro);
@@ -69,9 +70,9 @@ void booz2_stabilization_rate_run(void) {
   struct Int32Rates _cmd;
   RATES_EWMULT_RSHIFT(_cmd, _error, booz2_stabilization_rate_gain, 16);
 
-  booz2_stabilization_cmd[COMMAND_ROLL]  = _cmd.p;
-  booz2_stabilization_cmd[COMMAND_PITCH] = _cmd.q;
-  booz2_stabilization_cmd[COMMAND_YAW]   = _cmd.r;
- 
+  stabilization_cmd[COMMAND_ROLL]  = _cmd.p;
+  stabilization_cmd[COMMAND_PITCH] = _cmd.q;
+  stabilization_cmd[COMMAND_YAW]   = _cmd.r;
+
 }
 

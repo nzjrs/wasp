@@ -24,6 +24,7 @@
 #define _GUIDANCE_H_
 
 #include "std.h"
+#include "generated/settings.h"
 
 #define BOOZ2_GUIDANCE_H_MODE_KILL      0
 #define BOOZ2_GUIDANCE_H_MODE_RATE      1
@@ -37,6 +38,8 @@ extern uint8_t booz2_guidance_h_mode;
 extern uint8_t booz2_guidance_v_mode;
 
 void guidance_init(void);
+
+extern int32_t booz2_stabilization_cmd[COMMAND_NB];
 
 void stabilization_init(void);
 struct Int32Eulers *stabilization_sp_get_attitude(void);

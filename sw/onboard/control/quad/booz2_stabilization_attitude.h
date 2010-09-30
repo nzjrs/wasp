@@ -29,7 +29,7 @@ extern void booz2_stabilization_attitude_init(void);
 extern void booz2_stabilization_attitude_read_rc(struct Int32Eulers *sp, bool_t in_flight);
 extern void booz2_stabilization_attitude_reset_psi_ref(struct Int32Eulers *sp);
 extern void booz2_stabilization_attitude_enter(void);
-extern void booz2_stabilization_attitude_run(bool_t  in_flight);
+extern void booz2_stabilization_attitude_run(bool_t in_flight, int32_t *stabilization_cmd);
 
 extern struct Int32Eulers booz_stabilization_att_sp;
 

@@ -46,6 +46,4 @@
     while (_a < -PI_ANGLE_REF)  _a += TWO_PI_ANGLE_REF;		\
   }
 
-extern int32_t booz2_stabilization_cmd[COMMAND_NB];
-
 #endif /* BOOZ2_STABILIZATION_H */

@@ -110,7 +110,8 @@ void booz2_stabilization_attitude_enter(void) {
 
 #define MAX_SUM_ERR 4000000
 
-void booz2_stabilization_attitude_run(bool_t  in_flight) {
+void booz2_stabilization_attitude_run(bool_t in_flight, int32_t *stabilization_cmd)
+{
 
   booz_stabilization_update_ref();
 
@@ -141,23 +142,23 @@ void booz2_stabilization_attitude_run(bool_t  in_flight) {
   RATES_DIFF(rate_err, ahrs.body_rate, rate_ref_scaled);
 
   /* compute PID loop                  */
-  booz2_stabilization_cmd[COMMAND_ROLL] = booz_stabilization_pgain.x    * att_err.phi +
+  stabilization_cmd[COMMAND_ROLL] = booz_stabilization_pgain.x    * att_err.phi +
     booz_stabilization_dgain.x    * rate_err.p +
     ((booz_stabilization_ddgain.x * booz_stabilization_accel_ref.x) >> 5) +
     ((booz_stabilization_igain.x  * booz_stabilization_att_sum_err.phi) >> 10);
-  booz2_stabilization_cmd[COMMAND_ROLL] = booz2_stabilization_cmd[COMMAND_ROLL] >> 16;
+  stabilization_cmd[COMMAND_ROLL] = stabilization_cmd[COMMAND_ROLL] >> 16;
 
-  booz2_stabilization_cmd[COMMAND_PITCH] = booz_stabilization_pgain.y    * att_err.theta +
+  stabilization_cmd[COMMAND_PITCH] = booz_stabilization_pgain.y    * att_err.theta +
     booz_stabilization_dgain.y    * rate_err.q +
     ((booz_stabilization_ddgain.y * booz_stabilization_accel_ref.y) >> 5) +
     ((booz_stabilization_igain.y  * booz_stabilization_att_sum_err.theta) >> 10);
-  booz2_stabilization_cmd[COMMAND_PITCH] = booz2_stabilization_cmd[COMMAND_PITCH] >> 16;
+  stabilization_cmd[COMMAND_PITCH] = stabilization_cmd[COMMAND_PITCH] >> 16;
   
-  booz2_stabilization_cmd[COMMAND_YAW] = booz_stabilization_pgain.z    * att_err.psi +
+  stabilization_cmd[COMMAND_YAW] = booz_stabilization_pgain.z    * att_err.psi +
     booz_stabilization_dgain.z    * rate_err.r +
     ((booz_stabilization_ddgain.z * booz_stabilization_accel_ref.z) >> 5) +
     ((booz_stabilization_igain.z  * booz_stabilization_att_sum_err.psi) >> 10);
-  booz2_stabilization_cmd[COMMAND_YAW] = booz2_stabilization_cmd[COMMAND_YAW] >> 16;
+  stabilization_cmd[COMMAND_YAW] = stabilization_cmd[COMMAND_YAW] >> 16;
   
 }
 

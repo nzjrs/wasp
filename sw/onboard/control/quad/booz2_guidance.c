@@ -56,6 +56,8 @@ int32_t booz2_guidance_h_igain;
 /* direct throttle from radio control (range 0:200 */
 int32_t booz2_guidance_v_rc_delta_t;
 
+int32_t booz2_stabilization_cmd[COMMAND_NB];
+
 static inline void booz2_guidance_h_hover_run(void);
 static inline void booz2_guidance_h_hover_enter(void);
 static inline void booz2_guidance_h_init(void);
@@ -68,6 +70,12 @@ void guidance_init(void)
 
     booz2_guidance_h_init();
     booz2_guidance_v_init();
+}
+
+struct Int32Eulers *
+stabilization_sp_get_attitude(void)
+{
+    return &booz_stabilization_att_sp;
 }
 
 static inline void booz2_guidance_h_init(void) {
@@ -136,16 +144,16 @@ void booz2_guidance_h_run(bool_t  in_flight) {
   switch ( booz2_guidance_h_mode ) {
 
   case BOOZ2_GUIDANCE_H_MODE_RATE:
-    booz2_stabilization_rate_run();
+    booz2_stabilization_rate_run(in_flight, booz2_stabilization_cmd);
     break;
 
   case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
-    booz2_stabilization_attitude_run(in_flight);
+    booz2_stabilization_attitude_run(in_flight, booz2_stabilization_cmd);
     break;
     
   case BOOZ2_GUIDANCE_H_MODE_HOVER:
     booz2_guidance_h_hover_run();
-    booz2_stabilization_attitude_run(in_flight);
+    booz2_stabilization_attitude_run(in_flight, booz2_stabilization_cmd);
     break;
     
   }
