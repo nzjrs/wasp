@@ -21,11 +21,11 @@
  *
  */
 #include "booz2_stabilization_attitude.h"
+#include "booz2_stabilization.h"
 
 #include "rc.h"
 #include "ahrs.h"
 #include "fms.h"
-#include "booz2_stabilization.h"
 
 #include "generated/settings.h"
 
