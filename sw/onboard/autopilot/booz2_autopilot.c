@@ -264,3 +264,7 @@ void autopilot_get_h_and_v_control_modes(uint8_t *h_mode, uint8_t *v_mode)
     *v_mode = booz2_guidance_v_mode;
 }
 
+struct Int32Eulers *autopilot_sp_get_attitude(void)
+{
+    return booz2_guidance_sp_get_attitude();
+}

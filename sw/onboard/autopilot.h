@@ -56,6 +56,7 @@ extern uint32_t     autopilot_motors_on_counter;
 extern uint32_t     autopilot_in_flight_counter;
 extern Autopilot_t  autopilot;
 
+
 void
 autopilot_init(void);
 
@@ -79,5 +80,8 @@ autopilot_kill(void);
 
 void
 autopilot_get_h_and_v_control_modes(uint8_t *h_mode, uint8_t *v_mode);
+
+struct Int32Eulers *
+autopilot_sp_get_attitude(void);
 
 #endif /* AUTOPILOT_H */

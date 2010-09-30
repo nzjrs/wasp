@@ -20,7 +20,6 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#include "guidance.h"
 #include "booz2_guidance.h"
 
 #include "rc.h"
@@ -177,7 +176,7 @@ void booz2_guidance_run(bool_t in_flight)
 }
 
 struct Int32Eulers *
-stabilization_sp_get_attitude(void)
+booz2_guidance_sp_get_attitude(void)
 {
     return &booz_stabilization_att_sp;
 }

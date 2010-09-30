@@ -20,7 +20,6 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#include "guidance.h"
 #include "fixedwing_guidance.h"
 
 uint8_t booz2_guidance_h_mode;
