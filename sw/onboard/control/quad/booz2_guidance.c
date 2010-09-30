@@ -27,9 +27,9 @@
 #include "ins.h"
 #include "ahrs.h"
 
-#include "stabilization/booz2_stabilization.h"
-#include "stabilization/booz2_stabilization_rate.h"
-#include "stabilization/booz2_stabilization_attitude.h"
+#include "booz2_stabilization.h"
+#include "booz2_stabilization_rate.h"
+#include "booz2_stabilization_attitude.h"
 
 #include "generated/settings.h"
 #include "generated/radio.h"
