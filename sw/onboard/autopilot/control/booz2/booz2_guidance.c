@@ -25,6 +25,7 @@
 #include "rc.h"
 #include "ins.h"
 #include "ahrs.h"
+#include "fms.h"
 
 #include "booz2_stabilization.h"
 #include "booz2_stabilization_rate.h"
@@ -38,21 +39,21 @@ uint8_t booz2_guidance_v_mode;
 
 /* horizontal setpoint in NED */
 /* Q_int32_xx_8        */
-struct Int32Vect2  booz2_guidance_h_pos_sp;
-int32_t            booz2_guidance_h_psi_sp;
+struct Int32Vect2   booz2_guidance_h_pos_sp;
+int32_t             booz2_guidance_h_psi_sp;
 
-struct Int32Vect2 booz2_guidance_h_pos_err;
-struct Int32Vect2 booz2_guidance_h_speed_err;
-struct Int32Vect2 booz2_guidance_h_pos_err_sum;
+struct Int32Vect2   booz2_guidance_h_pos_err;
+struct Int32Vect2   booz2_guidance_h_speed_err;
+struct Int32Vect2   booz2_guidance_h_pos_err_sum;
 
-struct Int32Eulers booz2_guidance_h_rc_sp;
-struct Int32Vect2 booz2_guidance_h_command_earth;
-struct Int32Vect2 booz2_guidance_h_stick_earth_sp;
-struct Int32Eulers booz2_guidance_h_command_body;
+struct Int32Eulers  booz2_guidance_h_rc_sp;
+struct Int32Vect2   booz2_guidance_h_command_earth;
+struct Int32Vect2   booz2_guidance_h_stick_earth_sp;
+struct Int32Eulers  booz2_guidance_h_command_body;
 
-int32_t booz2_guidance_h_pgain;
-int32_t booz2_guidance_h_dgain;
-int32_t booz2_guidance_h_igain;
+int32_t             booz2_guidance_h_pgain;
+int32_t             booz2_guidance_h_dgain;
+int32_t             booz2_guidance_h_igain;
 
 /* direct throttle from radio control (range 0:200 */
 int32_t booz2_guidance_v_rc_delta_t;
@@ -178,7 +179,22 @@ void booz2_guidance_run(bool_t in_flight)
 struct Int32Eulers *
 booz2_guidance_sp_get_attitude(void)
 {
-    return &booz_stabilization_att_sp;
+    /* horizontal control mode */
+    switch ( booz2_guidance_h_mode )
+    {
+        case BOOZ2_GUIDANCE_H_MODE_RATE:
+            return NULL;
+            break;
+        case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
+            return &booz_stabilization_att_sp;
+            break;
+        case BOOZ2_GUIDANCE_H_MODE_HOVER:
+            return &booz2_guidance_h_rc_sp;
+            break;
+        default:
+            return NULL;
+            break;
+    }
 }
 
 #define MAX_POS_ERR         POS_BFP_OF_REAL(16.)
@@ -190,23 +206,23 @@ booz2_guidance_sp_get_attitude(void)
 
 static inline void  booz2_guidance_h_hover_run(void) {
 
-  /* compute position error    */
+  /* compute position error */
   VECT2_DIFF(booz2_guidance_h_pos_err, ins.ltp_pos, booz2_guidance_h_pos_sp);
-  /* saturate it               */
+  /* saturate it */
   VECT2_STRIM(booz2_guidance_h_pos_err, -MAX_POS_ERR, MAX_POS_ERR);
 
-  /* compute speed error    */
+  /* compute speed error */
   VECT2_COPY(booz2_guidance_h_speed_err, ins.ltp_speed);
-  /* saturate it               */
+  /* saturate it */
   VECT2_STRIM(booz2_guidance_h_speed_err, -MAX_SPEED_ERR, MAX_SPEED_ERR);
   
   /* update pos error integral */
   VECT2_ADD(booz2_guidance_h_pos_err_sum, booz2_guidance_h_pos_err);
-  /* saturate it               */
+  /* saturate it */
   VECT2_STRIM(booz2_guidance_h_pos_err_sum, -MAX_POS_ERR_SUM, MAX_POS_ERR_SUM);
 		    
   /* run PID */
-  // cmd_earth < 15.17
+  /* cmd_earth < 15.17 */
   booz2_guidance_h_command_earth.x = (booz2_guidance_h_pgain<<1)  * booz2_guidance_h_pos_err.x +
                                      booz2_guidance_h_dgain * (booz2_guidance_h_speed_err.x>>9) +
                                       booz2_guidance_h_igain * (booz2_guidance_h_pos_err_sum.x >> 12); 
@@ -222,7 +238,7 @@ static inline void  booz2_guidance_h_hover_run(void) {
   PPRZ_ITRIG_COS(c_psi, ahrs.ltp_to_body_euler.psi);	
 
 
-  // INT32_TRIG_FRAC - 2: 100mm erreur, gain 100 -> 10000 command | 2 degres = 36000, so multiply by 4
+  /* INT32_TRIG_FRAC - 2: 100mm erreur, gain 100 -> 10000 command | 2 degres = 36000, so multiply by 4 */
   booz2_guidance_h_command_body.phi = 
       ( - s_psi * booz2_guidance_h_command_earth.x + c_psi * booz2_guidance_h_command_earth.y)
     >> (INT32_TRIG_FRAC - 2);
