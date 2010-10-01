@@ -32,6 +32,7 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
     AXIS_ID_PITCH           = 1
     AXIS_ID_HEADING         = 2
     AXIS_ID_THRUST          = 3
+    MAX_AXIS_ID             = 4
 
     def __init__(self, conf, source, messages_file, groundstation_window):
 
@@ -56,7 +57,7 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
                 "Joystick Control",
                 self)
 
-        self._servo_vals = [0,0,0,0,0,0]
+        self._attitude_vals = [0.0] * self.MAX_AXIS_ID
 
     def _on_joystick_device_set(self):
         if self.joystick != None:
@@ -70,15 +71,11 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
         self.joystick.axis_remap(int(self._axis_pitch), self.AXIS_ID_PITCH)
         self.joystick.axis_remap(int(self._axis_heading), self.AXIS_ID_HEADING)
         self.joystick.axis_remap(int(self._axis_thrust), self.AXIS_ID_THRUST)
-        if self._reverse_roll:
-            self.joystick.axis_reverse(int(self._axis_roll))
-        if self._reverse_pitch:
-            self.joystick.axis_reverse(int(self._axis_pitch))
-        if self._reverse_heading:
-            self.joystick.axis_reverse(int(self._axis_heading))
-        if self._reverse_thrust:
-            self.joystick.axis_reverse(int(self._axis_thrust))
 
+        self.joystick.axis_reverse(int(self._axis_roll), self._reverse_roll == "1")
+        self.joystick.axis_reverse(int(self._axis_pitch), self._reverse_pitch == "1")
+        self.joystick.axis_reverse(int(self._axis_heading), self._reverse_heading == "1")
+        self.joystick.axis_reverse(int(self._axis_thrust), self._reverse_thrust == "1")
 
         self.jsw.set_joystick(self.joystick)
 
@@ -86,22 +83,13 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
 
     def _on_joystick_event(self, joystick, joystick_axis, joystick_value, init):
         if self.fms_control:
-            self._servo_vals[joystick_axis] = int(gs.scale_to_range(
-                                                        joystick_value,
-                                                        oldrange=(-32767,32767),
-                                                        newrange=(-9600,9600)))
-            self.fms_control.set_rc(*self._servo_vals)
-        #try:
-        #    label, progress_bar, fms_axis_id = self.progress[ self.axis_channel[joystick_axis] ]
-        #    value = gs.scale_to_range(
-        #                    joystick_value,
-        #                    oldrange=(-32767,32767),
-        #                    newrange=(0.0,1.0),
-        #                    reverse=self.axis_reverse[joystick_axis])
-        #    progress_bar.set_value(value)
-        #except KeyError:
-        #    #ignored axis
-        #    pass
+            if joystick_axis < self.MAX_AXIS_ID:
+                #scale to the range expected by the attitude message
+                val = gs.scale_to_range(joystick_value,
+                                        oldrange=(-32767,32767),
+                                        newrange=fms.RANGE_ATTITUDE)
+                self._attitude_vals[joystick_axis] = float(val)
+                self.fms_control.set_attitude(*self._attitude_vals)
 
     def get_preference_widgets(self):
         #all following items configuration is saved

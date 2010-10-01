@@ -23,6 +23,9 @@ ID_ATTITUDE             = 1
 
 ID_LIST_FMS_MODE        = [ID_RC, ID_ATTITUDE]
 
+RANGE_RC                = (-9600,9600)
+RANGE_ATTITUDE          = (-180,180)
+
 LOG = logging.getLogger("wasp.fms")
 
 class _Command:
