@@ -130,14 +130,16 @@ void booz2_guidance_read_rc(bool_t in_flight)
         case BOOZ2_GUIDANCE_H_MODE_RATE:
             booz2_stabilization_rate_read_rc();
             break;
-
-        /* FIXME: John, I think hover should be the command from FMS, and attitude should be
-        the only thing to call read_rc */
         case BOOZ2_GUIDANCE_H_MODE_ATTITUDE:
             booz2_stabilization_attitude_read_rc(&booz_stabilization_att_sp, in_flight);
             break;
         case BOOZ2_GUIDANCE_H_MODE_HOVER:
-            booz2_stabilization_attitude_read_rc(&booz2_guidance_h_rc_sp, in_flight);
+            if (fms.enabled == FMS_RC_ENABLED) {
+                EULERS_COPY(booz2_guidance_h_rc_sp, fms.command.h_sp.attitude);
+                booz2_guidance_h_rc_sp.psi = ahrs.ltp_to_body_euler.psi << (ANGLE_REF_RES - INT32_ANGLE_FRAC);
+            } else {
+                booz2_stabilization_attitude_read_rc(&booz2_guidance_h_rc_sp, in_flight);
+            }
             break;
     }
 

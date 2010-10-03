@@ -34,6 +34,9 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
     AXIS_ID_THRUST          = 3
     MAX_AXIS_ID             = 4
 
+    #limit joystick authority to less than full command range
+    RANGE_ATTITUDE          = map(lambda x: x * 0.4, fms.RANGE_ATTITUDE)
+
     def __init__(self, conf, source, messages_file, groundstation_window):
 
         if not joystick.list_devices():
@@ -81,14 +84,22 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
 
         LOG.info("Joystick initialized: %s" % self._device)
 
+    def __FIXME_axis_correction(self, joystick_axis, val):
+        if joystick_axis == self.AXIS_ID_ROLL:
+            return 12.0
+        elif joystick_axis == self.AXIS_ID_PITCH:
+            return -14.0
+        else:
+            return 0.0
+
     def _on_joystick_event(self, joystick, joystick_axis, joystick_value, init):
         if self.fms_control:
             if joystick_axis < self.MAX_AXIS_ID:
                 #scale to the range expected by the attitude message
                 val = gs.scale_to_range(joystick_value,
                                         oldrange=(-32767,32767),
-                                        newrange=fms.RANGE_ATTITUDE)
-                self._attitude_vals[joystick_axis] = float(val)
+                                        newrange=self.RANGE_ATTITUDE)
+                self._attitude_vals[joystick_axis] = float(val) + self.__FIXME_axis_correction(joystick_axis, val)
                 self.fms_control.set_attitude(*self._attitude_vals)
 
     def get_preference_widgets(self):
