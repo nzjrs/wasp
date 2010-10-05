@@ -127,17 +127,21 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
 			        &booz_imu.mag.z);
             break;
         case MESSAGE_ID_PPM:
-#if MESSAGE_PPM_NUM_ELEMENTS_values == RADIO_CTL_NB
+/* The PPM/RC message is 6 elements, so we need at least 6
+   channels if we want to unconditionally send this array, that
+   is an OK requirement because all RC/helicopter TX/RX kits are 6ch
+   or more anyway... */
+#if RADIO_CTL_NB >= MESSAGE_PPM_NUM_ELEMENTS_values
             MESSAGE_SEND_PPM(chan, ppm_pulses);
 #else
-            #error PPM message size mismatch
+            #error PPM message size mismatch (insufficient RC channels)
 #endif
             break;
         case MESSAGE_ID_RC:
-#if MESSAGE_RC_NUM_ELEMENTS_values == RADIO_CTL_NB
+#if RADIO_CTL_NB >= MESSAGE_RC_NUM_ELEMENTS_values
             MESSAGE_SEND_RC(chan, rc_values);
 #else
-            #error RC message size mismatch
+            #error RC message size mismatch (insufficient RC channels)
 #endif
             break;
         case MESSAGE_ID_STATUS:
