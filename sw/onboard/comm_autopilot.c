@@ -146,6 +146,7 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
         case MESSAGE_ID_STATUS:
             {
             uint8_t bat = analog_read_battery();
+            bool_t fms_enabled = fms_is_enabled();
             MESSAGE_SEND_STATUS(
                     chan,
                     &rc_status,
@@ -155,7 +156,7 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &autopilot.motors_on,
                     &autopilot.mode,
                     &cpu_usage,
-                    &fms.enabled,
+                    &fms_enabled,
                     &fms.mode);
             }
             break;
@@ -281,6 +282,12 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
         case MESSAGE_ID_FMS_ATTITUDE:
             fms_set(message);
             need_ack = FALSE;
+            break;
+        case MESSAGE_ID_FMS_ON:
+            fms_msg_enable(TRUE);
+            break;
+        case MESSAGE_ID_FMS_OFF:
+            fms_msg_enable(FALSE);
             break;
         case MESSAGE_ID_ALTIMETER_RESET:
             altimeter_recalibrate();

@@ -9,7 +9,7 @@
    <value name="autopilot_mode" values="FAILSAFE|KILL|RC_DIRECT|ATTITUDE_DIRECT|HOVER_DIRECT"/>
    <value name="autopilot_h_mode" values="KILL|RATE|ATTITUDE|HOVER"/>
    <value name="autopilot_v_mode" values="KILL|RC_DIRECT"/>
-   <value name="fms_on" values="FMS_OFF|FMS_RC_ENABLED|FMS_ON"/>
+   <value name="fms_on" values="FMS_OFF|FMS_ON"/>
    <value name="status" values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
 
    <!-- IDs < 25 are reserved for standard messages -->
@@ -284,6 +284,9 @@
      <field name="pitch"   type="float"/>
      <field name="heading" type="float"/>
    </message>
+
+   <message name="FMS_ON" id="54" command="1"/>
+   <message name="FMS_OFF" id="55" command="1"/>
 
    <!-- Begin periodic messages -->
    <periodic channel="COMM_TELEMETRY" adjustable="2">

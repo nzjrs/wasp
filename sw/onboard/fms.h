@@ -19,15 +19,10 @@ typedef struct __FMSCommand {
     } v_sp;
 } FMSCommand_t;
 
-typedef enum {
-    FMS_OFF,
-    FMS_RC_ENABLED,
-    FMS_ON
-} FMSEnabled_t;
-
 typedef struct __FMS {
     FMSCommand_t    command;
-    FMSEnabled_t    enabled;
+    bool_t          enabled_rc;
+    bool_t          enabled_msg;
     uint8_t         mode;
     bool_t          timeout;
     uint8_t         last_msg;
@@ -39,5 +34,7 @@ extern SystemStatus_t   fms_system_status;
 void fms_init(void);
 void fms_periodic_task(void);
 void fms_set(CommMessage_t *message);
+bool_t fms_is_enabled(void);
+void fms_msg_enable(bool_t enabled);
 
 #endif /* _FMS_H_ */
