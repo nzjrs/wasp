@@ -6,12 +6,12 @@ LOG = logging.getLogger("ui.control")
 
 class ControlController:
 
-    def __init__(self, source, messages_file):
+    def __init__(self, source, messages_file, settings_file):
         self._source = source
         self._messages_file = messages_file
         self.widget = gtk.VBox(spacing=5)
 
-        self._fms_control = wasp.fms.ControlManager(source, messages_file)
+        self._fms_control = wasp.fms.ControlManager(source, messages_file, settings_file)
 
     def _on_enabled(self, btn, widget, control_widget):
         enabled = btn.get_active()

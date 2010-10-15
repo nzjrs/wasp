@@ -13,7 +13,7 @@ LOG = logging.getLogger('fgvis')
 
 class FlightGearVis(plugin.Plugin):
 
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
         if not gs.utils.program_installed(sim.EXECUTABLE):
             raise plugin.PluginNotSupported("%s not installed" % sim.EXECUTABLE)
 

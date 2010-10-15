@@ -10,7 +10,7 @@ import gs.plugin as plugin
 LOG = logging.getLogger('gpsview')
 
 class GpsView(plugin.Plugin):
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
 
         pb = gs.ui.get_icon_pixbuf("world.svg",size=gtk.ICON_SIZE_MENU)
         item = gtk.ImageMenuItem("Show Detailed GPS Info")

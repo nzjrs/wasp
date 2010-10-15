@@ -85,9 +85,7 @@ class CommandManager:
 
 class ControlManager:
 
-
-
-    def __init__(self, source, messages_file):
+    def __init__(self, source, messages_file, settings_file):
         self.source = source
         self.enabled = False
 
@@ -107,6 +105,12 @@ class ControlManager:
             [0.0]   * len(ID_LIST_FMS_ATTITUDE)
         ]
 
+        #corrections, trim
+        self._corrections = [
+            [int(settings_file["FMS_CORRECTION_RC_%s" % k].value) for k in ("ROLL","PITCH","HEADING","THRUST")],
+            [float(settings_file["FMS_CORRECTION_ATTITUDE_%s" % k].value) for k in ("ROLL","PITCH","HEADING","THRUST")]
+        ]
+
     def _send_control(self):
         if self._msg != None and self._msg_id != None:
             self.source.send_message(self._msg, self._sp[self._msg_id])
@@ -122,10 +126,12 @@ class ControlManager:
         self.enabled = enable
 
     def _generic_set(self, msg, _id, r, p, y, t):
-        self._sp[_id][ID_ROLL] = r
-        self._sp[_id][ID_PITCH] = p
-        self._sp[_id][ID_HEADING] = y
-        self._sp[_id][ID_THRUST] = t
+        #apply corrections and cache/store the result for later sending
+        #at fixed frequency
+        self._sp[_id][ID_ROLL] = self._corrections[_id][ID_ROLL] + r
+        self._sp[_id][ID_PITCH] = self._corrections[_id][ID_PITCH] + p
+        self._sp[_id][ID_HEADING] = self._corrections[_id][ID_HEADING] + y
+        self._sp[_id][ID_THRUST] = self._corrections[_id][ID_THRUST] + t
         if self._msg != msg and self._msg_id != _id:
             self._msg = msg
             self._msg_id = _id

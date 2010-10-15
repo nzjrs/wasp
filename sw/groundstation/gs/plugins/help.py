@@ -4,7 +4,7 @@ import gs.plugin as plugin
 
 class Help(plugin.Plugin):
 
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
         self._add_link(groundstation_window, 
                 "Wasp Documentation",
                 "http://www.waspuav.org/doc/")

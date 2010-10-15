@@ -21,7 +21,7 @@ class ControlManual(plugin.Plugin, gs.ui.GtkBuilderWidget, control.ControlWidget
     }
 
 
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
         mydir = os.path.dirname(os.path.abspath(__file__))
         uifile = os.path.join(mydir, "control_manual.ui")
         gs.ui.GtkBuilderWidget.__init__(self, uifile)

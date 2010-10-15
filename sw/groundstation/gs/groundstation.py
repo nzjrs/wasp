@@ -138,14 +138,14 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("telemetry_hbox").pack_start(self.telemetrycontroller.widget, True, True)
 
         #The settings tab page
-        settingsfile = SettingsFile(path=settingsfile)
-        self.settingscontroller = SettingsController(self._source, settingsfile, self._messagesfile)
+        self._settingsfile = SettingsFile(path=settingsfile)
+        self.settingscontroller = SettingsController(self._source, self._settingsfile, self._messagesfile)
         self.get_resource("settings_hbox").pack_start(self.settingscontroller.widget, True, True)
 
         #The command and control tab page
         self.commandcontroller = CommandController(self._source, self._messagesfile)
         self.get_resource("command_hbox").pack_start(self.commandcontroller.widget, False, True)
-        self.controlcontroller = ControlController(self._source, self._messagesfile)
+        self.controlcontroller = ControlController(self._source, self._messagesfile, self._settingsfile)
         self.get_resource("control_hbox").pack_start(self.controlcontroller.widget, True, True)
 
         #Lazy initialize the following when first needed
@@ -161,7 +161,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         #initialize the plugins
         self._plugin_manager = PluginManager(plugindir)
         if not disable_plugins:
-            self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
+            self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self._settingsfile, self)
     
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface

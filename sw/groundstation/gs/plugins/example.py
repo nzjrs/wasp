@@ -10,7 +10,7 @@ LOG = logging.getLogger('example')
 
 # All plugins must inherit from plugin.Plugin
 class ExamplePlugin(plugin.Plugin):
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
         # You should comment out the following two lines in your plugin. This
         # statement stops the plugin from loading unless the groundstation is
         # launched in a special 'testing' mode. See the groundstation documentation
