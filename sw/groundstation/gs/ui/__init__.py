@@ -57,15 +57,16 @@ def get_icon_pixbuf(name=None, stock=None, size=gtk.ICON_SIZE_DIALOG):
         raise ValueError("Must pass and icon name or a stock name")
 
     if not ok:
-        pb = gtk.icon_theme_get_default().load_icon(
-                    gtk.STOCK_MISSING_IMAGE, 
-                    gtk.icon_size_lookup(size)[0],
-                    0)
+        pb = gtk.image_new_from_stock(
+                    gtk.STOCK_MISSING_IMAGE, size).get_pixbuf()
 
     return pb
 
-def get_icon_image(*args, **kwargs):
-    return gtk.image_new_from_pixbuf(get_icon_pixbuf(*args,**kwargs))
+def get_icon_image(name=None, stock=None, size=gtk.ICON_SIZE_DIALOG):
+    if stock:
+        return gtk.image_new_from_stock(stock, size)
+    else:
+        return gtk.image_new_from_pixbuf(get_icon_pixbuf(name, stock, size))
 
 def get_button(label, stock=None, image_name=None, image_stock=None):
     if stock:

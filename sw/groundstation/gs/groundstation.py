@@ -71,6 +71,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         LOG.info("Restored preferences: %s" % prefsfile)
         LOG.info("Messages file: %s" % messagesfile)
         LOG.info("Settings file: %s" % settingsfile)
+        LOG.info("Installed: %d" % gs.IS_INSTALLED)
+        LOG.info("Windows: %d" % gs.IS_WINDOWS)
 
         try:
             GtkBuilderWidget.__init__(self, "groundstation.ui")
