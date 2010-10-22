@@ -73,8 +73,12 @@ void comm_network_end_message_hw ( void )
                                    NULL,
                                    &err);
 
-    if (sent != tx_i)
-        ;
+    if (sent != tx_i) {
+        /* could not send whole packet */
+    }
+
+    if (err)
+        g_error_free(err);
 }
 
 bool_t comm_network_ch_available ( void )
@@ -96,9 +100,11 @@ bool_t comm_network_ch_available ( void )
         rx_len = got;
         rx_i = 0;
         return TRUE;
+    } else {
+        /* error receiving */
+        g_error_free(err);
+        return FALSE;
     }
-
-    return FALSE;
 }
 
 void comm_network_send_ch ( uint8_t c )
