@@ -60,6 +60,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             compound.compounddefTypeSub : compoundrenderer.CompoundDefTypeSubRenderer,
             compound.sectiondefTypeSub : compoundrenderer.SectionDefTypeSubRenderer,
             compound.memberdefTypeSub : compoundrenderer.MemberDefTypeSubRenderer,
+            compound.enumvalueTypeSub : compoundrenderer.EnumvalueTypeSubRenderer,
             compound.linkedTextTypeSub : compoundrenderer.LinkedTextTypeSubRenderer,
             compound.descriptionTypeSub : compoundrenderer.DescriptionTypeSubRenderer,
             compound.paramTypeSub : compoundrenderer.ParamTypeSubRenderer,
@@ -70,6 +71,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             compound.docParamNameListSub : compoundrenderer.DocParamNameListSubRenderer,
             compound.docParamNameSub : compoundrenderer.DocParamNameSubRenderer,
             compound.docSect1TypeSub : compoundrenderer.DocSect1TypeSubRenderer,
+            compound.docSimpleSectTypeSub : compoundrenderer.DocSimpleSectTypeSubRenderer,
             compoundsuper.MixedContainer : compoundrenderer.MixedContainerRenderer,
             unicode : UnicodeRenderer,
             }
