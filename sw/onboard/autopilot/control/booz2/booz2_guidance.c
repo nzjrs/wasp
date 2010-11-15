@@ -122,7 +122,7 @@ void booz2_guidance_mode_changed(uint8_t h_mode, uint8_t v_mode)
 
 }
 
-void booz2_guidance_read_rc(bool_t in_flight)
+void booz2_guidance_on_rc_event(bool_t in_flight)
 {
     /* horizontal control mode */
     switch ( booz2_guidance_h_mode )
@@ -136,6 +136,7 @@ void booz2_guidance_read_rc(bool_t in_flight)
         case BOOZ2_GUIDANCE_H_MODE_HOVER:
             if ( fms_is_enabled() ) {
                 EULERS_COPY(booz2_guidance_h_rc_sp, fms.command.h_sp.attitude);
+                /* blank out yaw */
                 booz2_guidance_h_rc_sp.psi = ahrs.ltp_to_body_euler.psi << (ANGLE_REF_RES - INT32_ANGLE_FRAC);
             } else {
                 booz2_stabilization_attitude_read_rc(&booz2_guidance_h_rc_sp, in_flight);

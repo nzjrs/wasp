@@ -42,7 +42,7 @@ extern int32_t booz2_stabilization_cmd[COMMAND_NB];
 
 void booz2_guidance_init(void);
 void booz2_guidance_mode_changed(uint8_t h_mode, uint8_t v_mode);
-void booz2_guidance_read_rc(bool_t in_flight);
+void booz2_guidance_on_rc_event(bool_t in_flight);
 void booz2_guidance_run(bool_t in_flight);
 struct Int32Eulers *booz2_guidance_sp_get_attitude(void);
 

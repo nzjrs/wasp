@@ -24,6 +24,7 @@
 #include "autopilot.h"
 
 #include "rc.h"
+#include "fms.h"
 #include "actuators.h"
 #include "supervision.h"
 #include "control/booz2/booz2_guidance.h"
@@ -237,17 +238,23 @@ void autopilot_on_rc_event(void)
         rc_values_contains_avg_channels = FALSE;
     }
 
-    autopilot_check_motors_on();
-    autopilot_check_in_flight();
+    /* FMS hands all control over to comms messages */
+    if (fms_is_enabled()) {
+        autopilot_in_flight_counter = BOOZ2_AUTOPILOT_IN_FLIGHT_TIME;
+        autopilot.in_flight = TRUE;
+    } else {
+        autopilot_check_motors_on();
+        autopilot_check_in_flight();
+    }
 
-    booz2_guidance_read_rc(autopilot.in_flight);
+    booz2_guidance_on_rc_event(autopilot.in_flight);
 
 }
 
 void autopilot_set_motors(bool_t on)
 {
     /* only turn the motors on/off while on ground */
-    if (!autopilot.in_flight) {
+    if (!autopilot.in_flight || fms_is_enabled()) {
         if (on) {
             autopilot_motors_on_counter = BOOZ2_AUTOPILOT_MOTOR_ON_TIME;
             autopilot.motors_on = TRUE;
