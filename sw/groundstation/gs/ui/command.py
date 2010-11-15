@@ -25,7 +25,7 @@ class CommandController(gs.ui.GtkBuilderWidget):
         self._tv = treeview.MessageTreeView(ts)
         self.get_resource("commands_sw").add(self._tv)
 
-        self.get_resource("command_send_button").connect("clicked", self._send_command)
+        self.get_resource("command_send_button").connect("clicked", self._on_send_clicked)
 
     def _on_setting(self, msg, header, payload):
         id_, type_, val = msg.unpack_values(payload)
@@ -38,9 +38,12 @@ class CommandController(gs.ui.GtkBuilderWidget):
     def _command_fail_response(self, error_code):
         LOG.debug("COMMAND FAIL: %s" % error_code)
 
-    def _send_command(self, btn):
+    def _on_send_clicked(self, btn):
         msg,vals = self._tv.get_selected_message_and_values()
         if msg:
-            LOG.info("Sending Command: %s %s" % (msg,vals))
-            self._command_manager.send_command(msg, vals, self._command_ok_response, self._command_fail_response)
+            self.send_command(msg, vals)
+
+    def send_command(self, msg, vals):
+        LOG.info("Sending Command: %s %s" % (msg,vals))
+        self._command_manager.send_command(msg, vals, self._command_ok_response, self._command_fail_response)
 
