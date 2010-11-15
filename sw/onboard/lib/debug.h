@@ -4,8 +4,9 @@
 #include "std.h"
 #include "messages_types.h"
 
-void debug_int (CommChannel_t chan, uint8_t i);
-void debug_float (CommChannel_t chan, float f);
+void debug_uint8 (uint8_t i);
+void debug_int32 (int32_t i);
+void debug_float (float f);
 
 #endif /*_DEBUG_H_*/
 

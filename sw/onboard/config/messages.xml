@@ -79,7 +79,7 @@
      <field name="value" type="float"/>
    </message>
 
-   <message name="DEBUG" id="13">
+   <message name="DEBUG_UINT8" id="13">
      <field name="value" type="uint8"/>
    </message>
 
@@ -287,6 +287,10 @@
 
    <message name="FMS_ON" id="54" command="1"/>
    <message name="FMS_OFF" id="55" command="1"/>
+
+   <message name="DEBUG_INT32" id="56">
+     <field name="value" type="int32"/>
+   </message>
 
    <!-- Begin periodic messages -->
    <periodic channel="COMM_TELEMETRY" adjustable="2">

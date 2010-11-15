@@ -43,6 +43,13 @@ ACID_ALL            = 0xFF
 ACID_TEST           = 0xFE
 ACID_GROUNDSTATION  = 0xFD
 
+#: dictionary mapping debug types to format characters
+DEBUG_MESSAGES = {
+    "DEBUG_UINT8"   :   "%d",
+    "DEBUG_INT32"   :   "%d",
+    "DEBUG_FLOAT"   :   "%#f"
+}
+
 class _Noisy:
     """
     An interface for objects providing noisy data (usually for testing)

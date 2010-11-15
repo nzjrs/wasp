@@ -1,6 +1,8 @@
 import gobject
 import gtk
 
+import wasp
+
 import gs.ui
 import gs.ui.indicators as indicators
 import gs.geo as geo
@@ -65,7 +67,7 @@ class StatusBar(gtk.Statusbar):
         source.connect("source-link-status-change", self._connected_update_icon)
 
         source.register_interest(self._on_gps, 0, "GPS_LLH")
-        source.register_interest(self._on_debug, 0, "DEBUG", "DEBUG_FLOAT")
+        source.register_interest(self._on_debug, 0, *wasp.DEBUG_MESSAGES.keys())
 
         gobject.timeout_add(1000, self._check_messages_per_second, source)
 
@@ -87,13 +89,9 @@ class StatusBar(gtk.Statusbar):
 
     def _on_debug(self, msg, header, payload):
         value, = msg.unpack_values(payload)
-        if msg.name == "DEBUG":
-            txt = "DEBUG I: %d" % value
-        elif msg.name == "DEBUG_FLOAT":
-            txt = "DEBUG F: %f" % value
-        else:
-            txt = "DEBUG ?: %s" % value
-        self._debug.set_text(txt)
+        #get the format character
+        fmt = "DEBUG: %s" % wasp.DEBUG_MESSAGES.get(msg.name, "%s")
+        self._debug.set_text(fmt % value)
         self._debug.set_green()
 
     def _on_gps(self, msg, header, payload):
