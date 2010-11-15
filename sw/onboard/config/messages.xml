@@ -268,7 +268,7 @@
      <field name="roll"    type="float"/>
      <field name="pitch"   type="float"/>
      <field name="heading" type="float"/>
-     <field name="thrust"  type="float"/>
+     <field name="thrust"  type="int32"/>
    </message>
 
    <message name="FMS_RC" id="52">

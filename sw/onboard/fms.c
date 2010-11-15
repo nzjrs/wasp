@@ -38,6 +38,8 @@ void fms_set(CommMessage_t *message)
         };
 
         EULERS_COPY (fms.command.h_sp.attitude, att);
+
+        fms.command.v_sp.direct = MESSAGE_FMS_ATTITUDE_GET_FROM_BUFFER_thrust(message->payload);
     }
 }
 

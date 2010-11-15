@@ -147,7 +147,11 @@ void booz2_guidance_read_rc(bool_t in_flight)
     switch (booz2_guidance_v_mode)
     {
         case BOOZ2_GUIDANCE_V_MODE_RC_DIRECT:
-            booz2_guidance_v_rc_delta_t = (int32_t)rc_values[RADIO_THROTTLE] * 200 / MAX_PPRZ;
+            if ( fms_is_enabled() ) {
+                booz2_guidance_v_rc_delta_t = fms.command.v_sp.direct;
+            } else {
+                booz2_guidance_v_rc_delta_t = (int32_t)rc_values[RADIO_THROTTLE] * 200 / MAX_PPRZ;
+            }
             break;
     }
 }

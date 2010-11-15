@@ -8,7 +8,7 @@ COMMAND_ERROR_PENDING   = 0
 COMMAND_ERROR_LOST      = 1
 COMMAND_ERROR_NACK      = 2
 
-CONTROL_REFRESH_FREQ    = 10
+CONTROL_REFRESH_FREQ    = 20
 
 ID_ROLL                 = 0
 ID_PITCH                = 1
@@ -21,10 +21,16 @@ ID_LIST_FMS_RC          = [ID_ROLL, ID_PITCH, ID_HEADING, ID_THRUST]
 ID_RC                   = 0
 ID_ATTITUDE             = 1
 
-ID_LIST_FMS_MODE        = [ID_RC, ID_ATTITUDE]
+TYPE_RC                 = [int, int, int, int]
+TYPE_ATTITUDE           = [float, float, float, int]
+
+LIST_IDS                = [ID_RC, ID_ATTITUDE]
+LIST_TYPES              = [TYPE_RC, TYPE_ATTITUDE]
 
 RANGE_RC                = (-9600,9600)
+RANGE_RC_THRUST         = (0,200)
 RANGE_ATTITUDE          = (-180,180)
+RANGE_ATTITUDE_THRUST   = (0,200)
 
 LOG = logging.getLogger("wasp.fms")
 
@@ -101,13 +107,13 @@ class ControlManager:
 
         #setpoints
         self._sp = [
-            [0]     * len(ID_LIST_FMS_RC),
-            [0.0]   * len(ID_LIST_FMS_ATTITUDE)
+            [t() for t in TYPE_RC],
+            [t() for t in TYPE_ATTITUDE]
         ]
 
         #corrections, trim
         self._corrections = [
-            [int(settings_file["FMS_CORRECTION_RC_%s" % k].value) for k in ("ROLL","PITCH","HEADING","THRUST")],
+            [float(settings_file["FMS_CORRECTION_RC_%s" % k].value) for k in ("ROLL","PITCH","HEADING","THRUST")],
             [float(settings_file["FMS_CORRECTION_ATTITUDE_%s" % k].value) for k in ("ROLL","PITCH","HEADING","THRUST")]
         ]
 
@@ -126,12 +132,12 @@ class ControlManager:
         self.enabled = enable
 
     def _generic_set(self, msg, _id, r, p, y, t):
-        #apply corrections and cache/store the result for later sending
+        #apply corrections, cast to correct type, nd cache/store the result for later sending
         #at fixed frequency
-        self._sp[_id][ID_ROLL] = self._corrections[_id][ID_ROLL] + r
-        self._sp[_id][ID_PITCH] = self._corrections[_id][ID_PITCH] + p
-        self._sp[_id][ID_HEADING] = self._corrections[_id][ID_HEADING] + y
-        self._sp[_id][ID_THRUST] = self._corrections[_id][ID_THRUST] + t
+        self._sp[_id][ID_ROLL]      = LIST_TYPES[_id][ID_ROLL](self._corrections[_id][ID_ROLL] + r)
+        self._sp[_id][ID_PITCH]     = LIST_TYPES[_id][ID_PITCH](self._corrections[_id][ID_PITCH] + p)
+        self._sp[_id][ID_HEADING]   = LIST_TYPES[_id][ID_HEADING](self._corrections[_id][ID_HEADING] + y)
+        self._sp[_id][ID_THRUST]    = LIST_TYPES[_id][ID_THRUST](self._corrections[_id][ID_THRUST] + t)
         if self._msg != msg and self._msg_id != _id:
             self._msg = msg
             self._msg_id = _id

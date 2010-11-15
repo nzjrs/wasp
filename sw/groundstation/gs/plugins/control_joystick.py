@@ -28,14 +28,16 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
     DEFAULT_REVERSE_HEADING = "0"
     DEFAULT_REVERSE_THRUST  = "0"
 
-    AXIS_ID_ROLL            = 0
-    AXIS_ID_PITCH           = 1
-    AXIS_ID_HEADING         = 2
-    AXIS_ID_THRUST          = 3
-    MAX_AXIS_ID             = 4
+    AXIS_ID_ROLL            = fms.ID_ROLL
+    AXIS_ID_PITCH           = fms.ID_PITCH
+    AXIS_ID_HEADING         = fms.ID_HEADING
+    AXIS_ID_THRUST          = fms.ID_THRUST
+    MAX_AXIS_ID             = fms.ID_THRUST + 1
 
     #limit joystick authority to less than full command range
-    RANGE_ATTITUDE          = map(lambda x: x * 0.4, fms.RANGE_ATTITUDE)
+    RANGE_ATTITUDE_ROLL     = map(lambda x: x * 0.5, fms.RANGE_ATTITUDE)
+    RANGE_ATTITUDE_PITCH    = map(lambda x: x * 0.5, fms.RANGE_ATTITUDE)
+    RANGE_ATTITUDE_HEADING  = map(lambda x: x * 0.8, fms.RANGE_ATTITUDE)
 
     def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
 
@@ -88,9 +90,24 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
         if self.fms_control:
             if joystick_axis < self.MAX_AXIS_ID:
                 #scale to the range expected by the attitude message
-                val = gs.scale_to_range(joystick_value,
-                                        oldrange=(-32767,32767),
-                                        newrange=self.RANGE_ATTITUDE)
+                if joystick_axis == self.AXIS_ID_THRUST:
+                    val = gs.scale_to_range(joystick_value,
+                                            oldrange=(-32767,32767),
+                                            newrange=fms.RANGE_ATTITUDE_THRUST)
+                elif joystick_axis == self.AXIS_ID_ROLL:
+                    val = gs.scale_to_range(joystick_value,
+                                            oldrange=(-32767,32767),
+                                            newrange=self.RANGE_ATTITUDE_ROLL)
+                elif joystick_axis == self.AXIS_ID_PITCH:
+                    val = gs.scale_to_range(joystick_value,
+                                            oldrange=(-32767,32767),
+                                            newrange=self.RANGE_ATTITUDE_PITCH)
+                elif joystick_axis == self.AXIS_ID_HEADING:
+                    val = gs.scale_to_range(joystick_value,
+                                            oldrange=(-32767,32767),
+                                            newrange=self.RANGE_ATTITUDE_HEADING)
+
+
                 self._attitude_vals[joystick_axis] = float(val)
                 self.fms_control.set_attitude(*self._attitude_vals)
 
