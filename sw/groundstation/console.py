@@ -21,7 +21,12 @@ def message_received(comm, msg, header, payload):
         print "\t", msg.unpack_printable_values(payload, joiner=",")
 
 def uav_connected(source, connected):
-    print "Source connected: %s" % connected
+    if connected:
+        verb = "connected"
+    else:
+        verb = "disconnected"
+    name, config = source.get_connection_parameters()
+    print "\n%s source %s: %s\n" % (name, verb, config)
 
 if __name__ == "__main__":
     parser = gs.get_default_command_line_parser(True, False, True, preferences_name="console.ini")

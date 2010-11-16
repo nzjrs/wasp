@@ -300,7 +300,8 @@
       <message name="GPS_LLH" frequency="0.1"/>
    </periodic>
 
-   <periodic channel="COMM_0" />
+   <periodic channel="COMM_0" adjustable="3" />
+
    <periodic channel="COMM_1" />
 
 </messages>
