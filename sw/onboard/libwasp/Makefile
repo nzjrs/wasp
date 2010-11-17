@@ -5,7 +5,7 @@ SRCDIR              = ..
 INCDIR              = ./include
 
 LIB                 = ./lib/libwasp.a
-OBJS                = comm.o messages.o
+OBJS                = comm.o messages.o wasp.o
 
 default: dir $(LIB)
 
@@ -29,11 +29,11 @@ generated: $(INCDIR)/build.h $(INCDIR)/messages.h messages.c
 
 %.o: %.c
 	@echo COMPILE $<
-	$(Q)gcc -g -c -Wall -I$(INCDIR) $< -o $@
+	$(Q)$(CC) -g -c -Wall -I$(INCDIR) $< -o $@
 
 $(LIB):  headers-copy generated $(OBJS)
 	@echo ARCHIVE $@
-	$(Q)ar rcs $@ $(OBJS)
+	$(Q)$(AR) rcs $@ $(OBJS)
 
 headers-copy: dir
 	$(Q) cp $(SRCDIR)/std.h $(INCDIR)
@@ -51,4 +51,4 @@ clean:
 
 test: test.c $(LIB)
 	@echo COMPILE test
-	$(Q)gcc -g -Wall -I$(INCDIR) -o $@ $^
+	$(Q)$(CC) -g -Wall -I$(INCDIR) -o $@ $^
