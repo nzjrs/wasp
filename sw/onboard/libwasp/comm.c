@@ -4,6 +4,7 @@
 #include "comm.h"
 
 CommStatus_t    comm_status[COMM_NB];
+uint8_t         comm_acid;
 
 CommStatus_t    rxstatus;
 CommMessage_t   rxmsg;
@@ -27,7 +28,7 @@ comm_start_message ( CommChannel_t chan, uint8_t id, uint8_t len )
     comm_send_ch(chan, COMM_STX);
 
     comm_send_message_ch(chan, total_len);
-    comm_send_message_ch(chan, COMM_DEFAULT_ACID);
+    comm_send_message_ch(chan, comm_acid);
     comm_send_message_ch(chan, id);
 }
 
@@ -117,7 +118,7 @@ comm_parse (uint8_t *data, uint8_t len)
 }
 
 void
-comm_init (void)
+comm_init (uint8_t acid)
 {
     uint8_t i;
 
@@ -127,6 +128,8 @@ comm_init (void)
         comm_status[i].buffer_overrun = 0;
         comm_status[i].parse_error = 0;
     }
+
+    comm_acid = acid;
 
     rxstatus.parse_state = STATE_UNINIT;
     rxstatus.msg_received = FALSE;
