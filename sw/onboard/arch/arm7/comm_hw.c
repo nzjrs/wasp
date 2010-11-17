@@ -34,6 +34,19 @@ comm_init ( CommChannel_t chan )
 {
     uint8_t i;
 
+    /* comm_init can be called for multiple channels, so make this reiterant safe */
+    if (comm_system_status == STATUS_UNINITIAIZED) {
+        for (i = 0; i < COMM_NB; i++) {
+            comm_callback_rx[i] = 0;
+            comm_callback_tx[i] = 0;
+            comm_status[i].parse_state = STATE_UNINIT;
+            comm_status[i].msg_received = FALSE;
+            comm_status[i].buffer_overrun = 0;
+            comm_status[i].parse_error = 0;
+            comm_channel_used[i] = FALSE;
+        }
+    }
+
 #if USE_UART0
     if ( chan == COMM_0 ) {
         uart0_init_tx();
@@ -52,16 +65,6 @@ comm_init ( CommChannel_t chan )
         comm_channel_used[chan] = TRUE;
     }
 #endif
-
-    for (i = 0; i < COMM_NB; i++) {
-        comm_callback_rx[i] = 0;
-        comm_callback_tx[i] = 0;
-    
-        comm_status[i].parse_state = STATE_UNINIT;
-        comm_status[i].msg_received = FALSE;
-        comm_status[i].buffer_overrun = 0;
-        comm_status[i].parse_error = 0;
-    }
 
     comm_system_status = STATUS_INITIALIZED;
 }
