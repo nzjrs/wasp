@@ -37,6 +37,9 @@ void
 comm_init ( CommChannel_t chan );
 
 void
+comm_set_acid (uint8_t acid);
+
+void
 comm_add_rx_callback ( CommChannel_t chan, CommRXMessageCallback_t cb);
 
 void

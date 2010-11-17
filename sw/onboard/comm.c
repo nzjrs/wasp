@@ -35,6 +35,8 @@ CommTXMessageCallback_t  comm_callback_tx[COMM_NB];
 CommMessage_t            comm_message[COMM_NB];
 CommStatus_t             comm_status[COMM_NB];
 bool_t                   comm_channel_used[COMM_NB];
+
+uint8_t                  comm_acid = COMM_DEFAULT_ACID;
 PeriodicMessage_t        periodic_messages[NUM_PERIODIC_MESSAGES] = PERIODIC_MESSAGE_INITIALIZER;
 
 static bool_t comm_install_new_periodic_task ( CommChannel_t chan, CommMessage_t *request_telemetry_msg );
@@ -46,6 +48,12 @@ static bool_t comm_install_new_periodic_task ( CommChannel_t chan, CommMessage_t
 #define ADD_CHAR(_msg, _x)                  \
     _msg->payload[_msg->idx] = _x;          \
     _msg->idx++;
+
+void
+comm_set_acid (uint8_t acid)
+{
+    comm_acid = acid;
+}
 
 void
 comm_send_message_ch ( CommChannel_t chan, uint8_t c )
@@ -68,7 +76,7 @@ comm_start_message ( CommChannel_t chan, uint8_t id, uint8_t len )
     comm_send_ch(chan, COMM_STX);
 
     comm_send_message_ch(chan, total_len);
-    comm_send_message_ch(chan, COMM_DEFAULT_ACID);
+    comm_send_message_ch(chan, comm_acid);
     comm_send_message_ch(chan, id);
 }
 
