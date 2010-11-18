@@ -2,7 +2,7 @@ Q                   = @
 TOOLS               = ../../tools
 MESSAGES            = ../config/messages.xml
 SRCDIR              = ..
-INCDIR              = ./include
+INCDIR              = ./libwasp
 
 LIB                 = ./lib/libwasp.a
 OBJS                = comm.o messages.o wasp.o
@@ -51,4 +51,4 @@ clean:
 
 test: test.c $(LIB)
 	@echo COMPILE test
-	$(Q)$(CC) -g -Wall -I$(INCDIR) -o $@ $^
+	$(Q)$(CC) -g -Wall -o $@ $^

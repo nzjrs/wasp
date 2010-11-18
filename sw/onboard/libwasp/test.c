@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "wasp.h"
+#include "libwasp/wasp.h"
 
 void comm_send_ch ( CommChannel_t chan, uint8_t c )
 {
