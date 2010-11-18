@@ -37,9 +37,10 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
     MAX_AXIS_ID             = fms.ID_THRUST + 1
 
     #limit joystick authority to less than full command range
-    RANGE_ATTITUDE_ROLL     = map(lambda x: x * 0.5, fms.RANGE_ATTITUDE)
-    RANGE_ATTITUDE_PITCH    = map(lambda x: x * 0.5, fms.RANGE_ATTITUDE)
-    RANGE_ATTITUDE_HEADING  = map(lambda x: x * 0.8, fms.RANGE_ATTITUDE)
+    RANGE_ATTITUDE_ROLL     = map(lambda x: x * 0.5, fms.RANGE_ATTITUDE[fms.ID_ROLL])
+    RANGE_ATTITUDE_PITCH    = map(lambda x: x * 0.5, fms.RANGE_ATTITUDE[fms.ID_PITCH])
+    RANGE_ATTITUDE_HEADING  = map(lambda x: x * 0.5, fms.RANGE_ATTITUDE[fms.ID_HEADING])
+    RANGE_ATTITUDE_THRUST   = fms.RANGE_ATTITUDE[fms.ID_THRUST]
 
     def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
 
@@ -110,7 +111,7 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
                 if joystick_axis == self.AXIS_ID_THRUST:
                     val = gs.scale_to_range(joystick_value,
                                             oldrange=(-32767,32767),
-                                            newrange=fms.RANGE_ATTITUDE_THRUST)
+                                            newrange=self.RANGE_ATTITUDE_THRUST)
                 elif joystick_axis == self.AXIS_ID_ROLL:
                     val = gs.scale_to_range(joystick_value,
                                             oldrange=(-32767,32767),

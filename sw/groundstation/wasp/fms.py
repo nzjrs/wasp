@@ -24,13 +24,12 @@ ID_ATTITUDE             = 1
 TYPE_RC                 = [int, int, int, int]
 TYPE_ATTITUDE           = [float, float, float, int]
 
+RANGE_RC                = [(-9600,9600),(-9600,9600),(-9600,9600),(0,200)]
+RANGE_ATTITUDE          = [(-180,180),(-180,180),(-9600,9600),(0,200)]
+
 LIST_IDS                = [ID_RC, ID_ATTITUDE]
 LIST_TYPES              = [TYPE_RC, TYPE_ATTITUDE]
-
-RANGE_RC                = (-9600,9600)
-RANGE_RC_THRUST         = (0,200)
-RANGE_ATTITUDE          = (-180,180)
-RANGE_ATTITUDE_THRUST   = (0,200)
+LIST_RANGES             = [RANGE_RC, RANGE_ATTITUDE]
 
 LOG = logging.getLogger("wasp.fms")
 
@@ -158,5 +157,11 @@ class ControlManager:
         self._sp[ID_ATTITUDE][axis] += delta
         self._msg = self._msg_fms_attitude
         self._msg_id = ID_ATTITUDE
+
+    def get_mode_and_setpoints(self):
+        if self.enabled and self._msg != None and self._msg_id != None:
+            return self._msg.name, self._sp[self._msg_id]
+        else:
+            return None
 
 
