@@ -1,4 +1,6 @@
 import gtk
+import gobject
+
 import logging
 import wasp.fms
 
@@ -11,7 +13,38 @@ class ControlController:
         self._messages_file = messages_file
         self.widget = gtk.VBox(spacing=5)
 
+        self._control_widget = gtk.VBox(spacing=5)
+        self.widget.pack_start(self._control_widget, True, True)
+        self.widget.pack_start(gtk.HSeparator(), False, False)
+        self._status_widget = gtk.Label("")
+        self._status_widget.props.xalign = 0.0
+        self._status_widget.props.xpad = 5
+        self.widget.pack_start(self._status_widget, False, True)
+        gobject.timeout_add(1000/10, self._refresh_label)
+
         self._fms_control = wasp.fms.ControlManager(source, messages_file, settings_file)
+
+    def _set_label(self, enabled, name=None, sp=None):
+        LABEL_TEMPLATE = "<b>FMS Mode:</b> %s\n\t<i>roll:</i>\t\t%s\n\t<i>pitch:</i>\t%s\n\t<i>heading:</i>\t%s\n\t<i>thrust:</i>\t%s"
+        if enabled:
+            self._status_widget.set_markup(LABEL_TEMPLATE % (
+                    name,
+                    sp[wasp.fms.ID_ROLL],
+                    sp[wasp.fms.ID_PITCH],
+                    sp[wasp.fms.ID_HEADING],
+                    sp[wasp.fms.ID_THRUST])
+            )
+        else:
+            self._status_widget.set_markup(LABEL_TEMPLATE % ("Disabled","","","",""))
+
+    def _refresh_label(self):
+        try:
+            name, sp = self._fms_control.get_mode_and_setpoints()
+            self._set_label(True, name, sp)
+        except TypeError:
+            #no fms enalbed
+            self._set_label(False)
+        return True
 
     def _on_enabled(self, btn, widget, control_widget):
         enabled = btn.get_active()
@@ -43,7 +76,7 @@ class ControlController:
         hb.pack_start(widget, True, True)
         a.add(hb)
         f.show_all()
-        self.widget.pack_start(f, False, True)
+        self._control_widget.pack_start(f, False, True)
 
 class ControlWidgetIface:
 
