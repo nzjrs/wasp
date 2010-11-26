@@ -23,8 +23,16 @@
 #ifndef _WASP_H_
 #define _WASP_H_
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 #include "std.h"
 #include "comm.h"
 #include "messages.h"
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif /* _WASP_H_ */
