@@ -97,6 +97,8 @@ class ControlManager:
         #cache supported messages
         self._msg_fms_rc = messages_file["FMS_RC"]
         self._msg_fms_attitude = messages_file["FMS_ATTITUDE"]
+        self._msg_fms_on = messages_file["FMS_ON"]
+        self._msg_fms_off = messages_file["FMS_OFF"]
 
         #current message and args
         self._msg = None
@@ -125,9 +127,11 @@ class ControlManager:
         #if currently enabled and disabling then remove the source
         if self.enabled and not enable:
             gobject.source_remove(self._timeout_id)
+            self.source.send_command(self._msg_fms_off, ())
         #else if enabling and not currently enabled then add the source
         elif not self.enabled and enable:
             self._timeout_id = gobject.timeout_add(1000/CONTROL_REFRESH_FREQ, self._send_control)
+            self.source.send_command(self._msg_fms_on, ())
         self.enabled = enable
 
     def _generic_set(self, msg, _id, r, p, y, t):
