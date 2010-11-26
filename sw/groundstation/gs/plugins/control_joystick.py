@@ -66,8 +66,7 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
                 "Joystick Control",
                 self)
 
-        #YUCK, this breaks abstraction a bit, as commandcontroller is a UI widget...
-        self.command_controller = groundstation_window.commandcontroller
+        self.source = source
         self.start_motors_message = messages_file.get_message_by_name("MOTORS_START")
         self.stop_motors_message = messages_file.get_message_by_name("MOTORS_STOP")
 
@@ -100,9 +99,9 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
     def _on_joystick_button(self, joystick, button_num, button_value, init):
         if self.fms_control and button_value:
             if button_num == int(self._button_motor_start):
-                self.command_controller.send_command(self.start_motors_message, ())
+                self.source.send_command(self.start_motors_message, ())
             elif button_num == int(self._button_motor_stop):
-                self.command_controller.send_command(self.stop_motors_message, ())
+                self.source.send_command(self.stop_motors_message, ())
 
     def _on_joystick_event(self, joystick, joystick_axis, joystick_value, init):
         if self.fms_control:

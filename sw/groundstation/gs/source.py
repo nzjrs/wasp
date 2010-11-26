@@ -11,6 +11,7 @@ import gs.config
 import gs.utils as utils
 
 import wasp
+import wasp.fms as fms
 import wasp.transport as transport
 import wasp.communication as communication
 import wasp.ui.treeview as treeview
@@ -155,6 +156,9 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
                 gobject.TYPE_INT]),         #The ACID of a detected UAV
             "uav-selected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
                 gobject.TYPE_INT]),         #The ACID of a selected UAV
+            "command-ok"   : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, []),
+            "command-fail" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+                gobject.TYPE_INT]),         #The error code of the failed command
     }
 
     def __init__(self, conf, messages, options, listen_acid=wasp.ACID_ALL):
@@ -180,6 +184,9 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         source_name, comm_klass, cmdline_config = communication.get_source(options.source)
         LOG.info("Source: %s" % comm_klass)
         self.communication = comm_klass(self._transport, self._messages_file, self._groundstation_header)
+
+        #manage commands that expect a reply
+        self._command_manager = fms.CommandManager(self.communication)
 
         #configure the class, updating with command line values
         self._default_config = self.communication.get_configuration_default()
@@ -340,6 +347,17 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         if self.communication.is_connected():
             #FIXME: pass the header in here
             self.communication.send_message(msg, values)
+
+    def send_command(self, msg, vals):
+        """
+        Sends a command (a message that requires an ACK/NACK from the UAV). Emits command-ok or
+        command-fail signal when complete
+        """
+        self._command_manager.send_command(
+                                msg, vals,
+                                lambda: self.emit("command-ok"),
+                                lambda error_code: self.emit("command-fail", error_code)
+        )
 
     def connect_to_uav(self):
         """ Connects the communication to the UAV """

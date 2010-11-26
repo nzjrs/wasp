@@ -143,7 +143,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("settings_hbox").pack_start(self.settingscontroller.widget, True, True)
 
         #The command and control tab page
-        self.commandcontroller = CommandController(self._source, self._messagesfile)
+        self.commandcontroller = CommandController(self._source, self._messagesfile, self._settingsfile)
         self.get_resource("command_hbox").pack_start(self.commandcontroller.widget, False, True)
         self.controlcontroller = ControlController(self._source, self._messagesfile, self._settingsfile)
         self.get_resource("control_hbox").pack_start(self.controlcontroller.widget, True, True)
