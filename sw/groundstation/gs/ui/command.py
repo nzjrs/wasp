@@ -14,8 +14,6 @@ class CommandController(gs.ui.GtkBuilderWidget):
         gs.ui.GtkBuilderWidget.__init__(self, "command.ui")
 
         self._source = source
-        self._source.connect("command-ok", self._on_command_ok)
-        self._source.connect("command-fail", self._on_command_fail)
 
         self.widget = self.get_resource("hbox")
 
@@ -27,12 +25,6 @@ class CommandController(gs.ui.GtkBuilderWidget):
         self.get_resource("commands_sw").add(self._tv)
 
         self.get_resource("command_send_button").connect("clicked", self._on_send_clicked)
-
-    def _on_command_ok(self, source):
-        LOG.debug("COMMAND OK")
-
-    def _on_command_fail(self, source, error_code):
-        LOG.debug("COMMAND FAIL: %s" % error_code)
 
     def _on_send_clicked(self, btn):
         msg,vals = self._tv.get_selected_message_and_values()

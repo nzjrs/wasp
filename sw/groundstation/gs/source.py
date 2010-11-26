@@ -156,9 +156,11 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
                 gobject.TYPE_INT]),         #The ACID of a detected UAV
             "uav-selected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
                 gobject.TYPE_INT]),         #The ACID of a selected UAV
-            "command-ok"   : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, []),
+            "command-ok"   : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+                gobject.TYPE_INT]),         #The MSGID
             "command-fail" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
-                gobject.TYPE_INT]),         #The error code of the failed command
+                gobject.TYPE_INT,           #The MSGID
+                gobject.TYPE_STRING]),      #The error message of the failed command
     }
 
     def __init__(self, conf, messages, options, listen_acid=wasp.ACID_ALL):
@@ -351,12 +353,12 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
     def send_command(self, msg, vals):
         """
         Sends a command (a message that requires an ACK/NACK from the UAV). Emits command-ok or
-        command-fail signal when complete
+        command-fail signal when complete.
         """
         self._command_manager.send_command(
                                 msg, vals,
-                                lambda: self.emit("command-ok"),
-                                lambda error_code: self.emit("command-fail", error_code)
+                                lambda msgid: self.emit("command-ok", msgid),
+                                lambda msgid, error_code: self.emit("command-fail", msgid, error_code)
         )
 
     def connect_to_uav(self):

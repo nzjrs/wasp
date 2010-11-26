@@ -4,9 +4,9 @@ import gobject
 COMMAND_ACK             = "ACK"
 COMMAND_NACK            = "NACK"
 
-COMMAND_ERROR_PENDING   = 0
-COMMAND_ERROR_LOST      = 1
-COMMAND_ERROR_NACK      = 2
+COMMAND_ERROR_PENDING   = "Message In Flight"
+COMMAND_ERROR_LOST      = "Message Lost"
+COMMAND_ERROR_NACK      = "Message Not Acknowledged"
 
 CONTROL_REFRESH_FREQ    = 20
 
@@ -44,9 +44,9 @@ class _Command:
         #check we have not timed out
         if self.watch != None:
             if msg_name == COMMAND_ACK:
-                self.ok_cb()
+                self.ok_cb(self.msgid)
             elif msg_name == COMMAND_NACK:
-                self.failed_cb(COMMAND_ERROR_NACK)
+                self.failed_cb(self.msgid, COMMAND_ERROR_NACK)
             else:
                 raise Exception("Unknown message name (should be ACK or NACK)")
             #cancel timeout
@@ -55,7 +55,7 @@ class _Command:
     def _on_timeout(self, delete_myself_cb):
         #check we have not been cancelled
         if self.watch != None:
-            self.failed_cb(COMMAND_ERROR_LOST)
+            self.failed_cb(self.msgid, COMMAND_ERROR_LOST)
             delete_myself_cb(self.msgid)
         self.watch = None
         return False
@@ -83,7 +83,7 @@ class CommandManager:
             raise Exception("Can only send command messages")
 
         if msg.id in self.pending:
-            failed_cb(COMMAND_ERROR_PENDING)
+            failed_cb(msg.id, COMMAND_ERROR_PENDING)
         else:
             self.pending[msg.id] = _Command(msg.id, ok_cb, failed_cb, self._delete_command)
             self.communication.send_message(msg, values)
