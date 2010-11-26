@@ -252,6 +252,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         return self.STATUS_DISCONNECTED
 
     def register_csv_logger(self, logfilepath, *message_names):
+        """ Registers messages to be logged to a CSV file """
         #only allowed one CSV per message
         for m in message_names:
             msg = self._messages_file.get_message_by_name(m)
@@ -262,6 +263,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
             self._save_callback(msg, mcb)
 
     def register_sqlite_logger(self, logfilepath, *message_names):
+        """ Registers messages to be logged to a sqlite database """
         #the sqlite logger can store multiple messages in the same DB
         mcb = _LogSqliteCb(logfilepath)
         for m in message_names:
@@ -330,20 +332,25 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
 
 
     def get_rx_message_treestore(self):
+        """ Returns the gtk.TreeStore that holds recieved message details """
         return self._rxts
 
     def send_message(self, msg, values):
+        """ Sends a message to the UAV """
         if self.communication.is_connected():
             #FIXME: pass the header in here
             self.communication.send_message(msg, values)
 
     def connect_to_uav(self):
+        """ Connects the communication to the UAV """
         self.communication.connect_to_uav()
 
     def disconnect_from_uav(self):
+        """ Disconnects the communication from the UAV """
         self.communication.disconnect_from_uav()
 
     def refresh_uav_info(self):
+        """ Requests information about the UAV, from the BUILD_INFO message """
         m = self._messages_file.get_message_by_name("BUILD_INFO")
         self.request_message(m.id)
 
@@ -369,6 +376,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         self.request_telemetry(message_name, 0.0);
 
     def quit(self):
+        """ Cleans up all resources, disconnects callbacks, etc """
         self.disconnect_from_uav()
         for cbs in self._callbacks.values():
             for cb in cbs:
@@ -382,6 +390,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         return self.communication.COMMUNICATION_TYPE, self.communication.get_connection_string()
 
     def get_messages_per_second(self):
+        """ Returns the number of messages received from the UAV per second """
         if self._linkok:
             try:
                 return 1.0/self._times.average()
@@ -390,6 +399,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         return 0.0
 
     def get_ping_time(self):
+        """ Returns the average round trip time to ping the UAV """
         if self._linkok:
             if self._sendping:
                 return self._pingtime
