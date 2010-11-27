@@ -7,6 +7,8 @@ INCDIR              = ./include
 LIB                 = ./lib/libwasp.a
 OBJS                = comm.o messages.o wasp.o
 
+PREFIX             ?= /usr
+
 default: dir $(LIB)
 
 dir:
@@ -52,3 +54,12 @@ clean:
 test: test.c $(LIB)
 	@echo COMPILE test
 	$(Q)$(CC) -g -Wall -I$(INCDIR) -o $@ $^
+
+install: $(LIB)
+	@echo INSTALL TO $(PREFIX)
+	$(Q) mkdir -p $(PREFIX)/include
+	$(Q) cp -r $(INCDIR) $(PREFIX)/include/libwasp
+	$(Q) mkdir -p $(PREFIX)/lib/libwasp
+	$(Q) cp $(LIB) $(PREFIX)/lib/libwasp/
+
+
