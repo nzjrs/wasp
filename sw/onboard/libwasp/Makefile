@@ -38,6 +38,7 @@ $(LIB):  headers-copy generated $(OBJS)
 	$(Q)$(AR) rcs $@ $(OBJS)
 
 headers-copy: dir
+	@echo COPY HEADERS
 	$(Q) cp $(SRCDIR)/std.h $(INCDIR)
 	$(Q) cp $(SRCDIR)/messages_types.h $(INCDIR)
 
