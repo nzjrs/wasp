@@ -269,6 +269,7 @@
      <field name="pitch"   type="float"/>
      <field name="heading" type="float"/>
      <field name="thrust"  type="int32"/>
+     <field name="enabled" type="uint8"/>
    </message>
 
    <message name="FMS_RC" id="52">
@@ -276,6 +277,7 @@
      <field name="pitch"   type="int32"/>
      <field name="heading" type="int32"/>
      <field name="thrust"  type="int32"/>
+     <field name="enabled" type="uint8"/>
    </message>
 
    <message name="SP_ATTITUDE" id="53">

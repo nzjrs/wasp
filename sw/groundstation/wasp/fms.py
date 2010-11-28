@@ -15,8 +15,9 @@ ID_PITCH                = 1
 ID_HEADING              = 2
 ID_THRUST               = 3
 
+ID_NAMES                = ["roll", "pitch", "heading", "thrust"]
+
 ID_LIST_FMS_ATTITUDE    = [ID_ROLL, ID_PITCH, ID_HEADING, ID_THRUST]
-ID_LIST_FMS_RC          = [ID_ROLL, ID_PITCH, ID_HEADING, ID_THRUST]
 
 ID_RC                   = 0
 ID_ATTITUDE             = 1
@@ -30,6 +31,9 @@ RANGE_ATTITUDE          = [(-180,180),(-180,180),(-9600,9600),(0,200)]
 LIST_IDS                = [ID_RC, ID_ATTITUDE]
 LIST_TYPES              = [TYPE_RC, TYPE_ATTITUDE]
 LIST_RANGES             = [RANGE_RC, RANGE_ATTITUDE]
+
+#maps ID's to the enable mask value, keep in sync with FMSEnabledMask_T
+ENABLE_MASK             = [0x01, 0x02, 0x04, 0x08]
 
 LOG = logging.getLogger("wasp.fms")
 
@@ -111,6 +115,8 @@ class ControlManager:
             [t() for t in TYPE_RC],
             [t() for t in TYPE_ATTITUDE]
         ]
+        #enabled mask
+        self._enabled_mask = 0x00
 
         #corrections, trim
         self._corrections = [
@@ -120,7 +126,12 @@ class ControlManager:
 
     def _send_control(self):
         if self._msg != None and self._msg_id != None:
-            self.source.send_message(self._msg, self._sp[self._msg_id])
+            self.source.send_message(self._msg, (
+                            self._sp[self._msg_id][ID_ROLL],
+                            self._sp[self._msg_id][ID_PITCH],
+                            self._sp[self._msg_id][ID_HEADING],
+                            self._sp[self._msg_id][ID_THRUST],
+                            self._enabled_mask))
         return True
 
     def enable(self, enable=True):
@@ -133,6 +144,12 @@ class ControlManager:
             self._timeout_id = gobject.timeout_add(1000/CONTROL_REFRESH_FREQ, self._send_control)
             self.source.send_command(self._msg_fms_on, ())
         self.enabled = enable
+
+    def enable_axis(self, _id):
+        self._enabled_mask |= ENABLE_MASK[_id]
+
+    def disable_axis(self, _id):
+        self._enabled_mask &= ~ENABLE_MASK[_id]
 
     def _generic_set(self, msg, _id, r, p, y, t):
         #apply corrections, cast to correct type, nd cache/store the result for later sending

@@ -124,6 +124,8 @@ void booz2_guidance_mode_changed(uint8_t h_mode, uint8_t v_mode)
 
 void booz2_guidance_on_rc_event(bool_t in_flight)
 {
+    struct Int32Eulers rc_sp;
+
     /* horizontal control mode */
     switch ( booz2_guidance_h_mode )
     {
@@ -134,12 +136,23 @@ void booz2_guidance_on_rc_event(bool_t in_flight)
             booz2_stabilization_attitude_read_rc(&booz_stabilization_att_sp, in_flight);
             break;
         case BOOZ2_GUIDANCE_H_MODE_HOVER:
+            /* always read the RC because FMS can be applied to individual channels */
+            booz2_stabilization_attitude_read_rc(&rc_sp, in_flight);
             if ( fms_is_enabled() ) {
-                EULERS_COPY(booz2_guidance_h_rc_sp, fms.command.h_sp.attitude);
-                /* blank out yaw */
+                /* roll */
+                if (fms.enabled_mask & FMS_ROLL)
+                    booz2_guidance_h_rc_sp.phi = fms.command.h_sp.attitude.phi;
+                else
+                    booz2_guidance_h_rc_sp.phi = rc_sp.phi;
+                /* pitch */
+                if (fms.enabled_mask & FMS_PITCH)
+                    booz2_guidance_h_rc_sp.theta = fms.command.h_sp.attitude.theta;
+                else
+                    booz2_guidance_h_rc_sp.theta = rc_sp.theta;
+                /* FIXME: BLANK OUT heading */
                 booz2_guidance_h_rc_sp.psi = ahrs.ltp_to_body_euler.psi << (ANGLE_REF_RES - INT32_ANGLE_FRAC);
             } else {
-                booz2_stabilization_attitude_read_rc(&booz2_guidance_h_rc_sp, in_flight);
+                EULERS_COPY(booz2_guidance_h_rc_sp, rc_sp);
             }
             break;
     }
@@ -148,7 +161,7 @@ void booz2_guidance_on_rc_event(bool_t in_flight)
     switch (booz2_guidance_v_mode)
     {
         case BOOZ2_GUIDANCE_V_MODE_RC_DIRECT:
-            if ( fms_is_enabled() ) {
+            if ( fms_is_enabled() && fms.enabled_mask & FMS_THRUST ) {
                 booz2_guidance_v_rc_delta_t = fms.command.v_sp.direct;
             } else {
                 booz2_guidance_v_rc_delta_t = (int32_t)rc_values[RADIO_THROTTLE] * 200 / MAX_PPRZ;
