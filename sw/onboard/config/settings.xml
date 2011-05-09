@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <settings>
   <section name="AUTOPILOT">
-    <setting name="MODE_MANUAL" value="AP_MODE_RATE_DIRECT" doc="Autopilot mode in manual flight"/>
+    <setting name="MODE_MANUAL" value="AP_MODE_RC_DIRECT" doc="Autopilot mode in manual flight"/>
     <setting name="MODE_AUTO1" value="AP_MODE_HOVER_DIRECT" doc="Autopilot mode 1"/>
     <setting name="MODE_AUTO2" value="AP_MODE_ATTITUDE_DIRECT" doc="Autopilot mode 2"/>
   </section>
@@ -17,8 +17,15 @@
     <setting name="BODY_TO_IMU_THETA" type="float" value="1.50" min="-5.0" max="5.0" step="0.05" set="1" get="1"/>
     <setting name="BODY_TO_IMU_PSI" type="float" value="0.0" min="-5.0" max="5.0" step="0.05" set="1" get="1"/>
   </section>
-  <section name="BOOZ2_FMS">
-    <setting name="TYPE" value="BOOZ2_FMS_TYPE_TEST_SIGNAL"/>
+  <section name="FMS">
+    <setting name="CORRECTION_RC_ROLL" value="0"/>
+    <setting name="CORRECTION_RC_PITCH" value="0"/>
+    <setting name="CORRECTION_RC_HEADING" value="0"/>
+    <setting name="CORRECTION_RC_THRUST" value="0"/>
+    <setting name="CORRECTION_ATTITUDE_ROLL" value="12.0"/>
+    <setting name="CORRECTION_ATTITUDE_PITCH" value="-14.0"/>
+    <setting name="CORRECTION_ATTITUDE_HEADING" value="0.0"/>
+    <setting name="CORRECTION_ATTITUDE_THRUST" value="0.0"/>
   </section>
   <section name="PERIODIC">
     <setting name="TASK_DT" value="(1./512.)" doc="the periodic task time (seconds), the main loop runs at 1/TASK_DT"/>
@@ -136,8 +143,6 @@
     <setting name="V_MAX_ERR_ZD" value="SPEED_BFP_OF_REAL( 10.)"/>
     <setting name="V_HOVER_KP" value="-300"/>
     <setting name="V_HOVER_KD" value="-400"/>
-    <setting name="V_RC_CLIMB_COEF" value="163"/>
-    <setting name="V_RC_CLIMB_DEAD_BAND" value="160000"/>
     <setting name="H_PGAIN" value="-20"/>
     <setting name="H_DGAIN" value="-0"/>
     <setting name="H_IGAIN" value="-5"/>

@@ -26,22 +26,16 @@
 #include "std.h"
 #include "messages_types.h"
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 extern SystemStatus_t           comm_system_status;
 
 void comm_send_ch ( CommChannel_t chan, uint8_t c );
 void comm_send_message_ch ( CommChannel_t chan, uint8_t c );
 void comm_start_message ( CommChannel_t chan, uint8_t id, uint8_t len );
 void comm_end_message ( CommChannel_t chan );
-void comm_init (void);
+void comm_init (uint8_t acid);
+void comm_set_user_data( CommChannel_t chan, void *data );
+void *comm_get_user_data( CommChannel_t chan );
 const CommMessage_t *comm_parse (uint8_t *data, uint8_t len);
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif /* COMM_H */
 

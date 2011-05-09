@@ -35,7 +35,6 @@
 #include "settings.h"
 #include "sys_time.h"
 #include "autopilot.h"
-#include "guidance.h"
 
 #include "generated/radio.h"
 #include "generated/messages.h"
@@ -127,22 +126,27 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
 			        &booz_imu.mag.z);
             break;
         case MESSAGE_ID_PPM:
-#if MESSAGE_PPM_NUM_ELEMENTS_values == RADIO_CTL_NB
+/* The PPM/RC message is 6 elements, so we need at least 6
+   channels if we want to unconditionally send this array, that
+   is an OK requirement because all RC/helicopter TX/RX kits are 6ch
+   or more anyway... */
+#if RADIO_CTL_NB >= MESSAGE_PPM_NUM_ELEMENTS_values
             MESSAGE_SEND_PPM(chan, ppm_pulses);
 #else
-            #error PPM message size mismatch
+            #error PPM message size mismatch (insufficient RC channels)
 #endif
             break;
         case MESSAGE_ID_RC:
-#if MESSAGE_RC_NUM_ELEMENTS_values == RADIO_CTL_NB
+#if RADIO_CTL_NB >= MESSAGE_RC_NUM_ELEMENTS_values
             MESSAGE_SEND_RC(chan, rc_values);
 #else
-            #error RC message size mismatch
+            #error RC message size mismatch (insufficient RC channels)
 #endif
             break;
         case MESSAGE_ID_STATUS:
             {
             uint8_t bat = analog_read_battery();
+            bool_t fms_enabled = fms_is_enabled();
             MESSAGE_SEND_STATUS(
                     chan,
                     &rc_status,
@@ -152,7 +156,7 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &autopilot.motors_on,
                     &autopilot.mode,
                     &cpu_usage,
-                    &fms.enabled,
+                    &fms_enabled,
                     &fms.mode);
             }
             break;
@@ -168,11 +172,15 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
             }
             break;
         case MESSAGE_ID_AUTOPILOT:
+            {
+            uint8_t h_mode, v_mode;
+            autopilot_get_h_and_v_control_modes(&h_mode, &v_mode);
             MESSAGE_SEND_AUTOPILOT(
                     chan,
                     &autopilot.mode,
-                    &booz2_guidance_h_mode,
-                    &booz2_guidance_v_mode);
+                    &h_mode,
+                    &v_mode);
+            }
             break;
         case MESSAGE_ID_STATUS_LOWLEVEL:
             MESSAGE_SEND_STATUS_LOWLEVEL(
@@ -229,6 +237,25 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &autopilot.commands[2],
                     &autopilot.commands[3]);
             break;
+        case MESSAGE_ID_SP_ATTITUDE:
+            {
+                float r,p,y;
+                struct Int32Eulers *sp = autopilot_sp_get_attitude();
+                if (sp) {
+                    r = ANGLE_FLOAT_OF_BFP(sp->phi);
+                    p = ANGLE_FLOAT_OF_BFP(sp->theta);
+                    y = ANGLE_FLOAT_OF_BFP(sp->psi);
+                } else {
+                    r = p = y = 0.0;
+                }
+                MESSAGE_SEND_SP_ATTITUDE(
+                    chan,
+                    &autopilot.mode,
+                    &r,
+                    &p,
+                    &y);
+            }
+            break;
         default:
             ret = FALSE;
             break;
@@ -251,6 +278,16 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
         case MESSAGE_ID_SETTING_FLOAT:
             ret = settings_handle_message_received(chan, message);
             need_ack = FALSE;
+            break;
+        case MESSAGE_ID_FMS_ATTITUDE:
+            fms_set(message);
+            need_ack = FALSE;
+            break;
+        case MESSAGE_ID_FMS_ON:
+            fms_msg_enable(TRUE);
+            break;
+        case MESSAGE_ID_FMS_OFF:
+            fms_msg_enable(FALSE);
             break;
         case MESSAGE_ID_ALTIMETER_RESET:
             altimeter_recalibrate();

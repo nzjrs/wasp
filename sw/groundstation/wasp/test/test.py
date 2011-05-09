@@ -52,10 +52,10 @@ class MessageFileTest(unittest.TestCase):
 
 class MessageTest(unittest.TestCase):
     def setUp(self):
-        mf = get_mf()
-        self.test = mf.get_message_by_name(TEST_NAME)
-        self.pong = mf.get_message_by_name(PONG_NAME)
-        self.test_coef = mf.get_message_by_name(TEST_COEF_MSG_NAME)
+        self.mf = get_mf()
+        self.test = self.mf.get_message_by_name(TEST_NAME)
+        self.pong = self.mf.get_message_by_name(PONG_NAME)
+        self.test_coef = self.mf.get_message_by_name(TEST_COEF_MSG_NAME)
 
     def testName(self):
         self.assertEqual(self.test.name, TEST_NAME)
@@ -152,6 +152,15 @@ class FieldTest(unittest.TestCase):
 
         v = u8.interpret_value_from_user_string("LOST")
         self.failUnlessEqual( v, 1 )
+
+    def testValueIndirect(self):
+        tv = self.mf.get_message_by_name(TEST_VALUES_NAME)
+
+        self.failUnlessEqual( tv.num_fields, 2 )
+
+        self.failUnlessEqual( tv.get_field_by_name("abc").get_value_range(), ['a','b','c'] )
+
+        self.failUnlessEqual( tv.get_field_by_name("123").get_value_range(), ['1','2','3'] )
 
     def testInterpret(self):
         u8 = self.test.get_field_by_name("a_uint8")

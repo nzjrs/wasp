@@ -36,21 +36,15 @@
 #include "comm.h"
 #include "comm_autopilot.h"
 
+#include "gps.h"
+#include "ahrs.h"
+#include "ins.h"
 #include "imu.h"
 #include "analog.h"
 #include "altimeter.h"
 
-#include "autopilot.h"
-#include "stabilization.h"
-
-#include "gps.h"
-#include "guidance.h"
-//#include "booz2_navigation.h"
-
-#include "ahrs.h"
-#include "ins.h"
-
 #include "fms.h"
+#include "autopilot.h"
 
 #include "autopilot_main.h"
 
@@ -93,8 +87,6 @@ static inline void autopilot_main_init( void ) {
   imu_init();
 
   autopilot_init();
-  guidance_init();
-  stabilization_init();
 
   ahrs_init();
   ins_init();

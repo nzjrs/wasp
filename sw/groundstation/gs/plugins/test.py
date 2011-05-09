@@ -9,7 +9,7 @@ LOG = logging.getLogger('testmanager')
 
 class TestConfigurable(plugin.Plugin, config.ConfigurableIface):
     CONFIG_SECTION = "TEST"
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
         config.ConfigurableIface.__init__(self, conf)
         if not wasp.IS_TESTING:
             raise plugin.PluginNotSupported("Only enabled when WASP_IS_TESTING")

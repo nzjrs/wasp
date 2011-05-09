@@ -20,15 +20,13 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef _STABILIZATION_INIT_H_
-#define _STABILIZATION_INIT_H_
+#ifndef BOOZ2_STABILIZATION_RATE
+#define BOOZ2_STABILIZATION_RATE
 
-#include "std.h"
+#include "math/pprz_algebra_int.h"
 
-void
-stabilization_init(void);
+void booz2_stabilization_rate_init(void);
+void booz2_stabilization_rate_read_rc(void);
+void booz2_stabilization_rate_run(bool_t in_flight, int32_t *stabilization_cmd);
 
-void
-stabilization_tune(uint8_t setting, int32_t val);
-
-#endif /* _STABILIZATION_INIT_H_ */
+#endif /* BOOZ2_STABILIZATION_RATE */

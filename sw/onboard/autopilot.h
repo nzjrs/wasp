@@ -34,19 +34,9 @@
 typedef enum {
     AP_MODE_FAILSAFE = 0,
     AP_MODE_KILL,
-    AP_MODE_RATE_DIRECT,
+    AP_MODE_RC_DIRECT,
     AP_MODE_ATTITUDE_DIRECT,
-    AP_MODE_RATE_RC_CLIMB,
-    AP_MODE_ATTITUDE_RC_CLIMB,
-    AP_MODE_ATTITUDE_CLIMB,
-    AP_MODE_RATE_Z_HOLD,
-    AP_MODE_ATTITUDE_Z_HOLD,
-    AP_MODE_ATTITUDE_HOLD,
-    AP_MODE_HOVER_DIRECT,
-    AP_MODE_HOVER_CLIMB,
-    AP_MODE_HOVER_Z_HOLD,
-    AP_MODE_NAV,
-    AP_MODE_RC_DIRECT
+    AP_MODE_HOVER_DIRECT
 } AutopilotMode_t;
 
 typedef struct __Autopilot {
@@ -65,6 +55,7 @@ autopilot_mode_of_radio(pprz_t mode_channel);
 extern uint32_t     autopilot_motors_on_counter;
 extern uint32_t     autopilot_in_flight_counter;
 extern Autopilot_t  autopilot;
+
 
 void
 autopilot_init(void);
@@ -86,5 +77,11 @@ autopilot_set_motors(bool_t on);
 
 void
 autopilot_kill(void);
+
+void
+autopilot_get_h_and_v_control_modes(uint8_t *h_mode, uint8_t *v_mode);
+
+struct Int32Eulers *
+autopilot_sp_get_attitude(void);
 
 #endif /* AUTOPILOT_H */

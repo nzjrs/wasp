@@ -26,6 +26,8 @@ TEST_SETTING_DOC = "foo"
 
 XML = """<?xml version="1.0"?>
 <messages>
+   <value name="abc" values="a|b|c"/>
+
    <message name="PONG" id="2"/>
    <message name="TEST_MESSAGE" id="26">
      <field name="a_uint8" type="uint8" values="OK|LOST|REALLY_LOST"/>
@@ -45,11 +47,15 @@ XML = """<?xml version="1.0"?>
      <field name="a_float" type="float" alt_unit_coef="0.5"/>
    </message>
    <message name="ALTIMETER_RESET" id="43" command="1"/>
+   <message name="TEST_VALUES" id="99">
+     <field name="abc" type="uint8" values="@abc"/>
+     <field name="123" type="uint8" values="1|2|3"/>
+   </message>
    <periodic>
       <message name="TEST_MESSAGE" frequency="0.5"/>
    </periodic>
 </messages>"""
-NUM_MESSAGES = 5
+NUM_MESSAGES = 6
 
 PONG_ID = 2
 PONG_NAME = "PONG"
@@ -59,6 +65,8 @@ TEST_NAME = "TEST_MESSAGE"
 TEST_MSG_FIELD_NAME = "a_uint8"
 TEST_COEF_MSG_ID = 9
 TEST_COEF_MSG_NAME = "TEST_COEF"
+
+TEST_VALUES_NAME = "TEST_VALUES"
 
 TEST_ACID = 0x78
 

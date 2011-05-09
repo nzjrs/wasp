@@ -71,6 +71,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         LOG.info("Restored preferences: %s" % prefsfile)
         LOG.info("Messages file: %s" % messagesfile)
         LOG.info("Settings file: %s" % settingsfile)
+        LOG.info("Installed: %d" % gs.IS_INSTALLED)
+        LOG.info("Windows: %d" % gs.IS_WINDOWS)
 
         try:
             GtkBuilderWidget.__init__(self, "groundstation.ui")
@@ -128,7 +130,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._statusicon.connect("activate", lambda si, win: win.present(), self.window)
 
         self.get_resource("main_left_vbox").pack_start(self._info.widget, False, False)
-        self.get_resource("main_map_vbox").pack_start(self._msgarea, False, False)
+        self.get_resource("window_vbox").pack_start(self._msgarea, False, False)
         self.get_resource("window_vbox").pack_start(self._sb, False, False)
 
         #The telemetry tab page
@@ -136,15 +138,18 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("telemetry_hbox").pack_start(self.telemetrycontroller.widget, True, True)
 
         #The settings tab page
-        settingsfile = SettingsFile(path=settingsfile)
-        self.settingscontroller = SettingsController(self._source, settingsfile, self._messagesfile)
+        self._settingsfile = SettingsFile(path=settingsfile)
+        self.settingscontroller = SettingsController(self._source, self._settingsfile, self._messagesfile)
         self.get_resource("settings_hbox").pack_start(self.settingscontroller.widget, True, True)
 
         #The command and control tab page
-        self.commandcontroller = CommandController(self._source, self._messagesfile)
+        self.commandcontroller = CommandController(self._source, self._messagesfile, self._settingsfile)
         self.get_resource("command_hbox").pack_start(self.commandcontroller.widget, False, True)
-        self.controlcontroller = ControlController(self._source, self._messagesfile)
+        self.controlcontroller = ControlController(self._source, self._messagesfile, self._settingsfile)
         self.get_resource("control_hbox").pack_start(self.controlcontroller.widget, True, True)
+        #Track ok/failed command messages
+        self._source.connect("command-ok", self._on_command_ok)
+        self._source.connect("command-fail", self._on_command_fail)
 
         #Lazy initialize the following when first needed
         self._plane_view = None
@@ -159,7 +164,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         #initialize the plugins
         self._plugin_manager = PluginManager(plugindir)
         if not disable_plugins:
-            self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self)
+            self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self._settingsfile, self)
     
         #Setup those items which are configurable, or depend on configurable
         #information, and implement config.ConfigurableIface
@@ -181,6 +186,17 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.builder_connect_signals()
 
         self.window.show_all()
+
+    def _on_command_ok(self, source, msgid):
+        LOG.debug("COMMAND OK (ID: %d)", msgid)
+
+    def _on_command_fail(self, source, msgid, error_msg):
+        msg = self._messagesfile.get_message_by_id(msgid)
+        self._msgarea.new_from_text_and_icon(
+                        "Command Error",
+                        "Message %s, %s" % (msg.name, error_msg),
+                        message_type=gtk.MESSAGE_ERROR,
+                        timeout=5).show_all()
 
     def _on_uav_detected(self, source, acid):
         self._uav_detected_model.append( ("0x%X" % acid, acid) )
@@ -432,7 +448,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         w.show_all()
 
     def on_menu_item_home_activate(self, widget):
-        self._map.set_mapcenter(self._home_lat, self._home_lon, self._home_zoom)
+        self._map.centre(self._home_lat, self._home_lon, self._home_zoom)
 
     def on_menu_item_centre_activate(self, widget):
         self._map.centre()

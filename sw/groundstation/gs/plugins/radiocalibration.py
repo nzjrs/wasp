@@ -23,7 +23,7 @@ RADIO_CHANNELS = (
 
 class RadioCalibrator(plugin.Plugin, gs.ui.GtkBuilderWidget):
 
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
         mydir = os.path.dirname(os.path.abspath(__file__))
         uifile = os.path.join(mydir, "radiocalibration.ui")
         gs.ui.GtkBuilderWidget.__init__(self, uifile)

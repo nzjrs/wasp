@@ -27,13 +27,22 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
     DEFAULT_REVERSE_PITCH   = "0"
     DEFAULT_REVERSE_HEADING = "0"
     DEFAULT_REVERSE_THRUST  = "0"
+    DEFAULT_BUTTON_MOTOR_START  = "2"
+    DEFAULT_BUTTON_MOTOR_STOP   = "3"
 
-    AXIS_ID_ROLL            = 0
-    AXIS_ID_PITCH           = 1
-    AXIS_ID_HEADING         = 2
-    AXIS_ID_THRUST          = 3
+    AXIS_ID_ROLL            = fms.ID_ROLL
+    AXIS_ID_PITCH           = fms.ID_PITCH
+    AXIS_ID_HEADING         = fms.ID_HEADING
+    AXIS_ID_THRUST          = fms.ID_THRUST
+    MAX_AXIS_ID             = fms.ID_THRUST + 1
 
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    #limit joystick authority to less than full command range
+    RANGE_ATTITUDE_ROLL     = map(lambda x: x * 0.5, fms.RANGE_ATTITUDE[fms.ID_ROLL])
+    RANGE_ATTITUDE_PITCH    = map(lambda x: x * 0.5, fms.RANGE_ATTITUDE[fms.ID_PITCH])
+    RANGE_ATTITUDE_HEADING  = map(lambda x: x * 0.5, fms.RANGE_ATTITUDE[fms.ID_HEADING])
+    RANGE_ATTITUDE_THRUST   = fms.RANGE_ATTITUDE[fms.ID_THRUST]
+
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
 
         if not joystick.list_devices():
             raise plugin.PluginNotSupported("No Joystick (/dev/input/js) devices found")
@@ -43,10 +52,11 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
                 "device",
                 "axis_roll", "axis_pitch", "axis_heading", "axis_thrust",
                 "reverse_roll", "reverse_pitch", "reverse_heading", "reverse_thrust",
+                "button_motor_start", "button_motor_stop",
                 update_state_cb=self._on_joystick_device_set)
 
         self.joystick = None
-        self.joystick_id = None
+        self.joystick_axis_id = None
 
         self.ui = gtk.VBox()
         self.jsw = joystickui.JoystickWidget(num_axis=4, axis_labels=("R","P","Y","T"), show_range=False)
@@ -56,52 +66,67 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
                 "Joystick Control",
                 self)
 
-        self._servo_vals = [0,0,0,0,0,0]
+        self.source = source
+        self.start_motors_message = messages_file.get_message_by_name("MOTORS_START")
+        self.stop_motors_message = messages_file.get_message_by_name("MOTORS_STOP")
+
+        self._attitude_vals = [0.0] * self.MAX_AXIS_ID
 
     def _on_joystick_device_set(self):
         if self.joystick != None:
             self.joystick.close()
-            self.joystick.disconnect(self.joystick_id)
+            self.joystick.disconnect(self.joystick_axis_id)
+            self.joystick.disconnect(self.joystick_button_id)
 
         self.joystick = joystick.CalibratedJoystick(device=self._device)
-        self.joystick_id = self.joystick.connect("axis", self._on_joystick_event)
+        self.joystick_axis_id = self.joystick.connect("axis", self._on_joystick_event)
+        self.joystick_button_id = self.joystick.connect("button", self._on_joystick_button)
 
         self.joystick.axis_remap(int(self._axis_roll), self.AXIS_ID_ROLL)
         self.joystick.axis_remap(int(self._axis_pitch), self.AXIS_ID_PITCH)
         self.joystick.axis_remap(int(self._axis_heading), self.AXIS_ID_HEADING)
         self.joystick.axis_remap(int(self._axis_thrust), self.AXIS_ID_THRUST)
-        if self._reverse_roll:
-            self.joystick.axis_reverse(int(self._axis_roll))
-        if self._reverse_pitch:
-            self.joystick.axis_reverse(int(self._axis_pitch))
-        if self._reverse_heading:
-            self.joystick.axis_reverse(int(self._axis_heading))
-        if self._reverse_thrust:
-            self.joystick.axis_reverse(int(self._axis_thrust))
 
+        self.joystick.axis_reverse(int(self._axis_roll), self._reverse_roll == "1")
+        self.joystick.axis_reverse(int(self._axis_pitch), self._reverse_pitch == "1")
+        self.joystick.axis_reverse(int(self._axis_heading), self._reverse_heading == "1")
+        self.joystick.axis_reverse(int(self._axis_thrust), self._reverse_thrust == "1")
 
         self.jsw.set_joystick(self.joystick)
 
         LOG.info("Joystick initialized: %s" % self._device)
 
+    def _on_joystick_button(self, joystick, button_num, button_value, init):
+        if self.fms_control and button_value:
+            if button_num == int(self._button_motor_start):
+                self.source.send_command(self.start_motors_message, ())
+            elif button_num == int(self._button_motor_stop):
+                self.source.send_command(self.stop_motors_message, ())
+
     def _on_joystick_event(self, joystick, joystick_axis, joystick_value, init):
         if self.fms_control:
-            self._servo_vals[joystick_axis] = int(gs.scale_to_range(
-                                                        joystick_value,
-                                                        oldrange=(-32767,32767),
-                                                        newrange=(-9600,9600)))
-            self.fms_control.set_rc(*self._servo_vals)
-        #try:
-        #    label, progress_bar, fms_axis_id = self.progress[ self.axis_channel[joystick_axis] ]
-        #    value = gs.scale_to_range(
-        #                    joystick_value,
-        #                    oldrange=(-32767,32767),
-        #                    newrange=(0.0,1.0),
-        #                    reverse=self.axis_reverse[joystick_axis])
-        #    progress_bar.set_value(value)
-        #except KeyError:
-        #    #ignored axis
-        #    pass
+            if joystick_axis < self.MAX_AXIS_ID:
+                #scale to the range expected by the attitude message
+                if joystick_axis == self.AXIS_ID_THRUST:
+                    val = gs.scale_to_range(joystick_value,
+                                            oldrange=(-32767,32767),
+                                            newrange=self.RANGE_ATTITUDE_THRUST)
+                elif joystick_axis == self.AXIS_ID_ROLL:
+                    val = gs.scale_to_range(joystick_value,
+                                            oldrange=(-32767,32767),
+                                            newrange=self.RANGE_ATTITUDE_ROLL)
+                elif joystick_axis == self.AXIS_ID_PITCH:
+                    val = gs.scale_to_range(joystick_value,
+                                            oldrange=(-32767,32767),
+                                            newrange=self.RANGE_ATTITUDE_PITCH)
+                elif joystick_axis == self.AXIS_ID_HEADING:
+                    val = gs.scale_to_range(joystick_value,
+                                            oldrange=(-32767,32767),
+                                            newrange=self.RANGE_ATTITUDE_HEADING)
+
+
+                self._attitude_vals[joystick_axis] = float(val)
+                self.fms_control.set_attitude(*self._attitude_vals)
 
     def get_preference_widgets(self):
         #all following items configuration is saved
@@ -113,9 +138,11 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
         rh = self.build_checkbutton("reverse_heading", label="R")
         at = self.build_radio_group("axis_thrust", "0","1","2","3","4","5","6","7")
         rt = self.build_checkbutton("reverse_thrust", label="R")
+        bi = self.build_radio_group("button_motor_start", "0","1","2","3","4","5","6","7")
+        bo = self.build_radio_group("button_motor_stop", "0","1","2","3","4","5","6","7")
         es = self.build_combo("device", *joystick.list_devices())
 
-        items = ar + ap + ah + at + [es, rr, rp, rh, rt]
+        items = ar + ap + ah + at + [es, rr, rp, rh, rt] + bi + bo
 
         #the gui looks like
         sg = self.build_sizegroup()
@@ -124,13 +151,15 @@ class ControlJoystick(plugin.Plugin, config.ConfigurableIface, control.ControlWi
             self.build_label("Roll Axis", self.build_hbox(rr, *ar), sg=sg),
             self.build_label("Pitch Axis", self.build_hbox(rp, *ap), sg=sg),
             self.build_label("Heading Axis", self.build_hbox(rh, *ah), sg=sg),
-            self.build_label("Thrust Axis", self.build_hbox(rt, *at), sg=sg)
+            self.build_label("Thrust Axis", self.build_hbox(rt, *at), sg=sg),
+            self.build_label("Motor Start Button", self.build_hbox(*bi), sg=sg),
+            self.build_label("Motor Stop Button", self.build_hbox(*bo), sg=sg)
         ])
 
         hb = gtk.HBox(spacing=5)
         hb.pack_start(frame, True, True)
 
-        jsw = joystickui.JoystickWidget(num_axis=8, show_uncalibrated=True, show_range=False)
+        jsw = joystickui.JoystickWidget(num_axis=8, show_uncalibrated=True, show_buttons=True, show_range=False)
         jsw.set_joystick(self.joystick)
         hb.pack_start(jsw, False, False)
 

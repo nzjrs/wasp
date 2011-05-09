@@ -21,7 +21,7 @@ class Plugin(object):
     #: an optional plugin version string (not currently used for anything)
     PLUGIN_VERSION  = "0.1"
 
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
         """ 
         Plugins are passed the following objects during construction
 
@@ -31,6 +31,7 @@ class Plugin(object):
         :param source: a :class:`gs.source.UAVSource` object. Plugins typically
          call the :func:`gs.source.UAVSource.register_interest`
         :param messages_file: a :class:`wasp.messages.MessagesFile` object
+        :param settings_file: a :class:`wasp.settings.SettingsFile` object
         :param groundstation_window: a :class:`gs.groundstation.Groundstation` object
         """
         # dont call constructor

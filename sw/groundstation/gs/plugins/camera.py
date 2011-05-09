@@ -97,7 +97,7 @@ class Video4LinuxCameraWindow(plugin.Plugin, config.ConfigurableIface):
     DEFAULT_NORM = "PAL-N"
     DEFAULT_INPUT_CHANNEL = "Composite1"
 
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
         config.ConfigurableIface.__init__(self, conf)
 
         #look for any (up to 10) video4linux devices

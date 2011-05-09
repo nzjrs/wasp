@@ -20,13 +20,17 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#include "guidance.h"
-#include "booz2_guidance_h.h"
-#include "booz2_guidance_v.h"
+#ifndef BOOZ2_STABILIZATION_ATTITUDE_H
+#define BOOZ2_STABILIZATION_ATTITUDE_H
 
-void guidance_init(void)
-{
-    //nav_init();
-    booz2_guidance_h_init();
-    booz2_guidance_v_init();
-}
+#include "math/pprz_algebra_int.h"
+
+void booz2_stabilization_attitude_init(void);
+void booz2_stabilization_attitude_read_rc(struct Int32Eulers *sp, bool_t in_flight);
+void booz2_stabilization_attitude_reset_psi_ref(struct Int32Eulers *sp);
+void booz2_stabilization_attitude_enter(void);
+void booz2_stabilization_attitude_run(bool_t in_flight, int32_t *stabilization_cmd);
+
+extern struct Int32Eulers booz_stabilization_att_sp;
+
+#endif /* BOOZ2_STABILIZATION_ATTITUDE_H */

@@ -27,6 +27,23 @@
 
 #include "generated/settings.h"
 
-extern int32_t booz2_stabilization_cmd[COMMAND_NB];
+#define F_UPDATE_RES        9
+#define F_UPDATE            (1<<F_UPDATE_RES)
+
+#define ACCEL_REF_RES       12
+#define ACCEL_REF_MAX_PQ    BFP_OF_REAL(128,ACCEL_REF_RES)
+#define ACCEL_REF_MAX_R     BFP_OF_REAL( 32,ACCEL_REF_RES)
+
+#define RATE_REF_RES        16
+#define RATE_REF_MAX_PQ     BFP_OF_REAL(5,RATE_REF_RES)
+#define RATE_REF_MAX_R      BFP_OF_REAL(3,RATE_REF_RES)
+
+#define ANGLE_REF_RES       20
+#define PI_ANGLE_REF        BFP_OF_REAL(3.1415926535897932384626433832795029, ANGLE_REF_RES)
+#define TWO_PI_ANGLE_REF    BFP_OF_REAL(2.*3.1415926535897932384626433832795029, ANGLE_REF_RES)
+#define ANGLE_REF_NORMALIZE(_a) {				\
+    while (_a >  PI_ANGLE_REF)  _a -= TWO_PI_ANGLE_REF;		\
+    while (_a < -PI_ANGLE_REF)  _a += TWO_PI_ANGLE_REF;		\
+  }
 
 #endif /* BOOZ2_STABILIZATION_H */

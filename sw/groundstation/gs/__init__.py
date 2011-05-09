@@ -74,6 +74,11 @@ class _SourceOptionParser(optparse.OptionParser):
         options, args = optparse.OptionParser.parse_args(self)
         if options.use_test_source:
             options.source = "test"
+        else:
+            #strip the optional args from the source and check it is valid
+            source = options.source.split(":")
+            if source[0] not in wasp.communication.get_available_sources():
+                options.source = "test"
         return options, args
                 
 def get_default_command_line_parser(include_prefs, include_plugins, include_sources, messages_name="messages.xml", settings_name="settings.xml", preferences_name="groundstation.ini", ping_time=2):
@@ -117,12 +122,10 @@ def get_default_command_line_parser(include_prefs, include_plugins, include_sour
         parser.add_option("-t", "--use-test-source",
                         action="store_true", default=False,
                         help="Use a test source, equiv to --source=test")
-        all_sources = wasp.communication.get_available_sources()
         parser.add_option("-S", "--source",
                         default="serial",
-                        choices=all_sources,
-                        help="Source of uav data (%s)" % ",".join(all_sources),
-                        metavar="SOURCE")
+                        help="Source of uav data (%s)" % ",".join(wasp.communication.get_available_sources()),
+                        metavar="SOURCE[opt_1:opt_2:opt_n]")
 
     return parser
 

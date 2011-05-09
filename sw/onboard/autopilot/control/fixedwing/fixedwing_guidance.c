@@ -20,17 +20,18 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef BOOZ2_STABILIZATION_RATE
-#define BOOZ2_STABILIZATION_RATE
+#include "fixedwing_guidance.h"
 
-#include "math/pprz_algebra_int.h"
+uint8_t booz2_guidance_h_mode;
+uint8_t booz2_guidance_v_mode;
 
-extern void booz2_stabilization_rate_init(void);
-extern void booz2_stabilization_rate_read_rc(void);
-extern void booz2_stabilization_rate_run(void);
+void guidance_init(void)
+{
+    booz2_guidance_h_mode = 0;
+    booz2_guidance_v_mode = 0;
+}
 
-extern struct Int32Rates booz2_stabilization_rate_measure;
-extern struct Int32Rates booz2_stabilization_rate_sp;
-extern struct Int32Rates booz2_stabilization_rate_gain;
-
-#endif /* BOOZ2_STABILIZATION_RATE */
+void guidance_fixedwing_run(int32_t autopilot_commands[])
+{
+    ;
+}

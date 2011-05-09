@@ -1,6 +1,17 @@
 <?xml version="1.0"?>
 <messages>
 
+   <!-- Values defined here can be referred to by name, via @name, in messages -->
+   <value name="rc" values="OK|LOST|REALLY_LOST"/>
+   <value name="gps" values="NO_FIX|2D_FIX|3D_FIX"/>
+   <value name="in_flight" values="ON_GROUND|IN_FLIGHT"/>
+   <value name="motors_on" values="MOTORS_OFF|MOTORS_ON"/>
+   <value name="autopilot_mode" values="FAILSAFE|KILL|RC_DIRECT|ATTITUDE_DIRECT|HOVER_DIRECT"/>
+   <value name="autopilot_h_mode" values="KILL|RATE|ATTITUDE|HOVER"/>
+   <value name="autopilot_v_mode" values="KILL|RC_DIRECT"/>
+   <value name="fms_on" values="FMS_OFF|FMS_ON"/>
+   <value name="status" values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
+
    <!-- IDs < 25 are reserved for standard messages -->
    <message name="PING" id="1"/>
    <message name="PONG" id="2"/>
@@ -27,14 +38,14 @@
    </message>
 
    <message name="STATUS" id="8">
-     <field name="rc" type="uint8" values="OK|LOST|REALLY_LOST"/>
-     <field name="gps" type="uint8" values="NO_FIX|2D_FIX|3D_FIX"/>
+     <field name="rc" type="uint8" values="@rc"/>
+     <field name="gps" type="uint8" values="@gps"/>
      <field name="vsupply" type="uint8" unit="decivolt"/>
-     <field name="in_flight" type="uint8" values="ON_GROUND|IN_FLIGHT"/>
-     <field name="motors_on" type="uint8" values="MOTORS_OFF|MOTORS_ON"/>
-     <field name="autopilot_mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|ATTITUDE_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|ATTITUDE_HOLD|HOVER_DIRECT|HOVER_CLIMB|HOVER_Z_HOLD|NAV|RC_DIRECT"/>
+     <field name="in_flight" type="uint8" values="@in_flight"/>
+     <field name="motors_on" type="uint8" values="@motors_on"/>
+     <field name="autopilot_mode" type="uint8" values="@autopilot_mode"/>
      <field name="cpu_usage" type="uint8" unit="pct"/>
-     <field name="fms_on" type="uint8" values="FMS_OFF|FMS_RC_ENABLED|FMS_ON"/>
+     <field name="fms_on" type="uint8" values="@fms_on"/>
      <field name="fms_mode" type="uint8"/>
    </message>
 
@@ -68,22 +79,22 @@
      <field name="value" type="float"/>
    </message>
 
-   <message name="DEBUG" id="13">
+   <message name="DEBUG_UINT8" id="13">
      <field name="value" type="uint8"/>
    </message>
 
    <message name="AUTOPILOT" id="14">
-     <field name="mode" type="uint8" values="FAILSAFE|KILL|RATE_DIRECT|ATTITUDE_DIRECT|RATE_RC_CLIMB|ATTITUDE_RC_CLIMB|ATTITUDE_CLIMB|RATE_Z_HOLD|ATTITUDE_Z_HOLD|ATTITUDE_HOLD|HOVER_DIRECT|HOVER_CLIMB|HOVER_Z_HOLD|NAV|RC_DIRECT"/>
-     <field name="h_mode" type="uint8" values="KILL|RATE|ATTITUDE|HOVER|NAV"/>
-     <field name="v_mode" type="uint8" values="KILL|RC_DIRECT|RC_CLIMB|CLIMB|HOVER|NAV"/>
+     <field name="mode" type="uint8" values="@autopilot_mode"/>
+     <field name="h_mode" type="uint8" values="@autopilot_h_mode"/>
+     <field name="v_mode" type="uint8" values="@autopilot_v_mode"/>
    </message>
 
    <message name="STATUS_LOWLEVEL" id="15">
-     <field name="rc" type="uint8"          values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
-     <field name="gps" type="uint8"         values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
-     <field name="altimeter" type="uint8"   values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
-     <field name="comm" type="uint8"        values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
-     <field name="ahrs" type="uint8"        values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
+     <field name="rc" type="uint8"          values="@status"/>
+     <field name="gps" type="uint8"         values="@status"/>
+     <field name="altimeter" type="uint8"   values="@status"/>
+     <field name="comm" type="uint8"        values="@status"/>
+     <field name="ahrs" type="uint8"        values="@status"/>
    </message>
 
   <message name="AHRS_EULER" id="16">
@@ -184,7 +195,7 @@
 
    <message name="ALTIMETER" id="37">
       <field name="altitude" type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
-      <field name="status" type="uint8" values="UNINITIAIZED|INITIALIZING|INITIALIZED|ALIVE|FAIL"/>
+      <field name="status" type="uint8" values="@status"/>
       <field name="baro_offset" type="uint16"/>
       <field name="baro_value" type="uint16"/>
    </message>
@@ -254,10 +265,11 @@
    </message>
 
    <message name="FMS_ATTITUDE" id="51">
-     <field name="roll"    type="int32"/>
-     <field name="pitch"   type="int32"/>
-     <field name="heading" type="int32"/>
+     <field name="roll"    type="float"/>
+     <field name="pitch"   type="float"/>
+     <field name="heading" type="float"/>
      <field name="thrust"  type="int32"/>
+     <field name="enabled" type="uint8"/>
    </message>
 
    <message name="FMS_RC" id="52">
@@ -265,6 +277,21 @@
      <field name="pitch"   type="int32"/>
      <field name="heading" type="int32"/>
      <field name="thrust"  type="int32"/>
+     <field name="enabled" type="uint8"/>
+   </message>
+
+   <message name="SP_ATTITUDE" id="53">
+     <field name="mode"    type="uint8" values="@autopilot_mode"/>
+     <field name="roll"    type="float"/>
+     <field name="pitch"   type="float"/>
+     <field name="heading" type="float"/>
+   </message>
+
+   <message name="FMS_ON" id="54" command="1"/>
+   <message name="FMS_OFF" id="55" command="1"/>
+
+   <message name="DEBUG_INT32" id="56">
+     <field name="value" type="int32"/>
    </message>
 
    <!-- Begin periodic messages -->
@@ -275,7 +302,8 @@
       <message name="GPS_LLH" frequency="0.1"/>
    </periodic>
 
-   <periodic channel="COMM_0" />
+   <periodic channel="COMM_0" adjustable="3" />
+
    <periodic channel="COMM_1" />
 
 </messages>
