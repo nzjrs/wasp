@@ -24,6 +24,7 @@ class GroundStationDeploy(Deploy):
             import gtk.gdk
             import gobject
             import glib
+            import serial
         except ImportError:
                 self.close('IMPORT_ERROR: Could not find the Gtk Python bindings.\n'
                     'You can download the installers at: http://www.pygtk.org/')
