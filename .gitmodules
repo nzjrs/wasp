@@ -4,3 +4,6 @@
 [submodule "sw/groundstation/gs/ui/rtgraph"]
 	path = sw/groundstation/gs/ui/rtgraph
 	url = git://github.com/nzjrs/rtgraph.git
+[submodule "sw/groundstation/win32/deploy"]
+	path = sw/groundstation/win32/deploy
+	url = git://github.com/nzjrs/python-gtk-windows-deploy.git
