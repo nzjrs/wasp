@@ -44,9 +44,6 @@ void actuators_set( ActuatorID_t id, uint8_t value )
 
 #if USE_SERVOS_4017    
     if ( id & ACTUATOR_BANK_SERVOS ) {
-        /* value is in range 0 -> 255, so scale this
-           range to be in the servo range of 1000 - 2000us */
-        uint16_t tmp = ((((uint32_t)value*1000)/0xFF) + 1000);
         /*FIXME: HACK HACK BROKEN BROKEN. 
         THE FIRST TWO CHANNELS DO NOT SO SUBTRACT 2 FROM THE INDEX.
         !!!!!!
@@ -56,7 +53,7 @@ void actuators_set( ActuatorID_t id, uint8_t value )
         NEED TO FIX THE TIMING IN SERVOS_4017_HW.c */
         if (aid >= 2)
             aid -= 2;
-        servos_values[aid] = SERVOS_TICS_OF_USEC(tmp);
+        servos_4017_set(aid, value);
     }
 #endif
 
@@ -88,7 +85,7 @@ uint8_t actuators_get( ActuatorID_t id )
         return buss_twi_blmc_motor_power[aid];
 #if USE_SERVOS_4017
     if (id & ACTUATOR_BANK_SERVOS)
-        return servos_values[aid];
+        return servos_4017_get(aid);
 #endif
     return 0;
 }

@@ -27,17 +27,18 @@
 
 #include "LPC21xx.h"
 #include "arm7/config.h"
-#include "arm7/sys_time_hw.h"
+#include "arm7/servos_hw.h"
 
-#define SERVOS_TICS_OF_USEC(s)          SYS_TICS_OF_USEC(s)
 #define SERVOS_4017_RESET_WIDTH         SERVOS_TICS_OF_USEC(1000)
 #define SERVOS_4017_FIRST_PULSE_WIDTH   SERVOS_TICS_OF_USEC(100)
 
-extern uint16_t servos_values[SERVOS_4017_NB_CHANNELS];
-extern uint8_t servos_4017_idx;
+extern uint16_t servos_4017_values[SERVOS_4017_NB_CHANNELS];
+extern uint8_t  servos_4017_idx;
 
-void servos_4017_init(void);
+void    servos_4017_init(void);
 uint8_t servos_4017_get_num(void);
+void    servos_4017_set(uint8_t id, uint8_t value);
+uint8_t servos_4017_get(uint8_t id);
 
 static inline void servos_4017_isr(void)
 {
@@ -63,7 +64,7 @@ static inline void servos_4017_isr(void)
     else 
     {
         /* request next match */
-        T0MR0 += servos_values[servos_4017_idx];
+        T0MR0 += servos_4017_values[servos_4017_idx];
         /* clock low if not last one, last is done with reset */
         if (servos_4017_idx != SERVOS_4017_NB_CHANNELS-1) 
         {
