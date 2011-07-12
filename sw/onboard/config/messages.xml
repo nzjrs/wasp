@@ -294,6 +294,8 @@
      <field name="value" type="int32"/>
    </message>
 
+   <message name="BOMB_DROP" id="57" command="1"/>
+
    <!-- Begin periodic messages -->
    <periodic channel="COMM_TELEMETRY" adjustable="2">
       <message name="COMM_STATUS" frequency="0.25"/>

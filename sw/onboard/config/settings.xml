@@ -147,5 +147,11 @@
     <setting name="H_DGAIN" value="-0"/>
     <setting name="H_IGAIN" value="-5"/>
   </section>
+  <section name="BOMB">
+    <setting name="ENABLED" value="1"/>
+    <setting name="RELEASE_VALUE" value="0xFF"/>
+    <setting name="HOLD_VALUE" value="0x0"/>
+    <setting name="PERIODIC_TICKS" value="80" doc="the amount of time for the bomb latch to be held"/>
+  </section>
 </settings>
 
