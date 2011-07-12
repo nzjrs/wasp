@@ -23,8 +23,17 @@
 #ifndef SERVOS_HW_H
 #define SERVOS_HW_H
 
+#include "std.h"
 #include "arm7/sys_time_hw.h"
 
 #define SERVOS_TICS_OF_USEC(s)          SYS_TICS_OF_USEC(s)
+
+static inline uint16_t servos_timer_value_from_8bit_range(uint8_t value)
+{
+    /* value is in range 0 -> 255, so scale this
+       range to be in the servo range of 1000 - 2000us */
+    uint16_t tmp = ((((uint32_t)value*1000)/0xFF) + 1000);
+    return SERVOS_TICS_OF_USEC(tmp);
+}
 
 #endif /* SERVOS_HW_H */

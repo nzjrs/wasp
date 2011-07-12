@@ -20,6 +20,7 @@ ARCHSRC =                                \
     arch/arm7/actuators_hw.c             \
     arch/arm7/buss_twi_blmc_hw.c         \
     arch/arm7/servos_4017_hw.c           \
+    arch/arm7/servos_direct_hw.c         \
     arch/arm7/analog_hw.c                \
     arch/arm7/altimeter_analog_baro_hw.c \
     arch/arm7/settings_mem_hw.c

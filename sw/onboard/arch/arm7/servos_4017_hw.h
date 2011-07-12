@@ -39,6 +39,7 @@ void    servos_4017_init(void);
 uint8_t servos_4017_get_num(void);
 void    servos_4017_set(uint8_t id, uint8_t value);
 uint8_t servos_4017_get(uint8_t id);
+void    servos_4017_commit(void);
 
 static inline void servos_4017_isr(void)
 {

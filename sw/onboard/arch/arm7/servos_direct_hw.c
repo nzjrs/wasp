@@ -1,13 +1,9 @@
 #include "std.h"
-#include "actuators.h"
-#include "servos_direct_hw.h"
+#include "arm7/config.h"
+#include "arm7/servos_direct_hw.h"
 
-/* 40 Hz */
-#ifndef SERVOS_PERIOD
-#define SERVOS_PERIOD SERVOS_TICS_OF_USEC(25000)
-#endif
-
-const uint8_t pwm_latch_value = 0
+uint8_t         servos_direct_last_value;
+const uint8_t   servos_direct_pwm_latch_value = 0
 #if defined PWM_SERVO_0
     | PWM_SERVO_0_LATCH 
 #endif
@@ -28,8 +24,8 @@ const uint8_t pwm_latch_value = 0
 #endif
   ;
 
-void actuators_init ( void ) {
-
+void servos_direct_init(void)
+{
   /* configure pins for PWM */
 #if defined PWM_SERVO_0
   PWM_SERVO_0_PINSEL = (PWM_SERVO_0_PINSEL & PWM_SERVO_0_PINSEL_MASK) | PWM_SERVO_0_PINSEL_VAL << PWM_SERVO_0_PINSEL_BIT;
@@ -51,7 +47,7 @@ void actuators_init ( void ) {
 #endif
 
   /* set servo refresh rate */
-  PWMMR0 = SERVOS_PERIOD;
+  PWMMR0 = SERVOS_TICS_OF_USEC(10000);
 
   /* FIXME: For now, this prescaler needs to match the TIMER0 prescaler, as the
   higher level code treats them the same */
@@ -85,5 +81,53 @@ void actuators_init ( void ) {
   /* enable PWM timer in PWM mode */
   PWMTCR = PWMTCR_COUNTER_ENABLE | PWMTCR_PWM_ENABLE;
 
+  PWMLER = servos_direct_pwm_latch_value;
+}
+
+/* only one channel supported at once... */
+uint8_t servos_direct_get_num(void)
+{
+    return 1;
+}
+
+void servos_direct_set(uint8_t id, uint8_t value)
+{
+    uint16_t tval;
+
+    servos_direct_last_value = value;
+
+    uint16_t tmp = ((((uint32_t)value*650)/0xFF) + 500);
+    tval = SERVOS_TICS_OF_USEC(tmp);
+
+
+#if defined PWM_SERVO_0
+    SERVO_REG_0 = tval;
+#endif
+#if defined PWM_SERVO_1
+    SERVO_REG_1 = tval;
+#endif
+#if defined PWM_SERVO_2
+    SERVO_REG_2 = tval;
+#endif
+#if defined PWM_SERVO_3
+    SERVO_REG_3 = tval;
+#endif
+#if defined PWM_SERVO_4
+    SERVO_REG_4 = tval;
+#endif
+#if defined PWM_SERVO_5
+    SERVO_REG_5 = tval;
+#endif
 
 }
+
+uint8_t servos_direct_get(uint8_t id)
+{
+    return servos_direct_last_value;
+}
+
+void servos_direct_commit(void)
+{
+    PWMLER = servos_direct_pwm_latch_value;
+}
+

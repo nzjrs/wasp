@@ -95,20 +95,23 @@
 #define MM_DRDY_VIC_IT      VIC_EINT3
 
 /* Servos: 4017 servo driver on CAM connector */
-#define USE_SERVOS_4017         1
-#define SERVOS_4017_NB_CHANNELS 10
+#define USE_SERVOS_4017         0
+    #define SERVOS_4017_NB_CHANNELS 10
 
-#define SERVO_CLOCK_IODIR       IO0DIR
-#define SERVO_CLOCK_PIN         22          /* P0.22 aka MAT0.0  */
-#define SERVO_CLOCK_PINSEL      PINSEL1
-#define SERVO_CLOCK_PINSEL_VAL  0x03
-#define SERVO_CLOCK_PINSEL_BIT  12
+    #define SERVO_CLOCK_IODIR       IO0DIR
+    #define SERVO_CLOCK_PIN         22          /* P0.22 aka MAT0.0  */
+    #define SERVO_CLOCK_PINSEL      PINSEL1
+    #define SERVO_CLOCK_PINSEL_VAL  0x03
+    #define SERVO_CLOCK_PINSEL_BIT  12
 
-#define SERVO_RESET_PIN         21          /* P0.21 aka PWM5 */
-//#define SERVO_RESET_PIN         13          /* P0.13 aka PWM5 aka ADC_SPARE */
-#define SERVO_RESET_IODIR       IO0DIR
-#define SERVO_RESET_IOSET       IO0SET
-#define SERVO_RESET_IOCLR       IO0CLR
+    #define SERVO_RESET_PIN         21          /* P0.21 aka PWM5 */
+    #define SERVO_RESET_IODIR       IO0DIR
+    #define SERVO_RESET_IOSET       IO0SET
+    #define SERVO_RESET_IOCLR       IO0CLR
+
+/* Servos: Direct drive via PWM */
+#define USE_SERVOS_DIRECT       1
+    #define PWM_SERVO_0             1
 
 /* Radio Control */
 #define USE_RADIO_CONTROL       1

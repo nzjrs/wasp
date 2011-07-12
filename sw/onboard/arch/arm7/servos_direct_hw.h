@@ -2,10 +2,8 @@
 #define SERVOS_DIRECT_HW_H
 
 #include "LPC21xx.h"
-#include "sys_time.h"
-
-#define SERVOS_TICS_OF_USEC(s) SYS_TICS_OF_USEC(s)
-#define ChopServo(x,a,b) Chop(x, a, b)
+#include "arm7/config.h"
+#include "arm7/servos_hw.h"
 
 #define SERVO_REG_0 PWMMR5
 #define SERVO_REG_1 PWMMR3
@@ -14,12 +12,8 @@
 #define SERVO_REG_4 PWMMR4
 #define SERVO_REG_5 PWMMR2
 
-#define COMMAND_(i) SERVO_REG_ ## i
-#define Actuator(i) COMMAND_(i)
-
-
 /* 
-   wiring on classix PWM connector
+   wiring on PPZ PWM connector
 connector   LPC   shared         port
 PWM1        PWM5  AD1_6  CAP1_3  P0.21
 PWM2        PWM3  RXD0   EINT0   P0.1
@@ -74,10 +68,10 @@ PWM6        PWM2  SSEL0  EINT2   P0.7
 #define PWM_SERVO_5_ENA PWMPCR_ENA2
 #define PWM_SERVO_5_LATCH PWMLER_LATCH2
 
-extern const uint8_t pwm_latch_value;
-
-#define ActuatorsCommit() { \
-    PWMLER = pwm_latch_value;   \
-  }
+void    servos_direct_init(void);
+uint8_t servos_direct_get_num(void);
+void    servos_direct_set(uint8_t id, uint8_t value);
+uint8_t servos_direct_get(uint8_t id);
+void    servos_direct_commit(void);
 
 #endif /* SERVOS_DIRECT_HW_H */

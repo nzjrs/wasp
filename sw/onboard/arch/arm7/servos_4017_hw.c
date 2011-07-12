@@ -70,14 +70,16 @@ uint8_t servos_4017_get_num(void)
 
 void servos_4017_set(uint8_t id, uint8_t value)
 {
-    /* value is in range 0 -> 255, so scale this
-       range to be in the servo range of 1000 - 2000us */
-    uint16_t tmp = ((((uint32_t)value*1000)/0xFF) + 1000);
-    servos_4017_values[id] = SERVOS_TICS_OF_USEC(tmp);
+    servos_4017_values[id] = servos_timer_value_from_8bit_range(value);
 }
 
 uint8_t servos_4017_get(uint8_t id)
 {
     return servos_4017_values[id];
+}
+
+void    servos_4017_commit(void)
+{
+    ;
 }
 
