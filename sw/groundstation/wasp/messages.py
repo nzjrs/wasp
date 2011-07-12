@@ -95,6 +95,10 @@ class Message:
 
         self.num_fields = len(self.fields)
 
+    @property
+    def pretty_name(self):
+        return self.name.replace("_"," ").title()
+
     def __str__(self):
         return "<Message: %s (%s)>" % (self.name, self.id)
 

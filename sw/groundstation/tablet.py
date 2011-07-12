@@ -14,7 +14,7 @@ sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
 import gs
 import gs.ui
-from gs.config import Config
+from gs.config import Config, ConfigurableIface
 from gs.source import UAVSource
 from gs.ui import message_dialog
 from gs.ui.info import InfoBox
@@ -68,7 +68,11 @@ class TabletGraphManager(GraphManager):
         self._ui.remove_page(gh)
         del(self._graphs[name])
 
-class UI:
+class UI(ConfigurableIface):
+
+    CONFIG_SECTION = "MAIN"
+    DEFAULT_COMMAND_BUTTON = "BOMB_DROP"
+
     def __init__(self, options, show_tabs=False):
 
         prefsfile = os.path.abspath(options.preferences)
@@ -91,6 +95,9 @@ class UI:
         self._messagesfile.parse()
 
         self._config = Config(filename=prefsfile)
+        ConfigurableIface.__init__(self, self._config)
+        self.autobind_config("command_button")
+
         self._source = UAVSource(self._config, self._messagesfile, options)
         self._tm = TabletGraphManager(self._config, self._source, self._messagesfile, self)
 
@@ -170,6 +177,13 @@ class UI:
         mb = RequestMessageButton(self._messagesfile, "BUILD_INFO", gtk.Button(stock=gtk.STOCK_REFRESH))
         mb.connect("send-message", lambda mb, msg, vals, source: source.send_message(msg, vals), self._source)
         vb.pack_start(mb)
+        #custom command buttons
+        for name in self._command_button.split(","):
+            LOG.info("Adding custom command button: %s" % name)
+            msg = self._messagesfile.get_message_by_name(name)
+            b = gtk.Button(msg.pretty_name)
+            b.connect("clicked", lambda b,s,c,: s.send_command(c, ()), self._source, msg)
+            vb.pack_start(b)
 
         #hb contains info and buttons
         hb = gtk.HBox(spacing=5)
