@@ -68,7 +68,7 @@ static inline void autopilot_main_init( void ) {
   led_init();
 
   supervision_init();
-  actuators_init(ACTUATOR_BANK_MOTORS);
+  actuators_init(ACTUATOR_BANK_MOTORS | ACTUATOR_BANK_SERVOS);
 
   rc_init();
 
@@ -130,7 +130,14 @@ static inline void autopilot_main_periodic( void ) {
         comm_periodic_task(COMM_TELEMETRY);
         break;
     case 2:
-        fms_periodic_task();
+        //fms_periodic_task();
+        if (rc_status == RC_OK) {
+            if (rc_values[RADIO_FMS] > 0)
+                actuators_set(ACTUATOR_BANK_SERVOS | 0, 0);
+            else
+                actuators_set(ACTUATOR_BANK_SERVOS | 0, 0xFF);
+            actuators_commit(ACTUATOR_BANK_SERVOS);
+        }
         break;
   }
 
