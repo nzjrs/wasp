@@ -6,17 +6,17 @@
 
 typedef struct {
     uint8_t rc_channel;
-    pprz_t  rc_gt_val;
+    pprz_t  rc_lt_val;
     uint8_t servo_id;
     uint8_t is_dropping;    /* 0 when the bomb is held, !=0 otherwise */
 } BombState_t;
 
 BombState_t bombstate;
 
-void bomb_init_servo(uint8_t rc_channel, pprz_t rc_gt_val, uint8_t servo_id)
+void bomb_init_servo(uint8_t rc_channel, pprz_t rc_lt_val, uint8_t servo_id)
 {
     bombstate.rc_channel = rc_channel;
-    bombstate.rc_gt_val = rc_gt_val;
+    bombstate.rc_lt_val = rc_lt_val;
     bombstate.servo_id = servo_id;
     bombstate.is_dropping = 0;
 
@@ -35,7 +35,7 @@ void bomb_drop(void)
 void bomb_periodic_task(void)
 {
     if (rc_status == RC_OK) {
-        if (rc_values[bombstate.rc_channel] < bombstate.rc_gt_val)
+        if (rc_values[bombstate.rc_channel] < bombstate.rc_lt_val)
             bomb_drop();
     }
 
