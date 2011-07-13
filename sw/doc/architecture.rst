@@ -20,9 +20,5 @@ the communication layer.
 .. doxygenstruct:: CommMessage_t
    :project: onboard
 
-For a complete description of all communication messages please see
+For a complete description of all communication messages please see :doc:`comm-protocol`
 
-.. toctree::
-   :maxdepth: 2
-
-   comm-protocol
