@@ -55,43 +55,40 @@ typedef uint8_t ActuatorID_t;
 #define ACTUATOR_MAX                    16
 
 /**
- * actuators_init
+ * initializes the actuators only for the specified bank.
  *
  * @param bank the bank to initialize
- *
- * @brief initializes the actuators only for the specified bank.
  */
 void actuators_init( uint8_t bank );
 
 /**
- * actuators_set
+ * sets the supplied actuator to the given value
  *
- * @brief sets the supplied actuator to the given value
+ * @param id the actuator id
+ * @param value a number 0->255
  */
 void actuators_set( ActuatorID_t id, uint8_t value );
 
 /**
- * actuators_commit
+ * commits an previously set actuator values to the hardware.
  *
  * @param bank actuator bank
- *
- * @brief commits an previously set actuator values to the hardware.
  */
 void actuators_commit( uint8_t bank );
 
 /**
- * actuators_get_num
+ * returns the number of actuators the hardware backing bank supports
  *
  * @param bank actuator bank
- * @return the number of actuators the hardware backing bank supports
+ * @return a number
  */
 uint8_t actuators_get_num( uint8_t bank );
 
 /**
- * actuators_get
+ * returns the value of the actuator corresponding to id
  *
- * @param id
- * @return the value of the actuator corresponding to id
+ * @param id actuator id
+ * @return a number
  */
 uint8_t actuators_get( ActuatorID_t id );
 

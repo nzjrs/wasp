@@ -21,11 +21,12 @@
  *
  */
 
-/** \file rc.h
- *  \brief Remote Control API
+/**
+ * @file rc.h
+ * @brief Remote Control API
  *
- *  Manages the acquisition of RC signals. Channel assignment is handled
- *  by the radio XML.
+ * Manages the acquisition of RC signals. Channel assignment is handled
+ * by the radio XML.
  */
 
 #ifndef RC_H
@@ -70,16 +71,16 @@ extern uint16_t     ppm_pulses[RADIO_CTL_NB];
 /**
  * To be called at startup. Backend dependant
  */
-void    rc_init ( void );
+void rc_init ( void );
 
 /**
  * To be called at periodic frequency. Backend dependant
  */
-void    rc_periodic_task ( void );
+void rc_periodic_task ( void );
 
 /**
  * Return TRUE if there is a valid RC signal.
  */
-bool_t  rc_event_task ( void );
+bool_t rc_event_task ( void );
 
 #endif /* RC_H */
