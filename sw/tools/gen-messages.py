@@ -450,16 +450,22 @@ class RSTWriter(_Writer):
         print >> outfile
 
     def body(self, outfile):
+        #sort the messages alphabetically
+        self.messages.sort(lambda a,b: cmp(a.name,b.name))
         for m in self.messages:
-            print >> outfile, " * **%s**" % m.name
+            print >> outfile, "%s" % m.name
+            print >> outfile, "\"" * len(m.name)
             print >> outfile
-            print >> outfile, "   *ID:* %s" % m.id
-            print >> outfile 
-            print >> outfile, "   *Payload Length:* %s" % m.size
+            if m.doc:
+                #capitalise the first letter
+                print >> outfile, "%s%s" % (m.doc[0].upper(), m.doc[1:])
+                print >> outfile
+            print >> outfile, "* ID: %s" % m.id
+            print >> outfile, "* Payload Length: %s" % m.size
+            if m.fields:
+                print >> outfile
+                self._write_table(m, outfile)
             print >> outfile
-            self._write_table(m, outfile, indent="  ")
-            print >> outfile
-
         
 
 if __name__ == "__main__":

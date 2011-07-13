@@ -68,6 +68,8 @@ class Message:
         - num_values: the total number of values in the message (as a
           field can have multiple elements, such as if it is an array)
         - num_fields: the number of fields in the message
+        - doc: documentation string
+        - is_command: is the message a command (i.e. needs to be ACK'd)
     """
     def __init__(self, m, field_klass, **field_kwargs):
         self._field_kwargs = field_kwargs
@@ -86,6 +88,11 @@ class Message:
             self.is_command = m.command == "1"
         except AttributeError:
             self.is_command = False
+
+        try:
+            self.doc = m.doc
+        except AttributeError:
+            self.doc = ""
 
         self.size = 0
         self.num_values = 0
