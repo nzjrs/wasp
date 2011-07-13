@@ -108,7 +108,7 @@ breathe_default_project = "onboard"
 
 # -- Options for xref documentation --------------------------------------------
 xref_links = {
-    "wasp": ("wasp", "http://github.com/nzjrs/wasp"),
+    "wasp": ("wasp", "http://waspuav.org"),
     "wasp-download": ("download", "http://github.com/nzjrs/wasp/downloads"),
     "osm-gps-map": ("osm-gps-map", "http://github.com/nzjrs/osm-gps-map")
     }
@@ -117,7 +117,7 @@ xref_links = {
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'default'
+html_theme = 'nature'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -173,7 +173,7 @@ html_theme = 'default'
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 #html_show_sphinx = True
