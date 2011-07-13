@@ -22,12 +22,16 @@
  *
  */
 
-/** \file actuators.h
- *  \brief Hardware independent API for actuators (servos, motor controllers)
+/** 
+ * @file actuators.h
+ * @brief Hardware independent API for actuators (servos, motor controllers)
  *
- *  The implementation splits the actuators into 4 banks of 16 actuators.
- *  nominally, the first bank is for motor controllers, the second bank is
- *  for servos
+ * The implementation splits the actuators into 4 banks of 16 actuators.
+ * Each bank may be backed by a seperate hw implementation. Nominally, the first
+ * bank is for motor controllers, the second bank is for servos,
+ * @see ACTUATOR_BANK_MOTORS and @see ACTUATOR_BANK_SERVOS
+ * 
+ * The ActuatorID_t for a numbered actuator is constructed via (bank_id | actuator_num)
  */
 #ifndef ACTUATORS_H
 #define ACTUATORS_H
@@ -36,7 +40,13 @@
 
 typedef uint8_t ActuatorID_t;
 
+/**
+ * bank containing motors for the UAV
+ */
 #define ACTUATOR_BANK_MOTORS            0x10
+/**
+ * bank containing servos
+ */
 #define ACTUATOR_BANK_SERVOS            0x20
 #define ACTUATOR_BANK_3                 0x40
 #define ACTUATOR_BANK_4                 0x80
@@ -44,14 +54,45 @@ typedef uint8_t ActuatorID_t;
 #define ACTUATOR_BANK_MAX               4
 #define ACTUATOR_MAX                    16
 
+/**
+ * actuators_init
+ *
+ * @param bank the bank to initialize
+ *
+ * @brief initializes the actuators only for the specified bank.
+ */
 void actuators_init( uint8_t bank );
 
+/**
+ * actuators_set
+ *
+ * @brief sets the supplied actuator to the given value
+ */
 void actuators_set( ActuatorID_t id, uint8_t value );
 
+/**
+ * actuators_commit
+ *
+ * @param bank actuator bank
+ *
+ * @brief commits an previously set actuator values to the hardware.
+ */
 void actuators_commit( uint8_t bank );
 
+/**
+ * actuators_get_num
+ *
+ * @param bank actuator bank
+ * @return the number of actuators the hardware backing bank supports
+ */
 uint8_t actuators_get_num( uint8_t bank );
 
+/**
+ * actuators_get
+ *
+ * @param id
+ * @return the value of the actuator corresponding to id
+ */
 uint8_t actuators_get( ActuatorID_t id );
 
 #endif /* ACTUATORS_H */
