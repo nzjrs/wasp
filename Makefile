@@ -25,7 +25,7 @@ BOOTLOADER_DEV=/dev/ttyUSB0
 install_bootloader: bootloader
 	lpc21isp -control sw/bootloader/bl.hex $(BOOTLOADER_DEV) 38400 12000
 
-doc: mkdir $(GENERATED_FILES) html
+doc: mkdir html
 
 all: onboard bootloader doc
 
@@ -64,8 +64,11 @@ release: dist uploaddoc
 mkdir:
 	@mkdir -p $(BUILT_DOCDIR)
 
-$(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg
+$(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg sw/onboard/*.h
 	@DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen $<
+	#this is a hack, sphinx does not notice the changed xml
+	@rm -f doc/built/html/sw/doc/onboard-api.html
+	@rm -f doc/.doctrees/sw/doc/onboard-api.doctree
 
 sw/doc/comm-protocol.rst: sw/onboard/config/messages.xml
 	@PYTHONPATH=./sw/groundstation/ ./sw/tools/gen-messages.py -m $< -f rst --output=$@
@@ -73,7 +76,7 @@ sw/doc/comm-protocol.rst: sw/onboard/config/messages.xml
 sw/onboard/generated/messages.h: sw/onboard/config/messages.xml
 	@make -C sw/onboard/ generated/messages.h
 
-html:
+html: $(GENERATED_FILES)
 	@$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) doc/built/html
 
 .PHONY: doc clean test onboard bootloader
