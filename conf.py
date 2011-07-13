@@ -30,10 +30,6 @@ extensions = ['sphinx.ext.todo', 'sphinx.ext.pngmath']
 sys.path.append( "doc" )
 extensions += ["breathe","xref"]
 
-# Add a helper for making the generated docs more suitable for 
-# hosting on github
-# extensions += ["sphinxtogithub"]
-
 ## Automatically document python code
 extensions += ['sphinx.ext.autodoc', 'sphinx.ext.autosummary']
 autoclass_content = "both"
