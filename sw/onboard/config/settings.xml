@@ -153,5 +153,8 @@
     <setting name="HOLD_VALUE" value="0x0"/>
     <setting name="PERIODIC_TICKS" value="80" doc="the amount of time for the bomb latch to be held"/>
   </section>
+  <section name="BATTERY">
+    <setting name="CRITICAL_VOLTAGE" value="100" doc="decivolts"/>
+  </section>
 </settings>
 

@@ -94,6 +94,8 @@ class UI(ConfigurableIface):
         self._messagesfile = MessagesFile(path=messagesfile, debug=False)
         self._messagesfile.parse()
 
+        self._settingsfile = SettingsFile(path=settingsfile)
+
         self._config = Config(filename=prefsfile)
         ConfigurableIface.__init__(self, self._config)
         self.autobind_config("command_button")
@@ -152,15 +154,15 @@ class UI(ConfigurableIface):
         #hbox for info pages
         ihb = gtk.HBox(homogeneous=True, spacing=5)
         if show_uav_info:
-            info = InfoBox(self._source, show_images=False, show_build=False, show_comm_status=False)
+            info = InfoBox(self._source, self._settingsfile, show_images=False, show_build=False, show_comm_status=False)
             ihb.pack_start(info.widget)
         if show_build or show_comm_status:
             vb = gtk.VBox(spacing=5)
             if show_build:
-                info = InfoBox(self._source, show_images=False, show_uav_status=False, show_build=True, show_comm_status=False)
+                info = InfoBox(self._source, self._settingsfile, show_images=False, show_uav_status=False, show_build=True, show_comm_status=False)
                 vb.pack_start(info.widget, False, False)
             if show_comm_status:
-                info = InfoBox(self._source, show_images=False, show_uav_status=False, show_build=False, show_comm_status=True)
+                info = InfoBox(self._source, self._settingsfile, show_images=False, show_uav_status=False, show_build=False, show_comm_status=True)
                 vb.pack_start(info.widget, False, False)
             ihb.pack_start(vb, False, True)
 

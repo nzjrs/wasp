@@ -47,9 +47,17 @@ class ProgressBar(gtk.HBox):
         if show_range:
             self.pack_start(self._lblmax, False)
 
+        self._warning_txt = None
+
+    def set_warning_text(self, txt):
+        self._warning_txt = txt
+        if self._warning_txt:
+            self._bar.set_text(self._warning_txt)
+
     def set_value(self, value):
         val = float(value)
-        self._bar.set_text("%.1f" % val)
+        if not self._warning_txt:
+            self._bar.set_text("%.1f" % val)
 
         if self._avg:
             self._avg.add(val)
