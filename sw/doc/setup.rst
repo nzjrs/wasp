@@ -1,6 +1,8 @@
 Building the Software
 =====================
 
+Running is supported using Ubuntu 10.10 (maverick) and above.
+
 In order to build the system the following software must be installed on your 
 computer.
 
@@ -30,24 +32,7 @@ Building the Groundstation
 
 ::
 
-    sudo apt-get install python-gtk2 python-serial python-gtkglext1 python-opengl
-
-- Install osm-gps-map
-
-The groundstation depends on :xref:`osm-gps-map`. It works with the version shipped
-in Ubuntu lucid, so it can be installed by simply typing::
-
-    sudo apt-get install python-osmgpsmap
-
-If you wish to use a later verion, :xref:`wasp` also supports recent stable releases
-of :xref:`osm-gps-map`. In this case, you should follow the installation instruction
-on the :xref:`osm-gps-map` homepage.
-
-One thing to note; you do not have to install osm-gps-map to /usr if you do not wish to.
-To run the groundstation against an uninstalled copy of osm-gps-map remember to
-set PYTHONPATH environment variable. For example::
-
-    PYTHONPATH=/path/to/osm-gps-map/python/.libs ./groundstation.py
+    sudo apt-get install python-gtk2 python-serial python-gtkglext1 python-opengl python-osmgpsmap
 
 - Check out the code from :xref:`wasp`.
 
