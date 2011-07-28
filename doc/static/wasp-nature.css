@@ -1,0 +1,19 @@
+@import url("nature.css");
+
+div.related { background-color: #CF5050; }
+
+div.body h1 { background-color: #DDDDDD; }
+div.body h2 { background-color: #DDDDDD; }
+div.body h3 { background-color: #DDDDDD; }
+div.body h4 { background-color: #DDDDDD; }
+div.body h5 { background-color: #DDDDDD; }
+div.body h6 { background-color: #DDDDDD; }
+
+a {
+	color: #729fcf;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}

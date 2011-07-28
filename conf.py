@@ -119,6 +119,8 @@ xref_links = {
 # Sphinx are currently 'default' and 'sphinxdoc'.
 html_theme = 'nature'
 
+html_style = 'wasp-nature.css'
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
@@ -146,7 +148,7 @@ html_theme = 'nature'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['doc/static']
+html_static_path = ['doc/static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
