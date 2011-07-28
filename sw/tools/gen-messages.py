@@ -416,8 +416,8 @@ class RSTWriter(_Writer, gentools.RSTHelper):
                 #capitalise the first letter
                 print >> outfile, "%s%s" % (m.doc[0].upper(), m.doc[1:])
                 print >> outfile
-            print >> outfile, "* ID: %s" % m.id
-            print >> outfile, "* Payload Length: %s" % m.size
+            self.rst_write_list(outfile, "ID: %s" % m.id)
+            self.rst_write_list(outfile, "Payload Length: %s" % m.size)
             if m.fields:
                 print >> outfile
                 self.rst_write_table(outfile,

@@ -30,6 +30,9 @@ class RSTHelper:
 
     HEADING_LEVELS = ('=','-','^','"')
 
+    def rst_write_list(self, outfile, txt, level=1, style="*"):
+        print >> outfile, "%s%s %s" % (" "*(2*level - 1),style,txt)
+
     def rst_write_header(self, name, outfile, level=0):
         print >> outfile, name
         print >> outfile, self.HEADING_LEVELS[level]*len(name)

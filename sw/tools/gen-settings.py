@@ -113,19 +113,18 @@ class RSTWriter(settings.SettingsFile, _Writer, gentools.RSTHelper):
             self.rst_write_header(sect.name, outfile, level=3)
             print >> outfile
             for s in sect.settings:
-                print >> outfile, " * %s" % s.name
+                self.rst_write_list(outfile, s.name)
                 print >> outfile
                 if s.doc:
-                    print >> outfile, "   %s" % s.doc
-                    print >> outfile
-                print >> outfile, "    * Value: %s" % s.value,
+                    self.rst_write_list(outfile, "*%s*" % s.doc, 2)
                 if s.type != None:
-                    print >> outfile, " (%s)" % s.type
+                    val_s = "Value: %s (%s)" % (s.value,s.type)
                 else:
-                    print >> outfile
+                    val_s = "Value: %s" % s.value
+                self.rst_write_list(outfile, val_s, 2)
                 if s.set:
-                    print >> outfile, "    * Min: %s" % s.min
-                    print >> outfile, "    * Max: %s" % s.max
+                    self.rst_write_list(outfile, "Min: %s" % s.min, 2)
+                    self.rst_write_list(outfile, "Max: %s" % s.max, 2)
                 print >> outfile
 
 if __name__ == "__main__":
