@@ -11,7 +11,8 @@ Additionally, there are a number of tools and similar utilities, primarily writt
 which bridge the pieces together.
 
 An important common element in all pieces is the :doc:`comm-protocol`, which defines the
-binary interface between the pieces. 
+binary interface between the pieces. To setup or customize the :xref:`wasp` system for
+a new UAV see :doc:`configuration`
 
 .. toctree::
    :maxdepth: 2
@@ -20,5 +21,6 @@ binary interface between the pieces.
    onboard
    groundstation
    sim
+   configuration
    comm-protocol
-   settings
+   

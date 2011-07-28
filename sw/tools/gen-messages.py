@@ -403,10 +403,12 @@ class RSTWriter(_Writer, gentools.RSTHelper):
     def preamble(self, outfile):
         self.rst_write_header(self._get_filename().replace("-"," ").title(), outfile, level=0)
         print >> outfile
-        self.rst_write_header("Message Definitions", outfile, level=2)
+        self.rst_write_comment(outfile, "begin-body")
         print >> outfile
 
     def body(self, outfile):
+        self.rst_write_header("Message Definitions", outfile, level=2)
+        print >> outfile
         #sort the messages alphabetically
         self.messages.sort(lambda a,b: cmp(a.name,b.name))
         for m in self.messages:
@@ -425,6 +427,10 @@ class RSTWriter(_Writer, gentools.RSTHelper):
                         ("name","type"),
                         [(f.name, f.ctype) for f in m.fields])
             print >> outfile
+
+    def postamble(self, outfile):
+        self.rst_write_comment(outfile, "end-body")
+        print >> outfile
 
 if __name__ == "__main__":
     OUTPUT_MODES = {

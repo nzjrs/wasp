@@ -9,7 +9,7 @@ ALLSPHINXOPTS   = -d $(DOCDIR)/.doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 GENERATED_FILES =							\
 	sw/doc/comm-protocol.rst				\
-	sw/doc/settings.rst						\
+	sw/doc/settings-xml.rst						\
 	sw/onboard/generated/messages.h			\
 	$(BUILT_DOCDIR)/onboard/xml/index.xml
 
@@ -74,7 +74,7 @@ $(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg sw/onboard/*.h
 sw/doc/comm-protocol.rst: sw/onboard/config/messages.xml
 	@PYTHONPATH=./sw/groundstation/ ./sw/tools/gen-messages.py -m $< -f rst --output=$@
 
-sw/doc/settings.rst: sw/onboard/config/settings.xml
+sw/doc/settings-xml.rst: sw/onboard/config/settings.xml
 	@PYTHONPATH=./sw/groundstation/ ./sw/tools/gen-settings.py -s $< -f rst > $@
 
 sw/onboard/generated/messages.h: sw/onboard/config/messages.xml
