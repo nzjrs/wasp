@@ -401,7 +401,7 @@ class FunctionWriterHeader(_FunctionWriter):
 class RSTWriter(_Writer, gentools.RSTHelper):
 
     def preamble(self, outfile):
-        self.rst_write_header(self._get_filename().replace("-"," ").title(), outfile)
+        self.rst_write_header(self._get_filename().replace("-"," ").title(), outfile, level=0)
         print >> outfile
         self.rst_write_header("Message Definitions", outfile, level=2)
         print >> outfile
@@ -410,8 +410,7 @@ class RSTWriter(_Writer, gentools.RSTHelper):
         #sort the messages alphabetically
         self.messages.sort(lambda a,b: cmp(a.name,b.name))
         for m in self.messages:
-            print >> outfile, "%s" % m.name
-            print >> outfile, "\"" * len(m.name)
+            self.rst_write_header(m.name, outfile, level=3)
             print >> outfile
             if m.doc:
                 #capitalise the first letter

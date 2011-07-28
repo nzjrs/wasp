@@ -7,6 +7,7 @@ Software
    setup
    architecture
    comm-protocol
+   settings
    onboard
    groundstation
    sim

@@ -28,9 +28,6 @@ def define_int(name, val, outfile=sys.stdout):
 class RSTHelper:
     # Utility mixin class for writing restructured text
 
-    TABLE_COL_W  = 25
-    TABLE_GAP_W  = 1
-    TABLE_HEADER = '='*TABLE_COL_W
     HEADING_LEVELS = ('=','-','^','"')
 
     def rst_write_header(self, name, outfile, level=0):
@@ -38,6 +35,19 @@ class RSTHelper:
         print >> outfile, self.HEADING_LEVELS[level]*len(name)
 
     def rst_write_table(self, outfile, title, contents_title, contents, indent=None):
+
+        assert len(contents) > 0
+        assert len(contents[0]) == 2
+        assert len(contents_title) == 2
+
+        #find the longest string in the table
+        max_contents = max(map(lambda x: max(len(x[0]),len(x[1])),contents))
+        max_contents_title = max(len(contents_title[0]),len(contents_title[1]))
+
+        TABLE_COL_W = max(25, max_contents, max_contents_title) + 1
+        TABLE_GAP_W  = 1
+        TABLE_HEADER = '='*TABLE_COL_W
+
         def _print_field(name, _type, center=False, gap=" "):
             if center:
                 f = string.center
@@ -47,16 +57,16 @@ class RSTHelper:
             if indent:
                 print >> outfile, indent,
             print >> outfile, "%s%s%s" % (
-                                    f(name,self.TABLE_COL_W),
-                                    gap*self.TABLE_GAP_W,
-                                    f(_type, self.TABLE_COL_W))
+                                    f(name, TABLE_COL_W),
+                                    gap*TABLE_GAP_W,
+                                    f(_type, TABLE_COL_W))
 
         def _print_header():
-            _print_field(self.TABLE_HEADER, self.TABLE_HEADER, center=True)
+            _print_field(TABLE_HEADER, TABLE_HEADER, center=True)
 
         def _print_title(name):
-            title_w = 2*self.TABLE_COL_W + self.TABLE_GAP_W
-            title_ul = "-"*self.TABLE_COL_W
+            title_w = 2*TABLE_COL_W + TABLE_GAP_W
+            title_ul = "-"*TABLE_COL_W
 
             if indent:
                 print >> outfile, indent,
@@ -64,7 +74,8 @@ class RSTHelper:
             _print_field(title_ul, title_ul, gap="-")
 
         _print_header()
-        _print_title(title)
+        if title:
+            _print_title(title)
         _print_field(contents_title[0],contents_title[1], center=True)
         _print_header()
 
