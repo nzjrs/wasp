@@ -9,7 +9,8 @@ settings which are not machine specific, but feature or configuration specific.
 Architecture Specific Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-FIXME
+.. doxygenindex::
+   :project: archconfigarm7
 
 .. include:: settings-xml.rst
    :start-after: begin-body

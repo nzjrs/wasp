@@ -102,7 +102,8 @@ pygments_style = 'sphinx'
 
 # -- Options for breath doxygen bridge -----------------------------------------
 breathe_projects = {
-    "onboard":"doc/built/onboard/xml/"
+    "onboard":"doc/built/onboard/xml/",
+    "archconfigarm7":"doc/built/archconfigarm7/xml/"
 }
 breathe_default_project = "onboard"
 

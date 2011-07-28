@@ -9,9 +9,10 @@ ALLSPHINXOPTS   = -d $(DOCDIR)/.doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 GENERATED_FILES =							\
 	sw/doc/comm-protocol.rst				\
-	sw/doc/settings-xml.rst						\
+	sw/doc/settings-xml.rst					\
 	sw/onboard/generated/messages.h			\
-	$(BUILT_DOCDIR)/onboard/xml/index.xml
+	$(BUILT_DOCDIR)/onboard/xml/index.xml	\
+	$(BUILT_DOCDIR)/archconfigarm7/xml/index.xml
 
 ################################################################################
 # Main targets
@@ -67,9 +68,9 @@ mkdir:
 
 $(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg sw/onboard/*.h
 	@DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen $<
-	#this is a hack, sphinx does not notice the changed xml
-	@rm -f doc/built/html/sw/doc/onboard-api.html
-	@rm -f doc/.doctrees/sw/doc/onboard-api.doctree
+
+$(BUILT_DOCDIR)/archconfigarm7/xml/index.xml: sw/onboard/arch/arm7/doxygen.cfg sw/onboard/arch/arm7/config.h
+	@DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen $<
 
 sw/doc/comm-protocol.rst: sw/onboard/config/messages.xml
 	@PYTHONPATH=./sw/groundstation/ ./sw/tools/gen-messages.py -m $< -f rst --output=$@
