@@ -57,7 +57,7 @@ dist:
 	@echo Created $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3).tar.gz
 
 release: dist uploaddoc
-	@rsync -av $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)*.tar.gz john@open.grcnz.com:/srv/default/http/downloads/wasp/
+	@rsync -av $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)*.tar.gz root@greenbirdsystems.com:/var/www/waspuav.org/downloads/
 
 ################################################################################
 # Dependencies
