@@ -10,7 +10,6 @@ except ImportError:
     import messages
     import xmlobject
 
-import string
 import optparse
 import re
 import os.path
@@ -399,54 +398,12 @@ class FunctionWriterHeader(_FunctionWriter):
             self._print_unpack_function(m, outfile, False, "")
         print >> outfile
 
-class RSTWriter(_Writer):
-
-    TABLE_COL_W  = 25
-    TABLE_GAP_W  = 1
-    TABLE_HEADER = '='*TABLE_COL_W
-    HEADING_LEVELS = ('=','-','^','"')
-
-    def _write_header(self, name, outfile, level=0):
-        print >> outfile, name
-        print >> outfile, self.HEADING_LEVELS[level]*len(name)
-        
-    def _write_table(self, m, outfile, indent=None):
-        def _print_field(name, _type, center=False, gap=" "):
-            if center:
-                f = string.center
-            else:
-                f = string.ljust
-
-            if indent:
-                print >> outfile, indent,
-            print >> outfile, "%s%s%s" % ( f(name,self.TABLE_COL_W), gap*self.TABLE_GAP_W, f(_type, self.TABLE_COL_W))
-
-        def _print_header():
-            _print_field(self.TABLE_HEADER, self.TABLE_HEADER, center=True)
-
-        def _print_title(name):
-            title_w = 2*self.TABLE_COL_W + self.TABLE_GAP_W
-            title_ul = "-"*self.TABLE_COL_W
-
-            if indent:
-                print >> outfile, indent,
-            print >> outfile, string.center(name, title_w)
-            _print_field(title_ul, title_ul, gap="-")
-
-        _print_header()
-        _print_title("Payload")
-        _print_field("name", "type", center=True)
-        _print_header()
-        
-        for f in m.fields:
-            _print_field(f.name, f.ctype)
-        
-        _print_header()
+class RSTWriter(_Writer, gentools.RSTHelper):
 
     def preamble(self, outfile):
-        self._write_header(self._get_filename().replace("-"," ").title(), outfile)
+        self.rst_write_header(self._get_filename().replace("-"," ").title(), outfile)
         print >> outfile
-        self._write_header("Message Definitions", outfile, level=2)
+        self.rst_write_header("Message Definitions", outfile, level=2)
         print >> outfile
 
     def body(self, outfile):
@@ -464,9 +421,11 @@ class RSTWriter(_Writer):
             print >> outfile, "* Payload Length: %s" % m.size
             if m.fields:
                 print >> outfile
-                self._write_table(m, outfile)
+                self.rst_write_table(outfile,
+                        "Payload",
+                        ("name","type"),
+                        [(f.name, f.ctype) for f in m.fields])
             print >> outfile
-        
 
 if __name__ == "__main__":
     OUTPUT_MODES = {
