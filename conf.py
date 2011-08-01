@@ -25,10 +25,10 @@ sys.path.append(os.path.join(os.path.abspath('.'),'sw','groundstation'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.todo', 'sphinx.ext.pngmath']
 
-# Add breathe for documenting code with doxygen, and xref for easier 
-# linking to external docs
+# Add breathe for documenting code with doxygen, xref for easier 
+# linking to external docs, and googleanalytics
 sys.path.append( "doc" )
-extensions += ["breathe","xref"]
+extensions += ["breathe","xref","googleanalytics"]
 
 ## Automatically document python code
 extensions += ['sphinx.ext.autodoc', 'sphinx.ext.autosummary']
@@ -113,6 +113,9 @@ xref_links = {
     "wasp-download": ("download", "http://github.com/nzjrs/wasp/downloads"),
     "osm-gps-map": ("osm-gps-map", "http://github.com/nzjrs/osm-gps-map")
     }
+
+# -- Options for googleanalytics -----------------------------------------------
+googleanalytics_id = "UA-3707626-6"
 
 # -- Options for HTML output ---------------------------------------------------
 
