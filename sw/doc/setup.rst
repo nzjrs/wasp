@@ -6,15 +6,6 @@ Running is supported using Ubuntu 10.10 (maverick) and above.
 In order to build the system the following software must be installed on your 
 computer.
 
-Building the Documentation (Optional)
--------------------------------------
-- python-sphinx > 0.6 
-- doxygen
-
-If you are using Ubuntu Jaunty, you may :xref:`wasp-download` sphinx from the :xref:`wasp`
-homepage. Ubunty Karmic users, or users of other distributions should install
-sphinx from your package manager.
-
 Building the Onboard Software
 -----------------------------
 - newlib-arm_1.13_all.deb
@@ -68,12 +59,13 @@ Building the Groundstation
     ./groundstation.py
 
 - Install the groundstation (optional)
-  Using this method, the groundstation can be started from the Applications menu in GNOME, however for developemnt it is recommended to run the groundstation from the command line
+  Using this method, the groundstation can be started from the Applications menu in GNOME,
+  however for developemnt it is recommended to run the groundstation from the command line
 
 ::
 
     cd sw/groundstation
-    make install
+    make install-local
 
 - Build the onboard code
 
@@ -81,6 +73,11 @@ Building the Groundstation
 
     cd sw/onboard
     make
+
+Building the Documentation (Optional)
+-------------------------------------
+- python-sphinx > 1.0
+- doxygen
 
 Programming the Autopilot
 -------------------------
