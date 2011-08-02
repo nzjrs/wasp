@@ -13,6 +13,13 @@ This launches the groundstation mode with a test (**-t**) data source.
 
 .. image:: groundstation.png
 
+You can also install the groundstation by typing::
+
+make install-local
+
+From the ``sw/groundstation/`` directory. This will allow launching the groundstation from
+the menu of most linux computers.
+
 Configuration
 -------------
 
