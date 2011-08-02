@@ -162,36 +162,23 @@ class Setting:
     def set_id(self, id_):
         self.id = id_
 
-    def print_id(self):
-        print "#define %s %d" % (self.id_str, self.id)
+    def get_rational_approximation(self):
+        val = float(self.value)
+        if val == 0.0:
+            num = 0
+            den = 1
+            err = 0.0
+            approx = 0.0
+        else:
+            #maximum integer to fit in approximation of length
+            maxval = (2 ** self.rational_approximation) - 1
+            num,den = convert_float_to_rational_fraction_approximation(val, maxval)
+            approx = float(num)/float(den)
+            err = (val-approx)/val
+        if err > 0.001:
+            raise Exception("Approximation Error: %f != %f" % (val, approx))
 
-    def print_type(self):
-        if self.type:
-            print "#define SETTING_TYPE_%s %s" % (self.name, self.type_enum)
-
-    def print_value(self):
-        print "#define %s %s" % (self.name, self.value)
-        if self.rational_approximation:
-            val = float(self.value)
-            if val == 0.0:
-                num = 0
-                den = 1
-                err = 0.0
-                approx = 0.0
-            else:
-                #maximum integer to fit in approximation of length
-                maxval = (2 ** self.rational_approximation) - 1
-                num,den = convert_float_to_rational_fraction_approximation(val, maxval)
-                approx = float(num)/float(den)
-                err = (val-approx)/val
-            if err > 0.001:
-                raise Exception("Approximation Error: %f != %f" % (val, approx))
-
-            print "/* Fraction %d bit approximation, %0.3f%% error " % (self.rational_approximation, err*100.0)
-            print " * %.10f ~= %d / %d " % (val, num, den)
-            print " * %.10f ~= %.10f */" % (val, approx)
-            print "#define %s_NUM %d" % (self.name, num)
-            print "#define %s_DEN %d" % (self.name, den)
+        return val,num,den,err,approx
 
     def __str__(self):
         return "<Setting: %s>" % self.name

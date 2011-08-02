@@ -28,7 +28,7 @@
 #define START_TIMEOUT 0xFFFF;
 
 uint8_t servos_4017_idx;
-uint16_t servos_values[SERVOS_4017_NB_CHANNELS];
+uint16_t servos_4017_values[SERVOS_4017_NB_CHANNELS];
 
 void servos_4017_init ( void ) 
 {
@@ -59,12 +59,27 @@ void servos_4017_init ( void )
     /* Set all servos at their midpoints */
     /* compulsory for unaffected servos */
     for( i=0 ; i < SERVOS_4017_NB_CHANNELS ; i++ )
-        servos_values[i] = SERVOS_TICS_OF_USEC(1500);
+        servos_4017_values[i] = SERVOS_TICS_OF_USEC(1500);
 
 }
 
 uint8_t servos_4017_get_num(void)
 {
     return SERVOS_4017_NB_CHANNELS;
+}
+
+void servos_4017_set(uint8_t id, uint8_t value)
+{
+    servos_4017_values[id] = servos_timer_value_from_8bit_range(value);
+}
+
+uint8_t servos_4017_get(uint8_t id)
+{
+    return servos_4017_values[id];
+}
+
+void    servos_4017_commit(void)
+{
+    ;
 }
 

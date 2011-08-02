@@ -13,7 +13,7 @@
    height="31.872"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.0 r9654"
    sodipodi:docname="logo.svg"
    inkscape:export-filename="/home/john/Desktop/logo.png"
    inkscape:export-xdpi="169.42772"
@@ -36,7 +36,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="162.49044"
+     inkscape:cx="106.41901"
      inkscape:cy="-29.563018"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -54,7 +54,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -67,14 +67,14 @@
        id="text2826"
        y="545.39191"
        x="-387.79636"
-       style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#e9afaf;fill-opacity:1;stroke:none;font-family:Spin Cycle OT;-inkscape-font-specification:AlArabiya"
+       style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#cf5050;fill-opacity:1;stroke:none;font-family:Spin Cycle OT;-inkscape-font-specification:AlArabiya"
        xml:space="preserve"
        transform="scale(-1,1)"><tspan
          y="545.39191"
          x="-387.79636"
          id="tspan2828"
          sodipodi:role="line"
-         style="fill:#e9afaf">s</tspan></text>
+         style="fill:#cf5050;fill-opacity:1">s</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Spin Cycle OT;-inkscape-font-specification:AlArabiya"

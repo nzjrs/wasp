@@ -1,0 +1,151 @@
+* {
+	padding: 0;
+	margin: 0;
+	color: #3E4349;
+	line-height: 18pt;
+}
+
+body, html {
+	background-color: #fff;
+	font-family: "Droid Sans", "Sans", sans-serif;
+	font-size: 11pt;
+	height: 100%;
+	min-height: 100%;
+}
+
+h1 {
+	color: #cf5050;
+	font-size: 13pt;
+}
+
+h2 {
+	font-size: 11pt;
+}
+
+a {
+	color: #729fcf;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+small {
+	font-size: 10pt;
+}
+
+#links h2 {
+	margin-bottom: 10pt;
+}
+
+p {
+	margin-top: 10pt;
+	margin-bottom: 15pt;
+}
+
+li {
+	list-style: none;
+}
+
+.thumb {
+	padding-right: 9pt;
+}
+
+.header {
+	padding: 15pt;
+}
+
+#header {
+	width: 100%;
+	height: 100pt;
+	background-repeat: repeat-x;
+}
+
+#logo {
+	width: 640pt;
+	height: 100pt;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top: 30pt;
+	padding-left: 40pt;
+}
+
+#wrapper {
+	margin-left: auto;
+	margin-right: auto;
+	width: 640pt;
+}
+
+#info {
+	width: 280pt;
+	padding: 15pt;
+	float: left;
+}
+
+#graphic {
+	float: left;
+	margin-top: 50pt;
+	width: 315pt;
+	text-align: center;
+}
+
+object {
+	overflow: hidden;
+}
+
+#screenshots {
+	width: 640pt;
+	clear: both;
+	padding: 15pt;
+}
+
+#documentation {
+	width: 640pt;
+	clear: both;
+	padding: 15pt;
+}
+
+#documentation h2 {
+	margin-bottom: 0;
+	margin-top: 0;
+}
+
+.documentation-item {
+	width: 160pt;
+	float: left;
+}
+
+#news {
+	width: 640pt;
+	clear: both;
+	padding: 15pt;
+}
+
+.news-item {
+	width: 280pt;
+	float: left;
+	margin-top: 15pt;
+	margin-right: 40pt;
+}
+
+#footer {
+	clear: both;
+	width: 100%;
+	height: 200pt;
+	background-image: url('../images/bg-bottom.png');
+	background-repeat: repeat-x;
+}
+
+#links {
+
+	padding: 15pt;
+	padding-bottom: 80pt;
+	width: 640pt;
+	height: 100pt;
+}
+
+.links-item {
+	width: 160pt;
+	float: left;
+}

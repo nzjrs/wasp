@@ -1,5 +1,6 @@
-ME = $(shell pwd | sed -e 's/\//\\\//g')
-DFILE = "groundstation.desktop"
+ME=$(shell pwd | sed -e 's/\//\\\//g')
+DFILE="groundstation.desktop"
+ICON="groundstation.svg"
 
 test:
 	@PYTHONPATH=. find wasp/test/ -name 'test*.py' -exec python {} \;
@@ -8,12 +9,13 @@ test:
 clean:
 	@find . -name '*.pyc' -exec rm -f {} \;
 
-install:
+install-local:
 	@echo "Installing .desktop file in "$(HOME)"/.local/share/applications/"$(DFILE)
-	@cat $(DFILE) | sed -e "s/Exec=/Exec=$(ME)\//g" -e 's/Icon=groundstation/Icon=$(ME)\/data\/icons\/rocket.svg/g' > $(HOME)/.local/share/applications/$(DFILE)
+	@cat $(DFILE) | sed -e "s/Exec=/Exec=$(ME)\//g" > $(HOME)/.local/share/applications/$(DFILE)
+	@cp -f ./data/icons/rocket.svg $(HOME)/.local/share/icons/$(ICON)
 
-uninstall:
+uninstall-local:
 	@echo "Removing .desktop file from "$(HOME)"/.local/share/applications/"$(DFILE)
 	@rm -f $(HOME)/.local/share/applications/$(DFILE)
+	@rm -f $(HOME)/.local/share/icons/$(ICON)
 
-.PHONY: test

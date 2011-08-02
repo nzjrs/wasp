@@ -474,7 +474,7 @@ def get_source(source_name):
 
     where opt1 and opt2 meaning depends on the particular source
 
-    :returns: (sournce_name, klass, **options)
+    :returns: (sournce_name, klass, options_dict)
     """
     bits = source_name.split(":")
     name = bits[0]

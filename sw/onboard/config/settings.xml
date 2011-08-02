@@ -151,5 +151,14 @@
     <setting name="HOST_IP_ADDRESS" value='"192.168.0.1"'/>
     <setting name="HOST_PORT" value='1212'/>
   </section>
+  <section name="BOMB">
+    <setting name="ENABLED" value="1"/>
+    <setting name="RELEASE_VALUE" value="0xFF"/>
+    <setting name="HOLD_VALUE" value="0x0"/>
+    <setting name="PERIODIC_TICKS" value="80" doc="the amount of time for the bomb latch to be held"/>
+  </section>
+  <section name="BATTERY">
+    <setting name="CRITICAL_VOLTAGE" value="100" doc="decivolts"/>
+  </section>
 </settings>
 

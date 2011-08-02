@@ -2,7 +2,7 @@
 Type=Application
 Terminal=false
 Name=UAV Groundstation
-Comment=UAV Groundstation
+Comment=Wasp UAV Groundstation
 Icon=groundstation
 Exec=groundstation.py
 Categories=GNOME;GTK;Other;

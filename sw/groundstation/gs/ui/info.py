@@ -11,7 +11,9 @@ LOG = logging.getLogger("infobox")
 
 class InfoBox:
 
-    def __init__(self, source, show_images=True, show_build=True, show_uav_status=True, show_comm_status=True):
+    def __init__(self, source, settingsfile, show_images=True, show_build=True, show_uav_status=True, show_comm_status=True):
+        self._settingsfile = settingsfile
+
         self.widget = gtk.VBox(spacing=10)
         image = None
 
@@ -55,6 +57,8 @@ class InfoBox:
             self._build_progress_bar_holder(vb, "Battery:", self._batt_pb)
             self._cpu_pb = progressbar.ProgressBar(range=(0,100))
             self._build_progress_bar_holder(vb, "CPU Usage:", self._cpu_pb)
+
+            self._batt_low_value = float(self._settingsfile["BATTERY_CRITICAL_VOLTAGE"].value)
 
             #make the progress bars the same size
             sg = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
@@ -165,6 +169,11 @@ class InfoBox:
 
         self._cpu_pb.set_value(cpu_usage)
         self._batt_pb.set_value(bv/10.0)
+
+        if bv < self._batt_low_value:
+            self._batt_pb.set_warning_text("LOW BATTERY")
+        else:
+            self._batt_pb.set_warning_text(None)
 
     def _on_comm_status(self, msg, header, payload):
         overruns, errors = msg.unpack_printable_values(payload, joiner=None)

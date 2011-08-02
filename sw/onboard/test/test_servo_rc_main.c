@@ -25,6 +25,7 @@
 #include "init.h"
 #include "sys_time.h"
 #include "led.h"
+#include "comm.h"
 #include "rc.h"
 #include "actuators.h"
 #include "generated/settings.h"
@@ -48,6 +49,7 @@ static inline void main_init( void ) {
     sys_time_init();
     led_init();
     actuators_init(ACTUATOR_BANK_SERVOS);
+    comm_init(COMM_TELEMETRY);
     rc_init();
     int_enable();
 }
@@ -56,6 +58,7 @@ static inline void main_periodic_task( void ) {
     uint8_t i, val;
 
     led_periodic_task();
+    comm_periodic_task(COMM_TELEMETRY);
 
     rc_periodic_task();
     if (rc_status == RC_OK) {
@@ -76,5 +79,6 @@ static inline void main_periodic_task( void ) {
 
 static inline void main_event_task( void ) {
     rc_event_task();
+    comm_event_task(COMM_TELEMETRY);
 }
 

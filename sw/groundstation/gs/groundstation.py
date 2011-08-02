@@ -97,6 +97,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._messagesfile = MessagesFile(path=messagesfile, debug=False)
         self._messagesfile.parse()
 
+        self._settingsfile = SettingsFile(path=settingsfile)
+
         self._source = UAVSource(self._config, self._messagesfile, options)
         self._source.connect("source-connected", self._on_source_connected)
         self._source.connect("uav-selected", self._on_uav_selected)
@@ -123,7 +125,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map = Map(self._config, self._source)
         self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
-        self._info = InfoBox(self._source)
+        self._info = InfoBox(self._source, self._settingsfile)
         self._statusicon = StatusIcon(icon, self._source)
 
         #raise the window when the status icon clicked
@@ -138,7 +140,6 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("telemetry_hbox").pack_start(self.telemetrycontroller.widget, True, True)
 
         #The settings tab page
-        self._settingsfile = SettingsFile(path=settingsfile)
         self.settingscontroller = SettingsController(self._source, self._settingsfile, self._messagesfile)
         self.get_resource("settings_hbox").pack_start(self.settingscontroller.widget, True, True)
 

@@ -9,8 +9,10 @@ ALLSPHINXOPTS   = -d $(DOCDIR)/.doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 GENERATED_FILES =							\
 	sw/doc/comm-protocol.rst				\
+	sw/doc/settings-xml.rst					\
 	sw/onboard/generated/messages.h			\
-	$(BUILT_DOCDIR)/onboard/xml/index.xml
+	$(BUILT_DOCDIR)/onboard/xml/index.xml	\
+	$(BUILT_DOCDIR)/archconfigarm7/xml/index.xml
 
 ################################################################################
 # Main targets
@@ -25,7 +27,7 @@ BOOTLOADER_DEV=/dev/ttyUSB0
 install_bootloader: bootloader
 	lpc21isp -control sw/bootloader/bl.hex $(BOOTLOADER_DEV) 38400 12000
 
-doc: mkdir $(GENERATED_FILES) html
+doc: mkdir html
 
 all: onboard bootloader doc
 
@@ -56,7 +58,7 @@ dist:
 	@echo Created $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3).tar.gz
 
 release: dist uploaddoc
-	@rsync -av $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)*.tar.gz john@open.grcnz.com:/srv/default/http/downloads/wasp/
+	@rsync -av $(shell git rev-parse --verify HEAD)-$(shell git symbolic-ref HEAD | cut -d / -f 3)*.tar.gz root@greenbirdsystems.com:/var/www/waspuav.org/downloads/
 
 ################################################################################
 # Dependencies
@@ -64,16 +66,22 @@ release: dist uploaddoc
 mkdir:
 	@mkdir -p $(BUILT_DOCDIR)
 
-$(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg
+$(BUILT_DOCDIR)/onboard/xml/index.xml: sw/onboard/doxygen.cfg sw/onboard/*.h
+	@DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen $<
+
+$(BUILT_DOCDIR)/archconfigarm7/xml/index.xml: sw/onboard/arch/arm7/doxygen.cfg sw/onboard/arch/arm7/config.h
 	@DOCDIR=$(DOCDIR) BUILT_DOCDIR=$(BUILT_DOCDIR) doxygen $<
 
 sw/doc/comm-protocol.rst: sw/onboard/config/messages.xml
 	@PYTHONPATH=./sw/groundstation/ ./sw/tools/gen-messages.py -m $< -f rst --output=$@
 
+sw/doc/settings-xml.rst: sw/onboard/config/settings.xml
+	@PYTHONPATH=./sw/groundstation/ ./sw/tools/gen-settings.py -s $< -f rst > $@
+
 sw/onboard/generated/messages.h: sw/onboard/config/messages.xml
 	@make -C sw/onboard/ generated/messages.h
 
-html:
+html: $(GENERATED_FILES)
 	@$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) doc/built/html
 
 .PHONY: doc clean test onboard bootloader

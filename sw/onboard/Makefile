@@ -22,6 +22,7 @@ SRC =                               \
     imu.c                           \
     fms.c                           \
     autopilot.c                     \
+    bomb.c                          \
     ins/booz2_ins.c                 \
     ins/booz2_hf_float.c            \
     ins/booz2_vf_float.c            \
