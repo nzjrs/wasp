@@ -1,14 +1,9 @@
-========
-Wasp UAV
-========
-
-This is the :xref:`wasp` UAV documentation. May I suggest you start by reading
-the :ref:`introduction`
+.. include:: README.rst
 
 .. toctree::
    :maxdepth: 2
 
-   README
+   FAQ
    sw/doc/index
    hw/doc/index
 
