@@ -7,7 +7,7 @@ import gs.plugin as plugin
 LOG = logging.getLogger('enel675')
 
 class ENEL675Plugin(plugin.Plugin):
-    def __init__(self, conf, source, messages_file, groundstation_window):
+    def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
 
         source.register_interest(self._on_ppm, 0, "PPM")
         source.register_interest(self._on_rc, 0, "RC")
