@@ -104,6 +104,16 @@ Now you need to install the appropriate kernel modules.
    chmod +x /etc/init.d/usbserial
    ln -s /etc/init.d/usbserial /etc/rc2.d/S99usbserial
 
+Check that the modules insert without errors
+
+.. code-block:: bash
+
+   sudo gainroot
+   /etc/init.d/usbserial
+
+If that completes witout error check the modules are loaded (see #6 below). You
+should now turn off the device.
+
 Running
 ^^^^^^^
 
