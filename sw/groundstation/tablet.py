@@ -107,6 +107,7 @@ class UI(ConfigurableIface):
 
         if HILDON_AVAILABLE:
             self._win = hildon.Window()
+            self._win.fullscreen()
             self._win.connect("key-press-event", self._on_hildon_key_press)
         else:
             self._win = gtk.Window()
