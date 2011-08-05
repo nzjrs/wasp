@@ -137,7 +137,7 @@ been installed, the following steps must be performed in this order
 
    ls /dev/ttyUSB*
 
-6. If ``/dev/ttyUSB0`` is not listed in the output of #5 then type ``/sbin/lsmod`` to check if the kernel modules are present, you should see ftdi_sio and usbserial listed.
+6. If ``/dev/ttyUSB0`` is not listed in the output of #5 then type ``/sbin/lsmod`` to check if the kernel modules are present, you should see ``ftdi_sio`` and ``usbserial`` listed.
 7. Start the tablet groundstation
 
 .. code-block:: bash
