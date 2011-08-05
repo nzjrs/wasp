@@ -366,6 +366,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         tv = MessageTreeView(
                 self._source.get_rx_message_treestore(),
                 editable=False, show_dt=False, show_value=False)
+        tv.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         tv.show()
         sw.add(tv)
 
@@ -378,11 +379,27 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         if resp == gtk.RESPONSE_OK:
             csv = self.get_resource("log_csv_radiobutton")
 
-            messages = ("STATUS", "GPS_LLH")
-            if csv.get_active():
-                self._source.register_csv_logger(None, *messages)
+            messages = [m.name for m in tv.get_all_selected_messages()]
+            if messages:
+                if csv.get_active():
+                    loggers = self._source.register_csv_logger(None, *messages)
+                else:
+                    loggers = self._source.register_sqlite_logger(None, *messages)
+
+                msg = self._msgarea.new_from_text_and_icon(
+                                "Logging Data Enabled",
+                                "Messages will be saved to %s in %s" % (
+                                    ", ".join(['<a href="file://%s">%s</a>' % (l.logfile,os.path.basename(l.logfile)) for l in loggers]),
+                                    '<a href="file://%s">%s</a>' % (os.path.dirname(loggers[0].logfile),os.path.basename(os.path.dirname(loggers[0].logfile)))),
+                                timeout=5)
             else:
-                self._source.register_sqlite_logger(None, *messages)
+                msg = self._msgarea.new_from_text_and_icon(
+                                "Logging Data Failed",
+                                "You must select messages to be logged",
+                                message_type=gtk.MESSAGE_ERROR,
+                                timeout=5)
+
+            msg.show_all()
 
         sw.remove(tv)
 

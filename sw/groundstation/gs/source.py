@@ -61,9 +61,13 @@ class MessageCb:
         pass
 
 class _LogSqliteCb(MessageCb):
+
+    logfile = ""
+
     def __init__(self, logfile):
         if not logfile:
             logfile = gs.user_file_path("flight.sqlite")
+        self.logfile = logfile
 
         self._con = sqlite3.connect(
                         logfile,
@@ -89,10 +93,15 @@ class _LogSqliteCb(MessageCb):
             self._con = self._cur = None
 
 class _LogCsvCb(MessageCb):
+
+    logfile = ""
+
     def __init__(self, logfile, msg):
         if not logfile:
             logfile = gs.user_file_path(msg.name + ".csv")
-        self._f = open(logfile, 'w')
+        self.logfile = logfile
+
+        self._f = open(self.logfile, 'w')
 
         #print the CSV header
         header = ["time", "acid"] + [f.name for f in msg.fields]
@@ -262,6 +271,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
 
     def register_csv_logger(self, logfilepath, *message_names):
         """ Registers messages to be logged to a CSV file """
+        loggers = []
         #only allowed one CSV per message
         for m in message_names:
             msg = self._messages_file.get_message_by_name(m)
@@ -270,6 +280,9 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
 
             mcb = _LogCsvCb(logfilepath, msg)
             self._save_callback(msg, mcb)
+            loggers.append(mcb)
+
+        return loggers
 
     def register_sqlite_logger(self, logfilepath, *message_names):
         """ Registers messages to be logged to a sqlite database """
@@ -281,6 +294,8 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
                 LOG.critical("Unknown message: %s" % m)
 
             self._save_callback(msg, mcb)
+
+        return [mcb]
 
     def register_interest(self, cb, max_frequency, *message_names, **user_data):
         """

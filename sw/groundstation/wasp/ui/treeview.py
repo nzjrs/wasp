@@ -1,6 +1,9 @@
+import logging
 import gobject
 import gtk
 import time
+
+LOG = logging.getLogger(__name__)
 
 class MessageTreeStore(gtk.TreeStore):
 
@@ -140,6 +143,17 @@ class MessageTreeView(gtk.TreeView):
 
         return model.get_value(_iter, MessageTreeStore.OBJECT_IDX)
 
+    def get_all_selected_messages(self):
+        selected = []
+        model, rows = self.get_selection().get_selected_rows()
+        for row in rows:
+            #row[0] is the toplevel row
+            _iter = model.get_iter(row[0])
+            if model.iter_is_valid(_iter):
+                selected.append(model.get_value(_iter, MessageTreeStore.OBJECT_IDX))
+            else:
+                LOG.warning("Invalid selection")
+        return selected
     
     def get_selected_field(self):
         model, _iter = self.get_selection().get_selected()
