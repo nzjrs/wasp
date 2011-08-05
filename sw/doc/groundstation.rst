@@ -80,8 +80,18 @@ First install the dependencies
    sudo gainroot
    sudo apt-get install python2.5-gtk2 git-core wget
 
-Now install ``python-serial``. You may need to install python-serial manually; e.g by going to the
-python-serial website and manually copying the downloaded files into ``/usr/lib/pythonX.X/site-packages``.
+Now install and test the groundstation
+
+.. code-block:: bash
+
+   cd /home/user/
+   git clone --recursive git://github.com/nzjrs/wasp.git
+   cd wasp/sw/groundstation/
+   ./tablet.py -t
+
+This will check out all the groundstation code from git, and all submodules. Note;
+unlike previous versions of this guide this includes a copy of ``python-serial``. 
+This means you no longer have to install that package manually.
 
 Now you need to install the appropriate kernel modules. 
 
@@ -100,11 +110,11 @@ Running
 Running is a bit complicated because there is no serial port on the n800. You can connect a
 XBEE modem into the USB port, but you must
 
-1. Power the XBEE externally (i.e. not from the USB port)
-2. Connect the XBEE into the n800 via a USB-OTG adapter
+* Power the XBEE externally (i.e. not from the USB port)
+* Connect the XBEE into the n800 via a USB-OTG adapter
 
-Once the hardware preparation has been made, and the sofware dependencies have been installed,
-the following steps must be performed in this order
+Once the hardware preparation has been made, and the sofware dependencies have
+been installed, the following steps must be performed in this order
 
 1. Plug in the OTG adapter, but do not connect the XBEE to it yet
 2. Power on n800
@@ -117,6 +127,11 @@ the following steps must be performed in this order
 
    ls /dev/ttyUSB*
 
-6. If ``/dev/ttyUSB0`` is not listed in the output of #6 then type ``dmesg`` to see what went wrong.
+6. If ``/dev/ttyUSB0`` is not listed in the output of #5 then type ``/sbin/lsmod`` to check if the kernel modules are present, you should see ftdi_sio and usbserial listed.
 7. Start the tablet groundstation
+
+.. code-block:: bash
+
+   cd /home/user/wasp/sw/groundstation/
+   ./tablet.py
 
