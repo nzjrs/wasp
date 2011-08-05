@@ -75,12 +75,24 @@ Installing
 
 First install the dependencies
 
-* python-gtk2
-* python-serial
+.. code-block:: bash
 
-You may need to install python-serial manually; e.g by manually copying into /usr/lib/pythonX.X/site-packages. You
-also need to install the appropriate kernel modules. Copy the files located
-`here <https://github.com/nzjrs/wasp/tree/master/sw/groundstation/data/n800/>`_ into ``/home/user/``
+   sudo gainroot
+   sudo apt-get install python2.5-gtk2 git-core wget
+
+Now install ``python-serial``. You may need to install python-serial manually; e.g by going to the
+python-serial website and manually copying the downloaded files into ``/usr/lib/pythonX.X/site-packages``.
+
+Now you need to install the appropriate kernel modules. 
+
+.. code-block:: bash
+
+   sudo gainroot
+   wget https://github.com/nzjrs/wasp/raw/master/sw/groundstation/data/n800/ftdi_sio.ko -O /lib/ftdi_sio.ko
+   wget https://github.com/nzjrs/wasp/raw/master/sw/groundstation/data/n800/usbserial.ko -O /lib/usbserial.ko
+   wget https://github.com/nzjrs/wasp/raw/master/sw/groundstation/data/n800/usbserial -O /etc/init.d/usbserial
+   chmod +x /etc/init.d/usbserial
+   ln -s /etc/init.d/usbserial /etc/rc2.d/S99usbserial
 
 Running
 ^^^^^^^
@@ -91,29 +103,20 @@ XBEE modem into the USB port, but you must
 1. Power the XBEE externally (i.e. not from the USB port)
 2. Connect the XBEE into the n800 via a USB-OTG adapter
 
-Once the hardware preparation has been made, the following steps must be performed in this order
+Once the hardware preparation has been made, and the sofware dependencies have been installed,
+the following steps must be performed in this order
 
-1. Plug in OTG adapter (but do not plug XBEE into it yet)
-2. Power on XBEE
-3. Power on n800
-4. Wait for the n800 to start
-5. Open a terminal and type
-
-.. code-block:: bash
-
-   sudo gainroot
-   cd /home/user/
-   ./setup-serial.sh
-
-5. Now plug the XBEE USB into the OTG adapter. There should be some activity on the screen (a USB logo may
+1. Plug in the OTG adapter, but do not connect the XBEE to it yet
+2. Power on n800
+3. Power on XBEE
+4. Now plug the XBEE USB into the OTG adapter. There should be some activity on the screen (a USB logo may
    appear).
-6. Check the serial port was created in a terminal
+5. Check the serial port was created in a terminal
 
 .. code-block:: bash
 
    ls /dev/ttyUSB*
 
-7. If ``/dev/ttyUSB0`` is not listed in the output of #6 then type ``dmesg`` to see what went wrong.
-8. Start the tablet groundstation
-
+6. If ``/dev/ttyUSB0`` is not listed in the output of #6 then type ``dmesg`` to see what went wrong.
+7. Start the tablet groundstation
 
