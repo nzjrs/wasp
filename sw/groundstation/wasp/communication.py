@@ -64,6 +64,10 @@ class _Communication(gobject.GObject):
     def get_connection_string(self):
         return ""
 
+class NoneCommunication(_Communication):
+
+    COMMUNICATION_TYPE = "none"
+
 class UdpCommunication(_Communication):
 
     COMMUNICATION_TYPE = "network"
@@ -454,7 +458,8 @@ ALL_COMMUNICATION_KLASSES = [
     SerialCommunication,
     DummyCommunication,
     UdpCommunication,
-    FifoCommunication
+    FifoCommunication,
+    NoneCommunication
 ]
 
 def get_source(source_name):
