@@ -114,6 +114,28 @@ Check that the modules insert without errors
 If that completes witout error check the modules are loaded (see #6 below). You
 should now turn off the device.
 
+Extra Notes
+"""""""""""
+
+* Checking Out
+
+.. code-block:: bash
+
+   git clone --recursive git://github.com/nzjrs/wasp.git
+
+is the same as
+
+.. code-block:: bash
+
+   git clone git://github.com/nzjrs/wasp.git
+   cd wasp
+   git submodule init
+   git submodule update
+
+* You need to add the devel inorder to install git, loading details are here
+  http://wiki.maemo.org/Extras-devel#How_to_activate_Extras-devel
+* The repo of choice for n800/n810 is ``http://repository.maemo.org/extras-devel/pool/diablo/``
+
 Running
 ^^^^^^^
 
