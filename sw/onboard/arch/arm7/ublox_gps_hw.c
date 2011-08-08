@@ -43,7 +43,7 @@ typedef struct __UbxParseState {
 } UbxParseState_t;
 
 typedef enum {
-    GOT_MSG_GPS_POS                 = (1 << 0), /* Any position message, e.g. POSLLH_OR_POSUTM */
+    GOT_MSG_GPS_POS                 = (1 << 0), /* Position message, e.g. POSLLH */
     GOT_MSG_GPS_SOL                 = (1 << 1), /* Nav solution message */
     GOT_MSG_GPS_VEL                 = (1 << 2), /* Any velocity message */
     GOT_MSG_GPS_STATUS              = (1 << 3), /* Any status message   */
@@ -106,11 +106,6 @@ gps_event_task(void)
                     gps_state.hmsl = UBX_NAV_POSLLH_HMSL(ubx_msg_buf);
                     gps_state.hacc = UBX_NAV_POSLLH_Hacc(ubx_msg_buf);
                     gps_state.vacc = UBX_NAV_POSLLH_Vacc(ubx_msg_buf);
-                    break;
-                case UBX_NAV_POSUTM_ID:
-                    gps_got_msgs |= GOT_MSG_GPS_POS;
-
-                    /* FIXME: Fill state from UTM */
                     break;
                 case UBX_NAV_SOL_ID:
                     {
