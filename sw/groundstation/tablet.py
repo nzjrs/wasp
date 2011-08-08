@@ -9,7 +9,6 @@ import gobject
 gobject.threads_init()
 gtk.gdk.threads_init()
 
-sys.path.insert(0,'/home/user/pythonlibs')
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
 import gs
