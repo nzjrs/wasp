@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <settings>
   <section name="HARDWARE_ENABLED">
-    <setting name="GPS" value="0"/>
+    <setting name="GPS" value="1"/>
   </section>
   <section name="AUTOPILOT">
     <setting name="MODE_MANUAL" value="AP_MODE_RC_DIRECT" doc="Autopilot mode in manual flight"/>
