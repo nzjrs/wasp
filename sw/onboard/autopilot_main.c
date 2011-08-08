@@ -77,10 +77,13 @@ static inline void autopilot_main_init( void ) {
 
   rc_init();
 
-  /* gps_init(); */
+#if HARDWARE_ENABLED_GPS
+  gps_init();
+#else
   comm_init(COMM_0);
   comm_add_tx_callback(COMM_0, comm_autopilot_message_send);
   comm_add_rx_callback(COMM_0, comm_autopilot_message_received);
+#endif
 
   comm_init(COMM_TELEMETRY);
   comm_add_tx_callback(COMM_TELEMETRY, comm_autopilot_message_send);
@@ -136,7 +139,9 @@ static inline void autopilot_main_periodic( void ) {
         break;
     case 1:
         comm_periodic_task(COMM_TELEMETRY);
+#if !HARDWARE_ENABLED_GPS
         comm_periodic_task(COMM_0);
+#endif
         break;
     case 2:
         fms_periodic_task();
@@ -169,6 +174,7 @@ static inline void autopilot_main_periodic( void ) {
 }
 
 static inline void autopilot_main_event( void ) {
+  bool_t gps_event;
   uint8_t valid = 0;
 
   analog_event_task();
@@ -191,7 +197,13 @@ static inline void autopilot_main_event( void ) {
   if ( altimeter_event_task() )
     ins_update_baro();
 
-  if ( FALSE /*gps_event_task()*/ ) {
+#if HARDWARE_ENABLED_GPS
+  gps_event = gps_event_task();
+#else
+  gps_event = FALSE;
+#endif
+
+  if ( gps_event ) {
     if (gps_state.fix == GPS_FIX_3D)
         led_on(LED_GPS);
     else
@@ -200,7 +212,9 @@ static inline void autopilot_main_event( void ) {
   }
 
   comm_event_task(COMM_TELEMETRY);
+#if !HARDWARE_ENABLED_GPS
   comm_event_task(COMM_0);
+#endif
 }
 
 
