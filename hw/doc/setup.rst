@@ -87,5 +87,17 @@ LEA-4P
 * UBX->NAV (not UBX->CFG->NAV): double click on POSUTM, SOL, STATUS, SVINFO, VELNED. They should change from grey to black
 * UBX->CFG->CFG : save current config, click "send" in the lower left corner to permanently save these settings to the receiver 
 
+LEA-5H
+------
+* Right Click on the NMEA Text on top of the tree and choose disable child messages
+* Choose UBX->CFG->NAV5(Navigation 5) - set it to use Airborne 8 <4G. This tells the Kalman filter to expect significant changes in direction. 
+  Note that this setting is only good for faster moving airplanes. For a fixed position hovering heli, 'pedestrian' setting is better
+* UBX->CFG->PRT - set USART1 to 38400bps (must match the value in your Airframe file)
+* Change the baudrate of U-Center to 38400bps if the connection is lost at this point
+* UBX->CFG->RATE(Rates) - change the Measurement Period to 250ms This gives a 4 Hz position update since 4 x 250ms is one second.
+* UBX->CFG->SBAS : Disable (SBAS appears to cause occasional severe altitude calcuation errors)
+* UBX->NAV (not UBX->CFG->NAV): double click on POSLLH, SOL, STATUS, SVINFO, VELNED. They should change from grey to black
+* UBX->CFG->CFG : save current config, click "send"
+
 
 
