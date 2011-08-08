@@ -4,6 +4,19 @@ import os.path
 import logging
 import optparse
 
+if os.name == "posix":
+    stream = sys.stderr
+else:
+    #when running from py2exe, if anything is printed to stderr
+    #then the app shows an annoying dialog when closed
+    stream = sys.stdout
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="[%(name)-20s][%(levelname)-7s] %(message)s (%(filename)s:%(lineno)d)",
+    stream=stream
+    )
+
 try:
     import gs
 except ImportError:
@@ -12,19 +25,6 @@ except ImportError:
     import gs
 
 import gs.groundstation as groundstation
-
-#when running from py2exe, if anything is printed to stderr then the app
-#shows an annoying dialog when closed
-if gs.IS_WINDOWS:
-    stream = sys.stdout
-else:
-    stream = sys.stderr
- 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="[%(name)-20s][%(levelname)-7s] %(message)s (%(filename)s:%(lineno)d)",
-    stream=stream
-    )
 
 if __name__ == "__main__":
     parser = gs.get_default_command_line_parser(True, True, True)

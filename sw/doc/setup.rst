@@ -1,17 +1,10 @@
 Building the Software
 =====================
 
+Running is supported using Ubuntu 10.10 (maverick) and above.
+
 In order to build the system the following software must be installed on your 
 computer.
-
-Building the Documentation (Optional)
--------------------------------------
-- python-sphinx > 0.6 
-- doxygen
-
-If you are using Ubuntu Jaunty, you may :xref:`wasp-download` sphinx from the :xref:`wasp`
-homepage. Ubunty Karmic users, or users of other distributions should install
-sphinx from your package manager.
 
 Building the Onboard Software
 -----------------------------
@@ -30,24 +23,7 @@ Building the Groundstation
 
 ::
 
-    sudo apt-get install python-gtk2 python-serial python-gtkglext1 python-opengl
-
-- Install osm-gps-map
-
-The groundstation depends on :xref:`osm-gps-map`. It works with the version shipped
-in Ubuntu lucid, so it can be installed by simply typing::
-
-    sudo apt-get install python-osmgpsmap
-
-If you wish to use a later verion, :xref:`wasp` also supports recent stable releases
-of :xref:`osm-gps-map`. In this case, you should follow the installation instruction
-on the :xref:`osm-gps-map` homepage.
-
-One thing to note; you do not have to install osm-gps-map to /usr if you do not wish to.
-To run the groundstation against an uninstalled copy of osm-gps-map remember to
-set PYTHONPATH environment variable. For example::
-
-    PYTHONPATH=/path/to/osm-gps-map/python/.libs ./groundstation.py
+    sudo apt-get install python-gtk2 python-serial python-gtkglext1 python-opengl python-osmgpsmap
 
 - Check out the code from :xref:`wasp`.
 
@@ -83,12 +59,13 @@ set PYTHONPATH environment variable. For example::
     ./groundstation.py
 
 - Install the groundstation (optional)
-  Using this method, the groundstation can be started from the Applications menu in GNOME, however for developemnt it is recommended to run the groundstation from the command line
+  Using this method, the groundstation can be started from the Applications menu in GNOME,
+  however for developemnt it is recommended to run the groundstation from the command line
 
 ::
 
     cd sw/groundstation
-    make install
+    make install-local
 
 - Build the onboard code
 
@@ -96,6 +73,11 @@ set PYTHONPATH environment variable. For example::
 
     cd sw/onboard
     make
+
+Building the Documentation (Optional)
+-------------------------------------
+- python-sphinx > 1.0
+- doxygen
 
 Programming the Autopilot
 -------------------------

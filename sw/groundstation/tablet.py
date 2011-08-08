@@ -9,12 +9,11 @@ import gobject
 gobject.threads_init()
 gtk.gdk.threads_init()
 
-sys.path.insert(0,'/home/user/pythonlibs')
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
 import gs
 import gs.ui
-from gs.config import Config
+from gs.config import Config, ConfigurableIface
 from gs.source import UAVSource
 from gs.ui import message_dialog
 from gs.ui.info import InfoBox
@@ -68,7 +67,11 @@ class TabletGraphManager(GraphManager):
         self._ui.remove_page(gh)
         del(self._graphs[name])
 
-class UI:
+class UI(ConfigurableIface):
+
+    CONFIG_SECTION = "MAIN"
+    DEFAULT_COMMAND_BUTTON = "BOMB_DROP"
+
     def __init__(self, options, show_tabs=False):
 
         prefsfile = os.path.abspath(options.preferences)
@@ -90,7 +93,12 @@ class UI:
         self._messagesfile = MessagesFile(path=messagesfile, debug=False)
         self._messagesfile.parse()
 
+        self._settingsfile = SettingsFile(path=settingsfile)
+
         self._config = Config(filename=prefsfile)
+        ConfigurableIface.__init__(self, self._config)
+        self.autobind_config("command_button")
+
         self._source = UAVSource(self._config, self._messagesfile, options)
         self._tm = TabletGraphManager(self._config, self._source, self._messagesfile, self)
 
@@ -98,6 +106,7 @@ class UI:
 
         if HILDON_AVAILABLE:
             self._win = hildon.Window()
+            self._win.fullscreen()
             self._win.connect("key-press-event", self._on_hildon_key_press)
         else:
             self._win = gtk.Window()
@@ -145,15 +154,15 @@ class UI:
         #hbox for info pages
         ihb = gtk.HBox(homogeneous=True, spacing=5)
         if show_uav_info:
-            info = InfoBox(self._source, show_images=False, show_build=False, show_comm_status=False)
+            info = InfoBox(self._source, self._settingsfile, show_images=False, show_build=False, show_comm_status=False)
             ihb.pack_start(info.widget)
         if show_build or show_comm_status:
             vb = gtk.VBox(spacing=5)
             if show_build:
-                info = InfoBox(self._source, show_images=False, show_uav_status=False, show_build=True, show_comm_status=False)
+                info = InfoBox(self._source, self._settingsfile, show_images=False, show_uav_status=False, show_build=True, show_comm_status=False)
                 vb.pack_start(info.widget, False, False)
             if show_comm_status:
-                info = InfoBox(self._source, show_images=False, show_uav_status=False, show_build=False, show_comm_status=True)
+                info = InfoBox(self._source, self._settingsfile, show_images=False, show_uav_status=False, show_build=False, show_comm_status=True)
                 vb.pack_start(info.widget, False, False)
             ihb.pack_start(vb, False, True)
 
@@ -170,6 +179,13 @@ class UI:
         mb = RequestMessageButton(self._messagesfile, "BUILD_INFO", gtk.Button(stock=gtk.STOCK_REFRESH))
         mb.connect("send-message", lambda mb, msg, vals, source: source.send_message(msg, vals), self._source)
         vb.pack_start(mb)
+        #custom command buttons
+        for name in self._command_button.split(","):
+            LOG.info("Adding custom command button: %s" % name)
+            msg = self._messagesfile.get_message_by_name(name)
+            b = gtk.Button(msg.pretty_name)
+            b.connect("clicked", lambda b,s,c,: s.send_command(c, ()), self._source, msg)
+            vb.pack_start(b)
 
         #hb contains info and buttons
         hb = gtk.HBox(spacing=5)

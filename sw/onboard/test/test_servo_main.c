@@ -31,6 +31,8 @@
 #include "actuators.h"
 #include "generated/messages.h"
 
+#include "lib/debug.h"
+
 typedef struct {
     uint8_t val;
     uint8_t dval;
@@ -59,6 +61,7 @@ static inline void main_init( void ) {
     hw_init();
     sys_time_init();
     led_init();
+    comm_init(COMM_TELEMETRY);
     actuators_init(ACTUATOR_BANK_SERVOS);
     int_enable();
 
@@ -87,6 +90,7 @@ static inline void main_periodic_task( void ) {
     static uint16_t cnt = 0;
 
     led_periodic_task();
+    comm_periodic_task(COMM_TELEMETRY);
 
     if (++cnt == SERVO_SPEED) 
     {
@@ -101,13 +105,13 @@ static inline void main_periodic_task( void ) {
             else if (servo->val == SERVO_MIN)
                 servo->dval = 1;
 
+#if SERVO_FIXED_VALUE > 0
+            servo->val = SERVO_FIXED_VALUE;
+#else
             /* move and set servo */
             servo->val += servo->dval;
-#if SERVO_FIXED_VALUE > 0
-            actuators_set(ACTUATOR_BANK_SERVOS | i, SERVO_FIXED_VALUE);
-#else
-            actuators_set(ACTUATOR_BANK_SERVOS | i, servo->val);
 #endif
+            actuators_set(ACTUATOR_BANK_SERVOS | i, servo->val);
         }
 
         actuators_commit(ACTUATOR_BANK_SERVOS);
@@ -116,6 +120,6 @@ static inline void main_periodic_task( void ) {
 }
 
 static inline void main_event_task( void ) {
-
+    comm_event_task(COMM_TELEMETRY);
 }
 

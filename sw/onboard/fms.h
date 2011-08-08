@@ -26,7 +26,15 @@ typedef struct __FMS {
     uint8_t         mode;
     bool_t          timeout;
     uint8_t         last_msg;
+    uint8_t         enabled_mask;
 } FMS_t;
+
+typedef enum {
+    FMS_ROLL    = 1,
+    FMS_PITCH   = 2,
+    FMS_HEADING = 4,
+    FMS_THRUST  = 8
+} FMSEnabledMask_t;
 
 extern FMS_t            fms;
 extern SystemStatus_t   fms_system_status;

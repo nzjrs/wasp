@@ -27,19 +27,22 @@ void fms_periodic_task(void)
 void fms_set(CommMessage_t *message)
 {
     if ( message->msgid == MESSAGE_ID_FMS_ATTITUDE ) {
+        /* copy roll, pitch, heading */
         float r = MESSAGE_FMS_ATTITUDE_GET_FROM_BUFFER_roll(message->payload);
         float p = MESSAGE_FMS_ATTITUDE_GET_FROM_BUFFER_pitch(message->payload);
         float y = MESSAGE_FMS_ATTITUDE_GET_FROM_BUFFER_heading(message->payload);
-
         struct Int32Eulers att = {
             ANGLE_BFP_OF_REAL( r ),
             ANGLE_BFP_OF_REAL( p ),
             ANGLE_BFP_OF_REAL( y )
         };
-
         EULERS_COPY (fms.command.h_sp.attitude, att);
 
+        /* copy thrust */
         fms.command.v_sp.direct = MESSAGE_FMS_ATTITUDE_GET_FROM_BUFFER_thrust(message->payload);
+
+        /* copy mask */
+        fms.enabled_mask = MESSAGE_FMS_ATTITUDE_GET_FROM_BUFFER_enabled(message->payload);
     }
 }
 

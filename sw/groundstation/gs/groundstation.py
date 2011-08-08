@@ -97,6 +97,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._messagesfile = MessagesFile(path=messagesfile, debug=False)
         self._messagesfile.parse()
 
+        self._settingsfile = SettingsFile(path=settingsfile)
+
         self._source = UAVSource(self._config, self._messagesfile, options)
         self._source.connect("source-connected", self._on_source_connected)
         self._source.connect("uav-selected", self._on_uav_selected)
@@ -123,14 +125,14 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self._map = Map(self._config, self._source)
         self._msgarea = MsgAreaController()
         self._sb = StatusBar(self._source)
-        self._info = InfoBox(self._source)
+        self._info = InfoBox(self._source, self._settingsfile)
         self._statusicon = StatusIcon(icon, self._source)
 
         #raise the window when the status icon clicked
         self._statusicon.connect("activate", lambda si, win: win.present(), self.window)
 
         self.get_resource("main_left_vbox").pack_start(self._info.widget, False, False)
-        self.get_resource("main_map_vbox").pack_start(self._msgarea, False, False)
+        self.get_resource("window_vbox").pack_start(self._msgarea, False, False)
         self.get_resource("window_vbox").pack_start(self._sb, False, False)
 
         #The telemetry tab page
@@ -138,15 +140,17 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.get_resource("telemetry_hbox").pack_start(self.telemetrycontroller.widget, True, True)
 
         #The settings tab page
-        self._settingsfile = SettingsFile(path=settingsfile)
         self.settingscontroller = SettingsController(self._source, self._settingsfile, self._messagesfile)
         self.get_resource("settings_hbox").pack_start(self.settingscontroller.widget, True, True)
 
         #The command and control tab page
-        self.commandcontroller = CommandController(self._source, self._messagesfile)
+        self.commandcontroller = CommandController(self._source, self._messagesfile, self._settingsfile)
         self.get_resource("command_hbox").pack_start(self.commandcontroller.widget, False, True)
         self.controlcontroller = ControlController(self._source, self._messagesfile, self._settingsfile)
         self.get_resource("control_hbox").pack_start(self.controlcontroller.widget, True, True)
+        #Track ok/failed command messages
+        self._source.connect("command-ok", self._on_command_ok)
+        self._source.connect("command-fail", self._on_command_fail)
 
         #Lazy initialize the following when first needed
         self._plane_view = None
@@ -183,6 +187,17 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         self.builder_connect_signals()
 
         self.window.show_all()
+
+    def _on_command_ok(self, source, msgid):
+        LOG.debug("COMMAND OK (ID: %d)", msgid)
+
+    def _on_command_fail(self, source, msgid, error_msg):
+        msg = self._messagesfile.get_message_by_id(msgid)
+        self._msgarea.new_from_text_and_icon(
+                        "Command Error",
+                        "Message %s, %s" % (msg.name, error_msg),
+                        message_type=gtk.MESSAGE_ERROR,
+                        timeout=5).show_all()
 
     def _on_uav_detected(self, source, acid):
         self._uav_detected_model.append( ("0x%X" % acid, acid) )
@@ -351,6 +366,7 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         tv = MessageTreeView(
                 self._source.get_rx_message_treestore(),
                 editable=False, show_dt=False, show_value=False)
+        tv.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         tv.show()
         sw.add(tv)
 
@@ -363,11 +379,27 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         if resp == gtk.RESPONSE_OK:
             csv = self.get_resource("log_csv_radiobutton")
 
-            messages = ("STATUS", "GPS_LLH")
-            if csv.get_active():
-                self._source.register_csv_logger(None, *messages)
+            messages = [m.name for m in tv.get_all_selected_messages()]
+            if messages:
+                if csv.get_active():
+                    loggers = self._source.register_csv_logger(None, *messages)
+                else:
+                    loggers = self._source.register_sqlite_logger(None, *messages)
+
+                msg = self._msgarea.new_from_text_and_icon(
+                                "Logging Data Enabled",
+                                "Messages will be saved to %s in %s" % (
+                                    ", ".join(['<a href="file://%s">%s</a>' % (l.logfile,os.path.basename(l.logfile)) for l in loggers]),
+                                    '<a href="file://%s">%s</a>' % (os.path.dirname(loggers[0].logfile),os.path.basename(os.path.dirname(loggers[0].logfile)))),
+                                timeout=5)
             else:
-                self._source.register_sqlite_logger(None, *messages)
+                msg = self._msgarea.new_from_text_and_icon(
+                                "Logging Data Failed",
+                                "You must select messages to be logged",
+                                message_type=gtk.MESSAGE_ERROR,
+                                timeout=5)
+
+            msg.show_all()
 
         sw.remove(tv)
 

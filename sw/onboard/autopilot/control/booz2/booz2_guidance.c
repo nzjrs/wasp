@@ -34,8 +34,6 @@
 #include "generated/settings.h"
 #include "generated/radio.h"
 
-#include "lib/debug.h"
-
 uint8_t booz2_guidance_h_mode;
 uint8_t booz2_guidance_v_mode;
 
@@ -124,12 +122,9 @@ void booz2_guidance_mode_changed(uint8_t h_mode, uint8_t v_mode)
 
 }
 
-#define USE_FMS_YAW     0
-#define RC_UPDATE_FREQ  40
-
 void booz2_guidance_on_rc_event(bool_t in_flight)
 {
-    int32_t psi;
+    struct Int32Eulers rc_sp;
 
     /* horizontal control mode */
     switch ( booz2_guidance_h_mode )
@@ -141,28 +136,24 @@ void booz2_guidance_on_rc_event(bool_t in_flight)
             booz2_stabilization_attitude_read_rc(&booz_stabilization_att_sp, in_flight);
             break;
         case BOOZ2_GUIDANCE_H_MODE_HOVER:
+            /* always read the RC because FMS can be applied to individual channels */
+            booz2_stabilization_attitude_read_rc(&rc_sp, in_flight);
             if ( fms_is_enabled() ) {
-                /* copy phi and theta as received from fms */
-                booz2_guidance_h_rc_sp.phi = fms.command.h_sp.attitude.phi;
-                booz2_guidance_h_rc_sp.theta = fms.command.h_sp.attitude.theta;
-#if USE_FMS_YAW
-                /* yaw */
-                psi = (int32_t)ANGLE_FLOAT_OF_BFP(fms.command.h_sp.attitude.psi);
-                booz2_guidance_h_rc_sp.psi +=
-                    ((int32_t)psi * BOOZ_STABILIZATION_ATTITUDE_SP_MAX_R / MAX_PPRZ / RC_UPDATE_FREQ)
-                    << (ANGLE_REF_RES - INT32_ANGLE_FRAC);
-                ANGLE_REF_NORMALIZE(booz2_guidance_h_rc_sp.psi);
-#else
-                /* blank out yaw */
+                /* roll */
+                if (fms.enabled_mask & FMS_ROLL)
+                    booz2_guidance_h_rc_sp.phi = fms.command.h_sp.attitude.phi;
+                else
+                    booz2_guidance_h_rc_sp.phi = rc_sp.phi;
+                /* pitch */
+                if (fms.enabled_mask & FMS_PITCH)
+                    booz2_guidance_h_rc_sp.theta = fms.command.h_sp.attitude.theta;
+                else
+                    booz2_guidance_h_rc_sp.theta = rc_sp.theta;
+                /* FIXME: BLANK OUT heading */
                 booz2_guidance_h_rc_sp.psi = ahrs.ltp_to_body_euler.psi << (ANGLE_REF_RES - INT32_ANGLE_FRAC);
-#endif
-
             } else {
-                booz2_stabilization_attitude_read_rc(&booz2_guidance_h_rc_sp, in_flight);
+                EULERS_COPY(booz2_guidance_h_rc_sp, rc_sp);
             }
-            RunOnceEvery(10, {
-                debug_int32(booz2_guidance_h_rc_sp.psi);
-            });
             break;
     }
 
@@ -170,7 +161,7 @@ void booz2_guidance_on_rc_event(bool_t in_flight)
     switch (booz2_guidance_v_mode)
     {
         case BOOZ2_GUIDANCE_V_MODE_RC_DIRECT:
-            if ( fms_is_enabled() ) {
+            if ( fms_is_enabled() && fms.enabled_mask & FMS_THRUST ) {
                 booz2_guidance_v_rc_delta_t = fms.command.v_sp.direct;
             } else {
                 booz2_guidance_v_rc_delta_t = (int32_t)rc_values[RADIO_THROTTLE] * 200 / MAX_PPRZ;

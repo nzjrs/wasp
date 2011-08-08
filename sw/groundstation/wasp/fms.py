@@ -4,9 +4,9 @@ import gobject
 COMMAND_ACK             = "ACK"
 COMMAND_NACK            = "NACK"
 
-COMMAND_ERROR_PENDING   = 0
-COMMAND_ERROR_LOST      = 1
-COMMAND_ERROR_NACK      = 2
+COMMAND_ERROR_PENDING   = "Message In Flight"
+COMMAND_ERROR_LOST      = "Message Lost"
+COMMAND_ERROR_NACK      = "Message Not Acknowledged"
 
 CONTROL_REFRESH_FREQ    = 20
 
@@ -15,8 +15,9 @@ ID_PITCH                = 1
 ID_HEADING              = 2
 ID_THRUST               = 3
 
+ID_NAMES                = ["roll", "pitch", "heading", "thrust"]
+
 ID_LIST_FMS_ATTITUDE    = [ID_ROLL, ID_PITCH, ID_HEADING, ID_THRUST]
-ID_LIST_FMS_RC          = [ID_ROLL, ID_PITCH, ID_HEADING, ID_THRUST]
 
 ID_RC                   = 0
 ID_ATTITUDE             = 1
@@ -31,6 +32,9 @@ LIST_IDS                = [ID_RC, ID_ATTITUDE]
 LIST_TYPES              = [TYPE_RC, TYPE_ATTITUDE]
 LIST_RANGES             = [RANGE_RC, RANGE_ATTITUDE]
 
+#maps ID's to the enable mask value, keep in sync with FMSEnabledMask_T
+ENABLE_MASK             = [0x01, 0x02, 0x04, 0x08]
+
 LOG = logging.getLogger("wasp.fms")
 
 class _Command:
@@ -44,9 +48,9 @@ class _Command:
         #check we have not timed out
         if self.watch != None:
             if msg_name == COMMAND_ACK:
-                self.ok_cb()
+                self.ok_cb(self.msgid)
             elif msg_name == COMMAND_NACK:
-                self.failed_cb(COMMAND_ERROR_NACK)
+                self.failed_cb(self.msgid, COMMAND_ERROR_NACK)
             else:
                 raise Exception("Unknown message name (should be ACK or NACK)")
             #cancel timeout
@@ -55,7 +59,7 @@ class _Command:
     def _on_timeout(self, delete_myself_cb):
         #check we have not been cancelled
         if self.watch != None:
-            self.failed_cb(COMMAND_ERROR_LOST)
+            self.failed_cb(self.msgid, COMMAND_ERROR_LOST)
             delete_myself_cb(self.msgid)
         self.watch = None
         return False
@@ -83,7 +87,7 @@ class CommandManager:
             raise Exception("Can only send command messages")
 
         if msg.id in self.pending:
-            failed_cb(COMMAND_ERROR_PENDING)
+            failed_cb(msg.id, COMMAND_ERROR_PENDING)
         else:
             self.pending[msg.id] = _Command(msg.id, ok_cb, failed_cb, self._delete_command)
             self.communication.send_message(msg, values)
@@ -97,6 +101,8 @@ class ControlManager:
         #cache supported messages
         self._msg_fms_rc = messages_file["FMS_RC"]
         self._msg_fms_attitude = messages_file["FMS_ATTITUDE"]
+        self._msg_fms_on = messages_file["FMS_ON"]
+        self._msg_fms_off = messages_file["FMS_OFF"]
 
         #current message and args
         self._msg = None
@@ -109,6 +115,8 @@ class ControlManager:
             [t() for t in TYPE_RC],
             [t() for t in TYPE_ATTITUDE]
         ]
+        #enabled mask
+        self._enabled_mask = 0x00
 
         #corrections, trim
         self._corrections = [
@@ -118,17 +126,30 @@ class ControlManager:
 
     def _send_control(self):
         if self._msg != None and self._msg_id != None:
-            self.source.send_message(self._msg, self._sp[self._msg_id])
+            self.source.send_message(self._msg, (
+                            self._sp[self._msg_id][ID_ROLL],
+                            self._sp[self._msg_id][ID_PITCH],
+                            self._sp[self._msg_id][ID_HEADING],
+                            self._sp[self._msg_id][ID_THRUST],
+                            self._enabled_mask))
         return True
 
     def enable(self, enable=True):
         #if currently enabled and disabling then remove the source
         if self.enabled and not enable:
             gobject.source_remove(self._timeout_id)
+            self.source.send_command(self._msg_fms_off, ())
         #else if enabling and not currently enabled then add the source
         elif not self.enabled and enable:
             self._timeout_id = gobject.timeout_add(1000/CONTROL_REFRESH_FREQ, self._send_control)
+            self.source.send_command(self._msg_fms_on, ())
         self.enabled = enable
+
+    def enable_axis(self, _id):
+        self._enabled_mask |= ENABLE_MASK[_id]
+
+    def disable_axis(self, _id):
+        self._enabled_mask &= ~ENABLE_MASK[_id]
 
     def _generic_set(self, msg, _id, r, p, y, t):
         #apply corrections, cast to correct type, nd cache/store the result for later sending

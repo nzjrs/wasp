@@ -24,6 +24,8 @@ class Speak(plugin.Plugin, config.ConfigurableIface):
         source.connect("source-connected", self._source_connected)
         source.register_interest(self._on_status, 1, "STATUS")
 
+        self._batt_low_value = float(settings_file["BATTERY_CRITICAL_VOLTAGE"].value)
+
     def _speak(self, msg):
         if self._enabled != "1":
             return
@@ -53,7 +55,7 @@ class Speak(plugin.Plugin, config.ConfigurableIface):
         say = []
 
         #check battery voltage (in decivolts)
-        if bv < 100:
+        if bv < self._batt_low_value:
             say.append("low battery")
         #check RC is connected
         if rc != msg.get_field_by_name("rc").interpret_value_from_user_string("OK"):

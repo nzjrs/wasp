@@ -30,6 +30,7 @@
 #include "ins.h"
 #include "fms.h"
 #include "ahrs.h"
+#include "bomb.h"
 #include "analog.h"
 #include "altimeter.h"
 #include "settings.h"
@@ -38,6 +39,7 @@
 
 #include "generated/radio.h"
 #include "generated/messages.h"
+#include "generated/settings.h"
 
 bool_t
 comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
@@ -307,6 +309,11 @@ comm_autopilot_message_received (CommChannel_t chan, CommMessage_t *message)
         case MESSAGE_ID_GPIO_OFF:
             gpio_off( MESSAGE_GPIO_OFF_GET_FROM_BUFFER_id(message->payload) );
             break;
+#if BOMB_ENABLED
+        case MESSAGE_ID_BOMB_DROP:
+            bomb_drop();
+            break;
+#endif
         default:
             ret = FALSE;
             break;

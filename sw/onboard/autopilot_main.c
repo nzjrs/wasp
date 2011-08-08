@@ -32,6 +32,7 @@
 #include "supervision.h"
 
 #include "rc.h"
+#include "bomb.h"
 
 #include "comm.h"
 #include "comm_autopilot.h"
@@ -69,6 +70,10 @@ static inline void autopilot_main_init( void ) {
 
   supervision_init();
   actuators_init(ACTUATOR_BANK_MOTORS);
+
+#if BOMB_ENABLED
+  bomb_init_servo(RADIO_FMS, 0, 0);
+#endif
 
   rc_init();
 
@@ -136,6 +141,11 @@ static inline void autopilot_main_periodic( void ) {
     case 2:
         fms_periodic_task();
         break;
+#if BOMB_ENABLED
+    case 3:
+        bomb_periodic_task();
+        break;
+#endif
   }
 
   /* flash leds... */

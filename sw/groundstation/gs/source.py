@@ -11,6 +11,7 @@ import gs.config
 import gs.utils as utils
 
 import wasp
+import wasp.fms as fms
 import wasp.transport as transport
 import wasp.communication as communication
 import wasp.ui.treeview as treeview
@@ -60,9 +61,13 @@ class MessageCb:
         pass
 
 class _LogSqliteCb(MessageCb):
+
+    logfile = ""
+
     def __init__(self, logfile):
         if not logfile:
             logfile = gs.user_file_path("flight.sqlite")
+        self.logfile = logfile
 
         self._con = sqlite3.connect(
                         logfile,
@@ -88,10 +93,15 @@ class _LogSqliteCb(MessageCb):
             self._con = self._cur = None
 
 class _LogCsvCb(MessageCb):
+
+    logfile = ""
+
     def __init__(self, logfile, msg):
         if not logfile:
             logfile = gs.user_file_path(msg.name + ".csv")
-        self._f = open(logfile, 'w')
+        self.logfile = logfile
+
+        self._f = open(self.logfile, 'w')
 
         #print the CSV header
         header = ["time", "acid"] + [f.name for f in msg.fields]
@@ -155,6 +165,11 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
                 gobject.TYPE_INT]),         #The ACID of a detected UAV
             "uav-selected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
                 gobject.TYPE_INT]),         #The ACID of a selected UAV
+            "command-ok"   : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+                gobject.TYPE_INT]),         #The MSGID
+            "command-fail" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+                gobject.TYPE_INT,           #The MSGID
+                gobject.TYPE_STRING]),      #The error message of the failed command
     }
 
     def __init__(self, conf, messages, options, listen_acid=wasp.ACID_ALL):
@@ -180,6 +195,9 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         source_name, comm_klass, cmdline_config = communication.get_source(options.source)
         LOG.info("Source: %s" % comm_klass)
         self.communication = comm_klass(self._transport, self._messages_file, self._groundstation_header)
+
+        #manage commands that expect a reply
+        self._command_manager = fms.CommandManager(self.communication)
 
         #configure the class, updating with command line values
         self._default_config = self.communication.get_configuration_default()
@@ -252,6 +270,8 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         return self.STATUS_DISCONNECTED
 
     def register_csv_logger(self, logfilepath, *message_names):
+        """ Registers messages to be logged to a CSV file """
+        loggers = []
         #only allowed one CSV per message
         for m in message_names:
             msg = self._messages_file.get_message_by_name(m)
@@ -260,8 +280,12 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
 
             mcb = _LogCsvCb(logfilepath, msg)
             self._save_callback(msg, mcb)
+            loggers.append(mcb)
+
+        return loggers
 
     def register_sqlite_logger(self, logfilepath, *message_names):
+        """ Registers messages to be logged to a sqlite database """
         #the sqlite logger can store multiple messages in the same DB
         mcb = _LogSqliteCb(logfilepath)
         for m in message_names:
@@ -270,6 +294,8 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
                 LOG.critical("Unknown message: %s" % m)
 
             self._save_callback(msg, mcb)
+
+        return [mcb]
 
     def register_interest(self, cb, max_frequency, *message_names, **user_data):
         """
@@ -330,20 +356,36 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
 
 
     def get_rx_message_treestore(self):
+        """ Returns the gtk.TreeStore that holds recieved message details """
         return self._rxts
 
     def send_message(self, msg, values):
+        """ Sends a message to the UAV """
         if self.communication.is_connected():
             #FIXME: pass the header in here
             self.communication.send_message(msg, values)
 
+    def send_command(self, msg, vals):
+        """
+        Sends a command (a message that requires an ACK/NACK from the UAV). Emits command-ok or
+        command-fail signal when complete.
+        """
+        self._command_manager.send_command(
+                                msg, vals,
+                                lambda msgid: self.emit("command-ok", msgid),
+                                lambda msgid, error_code: self.emit("command-fail", msgid, error_code)
+        )
+
     def connect_to_uav(self):
+        """ Connects the communication to the UAV """
         self.communication.connect_to_uav()
 
     def disconnect_from_uav(self):
+        """ Disconnects the communication from the UAV """
         self.communication.disconnect_from_uav()
 
     def refresh_uav_info(self):
+        """ Requests information about the UAV, from the BUILD_INFO message """
         m = self._messages_file.get_message_by_name("BUILD_INFO")
         self.request_message(m.id)
 
@@ -369,6 +411,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         self.request_telemetry(message_name, 0.0);
 
     def quit(self):
+        """ Cleans up all resources, disconnects callbacks, etc """
         self.disconnect_from_uav()
         for cbs in self._callbacks.values():
             for cb in cbs:
@@ -382,6 +425,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         return self.communication.COMMUNICATION_TYPE, self.communication.get_connection_string()
 
     def get_messages_per_second(self):
+        """ Returns the number of messages received from the UAV per second """
         if self._linkok:
             try:
                 return 1.0/self._times.average()
@@ -390,6 +434,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         return 0.0
 
     def get_ping_time(self):
+        """ Returns the average round trip time to ping the UAV """
         if self._linkok:
             if self._sendping:
                 return self._pingtime

@@ -40,7 +40,7 @@ libwasp API
    :members:
    :undoc-members:
 
-.. automodule:: wasp.monitor
+.. automodule:: wasp.fms
    :members:
    :undoc-members:
 

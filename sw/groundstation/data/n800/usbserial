@@ -1,0 +1,6 @@
+#!/bin/sh
+
+/sbin/insmod /lib/usbserial.ko
+/sbin/insmod /lib/ftdi_sio.ko
+
+exit 0

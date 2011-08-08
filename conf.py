@@ -25,14 +25,10 @@ sys.path.append(os.path.join(os.path.abspath('.'),'sw','groundstation'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.todo', 'sphinx.ext.pngmath']
 
-# Add breathe for documenting code with doxygen, and xref for easier 
-# linking to external docs
+# Add breathe for documenting code with doxygen, xref for easier 
+# linking to external docs, and googleanalytics
 sys.path.append( "doc" )
-extensions += ["breathe","xref"]
-
-# Add a helper for making the generated docs more suitable for 
-# hosting on github
-# extensions += ["sphinxtogithub"]
+extensions += ["breathe","xref","googleanalytics"]
 
 ## Automatically document python code
 extensions += ['sphinx.ext.autodoc', 'sphinx.ext.autosummary']
@@ -106,22 +102,28 @@ pygments_style = 'sphinx'
 
 # -- Options for breath doxygen bridge -----------------------------------------
 breathe_projects = {
-    "onboard":"doc/built/onboard/xml/"
+    "onboard":"doc/built/onboard/xml/",
+    "archconfigarm7":"doc/built/archconfigarm7/xml/"
 }
 breathe_default_project = "onboard"
 
 # -- Options for xref documentation --------------------------------------------
 xref_links = {
-    "wasp": ("wasp", "http://github.com/nzjrs/wasp"),
+    "wasp": ("wasp", "http://waspuav.org"),
     "wasp-download": ("download", "http://github.com/nzjrs/wasp/downloads"),
     "osm-gps-map": ("osm-gps-map", "http://github.com/nzjrs/osm-gps-map")
     }
+
+# -- Options for googleanalytics -----------------------------------------------
+googleanalytics_id = "UA-3707626-6"
 
 # -- Options for HTML output ---------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'default'
+html_theme = 'nature'
+
+html_style = 'wasp-nature.css'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -150,7 +152,7 @@ html_theme = 'default'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['doc/static']
+html_static_path = ['doc/static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -177,7 +179,7 @@ html_theme = 'default'
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 #html_show_sphinx = True

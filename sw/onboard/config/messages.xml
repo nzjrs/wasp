@@ -33,11 +33,11 @@
      <field name="frequency" type="float"/>
    </message>
 
-   <message name="TIME" id="7">
+   <message name="TIME" id="7" doc="the UAV runtime since power-on">
      <field name="t" type="uint16"></field>
    </message>
 
-   <message name="STATUS" id="8">
+   <message name="STATUS" id="8" doc="the current state of the UAV">
      <field name="rc" type="uint8" values="@rc"/>
      <field name="gps" type="uint8" values="@gps"/>
      <field name="vsupply" type="uint8" unit="decivolt"/>
@@ -269,6 +269,7 @@
      <field name="pitch"   type="float"/>
      <field name="heading" type="float"/>
      <field name="thrust"  type="int32"/>
+     <field name="enabled" type="uint8"/>
    </message>
 
    <message name="FMS_RC" id="52">
@@ -276,6 +277,7 @@
      <field name="pitch"   type="int32"/>
      <field name="heading" type="int32"/>
      <field name="thrust"  type="int32"/>
+     <field name="enabled" type="uint8"/>
    </message>
 
    <message name="SP_ATTITUDE" id="53">
@@ -291,6 +293,8 @@
    <message name="DEBUG_INT32" id="56">
      <field name="value" type="int32"/>
    </message>
+
+   <message name="BOMB_DROP" id="57" command="1"/>
 
    <!-- Begin periodic messages -->
    <periodic channel="COMM_TELEMETRY" adjustable="2">

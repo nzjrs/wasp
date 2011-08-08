@@ -17,6 +17,10 @@ Prerequisites for Building
 
 Building and Running
 ********************
+First check out (and create) the correct branch::
+
+    $ git checkout -b sim origin/sim
+ 
 From the onboard directory::
 
     $ make ARCH=jsbsim TARGET=test/test_led_main
