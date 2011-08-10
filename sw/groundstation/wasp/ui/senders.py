@@ -24,7 +24,9 @@ class _MessageSender(gtk.HBox):
 class _MessageSenderModel(_MessageSender):
     def __init__(self, messagefile=None):
         _MessageSender.__init__(self)
+
         self._model = gtk.ListStore(str, object)
+        self._model.set_sort_column_id(0, gtk.SORT_ASCENDING)
 
         self._cb = gtk.ComboBox(self._model)
         cell = gtk.CellRendererText()
@@ -134,6 +136,7 @@ class _SettingsSender(gtk.HBox):
         gtk.HBox.__init__(self, spacing=4)
 
         self._model = gtk.ListStore(str, object)
+        self._model.set_sort_column_id(0, gtk.SORT_ASCENDING)
 
         self._cb = gtk.ComboBox(self._model)
         cell = gtk.CellRendererText()
