@@ -41,6 +41,16 @@ class TelemetryController(gs.ui.GtkBuilderWidget):
 
             gb = self.get_resource("graph_button")
             gb.connect("clicked", self.on_gb_clicked, rxtv)
+        else:
+            LOG.critical("No RX message_treestore")
+
+        self._request_dlg = gs.ui.window.DialogWindow(
+                                "Requrest Telemetry",
+                                hide=True,
+                                parent=self.mainwindow)
+        rm = senders.RequestTelemetrySender(self.messagesfile)
+        rm.connect("send-message", lambda _rm, _msg, _vals: self.source.send_message(_msg, _vals))
+        self._request_dlg.vbox.pack_start(rm, False, False)
 
     def on_gb_clicked(self, btn, tv):
         field = tv.get_selected_field()
@@ -54,15 +64,6 @@ class TelemetryController(gs.ui.GtkBuilderWidget):
             self.source.send_message(msg, vals)
 
     def request_telemetry(self):
-        dlg = gs.ui.window.DialogWindow(
-                                "Requrest Telemetry",
-                                parent=self.mainwindow)
-
-        rm = senders.RequestTelemetrySender(self.messagesfile)
-        rm.connect("send-message", lambda _rm, _msg, _vals: self.source.send_message(_msg, _vals))
-        dlg.vbox.pack_start(rm, False, False)
-
-        dlg.show_all()
-
+        self._request_dlg.show_all()
 
 
