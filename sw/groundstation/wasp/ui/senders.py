@@ -4,7 +4,7 @@ import gtk
 MESSAGE_NAME_REQUEST_TELEMETRY  = "REQUEST_TELEMETRY"
 MESSAGE_NAME_REQUEST_MESSAGE    = "REQUEST_MESSAGE"
 
-class _MessageSender(gtk.HBox):
+class _Sender(gtk.HBox):
 
     __gsignals__ = {
         "send-message" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
@@ -21,13 +21,14 @@ class _MessageSender(gtk.HBox):
     def request_send_message(self, msg):
         pass
 
-class _MessageSenderModel(_MessageSender):
-    def __init__(self, messagefile=None):
-        _MessageSender.__init__(self)
-
+class _SenderModel(_Sender):
+    def __init__(self, *args, **kwargs):
+        _Sender.__init__(self, *args, **kwargs)
         self._model = gtk.ListStore(str, object)
         self._model.set_sort_column_id(0, gtk.SORT_ASCENDING)
 
+class _SenderModelComboMixin:
+    def __init__(self):
         self._cb = gtk.ComboBox(self._model)
         cell = gtk.CellRendererText()
         self._cb.pack_start(cell, True)
@@ -41,6 +42,11 @@ class _MessageSenderModel(_MessageSender):
         self._btn.connect("clicked", self._on_btn_clicked)
         self.pack_start(self._btn, expand=False, fill=False)
 
+class _MessageSenderModel(_SenderModel,_SenderModelComboMixin):
+    def __init__(self, messagefile=None):
+        _SenderModel.__init__(self)
+        _SenderModelComboMixin.__init__(self)
+
         self.set_spacing(4)
         if messagefile:
             self.add_message_file(messagefile)
@@ -51,9 +57,9 @@ class _MessageSenderModel(_MessageSender):
             msg = self._model.get_value(_iter, 1)
             self.request_send_message(msg)
 
-class MessageSendButton(_MessageSender):
+class MessageSendButton(_Sender):
     def __init__(self, messagefile, messagename, button):
-        _MessageSender.__init__(self)
+        _Sender.__init__(self)
         self.msg = messagefile.get_message_by_name(messagename)
         self.pack_start(button)
         button.connect("clicked", self._on_btn_clicked)
@@ -124,32 +130,11 @@ class RequestTelemetrySender(RequestMessageSender):
     def request_send_message(self, msg):
         self.emit("send-message", self._rt, (msg.id, float(self._sb.get_value())))
 
-class _SettingsSender(gtk.HBox):
-
-    __gsignals__ = {
-        "send-message" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
-            gobject.TYPE_PYOBJECT,      #message
-            gobject.TYPE_PYOBJECT]),    #values (tuple)
-    }
+class _SettingsSender(_SenderModel,_SenderModelComboMixin):
 
     def __init__(self, settingsfile):
-        gtk.HBox.__init__(self, spacing=4)
-
-        self._model = gtk.ListStore(str, object)
-        self._model.set_sort_column_id(0, gtk.SORT_ASCENDING)
-
-        self._cb = gtk.ComboBox(self._model)
-        cell = gtk.CellRendererText()
-        self._cb.pack_start(cell, True)
-        self._cb.add_attribute(cell, 'text', 0)
-        self.pack_start(self._cb, expand=True, fill=True)
-
-        self._btn = gtk.Button( stock=gtk.STOCK_EXECUTE )
-        #Change stock icon label
-        #http://faq.pygtk.org/index.py?req=show&file=faq09.005.htp
-        self._btn.get_children()[0].get_children()[0].get_children()[1].set_text( self.BUTTON_TEXT )
-        self._btn.connect("clicked", self._on_btn_clicked)
-        self.pack_start(self._btn, expand=False, fill=False)
+        _SenderModel.__init__(self)
+        _SenderModelComboMixin.__init__(self)
 
         if messagefile:
             self.add_message_file(messagefile)
