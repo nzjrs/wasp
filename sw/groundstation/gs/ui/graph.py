@@ -68,11 +68,15 @@ class _GraphRange(gtk.VBox):
         masb = gtk.SpinButton(self.maxadj)
         masb.props.digits = 1
 
+        self.maxadj.connect("value-changed", self._on_adj_changed, graph, 1)
+
         mil = gtk.Label("Min:")
         self.minadj = gtk.Adjustment()
         self._update_adjustment(self.minadj)
         misb = gtk.SpinButton(self.minadj)
         misb.props.digits = 1
+
+        self.minadj.connect("value-changed", self._on_adj_changed, graph, 0)
 
         self.pack_start(mal, False)
         self.pack_start(masb, False)
@@ -90,8 +94,10 @@ class _GraphRange(gtk.VBox):
         self._update_adjustment(self.maxadj, value=max_, lower=min_, upper=(max_*1.5))
         self._update_adjustment(self.minadj, value=min_, lower=(min_*1.5), upper=max_)
 
-    def _on_max_spinbutton_changed(self, adj, graph):
-        pass
+    def _on_adj_changed(self, adj, graph, idx):
+        graph.handler_block_by_func(self._on_range_changed)
+        graph.rescale(adj.get_value(), idx)
+        graph.handler_unblock_by_func(self._on_range_changed)
 
 class GraphHolder(gtk.HBox):
     """
