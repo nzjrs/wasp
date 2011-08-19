@@ -199,11 +199,15 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
         #manage commands that expect a reply
         self._command_manager = fms.CommandManager(self.communication)
 
-        #configure the class, updating with command line values
+        #configure the class
+        #start with default values
         self._default_config = self.communication.get_configuration_default()
+        #replace those with configured values
+        self.update_state_from_config()
+        #replace those with command line values
         self._default_config.update(cmdline_config)
-        self.communication.configure_connection(**self._default_config)
         LOG.debug("Source config: %s" % self._default_config)
+        self.communication.configure_connection(**self._default_config)
 
         #attach the config UI
         self._config_gui = _SOURCE_CONFIG_GUIS.get(source_name, _SourceConfig)()
