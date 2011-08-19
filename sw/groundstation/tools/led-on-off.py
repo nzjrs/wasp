@@ -2,11 +2,17 @@
 # vim: ai ts=4 sts=4 et sw=4
 
 import time
+import sys
 import os.path
 import optparse
 import gobject
 
-import wasp
+try:
+    import wasp
+except ImportError:
+    sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),"..")))
+    import wasp
+
 import wasp.transport as transport
 import wasp.communication as communication
 import wasp.messages as messages
@@ -27,13 +33,14 @@ def cmd_fail(*args):
     source.disconnect_from_uav()
 
 def uav_connected(src, connected, msgs, cmd):
+    name, config = src.get_connection_parameters()
     if connected:
         global led, led_cmd
         msg = msgs.get_message_by_name("GPIO_%s" % led_cmd)
         cmd.send_command(msg, (led,), cmd_ok, cmd_fail)
-        name, config = src.get_connection_parameters()
         print "%s connected: %s" % (name, config)
     else:
+        print "%s disconnected: %s" % (name, config)
         global loop
         loop.quit()
 
@@ -56,12 +63,12 @@ if __name__ == "__main__":
     c = config.Config(filename=options.preferences)
 
     global source
+    global loop
+
+    loop = gobject.MainLoop()
     source = source.UAVSource(c, m, options)
     cmd = fms.CommandManager(source.communication)
     source.connect("source-connected", uav_connected, m, cmd)
     source.connect_to_uav()
-
-    global loop
-    loop = gobject.MainLoop()
     loop.run()
 
