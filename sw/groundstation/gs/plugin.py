@@ -44,9 +44,16 @@ class Plugin(object):
         return self.PLUGIN_VERSION
 
 class PluginManager:
-    def __init__(self, *plugin_dirs):
+    def __init__(self, *plugin_dirs, **kwargs):
         self._plugins = []
         self._plugins_failed = []
+
+        try:
+            plugin_whitelist = kwargs.get("plugin_whitelist").strip()
+            if plugin_whitelist == "": plugin_whitelist = None
+            plugin_whitelist = plugin_whitelist.split(",")
+        except AttributeError:        
+            plugin_whitelist = None
 
         #default plugin dir is ./plugins/
         if not plugin_dirs:
@@ -54,7 +61,7 @@ class PluginManager:
 
         for d in plugin_dirs:
             LOG.debug("Searching for plugins in %s" % d)
-            plugin_files = [x[:-3] for x in os.listdir(d) if x.endswith(".py")]
+            plugin_files = [x[:-3] for x in os.listdir(d) if x.endswith(".py") and (plugin_whitelist == None or x in plugin_whitelist)]
             sys.path.insert(0, d)
             for plugin in plugin_files:
                 LOG.debug("Importing %s" % plugin)

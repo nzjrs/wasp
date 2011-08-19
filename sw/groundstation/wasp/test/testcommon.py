@@ -57,6 +57,8 @@ XML = """<?xml version="1.0"?>
 </messages>"""
 NUM_MESSAGES = 6
 
+MESSAGE_NAME = "PONG"
+
 PONG_ID = 2
 PONG_NAME = "PONG"
 COMMAND_NAME = "ALTIMETER_RESET"

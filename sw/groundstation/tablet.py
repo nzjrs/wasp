@@ -15,6 +15,7 @@ import gs
 import gs.ui
 from gs.config import Config, ConfigurableIface
 from gs.source import UAVSource
+from gs.plugin import PluginManager
 from gs.ui import message_dialog
 from gs.ui.info import InfoBox
 from gs.ui.graph import Graph, GraphHolder, GraphManager
@@ -70,13 +71,17 @@ class TabletGraphManager(GraphManager):
 class UI(ConfigurableIface):
 
     CONFIG_SECTION = "MAIN"
+
     DEFAULT_COMMAND_BUTTON = "BOMB_DROP"
+    DEFAULT_ENABLED_PLUGINS = "none"
 
     def __init__(self, options, show_tabs=False):
 
         prefsfile = os.path.abspath(options.preferences)
         messagesfile = os.path.abspath(options.messages)
         settingsfile = os.path.abspath(options.settings)
+        plugindir = os.path.abspath(options.plugin_dir)
+        disable_plugins = options.disable_plugins
 
         if not os.path.exists(messagesfile):
             message_dialog("Could not find messages.xml", None, secondary=gs.CONFIG_DIR)
@@ -97,10 +102,14 @@ class UI(ConfigurableIface):
 
         self._config = Config(filename=prefsfile)
         ConfigurableIface.__init__(self, self._config)
-        self.autobind_config("command_button")
+        self.autobind_config("command_button","enabled_plugins")
 
         self._source = UAVSource(self._config, self._messagesfile, options)
         self._tm = TabletGraphManager(self._config, self._source, self._messagesfile, self)
+
+        self._plugin_manager = PluginManager(plugindir, plugin_whitelist=self._enabled_plugins)
+        if not disable_plugins:
+            self._plugin_manager.initialize_plugins(self._config, self._source, self._messagesfile, self._settingsfile, self)
 
         self._in_fullscreen = False
 
@@ -290,7 +299,7 @@ class UI(ConfigurableIface):
         self._notebook.set_current_page(0)
 
 if __name__ == "__main__":
-    parser = gs.get_default_command_line_parser(True, False, True, preferences_name="tablet.ini")
+    parser = gs.get_default_command_line_parser(True, True, True, preferences_name="tablet.ini")
     options, args = parser.parse_args()
     if gs.IS_WINDOWS:
         import gtk.gdk

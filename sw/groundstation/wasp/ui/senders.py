@@ -58,11 +58,13 @@ class _MessageSenderModel(_SenderModel,_SenderModelComboMixin):
             self.request_send_message(msg)
 
 class MessageSendButton(_Sender):
-    def __init__(self, messagefile, messagename, button):
+    def __init__(self, messagefile, messagename, button=None):
         _Sender.__init__(self)
         self.msg = messagefile.get_message_by_name(messagename)
-        self.pack_start(button)
+        if not button:
+            button = gtk.Button(self.msg.pretty_name)
         button.connect("clicked", self._on_btn_clicked)
+        self.pack_start(button)
 
     def _on_btn_clicked(self, btn):
         self.emit("send-message", self.msg, ())
@@ -97,9 +99,11 @@ class RequestMessageSender(_MessageSenderModel):
         self.emit("send-message", self._rm, (msg.id, ))
 
 class RequestMessageButton(MessageSendButton):
-    def __init__(self, messagefile, requestmessagename, button):
+    def __init__(self, messagefile, messagename, button=None):
+        self.msgid = messagefile[messagename].id
+        if not button:
+            button = gtk.Button("Request %s" % messagefile[messagename].pretty_name)
         MessageSendButton.__init__(self, messagefile, MESSAGE_NAME_REQUEST_MESSAGE, button)
-        self.msgid = messagefile[requestmessagename].id
 
     def _on_btn_clicked(self, btn):
         self.emit("send-message", self.msg, (self.msgid,))
@@ -130,38 +134,19 @@ class RequestTelemetrySender(RequestMessageSender):
     def request_send_message(self, msg):
         self.emit("send-message", self._rt, (msg.id, float(self._sb.get_value())))
 
-class _SettingsSender(_SenderModel,_SenderModelComboMixin):
-
-    def __init__(self, settingsfile):
-        _SenderModel.__init__(self)
-        _SenderModelComboMixin.__init__(self)
-
-        if messagefile:
-            self.add_message_file(messagefile)
-
-    def _on_btn_clicked(self, btn):
-        _iter = self._cb.get_active_iter()
-        if _iter:
-            msg = self._model.get_value(_iter, 1)
-            self.request_send_message(msg)
-
-    def add_message_file(self, messagefile):
-        raise NotImplementedError
-
-    def request_send_message(self, msg):
-        raise NotImplementedError
-
-
 if __name__ == "__main__":
-    w = gtk.Window()
-    rm = RequestMessageSender()
-    sm = SimpleMessageSender()
-    tm = RequestTelemetrySender()
+    from wasp.test.testcommon import get_mf, MESSAGE_NAME
 
+    mf = get_mf()
+
+    w = gtk.Window()
     vb = gtk.VBox()
-    vb.pack_start(rm)
-    vb.pack_start(sm)
-    vb.pack_start(tm)
+
+    vb.pack_start(RequestMessageSender(messagefile=mf))
+    vb.pack_start(SimpleMessageSender(messagefile=mf))
+    vb.pack_start(RequestTelemetrySender(messagefile=mf))
+    vb.pack_start(MessageSendButton(messagefile=mf,messagename=MESSAGE_NAME))
+    vb.pack_start(RequestMessageButton(messagefile=mf,messagename=MESSAGE_NAME))
 
     w.add(vb)
     w.show_all()

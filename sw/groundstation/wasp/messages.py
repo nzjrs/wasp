@@ -314,6 +314,14 @@ class PyMessage(Message):
         except KeyError:
             return None
 
+    def get_field_index(self, name):
+        i = -1
+        for f in self.fields:
+            i = i + 1
+            if f.name == name:
+                break
+        return i
+
     def get_field_values(self, vals):
         """
         Returns a list of values for each field in the message. The return
