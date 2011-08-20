@@ -16,13 +16,14 @@ class Speak(plugin.Plugin, config.ConfigurableIface):
     DEFAULT_ANNOUNCE_LOW_BATTERY = "1"
     DEFAULT_ANNOUNCE_BATTERY_VOLTAGE = "0"
     DEFAULT_ANNOUNCE_TELEMETRY = ""
+    DEFAULT_ANNOUNCE_STATUS = "0"
 
     def __init__(self, conf, source, messages_file, settings_file, groundstation_window):
         if not gs.utils.program_installed(self.EXECUTABLE):
             raise plugin.PluginNotSupported("%s not installed" % self.EXECUTABLE)
 
         config.ConfigurableIface.__init__(self, conf)
-        self.autobind_config("enabled","announce_low_battery","announce_battery_voltage","announce_telemetry")
+        self.autobind_config("enabled","announce_low_battery","announce_battery_voltage","announce_telemetry","announce_status")
         self.process = None
 
         source.connect("source-connected", self._source_connected)
@@ -59,6 +60,9 @@ class Speak(plugin.Plugin, config.ConfigurableIface):
                 )
 
     def _source_connected(self, source, *args):
+        if not int(self._announce_status):
+            return
+
         status = source.get_status()
         if status == source.STATUS_CONNECTED:
             self._speak("U.A.V: connected")
@@ -83,7 +87,8 @@ class Speak(plugin.Plugin, config.ConfigurableIface):
 
         #check RC is connected
         if rc != msg.get_field_by_name("rc").interpret_value_from_user_string("OK"):
-            say.append("R.C: lost")
+            if int(self._announce_status):
+                say.append("R.C: lost")
 
         if say:
             self._speak(" ... ".join(say))
@@ -92,6 +97,7 @@ class Speak(plugin.Plugin, config.ConfigurableIface):
         e = self.build_entry("announce_telemetry")
         items = [
             self.build_checkbutton("enabled"),
+            self.build_checkbutton("announce_status"),
             self.build_checkbutton("announce_low_battery"),
             self.build_checkbutton("announce_battery_voltage"),
             e
