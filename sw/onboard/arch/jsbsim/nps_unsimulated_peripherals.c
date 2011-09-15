@@ -11,6 +11,7 @@ void int_enable(void) {}
 void sys_time_init(void) {}
 void sys_time_chrono_start ( void ) {}
 uint32_t sys_time_chrono_stop ( void ) { return 0; }
+uint32_t sys_time_get_ticks ( void ) { return 0; }
 void sys_time_usleep ( uint32_t us ) {}
 void sys_time_calculate_cpu_usage ( void ) {}
 

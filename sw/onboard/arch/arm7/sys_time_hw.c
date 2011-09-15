@@ -122,6 +122,10 @@ uint32_t sys_time_chrono_stop ( void ) {
   return T0TC - chrono_start;
 }
 
+uint32_t sys_time_get_ticks( void ) {
+  return T0TC;
+}
+
 void sys_time_usleep(uint32_t us) {
   uint32_t start = T0TC;
   uint32_t ticks = SYS_TICS_OF_USEC(us);

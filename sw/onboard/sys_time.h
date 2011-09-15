@@ -46,6 +46,9 @@ sys_time_chrono_stop ( void );
 void
 sys_time_usleep ( uint32_t us );
 
+uint32_t
+sys_time_get_ticks(void);
+
 /**
  * Calculates an approximation of the CPU usage, assuming
  * this function is called immediately before 
