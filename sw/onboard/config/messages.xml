@@ -296,6 +296,21 @@
 
    <message name="BOMB_DROP" id="57" command="1"/>
 
+   <message name="WASP_STATE" id="58">
+   <field name="p"    type="int32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
+   <field name="q"    type="int32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
+   <field name="r"    type="int32" alt_unit="deg/s" alt_unit_coef="0.0139882"/>
+   <field name="ax"    type="int32" alt_unit="m/s2" alt_unit_coef="0.0009766"/>
+   <field name="ay"    type="int32" alt_unit="m/s2" alt_unit_coef="0.0009766"/>
+   <field name="az"    type="int32" alt_unit="m/s2" alt_unit_coef="0.0009766"/>
+   <field name="imu_phi"    type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+   <field name="imu_theta"  type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+   <field name="imu_psi"    type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
+   <field name="altitude" type="int32" alt_unit="mm"/>
+   <field name="t" type="uint16"/>
+   <field name="ticks" type="uint32"/>
+   </message>
+
    <!-- Begin periodic messages -->
    <periodic channel="COMM_TELEMETRY" adjustable="2">
       <message name="COMM_STATUS" frequency="0.25"/>

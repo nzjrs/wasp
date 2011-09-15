@@ -258,6 +258,26 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                     &y);
             }
             break;
+        case MESSAGE_ID_WASP_STATE:
+            {
+                uint32_t ticks = sys_time_get_ticks();
+                int32_t alt = altimeter_get_altitude();
+                MESSAGE_SEND_WASP_STATE(
+                        chan,
+                        &booz_imu.gyro.p,
+                        &booz_imu.gyro.q,
+                        &booz_imu.gyro.r,
+                        &booz_imu.accel.x,
+                        &booz_imu.accel.y,
+                        &booz_imu.accel.z,
+                        &ahrs.ltp_to_imu_euler.phi,
+                        &ahrs.ltp_to_imu_euler.theta,
+                        &ahrs.ltp_to_imu_euler.psi,
+                        &alt,
+                        &cpu_time_sec,
+                        &ticks);
+            }
+            break;
         default:
             ret = FALSE;
             break;
