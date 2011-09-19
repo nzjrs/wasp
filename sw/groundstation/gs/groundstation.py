@@ -151,6 +151,8 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
         #Track ok/failed command messages
         self._source.connect("command-ok", self._on_command_ok)
         self._source.connect("command-fail", self._on_command_fail)
+        #Track logging of source
+        self._source.connect("logging-started", self._on_logging_started)
 
         #Lazy initialize the following when first needed
         self._plane_view = None
@@ -361,6 +363,15 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
                             timeout=5)
             msg.show_all()
 
+    def _on_logging_started(self, source, loggers):
+        msg = self._msgarea.new_from_text_and_icon(
+                    "Logging Data Enabled",
+                    "Messages will be saved to %s in %s" % (
+                        ", ".join(['<a href="file://%s">%s</a>' % (l.logfile,os.path.basename(l.logfile)) for l in loggers]),
+                        '<a href="file://%s">%s</a>' % (os.path.dirname(loggers[0].logfile),os.path.basename(os.path.dirname(loggers[0].logfile)))),
+                    timeout=5)
+        msg.show_all()
+
     def on_menu_item_log_uav_data_activate(self, *args):
         sw = self.get_resource("log_message_scrolledwindow")
         tv = MessageTreeView(
@@ -382,24 +393,16 @@ class Groundstation(GtkBuilderWidget, ConfigurableIface):
             messages = [m.name for m in tv.get_all_selected_messages()]
             if messages:
                 if csv.get_active():
-                    loggers = self._source.register_csv_logger(None, *messages)
+                    self._source.register_csv_logger(None, *messages)
                 else:
-                    loggers = self._source.register_sqlite_logger(None, *messages)
-
-                msg = self._msgarea.new_from_text_and_icon(
-                                "Logging Data Enabled",
-                                "Messages will be saved to %s in %s" % (
-                                    ", ".join(['<a href="file://%s">%s</a>' % (l.logfile,os.path.basename(l.logfile)) for l in loggers]),
-                                    '<a href="file://%s">%s</a>' % (os.path.dirname(loggers[0].logfile),os.path.basename(os.path.dirname(loggers[0].logfile)))),
-                                timeout=5)
+                    self._source.register_sqlite_logger(None, *messages)
             else:
                 msg = self._msgarea.new_from_text_and_icon(
-                                "Logging Data Failed",
-                                "You must select messages to be logged",
-                                message_type=gtk.MESSAGE_ERROR,
-                                timeout=5)
-
-            msg.show_all()
+                            "Logging Data Failed",
+                            "You must select messages to be logged",
+                            message_type=gtk.MESSAGE_ERROR,
+                            timeout=5)
+                msg.show_all()
 
         sw.remove(tv)
 

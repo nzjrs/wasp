@@ -4,8 +4,9 @@ import sys
 import logging
 import gtk
 
-import gs.config as config
+import gs
 import gs.ui.rtgraph as rtgraph
+import gs.config as config
 
 LOG = logging.getLogger("graph")
 
@@ -110,7 +111,7 @@ class GraphHolder(gtk.HBox):
      [    \ ]  | range widgets
     """
 
-    def __init__(self, g, name, adjustable, on_pause, on_print, on_remove, on_fullscreen):
+    def __init__(self, g, name, adjustable, on_pause, on_print, on_remove, on_fullscreen, on_log_data):
         gtk.HBox.__init__(self, spacing=5)
 
         self.graph = g
@@ -135,21 +136,25 @@ class GraphHolder(gtk.HBox):
         vb.pack_start(bbox, True, True)
 
         if on_pause:
-            pa = gtk.Button(stock=gtk.STOCK_MEDIA_PAUSE)
-            pa.connect("clicked", on_pause, tweak)
-            bbox.pack_start(pa, False, False)
+            b = gs.ui.get_button(stock=gtk.STOCK_MEDIA_PAUSE, xalign=0)
+            b.connect("clicked", on_pause, tweak)
+            bbox.pack_start(b, False, False)
         if on_print:
-            pr = gtk.Button(stock=gtk.STOCK_PRINT)
-            pr.connect("clicked", on_print, g, name)
-            bbox.pack_start(pr, False, False)
+            b = gs.ui.get_button(stock=gtk.STOCK_PRINT, xalign=0)
+            b.connect("clicked", on_print, g, name)
+            bbox.pack_start(b, False, False)
         if on_remove:
-            rm = gtk.Button(stock=gtk.STOCK_REMOVE)
-            rm.connect("clicked", on_remove, name)
-            bbox.pack_start(rm, False, False)
+            b = gs.ui.get_button(stock=gtk.STOCK_REMOVE, xalign=0)
+            b.connect("clicked", on_remove, name)
+            bbox.pack_start(b, False, False)
         if on_fullscreen:
-            fs = gtk.Button(stock=gtk.STOCK_FULLSCREEN)
-            fs.connect("clicked", on_fullscreen, name)
-            bbox.pack_start(fs, False, False)
+            b = gs.ui.get_button(stock=gtk.STOCK_FULLSCREEN, xalign=0)
+            b.connect("clicked", on_fullscreen, name)
+            bbox.pack_start(b, False, False)
+        if on_log_data:
+            b = gs.ui.get_button("Log Message",image_stock=gtk.STOCK_FILE, xalign=0)
+            b.connect("clicked", on_log_data, name)
+            bbox.pack_start(b, False, False)
 
         if adjustable:
             r = _GraphRange(g)
@@ -169,6 +174,9 @@ class GraphManager(config.ConfigurableIface):
         self._box = box
         self._main_window = main_window
         self._graphs = {}
+
+    def _on_log_data(self, sender, name):
+        self._source.register_csv_logger(None, name.split(':')[0])
 
     def _on_pause(self, sender, tweakScrollRate):
         if tweakScrollRate:
@@ -249,7 +257,8 @@ class GraphManager(config.ConfigurableIface):
                     self._on_pause,
                     self._on_print,
                     self._on_remove,
-                    self._on_fullscreen)
+                    self._on_fullscreen,
+                    self._on_log_data)
 
             self._box.pack_start(gh)
             self._graphs[name] = gh

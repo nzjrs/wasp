@@ -68,12 +68,18 @@ def get_icon_image(name=None, stock=None, size=gtk.ICON_SIZE_DIALOG):
     else:
         return gtk.image_new_from_pixbuf(get_icon_pixbuf(name, stock, size))
 
-def get_button(label, stock=None, image_name=None, image_stock=None):
+def get_button(label="", stock=None, image_name=None, image_stock=None, xalign=0.5):
     if stock:
-        return gtk.Button(stock=stock)
+        b = gtk.Button(stock=stock)
+    elif label:
+        b = gtk.Button(label=label)
+    else:
+        raise TypeError("Must specify label or stock")
 
-    b = gtk.Button(label=label)
-    b.set_image(get_icon_image(name=image_name, stock=image_stock, size=gtk.ICON_SIZE_BUTTON))
+    b.props.xalign = xalign
+
+    if image_name or image_stock:
+        b.set_image(get_icon_image(name=image_name, stock=image_stock, size=gtk.ICON_SIZE_BUTTON))
     return b
 
 def get_ui_file(name):

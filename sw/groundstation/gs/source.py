@@ -165,6 +165,8 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
                 gobject.TYPE_INT]),         #The ACID of a detected UAV
             "uav-selected" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
                 gobject.TYPE_INT]),         #The ACID of a selected UAV
+            "logging-started" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
+                gobject.TYPE_PYOBJECT]),    #A list of logger objects
             "command-ok"   : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
                 gobject.TYPE_INT]),         #The MSGID
             "command-fail" : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [
@@ -286,7 +288,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
             self._save_callback(msg, mcb)
             loggers.append(mcb)
 
-        return loggers
+        self.emit("logging-started", loggers)
 
     def register_sqlite_logger(self, logfilepath, *message_names):
         """ Registers messages to be logged to a sqlite database """
@@ -299,7 +301,7 @@ class UAVSource(gs.config.ConfigurableIface, gobject.GObject):
 
             self._save_callback(msg, mcb)
 
-        return [mcb]
+        self.emit("logging-started", [mcb])
 
     def register_interest(self, cb, max_frequency, *message_names, **user_data):
         """

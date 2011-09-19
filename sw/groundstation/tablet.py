@@ -42,6 +42,7 @@ class TabletGraphManager(GraphManager):
     def __init__(self, conf, source, messages, ui):
         GraphManager.__init__(self, conf, source, messages, None, None)
         self._ui = ui
+        self._source = source
 
     def add_graph(self, msg, field, adjustable=True, double_buffer=False):
         name = "%s:%s" % (msg.name, field.name)
@@ -56,7 +57,8 @@ class TabletGraphManager(GraphManager):
                     None,#self._on_pause,
                     None,#self._on_print,
                     self._on_remove,
-                    None)#self._on_fullscreen)
+                    None,#self._on_fullscreen,
+                    self._on_log_data)
 
             gh.show_all()
             self._ui.add_page(name, gh)
@@ -67,6 +69,9 @@ class TabletGraphManager(GraphManager):
         gh.graph.delete()
         self._ui.remove_page(gh)
         del(self._graphs[name])
+
+    def _on_log_data(self, sender, name):
+        self._source.register_csv_logger(None, name.split(':')[0])
 
 class UI(ConfigurableIface):
 
