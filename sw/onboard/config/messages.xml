@@ -307,6 +307,7 @@
    <field name="imu_theta"  type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
    <field name="imu_psi"    type="int32" alt_unit="degres" alt_unit_coef="0.0139882"/>
    <field name="altitude" type="int32" alt_unit="mm"/>
+   <field name="altitude_raw" type="uint16"/>
    <field name="t" type="uint16"/>
    <field name="ticks" type="uint32"/>
    </message>

@@ -274,6 +274,7 @@ comm_autopilot_message_send ( CommChannel_t chan, uint8_t msgid )
                         &ahrs.ltp_to_imu_euler.theta,
                         &ahrs.ltp_to_imu_euler.psi,
                         &alt,
+                        &altimeter_calibration_raw,
                         &cpu_time_sec,
                         &ticks);
             }
